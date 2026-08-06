@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import environ
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,15 +28,20 @@ environ.Env.read_env(
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
-
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS",
-    default=[]
+SECRET_KEY = env(
+    "SECRET_KEY",
+    default="development-secret-key"
 )
+
+
+DEBUG = env.bool(
+    "DEBUG",
+    default=True
+)
+
+ALLOWED_HOSTS = [
+    "*"
+]
 
 
 # Application definition
@@ -63,6 +69,7 @@ AUTH_USER_MODEL = "accounts.User"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -71,9 +78,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
-import os
-
-GOOGLE_CLIENT_ID = "214483159563-udmvatts6d2uj0gcj5u1ua0qave2rkdm.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = env(
+    "GOOGLE_CLIENT_ID",
+    default=""
+)
 
 TEMPLATES = [
     {
@@ -98,9 +106,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+
 DATABASES = {
-    "default": env.db(
-        "DATABASE_URL",
+    "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
     )
 }

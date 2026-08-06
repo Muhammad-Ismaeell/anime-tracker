@@ -9,6 +9,7 @@ colorama==0.4.6
 coverage==7.15.3
 cryptography==49.0.0
 defusedxml==0.7.1
+dj-database-url==3.1.2
 dj-rest-auth==7.2.0
 Django==5.2.13
 django-allauth==65.18.0
@@ -62,3 +63,4 @@ typing_extensions==4.16.0
 tzdata==2026.1
 uritemplate==4.2.0
 urllib3==2.7.0
+whitenoise==6.12.0
