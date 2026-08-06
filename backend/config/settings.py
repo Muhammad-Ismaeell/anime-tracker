@@ -177,27 +177,19 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Anime Tracker API",
+    "DESCRIPTION": """
+    Anime Tracker backend API.
+
+    Features:
+    - User authentication with JWT
+    - Google OAuth login
+    - Anime search and discovery
+    - Favorites
+    - Personal library tracking
+    - Reviews and ratings
+    - User activity feed
+    """,
     "VERSION": "1.0.0",
-
-    "SERVE_INCLUDE_SCHEMA": False,
-
-    "COMPONENT_SPLIT_REQUEST": True,
-
-    "SECURITY": [
-        {
-            "BearerAuth": []
-        }
-    ],
-
-    "COMPONENTS": {
-        "securitySchemes": {
-            "BearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-            }
-        }
-    },
 }
 
 
