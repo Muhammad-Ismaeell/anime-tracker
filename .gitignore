@@ -12,7 +12,7 @@ backend/media/
 
 # Environment
 backend/.env
-frontend/.env
+anime-frontend/.env
 
 # Node
 anime-frontend/node_modules/
