@@ -13,7 +13,7 @@ function Navbar() {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
 
-    const debouncedQuery = useDebounce(query, 700);
+    const debouncedQuery = useDebounce(query, 500);
 
     const {
         data: results = [],
@@ -32,10 +32,52 @@ function Navbar() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(()=>{
+
+        const handleEscape = (e)=>{
+
+            if(e.key === "Escape"){
+                setOpen(false);
+            }
+
+        };
+
+
+        window.addEventListener(
+            "keydown",
+            handleEscape
+        );
+
+
+        return ()=>{
+
+            window.removeEventListener(
+                "keydown",
+                handleEscape
+            );
+
+        };
+
+
+    },[]);
+
     const handleSelect = (anime) => {
+
+        const id =
+            anime.id ||
+            anime.mal_id;
+
+
+        if(!id) return;
+
+
         setOpen(false);
+
         setQuery("");
-        navigate(`/anime/${anime.id || anime.mal_id}`);
+
+
+        navigate(`/anime/${id}`);
+
     };
 
     return (
@@ -54,29 +96,50 @@ function Navbar() {
 
                 <input
                     value={query}
+
                     onChange={(e) => {
                         setQuery(e.target.value);
                         setOpen(true);
                     }}
+
                     onFocus={() => setOpen(true)}
-                    placeholder="Search anime..."
+
+                    onKeyDown={(e)=>{
+
+                        if(
+                            e.key === "Enter" &&
+                            query.trim()
+                        ){
+
+                            setOpen(false);
+
+                            navigate(
+                                `/search?q=${query.trim()}`
+                            );
+
+                        }
+
+                    }}
+
+                    placeholder="🔎 Search anime..."
+
                     className="navbar-search-input"
                 />
 
                 {/* DROPDOWN */}
-                {open && query.trim().length > 1 && (
+                {open && query.trim().length >= 3 && (
                     <div className="navbar-dropdown">
 
                         {isLoading ? (
 
                             <div className="navbar-message">
-                                Searching...
+                                🔎 Searching anime...
                             </div>
 
                         ) : results.length === 0 ? (
 
                             <div className="navbar-message">
-                                No results
+                                😢 No anime found
                             </div>
 
                         ) : (
@@ -111,7 +174,9 @@ function Navbar() {
                             className="navbar-view-all"
                             onClick={() => {
                                 setOpen(false);
-                                navigate(`/search?q=${query}`);
+                                navigate(
+                                    `/search?q=${query.trim()}`
+                                );
                             }}
                         >
                             View all results →
