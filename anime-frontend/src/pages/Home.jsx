@@ -1,232 +1,283 @@
-import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
-import AnimeCard from "../components/AnimeCard";
-import PageContainer from "../components/ui/PageContainer";
-import { useToggleFavorite, useFavorites } from "../hooks/user/useFavorites";
-import { normalizeAnime } from "../utils/normalizeAnime";
-import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
+
+import PageContainer from "../components/ui/PageContainer";
+import AnimeSection from "../components/ui/AnimeSection";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
-function Home() {
 
-    const trendingQuery = useInfiniteAnime("trending");
-    const seasonalQuery = useInfiniteAnime("seasonal");
-    const topQuery = useInfiniteAnime("top");
-    const toggleFavorite = useToggleFavorite();
-    const { statusMap } = useGlobalLibrary();
-    const { data: favoritesRes } = useFavorites();
+import { useToggleFavorite, useFavorites } 
+from "../hooks/user/useFavorites";
+
+import { useGlobalLibrary } 
+from "../hooks/useGlobalLibrary";
+
+import { normalizeAnime } 
+from "../utils/normalizeAnime";
+
+
+function Home(){
+
+
+    const trendingQuery =
+        useInfiniteAnime("trending");
+
+    const seasonalQuery =
+        useInfiniteAnime("seasonal");
+
+    const topQuery =
+        useInfiniteAnime("top");
+
+
+    const toggleFavorite =
+        useToggleFavorite();
+
+
+    const {statusMap} =
+        useGlobalLibrary();
+
+
+    const {data:favoritesRes} =
+        useFavorites();
+
+
 
     const favoriteIds = new Set(
-        Array.isArray(favoritesRes?.results)
-            ? favoritesRes.results.map(f =>
-                String(f.anime?.mal_id ?? f.anime_id)
-            )
-            : []
-    );
-        
-    if (trendingQuery.isLoading || seasonalQuery.isLoading || topQuery.isLoading) {
-        return (
-            <PageContainer>
-                <div className="grid">
-                    {Array.from({ length: 12 }).map((_, i) => (
-                        <AnimeCardSkeleton key={i} />
-                    ))}
-                </div>
-            </PageContainer>
-        );
-    }
 
-    if (
-        trendingQuery.error ||
-        seasonalQuery.error ||
-        topQuery.error
-    ) {
-        return (
-            <PageContainer>
-                <EmptyState text="Failed to load anime." />
-            </PageContainer>
-        );
-    }
-        
-    const normalizeList = (list) => {
+        favoritesRes?.results?.map(
+            fav =>
+            String(
+                fav.anime?.mal_id ??
+                fav.anime_id
+            )
+        )
+        ??
+        []
+
+    );
+
+
+
+    const extractAnime = (query)=>{
+
+
+        const pages =
+            query.data?.pages ?? [];
+
 
         const map = new Map();
 
-        list.forEach(item => {
 
-            const anime = normalizeAnime(item);
 
-            const id = anime?.id || anime?.mal_id || anime?.anime_id;
-            if (!id) return;
+        pages.forEach(page=>{
 
-                map.set(String(id), {
-                    ...anime,
-                    id
-                });
+
+            const items =
+                page.items ??
+                page.data ??
+                [];
+
+
+
+            items.forEach(item=>{
+
+
+                const anime =
+                    normalizeAnime(item);
+
+
+                if(anime?.id){
+
+                    map.set(
+                        String(anime.id),
+                        anime
+                    );
+
+                }
+
+            });
+
+
         });
 
-        return Array.from(map.values());
+
+
+        return Array.from(
+            map.values()
+        );
+
     };
 
-    const extractList = (query) => {
-        const pages = query?.data?.pages;
 
-        if (!Array.isArray(pages)) return [];
 
-        return pages.flatMap((p) => {
-            if (!p) return [];
 
-            if (Array.isArray(p.items)) return p.items;
-            if (Array.isArray(p.data)) return p.data;
+    const loading =
+        trendingQuery.isLoading ||
+        seasonalQuery.isLoading ||
+        topQuery.isLoading;
 
-            return [];
-        });
-    };
 
-    const trending = extractList(trendingQuery);
-    const seasonal = extractList(seasonalQuery);
-    const top = extractList(topQuery);
 
-    const trendingAnime = normalizeList(trending);
-    const seasonalAnime = normalizeList(seasonal);
-    const topAnime = normalizeList(top);
-    return (
-        <PageContainer>
-            
-            <Helmet>
-                <title>Anime Tracker | Home</title>
+    const error =
+        trendingQuery.error ||
+        seasonalQuery.error ||
+        topQuery.error;
 
-                <meta
-                    name="description"
-                    content="Discover trending, seasonal and top rated anime."
+
+
+    if(error){
+
+        return (
+
+            <PageContainer>
+
+                <EmptyState
+                    text="Failed to load anime."
                 />
-            </Helmet>
 
-            {/* Trending */}
-            <section className="home-section">
+            </PageContainer>
 
-                <div className="section-header">
-                    <h1>🔥 Trending Anime</h1>
-                    <Link
-                        to="/trending"
-                        className="view-all-btn"
-                    >
-                        View All →
-                    </Link>
-                </div>
+        );
 
-                <div className="grid">
+    }
 
-                    {trendingAnime.slice(0, 8).map(anime => {
 
-                        const liked = favoriteIds.has(anime.id)
 
-                        return (
-                            <AnimeCard
-                                key={anime.id}
-                                anime={anime}
-                                statusMap={statusMap}
-                                isFavorited={liked}
-                                onToggleFavorite={() =>
-                                    toggleFavorite.mutate({
-                                        anime_id: anime.id ?? anime.mal_id,
-                                        title: anime.title,
-                                        image: anime.image,
-                                    })
-                                }
-                            />
-                        );
-                    })}
+    return (
 
-                </div>
+<PageContainer>
 
-            </section>
 
-            {/* Seasonal */}
-            <section className="home-section">
+<Helmet>
 
-                <div className="section-header">
-                    <h1>🌸 Current Season</h1>
-                    <Link
-                        to="/seasonal"
-                        className="view-all-btn"
-                    >
-                        View All →
-                    </Link>
-                </div>
+<title>
+Anime Tracker
+</title>
 
-                <div className="grid">
 
-                    {seasonalAnime.slice(0, 8).map(anime => {
+<meta
+name="description"
+content="Discover trending and seasonal anime."
+/>
 
-                        const liked = favoriteIds.has(anime.id)
+</Helmet>
 
-                        return (
-                            <AnimeCard
-                                key={anime.id}
-                                anime={anime}
-                                statusMap={statusMap}
-                                isFavorited={liked}
-                                onToggleFavorite={() =>
-                                    toggleFavorite.mutate({
-                                        anime_id: anime.id ?? anime.mal_id,
-                                        title: anime.title,
-                                        image: anime.image,
-                                    })
-                                }
-                            />
-                        );
-                    })}
 
-                </div>
 
-            </section>
+<section className="home-hero">
 
-            <section className="home-section">
 
-                <div className="section-header">
+<h1>
+Discover Your Next Anime
+</h1>
 
-                    <h1>⭐ Top Rated Anime</h1>
 
-                    <Link
-                        to="/top"
-                        className="view-all-btn"
-                    >
-                        View All →
-                    </Link>
+<p>
+Track, save and explore your favorite shows.
+</p>
 
-                </div>
 
-                <div className="grid">
+</section>
 
-                    {topAnime.slice(0, 8).map(anime => {
 
-                        const liked = favoriteIds.has(anime.id)
 
-                        return (
-                            <AnimeCard
-                                key={anime.id}
-                                anime={anime}
-                                statusMap={statusMap}
-                                isFavorited={liked}
-                                onToggleFavorite={() =>
-                                    toggleFavorite.mutate({
-                                        anime_id: anime.id ?? anime.mal_id,
-                                        title: anime.title,
-                                        image: anime.image,
-                                    })
-                                }
-                            />
-                        );
-                    })}
 
-                </div>
+{
+loading ?
 
-            </section>
+<div className="grid">
 
-        </PageContainer>
-    );
+{
+Array.from({
+length:12
+})
+.map((_,i)=>(
+
+<AnimeCardSkeleton
+key={i}
+/>
+
+))
 }
+
+</div>
+
+
+:
+
+<>
+
+
+<AnimeSection
+
+title="Trending Anime"
+
+emoji="🔥"
+
+animeList={
+extractAnime(trendingQuery)
+}
+
+statusMap={statusMap}
+
+favoriteIds={favoriteIds}
+
+toggleFavorite={toggleFavorite}
+
+/>
+
+
+
+<AnimeSection
+
+title="Current Season"
+
+emoji="🌸"
+
+animeList={
+extractAnime(seasonalQuery)
+}
+
+statusMap={statusMap}
+
+favoriteIds={favoriteIds}
+
+toggleFavorite={toggleFavorite}
+
+/>
+
+
+
+<AnimeSection
+
+title="Top Rated Anime"
+
+emoji="⭐"
+
+animeList={
+extractAnime(topQuery)
+}
+
+statusMap={statusMap}
+
+favoriteIds={favoriteIds}
+
+toggleFavorite={toggleFavorite}
+
+/>
+
+
+</>
+
+}
+
+
+</PageContainer>
+
+    );
+
+}
+
 
 export default Home;
