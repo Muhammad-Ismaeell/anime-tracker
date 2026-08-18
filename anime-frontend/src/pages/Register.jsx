@@ -18,7 +18,7 @@ export default function Register() {
             { username, password, email },
             {
                 onSuccess: (res) => {
-                    const { access, refresh, user } = res.data;
+                    const { access, refresh} = res.data;
 
                     // auto login after register
                     login(access, refresh);

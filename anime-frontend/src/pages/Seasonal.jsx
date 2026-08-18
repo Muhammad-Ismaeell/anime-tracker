@@ -1,7 +1,6 @@
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import AnimeCard from "../components/AnimeCard";
 import PageContainer from "../components/ui/PageContainer";
-import { normalizeAnime } from "../utils/normalizeAnime";
 import { useEffect } from "react";
 function Seasonal() {
     useEffect(() => {
@@ -25,7 +24,6 @@ function Seasonal() {
 
     const anime = data?.anime || [];
 
-    const normalized = anime.map(normalizeAnime);
 
     return (
         <PageContainer>

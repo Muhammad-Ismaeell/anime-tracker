@@ -1,12 +1,11 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import App from "./app/router";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import AuthProvider from "./context/AuthContext";
-import ThemeProvider from "./context/ThemeContext";
+import AuthProvider from "./context/AuthProvider";
+import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import {

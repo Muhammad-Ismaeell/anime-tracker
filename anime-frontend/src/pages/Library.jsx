@@ -5,7 +5,6 @@ import { useLibrary } from "../hooks/useLibrary";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import { Helmet } from "react-helmet-async";
 import PageContainer from "../components/ui/PageContainer";
-import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import LibrarySection from "../components/library/LibrarySection";
 import EmptyState from "../components/ui/EmptyState";
 function Library() {
@@ -20,16 +19,14 @@ function Library() {
         refetch
     } = useLibrary();
 
-    const library = data?.pages?.flatMap(
-        page => page.results || []
-    ) || [];
-
     const grouped = useMemo(() => {
+        const library =
+            data?.pages?.flatMap(
+                page => page.results || []
+            ) || [];
 
         return library.reduce((acc, item) => {
-
-            const status =
-                (item.status || "").toLowerCase();
+            const status = (item.status || "").toLowerCase();
 
             if (!acc[status]) {
                 acc[status] = [];
@@ -38,15 +35,14 @@ function Library() {
             acc[status].push(item);
 
             return acc;
-
         }, {
             watching: [],
             completed: [],
             plan_to_watch: [],
-            dropped: []
+            dropped: [],
         });
+    }, [data]);
 
-    }, [library]);
 
     // ---------------- LOADING ----------------
     if (isLoading) {

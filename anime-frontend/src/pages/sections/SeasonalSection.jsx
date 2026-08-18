@@ -1,7 +1,7 @@
 import { useAnimeFeed } from "../../hooks/anime/useAnimeFeed";
 import AnimeCard from "../../components/AnimeCard";
 import { useFavorites } from "../../hooks/user/useFavorites";
-
+import Section from "../../components/ui/Section";
 function SeasonalSection() {
 
     const { data, isLoading } = useAnimeFeed("seasonal");

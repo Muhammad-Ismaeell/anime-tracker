@@ -7,8 +7,6 @@ import {
     useUserReviews,
     useReviewAnalytics,
     useTopRatedAnime,
-    useCreateReview,
-    useDeleteReview,
     useUpdateReview
 } from "../hooks/user/useReview";
 import OptimizedImage from "../components/ui/OptimizedImage";

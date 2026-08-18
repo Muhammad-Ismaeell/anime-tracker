@@ -1,6 +1,6 @@
 import PageContainer from "../components/ui/PageContainer";
 import { useDashboard } from "../hooks/user/useDashboard";
-
+import EmptyState from "../components/ui/EmptyState";
 function Dashboard() {
 
     const {

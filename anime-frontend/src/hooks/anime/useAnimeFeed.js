@@ -1,13 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { AnimeAPI } from "../../api/anime.api";
-import { queryKeys } from "../../queries/keys";
 
-const endpoints = {
-
-    trending: "/anime/trending/",
-    seasonal: "/anime/seasonal/",
-    top: "/anime/top/",
-};
 
 export function useAnimeFeed(type) {
 

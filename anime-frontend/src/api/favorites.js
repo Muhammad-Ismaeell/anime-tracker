@@ -1,8 +1,4 @@
 import api from "./client";
-import {
-    normalizeListResponse,
-    normalizeObjectResponse
-} from "../lib/normalize";
 
 export const FavoriteAPI = {
 

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-
+import EmptyState from "../components/ui/EmptyState";
 import PageContainer from "../components/ui/PageContainer";
 import ReviewSection from "../components/review/ReviewSection";
 import AnimeDetailSkeleton from "../components/skeletons/AnimeDetailSkeleton";

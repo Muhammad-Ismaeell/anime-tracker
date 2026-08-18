@@ -5,10 +5,8 @@ import { useAnimeSearch } from "../hooks/useAnimeSearch";
 import { useDebouncedSearch } from "../hooks/useDebouncedSearch";
 import { AnimeSkeleton } from "../components/skeletons/AnimeSkeleton";
 import AnimeCard from "../components/AnimeCard";
-import { normalizeAnime } from "../utils/normalizeAnime";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-import EmptyState from "../components/ui/EmptyState";
-
+import { Helmet } from "react-helmet-async";
 export default function Search() {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -18,7 +16,7 @@ export default function Search() {
     const [query, setQuery] = useState(params.get("q") || "");
     const debouncedQuery = useDebouncedSearch(query, 700);
 
-    const [filters, setFilters] = useState({
+    const [filters] = useState({
         type: params.get("type") || "",
         season: params.get("season") || "",
         year: params.get("year") || ""

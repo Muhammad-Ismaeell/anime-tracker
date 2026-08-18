@@ -5,23 +5,8 @@ import AnimeCard from "../components/AnimeCard";
 import PageContainer from "../components/ui/PageContainer";
 import { useToggleFavorite } from "../hooks/user/useFavorites";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-import { normalizeAnime } from "../utils/normalizeAnime";
 import { useEffect } from "react";
-
-function normalizeList(list) {
-    const map = new Map();
-
-    list.forEach(item => {
-
-        const anime = normalizeAnime(item);
-
-        if (!anime?.id) return;
-
-        map.set(String(anime.id), anime);
-    });
-
-    return Array.from(map.values());
-}
+import { useFavorites } from "../hooks/user/useFavorites";
 
 function Top() {
     useEffect(() => {
@@ -66,7 +51,7 @@ function Top() {
 
                 {animeList.map(item => {
 
-                    const liked = favoriteIds.has(anime.id)
+                    const liked = favoriteIds.has(String(item.id));
 
                     return (
                         <AnimeCard
