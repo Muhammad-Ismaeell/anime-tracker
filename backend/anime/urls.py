@@ -4,8 +4,7 @@ from anime.api.views import (
     anime_search,
     seasonal_anime,
     trending_anime,
-    anime_detail,
-    temporary_seed_anime
+    anime_detail
 )
 
 urlpatterns = [
@@ -14,8 +13,5 @@ urlpatterns = [
     path("seasonal/", seasonal_anime),
     path("trending/", trending_anime),
     path("<int:anime_id>/", anime_detail),
-    path(
-    "temporary-seed/",
-    temporary_seed_anime,
-),
+
 ]
