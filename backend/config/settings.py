@@ -210,6 +210,11 @@ CORS_ALLOWED_ORIGINS = env.list(
     ]
 )
 
+SEED_SECRET = env(
+    "SEED_SECRET",
+    default=""
+)
+
 # IMPORTANT for dev stability
 CORS_ALLOW_ALL_ORIGINS = False
 

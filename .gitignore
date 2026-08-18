@@ -9,6 +9,7 @@ backend/.coverage
 backend/venv/
 backend/.pytest_cache/
 backend/media/
+backend/jikan.json
 
 # Environment
 backend/.env
