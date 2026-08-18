@@ -1,6 +1,6 @@
 from core.exceptions.custom_exceptions import NotFoundException
 
-from anime.infrastructure.models import Anime
+from anime.infrastructure.models import Anime, Genre
 from anime.presentation.normalizer import normalize_anime_detail
 
 
@@ -37,6 +37,30 @@ class AnimeService:
             mal_id=raw["mal_id"],
             defaults=defaults,
         )
+
+        # Sync genres from Jikan.
+        genres = []
+
+        for genre_data in raw.get("genres", []):
+            mal_id = genre_data.get("mal_id")
+            name = genre_data.get("name")
+
+            if not mal_id or not name:
+                continue
+
+            genre, _ = Genre.objects.get_or_create(
+                mal_id=mal_id,
+                defaults={"name": name},
+            )
+
+            # Keep the genre name updated if Jikan changes it.
+            if genre.name != name:
+                genre.name = name
+                genre.save(update_fields=["name"])
+
+            genres.append(genre)
+
+        anime.genres.set(genres)
 
         return anime
 
