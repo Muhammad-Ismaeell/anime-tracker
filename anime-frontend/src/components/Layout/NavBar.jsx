@@ -4,7 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 import { useNavbarSearch } from "../../hooks/useNavbarSearch";
 import { useDebounce } from "../../hooks/useDebounce";
-
+import "./Navbar.css";
 function Navbar() {
 
     const navigate = useNavigate();
@@ -39,15 +39,18 @@ function Navbar() {
     };
 
     return (
-        <div style={styles.navbar}>
+        <div className="navbar">
 
             {/* LEFT */}
-            <Link to="/" style={styles.logo}>
-                🎬 Anime App
+            <Link to="/" className="navbar-logo">
+                🎬 Anime Tracker
             </Link>
 
             {/* CENTER SEARCH */}
-            <div ref={dropdownRef} style={styles.searchWrapper}>
+            <div 
+                ref={dropdownRef}
+                className="navbar-search-wrapper"
+            >
 
                 <input
                     value={query}
@@ -57,22 +60,22 @@ function Navbar() {
                     }}
                     onFocus={() => setOpen(true)}
                     placeholder="Search anime..."
-                    style={styles.input}
+                    className="navbar-search-input"
                 />
 
                 {/* DROPDOWN */}
                 {open && query.trim().length > 1 && (
-                    <div style={styles.dropdown}>
+                    <div className="navbar-dropdown">
 
                         {isLoading ? (
 
-                            <div style={styles.noResult}>
+                            <div className="navbar-message">
                                 Searching...
                             </div>
 
                         ) : results.length === 0 ? (
 
-                            <div style={styles.noResult}>
+                            <div className="navbar-message">
                                 No results
                             </div>
 
@@ -81,21 +84,21 @@ function Navbar() {
                             results.slice(0, 6).map((anime) => (
                                 <div
                                     key={anime.id || anime.mal_id}
-                                    style={styles.item}
+                                    className="navbar-result"
                                     onClick={() => handleSelect(anime)}
                                 >
                                     <img
                                         src={anime.image}
                                         alt={anime.title}
-                                        style={styles.thumb}
+                                        className="navbar-thumb"
                                     />
 
                                     <div>
-                                        <div style={styles.title}>
+                                        <div className="navbar-title">
                                             {anime.title}
                                         </div>
 
-                                        <div style={styles.meta}>
+                                        <div className="navbar-meta">
                                             {anime.type || "Anime"}
                                         </div>
                                     </div>
@@ -105,7 +108,7 @@ function Navbar() {
                         )}
 
                         <div
-                            style={styles.fullResults}
+                            className="navbar-view-all"
                             onClick={() => {
                                 setOpen(false);
                                 navigate(`/search?q=${query}`);
@@ -119,15 +122,15 @@ function Navbar() {
             </div>
 
             {/* RIGHT */}
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <div className="navbar-actions">
 
                 {!token ? (
                     <>
-                        <Link to="/login" style={{ color: "white" }}>Login</Link>
-                        <Link to="/register" style={{ color: "white" }}>Register</Link>
+                        <Link to="/login" className="navbar-link">Login</Link>
+                        <Link to="/register" className="navbar-link">Register</Link>
                     </>
                 ) : (
-                    <button onClick={logout} style={styles.logout}>
+                    <button onClick={logout} className="navbar-button">
                         Logout
                     </button>
                 )}
@@ -140,96 +143,3 @@ function Navbar() {
 export default Navbar;
 
 
-const styles = {
-
-    navbar: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "14px 20px",
-        background: "#0f172a",
-        color: "white",
-        borderBottom: "1px solid #1f2937",
-        position: "relative",
-        zIndex: 1000
-    },
-
-    logo: {
-        color: "white",
-        textDecoration: "none",
-        fontWeight: "bold"
-    },
-
-    searchWrapper: {
-        position: "relative",
-        width: "400px"
-    },
-
-    input: {
-        width: "100%",
-        padding: "10px 14px",
-        borderRadius: "10px",
-        border: "1px solid #333",
-        background: "#111",
-        color: "white"
-    },
-
-    dropdown: {
-        position: "absolute",
-        top: "45px",
-        left: 0,
-        right: 0,
-        background: "#111827",
-        border: "1px solid #2d2d2d",
-        borderRadius: "12px",
-        overflow: "hidden",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
-    },
-
-    item: {
-        display: "flex",
-        gap: "10px",
-        padding: "10px",
-        cursor: "pointer",
-        alignItems: "center"
-    },
-
-    thumb: {
-        width: "40px",
-        height: "50px",
-        objectFit: "cover",
-        borderRadius: "6px"
-    },
-
-    title: {
-        fontSize: "14px",
-        color: "white"
-    },
-
-    meta: {
-        fontSize: "12px",
-        color: "#9ca3af"
-    },
-
-    noResult: {
-        padding: "10px",
-        color: "#999"
-    },
-
-    fullResults: {
-        padding: "10px",
-        textAlign: "center",
-        borderTop: "1px solid #2d2d2d",
-        cursor: "pointer",
-        color: "#a78bfa"
-    },
-
-    logout: {
-        background: "#7c3aed",
-        border: "none",
-        padding: "8px 12px",
-        borderRadius: "8px",
-        color: "white",
-        cursor: "pointer"
-    }
-};

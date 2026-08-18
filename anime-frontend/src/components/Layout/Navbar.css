@@ -1,0 +1,225 @@
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 14px 20px;
+
+    background: #0f172a;
+    color: white;
+
+    border-bottom: 1px solid #1f2937;
+
+    position: relative;
+    z-index: 1000;
+}
+
+
+/* LOGO */
+
+.navbar-logo {
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: 800;
+
+    font-size: 20px;
+
+}
+
+
+/* SEARCH */
+
+.navbar-search-wrapper {
+
+    position: relative;
+
+    width: 400px;
+
+}
+
+
+.navbar-search-input {
+
+    width: 100%;
+
+    padding: 12px 16px;
+
+    border-radius: 12px;
+
+    border: 1px solid #374151;
+
+    background: #111827;
+
+    color:white;
+
+    font-size:14px;
+
+}
+
+
+.navbar-search-input:focus {
+
+    outline:none;
+
+    border-color:#8b5cf6;
+
+}
+
+
+/* DROPDOWN */
+
+.navbar-dropdown {
+
+    position:absolute;
+
+    top:50px;
+
+    left:0;
+
+    right:0;
+
+    background:#111827;
+
+    border:1px solid #374151;
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 15px 40px rgba(0,0,0,.5);
+
+}
+
+
+.navbar-result {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:10px;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+}
+
+
+.navbar-result:hover {
+
+    background:#1f2937;
+
+}
+
+
+.navbar-thumb {
+
+    width:45px;
+
+    height:60px;
+
+    object-fit:cover;
+
+    border-radius:8px;
+
+}
+
+
+.navbar-title {
+
+    color:white;
+
+    font-size:14px;
+
+}
+
+
+.navbar-meta {
+
+    color:#9ca3af;
+
+    font-size:12px;
+
+}
+
+
+/* EMPTY */
+
+.navbar-message {
+
+    padding:12px;
+
+    color:#9ca3af;
+
+}
+
+
+/* VIEW ALL */
+
+.navbar-view-all {
+
+    padding:12px;
+
+    text-align:center;
+
+    color:#a78bfa;
+
+    cursor:pointer;
+
+    border-top:1px solid #374151;
+
+}
+
+
+/* AUTH */
+
+.navbar-actions {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+.navbar-link {
+
+    color:white;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+
+.navbar-button {
+
+    padding:9px 16px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#7c3aed;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
