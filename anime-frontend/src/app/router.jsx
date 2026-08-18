@@ -34,7 +34,7 @@ const Profile = lazy(() => import("../pages/Profile"));
 const EditProfile = lazy(() => import("../pages/EditProfile"));
 
 export default function App() {
-
+    console.log("ROUTER PATH:", window.location.pathname);
     const { darkMode } = useContext(ThemeContext);
 
     return (
