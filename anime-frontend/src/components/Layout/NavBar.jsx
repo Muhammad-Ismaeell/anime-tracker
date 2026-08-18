@@ -8,7 +8,7 @@ import "./Navbar.css";
 function Navbar() {
 
     const navigate = useNavigate();
-    const { token, logout } = useContext(AuthContext);
+    const { token } = useContext(AuthContext);
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
@@ -85,7 +85,8 @@ function Navbar() {
 
             {/* LEFT */}
             <Link to="/" className="navbar-logo">
-                🎬 Anime Tracker
+                <span className="logo-icon">🎬</span>
+                Anime Tracker
             </Link>
 
             {/* CENTER SEARCH */}
@@ -191,13 +192,29 @@ function Navbar() {
 
                 {!token ? (
                     <>
-                        <Link to="/login" className="navbar-link">Login</Link>
-                        <Link to="/register" className="navbar-link">Register</Link>
+                        <Link
+                            to="/login"
+                            className="navbar-login"
+                        >
+                            Login
+                        </Link>
+
+                        <Link
+                            to="/register"
+                            className="navbar-register"
+                        >
+                            Create Account
+                        </Link>
                     </>
                 ) : (
-                    <button onClick={logout} className="navbar-button">
-                        Logout
-                    </button>
+                    <>
+                        <Link
+                            to="/profile"
+                            className="navbar-profile"
+                        >
+                            👤 Profile
+                        </Link>
+                    </>
                 )}
 
             </div>
