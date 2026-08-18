@@ -83,13 +83,16 @@ function Navbar() {
     return (
         <div className="navbar">
 
-            {/* LEFT */}
-            <Link to="/" className="navbar-logo">
-                <span className="logo-icon">🎬</span>
-                Anime Tracker
-            </Link>
+            <div className="navbar-left">
 
-            {/* CENTER SEARCH */}
+                <Link to="/" className="navbar-logo">
+                    <span className="logo-icon">🎬</span>
+                    Anime Tracker
+                </Link>
+
+            </div>
+
+
             <div 
                 ref={dropdownRef}
                 className="navbar-search-wrapper"
@@ -188,7 +191,7 @@ function Navbar() {
             </div>
 
             {/* RIGHT */}
-            <div className="navbar-actions">
+            <div className="navbar-right">
 
                 {!token ? (
                     <>
