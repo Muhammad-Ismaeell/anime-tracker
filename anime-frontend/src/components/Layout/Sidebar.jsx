@@ -3,7 +3,7 @@ import { useContext } from "react";
 
 import { AuthContext } from "../../context/AuthContext";
 
-import "./Sidebar.css";
+import "./SideBar.css";
 
 
 const navItems = [
