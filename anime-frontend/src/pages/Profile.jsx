@@ -1,6 +1,9 @@
 import PageContainer from "../components/ui/PageContainer";
 import { useProfile } from "../hooks/user/useProfile";
-import { useFavorites } from "../hooks/user/useFavorites";
+import {
+    useFavorites,
+    useToggleFavorite,
+} from "../hooks/user/useFavorites";
 import { useActivity } from "../hooks/user/useActivity";
 import { getMediaUrl } from "../utils/mediaUrl";
 import {
@@ -45,11 +48,29 @@ function Profile() {
     // ---------------- FAVORITES ----------------
     const favoritesRes = useFavorites();
     const updateReview = useUpdateReview();
-    const favorites =
-        favoritesRes?.data?.results ??
-        favoritesRes?.results ??
-        [];
+    const favorites = useMemo(
+        () =>
+            favoritesRes?.data?.results ??
+            favoritesRes?.results ??
+            [],
+        [favoritesRes]
+    );
+    const toggleFavorite = useToggleFavorite();
+    const favoriteIds = useMemo(() => {
+        return new Set(
+            favorites
+                .map((favorite) => {
+                    const id =
+                        favorite.anime?.mal_id ??
+                        favorite.anime?.id ??
+                        favorite.anime_id ??
+                        favorite.mal_id;
 
+                    return id != null ? String(id) : null;
+                })
+                .filter(Boolean)
+        );
+    }, [favorites]);
     // ---------------- ACTIVITY ----------------
     const {
         data: activityPages,
@@ -209,24 +230,58 @@ function Profile() {
                 <h2>❤️ Favorite Anime</h2>
 
                 <div className="anime-grid">
-
                     {favorites.length ? (
-                        favorites.slice(0, 8).map(item => (
-                            <AnimeCard
-                                key={item.id}
-                                anime={{
-                                    mal_id: item.anime.id,
-                                    title: item.anime.title,
-                                    image: item.anime.image,
-                                    score: item.anime.score,
-                                }}
-                                statusMap={statusMap}
-                            />
-                        ))
+                        favorites.slice(0, 8).map((item) => {
+                            const animeId =
+                                item.anime?.mal_id ??
+                                item.anime?.id ??
+                                item.anime_id ??
+                                item.id;
+
+                            if (animeId == null) {
+                                return null;
+                            }
+
+                            const id = String(animeId);
+
+                            const anime = {
+                                id: animeId,
+                                title:
+                                    item.anime?.title ??
+                                    item.title ??
+                                    "Unknown Anime",
+                                image:
+                                    item.anime?.image ??
+                                    item.image ??
+                                    "",
+                                score:
+                                    item.anime?.score ??
+                                    item.score ??
+                                    0,
+                            };
+
+                            return (
+                                <AnimeCard
+                                    key={id}
+                                    anime={anime}
+                                    statusMap={statusMap}
+                                    isFavorited={favoriteIds.has(id)}
+                                    isFavoritePending={
+                                        toggleFavorite.isPending
+                                    }
+                                    onToggleFavorite={() =>
+                                        toggleFavorite.mutate({
+                                            anime_id: animeId,
+                                            title: anime.title,
+                                            image: anime.image,
+                                        })
+                                    }
+                                />
+                            );
+                        })
                     ) : (
                         <EmptyState text="No favorite anime yet" />
                     )}
-
                 </div>
             </section>
 
@@ -235,23 +290,58 @@ function Profile() {
                 <h2>🏆 Top Rated By You</h2>
 
                 <div className="anime-grid">
-                    
                     {topRatedList.length ? (
-                        topRatedList.map(item => (
-                            <AnimeCard
-                                key={item.anime_id ?? item.id}
-                                anime={{
-                                    mal_id: item.anime_id,
-                                    title: item.title,
-                                    image: item.image,
-                                    score: item.rating,
-                                }}
-                            />
-                        ))
+                        topRatedList.map((item) => {
+                            const animeId =
+                                item.anime_id ??
+                                item.anime?.mal_id ??
+                                item.anime?.id ??
+                                item.id;
+
+                            if (animeId == null) {
+                                return null;
+                            }
+
+                            const id = String(animeId);
+
+                            const anime = {
+                                id: animeId,
+                                title:
+                                    item.title ??
+                                    item.anime?.title ??
+                                    "Unknown Anime",
+                                image:
+                                    item.image ??
+                                    item.anime?.image ??
+                                    "",
+                                score:
+                                    item.rating ??
+                                    item.anime?.score ??
+                                    0,
+                            };
+
+                            return (
+                                <AnimeCard
+                                    key={id}
+                                    anime={anime}
+                                    statusMap={statusMap}
+                                    isFavorited={favoriteIds.has(id)}
+                                    isFavoritePending={
+                                        toggleFavorite.isPending
+                                    }
+                                    onToggleFavorite={() =>
+                                        toggleFavorite.mutate({
+                                            anime_id: animeId,
+                                            title: anime.title,
+                                            image: anime.image,
+                                        })
+                                    }
+                                />
+                            );
+                        })
                     ) : (
                         <EmptyState text="No top rated anime yet" />
                     )}
-
                 </div>
             </section>
 
