@@ -1,72 +1,112 @@
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
+
 import { AuthContext } from "../../context/AuthContext";
 
-const linkStyle = ({ isActive }) => ({
-    display: "block",
-    padding: "12px 14px",
-    borderRadius: "12px",
-    marginBottom: "10px",
-    textDecoration: "none",
-    color: "white",
-    background: isActive ? "#7c3aed" : "#18181b"
-});
+import "./SideBar.css";
 
-export default function Sidebar() {
+
+const navItems = [
+    {
+        to: "/",
+        label: "Home",
+        icon: "🏠",
+    },
+    {
+        to: "/library",
+        label: "Library",
+        icon: "📚",
+    },
+    {
+        to: "/favorites",
+        label: "Favorites",
+        icon: "❤️",
+    },
+    {
+        to: "/dashboard",
+        label: "Dashboard",
+        icon: "📊",
+    },
+    {
+        to: "/profile",
+        label: "Profile",
+        icon: "👤",
+    },
+];
+
+
+function Sidebar() {
 
     const { token, logout } = useContext(AuthContext);
 
+
     return (
-        <aside
-            style={{
-                width: "240px",
-                height: "calc(100vh - 60px)", // 🔥 IMPORTANT (navbar space)
-                position: "sticky",
-                top: "60px", // 🔥 pushes under navbar
-                background: "linear-gradient(to bottom, #09090b, #111827)",
-                borderRight: "1px solid #222",
-                display: "flex",
-                flexDirection: "column",
-                padding: "20px",
-                justifyContent: "space-between", // 🔥 forces logout bottom
-                overflow: "hidden"
-            }}
-        >
+        <aside className="sidebar">
 
-            {/* TOP NAV */}
-            <div>
-                <h2 style={{ color: "white", marginBottom: "30px" }}>
-                    🎬 Anime App
-                </h2>
+            <div className="sidebar-content">
 
-                <NavLink to="/" style={linkStyle}>🏠 Home</NavLink>
-                <NavLink to="/library" style={linkStyle}>📚 Library</NavLink>
-                <NavLink to="/favorites" style={linkStyle}>❤️ Favorites</NavLink>
-                <NavLink to="/dashboard" style={linkStyle}>📊 Dashboard</NavLink>
-                <NavLink to="/profile" style={linkStyle}>👤 Profile</NavLink>
+                <div className="sidebar-brand">
+                    <span className="sidebar-brand-icon">
+                        🎬
+                    </span>
+                </div>
+
+
+                <nav className="sidebar-nav">
+
+                    {navItems.map((item) => (
+
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            end={item.to === "/"}
+                            className={({ isActive }) =>
+                                `sidebar-link ${
+                                    isActive
+                                        ? "active"
+                                        : ""
+                                }`
+                            }
+                        >
+                            <span className="sidebar-link-icon">
+                                {item.icon}
+                            </span>
+
+                            <span>
+                                {item.label}
+                            </span>
+                        </NavLink>
+
+                    ))}
+
+                </nav>
+
             </div>
 
-            {/* BOTTOM (ALWAYS VISIBLE) */}
-            <div style={{ marginTop: "auto" }}>
-                {token && (
+
+            {token && (
+                <div className="sidebar-footer">
+
                     <button
+                        type="button"
+                        className="sidebar-logout"
                         onClick={logout}
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "12px",
-                            border: "none",
-                            background: "#dc2626",
-                            color: "white",
-                            cursor: "pointer",
-                            fontWeight: "bold"
-                        }}
                     >
-                        Logout
+                        <span>
+                            🚪
+                        </span>
+
+                        <span>
+                            Logout
+                        </span>
                     </button>
-                )}
-            </div>
+
+                </div>
+            )}
 
         </aside>
     );
 }
+
+
+export default Sidebar;

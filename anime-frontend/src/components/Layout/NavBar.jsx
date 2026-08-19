@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavbarSearch } from "../../hooks/useNavbarSearch";
 import { useDebounce } from "../../hooks/useDebounce";
 import "./Navbar.css";
-function Navbar() {
+function NavBar() {
 
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
@@ -226,6 +226,6 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default NavBar;
 
 
