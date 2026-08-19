@@ -303,15 +303,10 @@
 .navbar-result {
     display: flex;
     align-items: center;
-    gap: 12px;
-
-    padding: 12px;
-
+    gap: 10px;
+    padding: 10px;
     cursor: pointer;
-
-    transition:
-        background 0.18s ease,
-        transform 0.18s ease;
+    transition: background 0.18s ease;
 }
 
 .navbar-result:hover {
@@ -369,4 +364,12 @@
     .navbar-login {
         font-size: 13px;
     }
+}
+
+.navbar-thumb {
+    width: 40px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
