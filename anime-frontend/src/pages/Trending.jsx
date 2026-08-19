@@ -1,47 +1,113 @@
-import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
-import AnimeCard from "../components/AnimeCard";
-import PageContainer from "../components/ui/PageContainer";
 import { useEffect } from "react";
+
+import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
+import {
+    useFavorites,
+    useToggleFavorite,
+} from "../hooks/user/useFavorites";
+import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
+
+import AnimeCard from "../components/AnimeCard";
+import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
+import EmptyState from "../components/ui/EmptyState";
+import PageContainer from "../components/ui/PageContainer";
+
 function Trending() {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
     const {
         data,
         fetchNextPage,
         hasNextPage,
         isLoading,
-        isFetchingNextPage
+        isError,
+        isFetchingNextPage,
     } = useInfiniteAnime("trending");
 
+    const toggleFavorite = useToggleFavorite();
+    const { data: favoritesRes } = useFavorites();
+    const { statusMap } = useGlobalLibrary();
+
+    const favoriteIds = new Set(
+        (favoritesRes?.results ?? [])
+            .map((favorite) => {
+                const id =
+                    favorite.anime?.mal_id ??
+                    favorite.anime?.id ??
+                    favorite.anime_id ??
+                    favorite.mal_id;
+
+                return id != null ? String(id) : null;
+            })
+            .filter(Boolean)
+    );
+
     if (isLoading) {
-        return <PageContainer>Loading...</PageContainer>;
+        return (
+            <PageContainer>
+                <div className="section-header">
+                    <h1>🔥 Trending Anime</h1>
+                </div>
+
+                <div className="grid">
+                    {Array.from({ length: 12 }).map((_, index) => (
+                        <AnimeCardSkeleton key={index} />
+                    ))}
+                </div>
+            </PageContainer>
+        );
     }
 
-    const anime = data?.anime || [];
+    if (isError) {
+        return (
+            <PageContainer>
+                <EmptyState text="Failed to load trending anime." />
+            </PageContainer>
+        );
+    }
 
+    const anime = data?.anime ?? [];
 
     return (
         <PageContainer>
-
             <div className="section-header">
                 <h1>🔥 Trending Anime</h1>
             </div>
 
-            <div className="grid">
+            {anime.length === 0 ? (
+                <EmptyState text="No trending anime found." />
+            ) : (
+                <div className="grid">
+                    {anime.map((item) => {
+                        const animeId = String(item.id);
 
-                {anime.map(item => (
-                    <AnimeCard
-                        key={item.id}
-                        anime={item}
-                    />
-                ))}
-
-            </div>
+                        return (
+                            <AnimeCard
+                                key={animeId}
+                                anime={item}
+                                statusMap={statusMap}
+                                isFavorited={favoriteIds.has(animeId)}
+                                isFavoritePending={
+                                    toggleFavorite.isPending
+                                }
+                                onToggleFavorite={() =>
+                                    toggleFavorite.mutate({
+                                        anime_id: item.id,
+                                        title: item.title,
+                                        image: item.image || "",
+                                    })
+                                }
+                            />
+                        );
+                    })}
+                </div>
+            )}
 
             {hasNextPage && (
-
                 <button
+                    type="button"
                     className="load-more-btn"
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
@@ -50,9 +116,7 @@ function Trending() {
                         ? "Loading..."
                         : "Load More Anime"}
                 </button>
-
             )}
-
         </PageContainer>
     );
 }

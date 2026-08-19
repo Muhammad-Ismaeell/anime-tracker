@@ -71,23 +71,33 @@ function Detail() {
     }
 
     const image =
-        anime.image ||
-        anime.images?.jpg?.large_image_url ||
-        anime.images?.jpg?.image_url ||
+        anime.image ??
+        anime.images?.jpg?.large_image_url ??
+        anime.images?.jpg?.image_url ??
         "/no-image.png";
 
-    const liked = favorites.some(
-        fav =>
-            String(fav.anime_id) ===
-            String(anime.id)
-    );
+    const liked = favorites.some((favorite) => {
+        const favoriteAnimeId =
+            favorite.anime?.mal_id ??
+            favorite.anime?.id ??
+            favorite.anime_id ??
+            favorite.mal_id;
+
+        return (
+            favoriteAnimeId != null &&
+            String(favoriteAnimeId) === String(anime.id)
+        );
+    });
 
     const handleFavorite = () => {
+        if (!anime?.id) {
+            return;
+        }
 
         toggleFavorite.mutate({
             anime_id: anime.id,
             title: anime.title,
-            image
+            image,
         });
     };
 
@@ -135,9 +145,15 @@ function Detail() {
                             </div>
 
                             <button
+                                type="button"
                                 className={`favorite-button ${liked ? "active" : ""}`}
                                 onClick={handleFavorite}
                                 disabled={toggleFavorite.isPending}
+                                aria-label={
+                                    liked
+                                        ? `Remove ${anime.title} from favorites`
+                                        : `Add ${anime.title} to favorites`
+                                }
                             >
                                 {toggleFavorite.isPending
                                     ? "Saving..."

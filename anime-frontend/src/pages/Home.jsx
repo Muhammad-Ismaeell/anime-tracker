@@ -44,17 +44,17 @@ function Home(){
 
 
     const favoriteIds = new Set(
+        (favoritesRes?.results ?? [])
+            .map((favorite) => {
+                const id =
+                    favorite.anime?.mal_id ??
+                    favorite.anime?.id ??
+                    favorite.anime_id ??
+                    favorite.mal_id;
 
-        favoritesRes?.results?.map(
-            fav =>
-            String(
-                fav.anime?.mal_id ??
-                fav.anime_id
-            )
-        )
-        ??
-        []
-
+                return id != null ? String(id) : null;
+            })
+            .filter(Boolean)
     );
 
 
@@ -210,61 +210,37 @@ key={i}
 
 
 <AnimeSection
-
-title="Trending Anime"
-
-emoji="🔥"
-
-animeList={
-extractAnime(trendingQuery)
-}
-
-statusMap={statusMap}
-
-favoriteIds={favoriteIds}
-
-toggleFavorite={toggleFavorite}
-
+    title="Trending Anime"
+    emoji="🔥"
+    animeList={extractAnime(trendingQuery)}
+    statusMap={statusMap}
+    favoriteIds={favoriteIds}
+    toggleFavorite={toggleFavorite}
+    viewAllPath="/trending"
 />
 
 
 
 <AnimeSection
-
-title="Current Season"
-
-emoji="🌸"
-
-animeList={
-extractAnime(seasonalQuery)
-}
-
-statusMap={statusMap}
-
-favoriteIds={favoriteIds}
-
-toggleFavorite={toggleFavorite}
-
+    title="Current Season"
+    emoji="🌸"
+    animeList={extractAnime(seasonalQuery)}
+    statusMap={statusMap}
+    favoriteIds={favoriteIds}
+    toggleFavorite={toggleFavorite}
+    viewAllPath="/seasonal"
 />
 
 
 
 <AnimeSection
-
-title="Top Rated Anime"
-
-emoji="⭐"
-
-animeList={
-extractAnime(topQuery)
-}
-
-statusMap={statusMap}
-
-favoriteIds={favoriteIds}
-
-toggleFavorite={toggleFavorite}
-
+    title="Top Rated Anime"
+    emoji="⭐"
+    animeList={extractAnime(topQuery)}
+    statusMap={statusMap}
+    favoriteIds={favoriteIds}
+    toggleFavorite={toggleFavorite}
+    viewAllPath="/top"
 />
 
 

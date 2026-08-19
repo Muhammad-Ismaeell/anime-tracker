@@ -1,160 +1,190 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { memo, useState } from "react";
-import { useToggleFavorite } from "../hooks/user/useFavorites";
+
 import { useUpdateLibrary } from "../hooks/useLibrary";
-import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 import OptimizedImage from "./ui/OptimizedImage";
 
-function AnimeCard({ anime, statusMap = new Map() }) {
 
-    const navigate = useNavigate();
+function AnimeCard({
+    anime,
+    statusMap = new Map(),
+    isFavorited = false,
+    onToggleFavorite,
+    isFavoritePending = false,
+}) {
     const updateLibrary = useUpdateLibrary();
-    const toggleFavorite = useToggleFavorite();
-
-    const favoriteIds = useFavoriteIds();
 
     const [open, setOpen] = useState(false);
 
-    const animeId = String(anime?.mal_id || anime?.id || anime?.anime_id);
+    const animeId = String(
+        anime?.mal_id ??
+        anime?.id ??
+        anime?.anime_id
+    );
+
     const status = statusMap.get(animeId);
+
+    const title = anime?.title || "Unknown Anime";
+    const image = anime?.image || "";
+
     const handleUpdate = (value) => {
         setOpen(false);
 
         if (value === "remove") {
             updateLibrary.mutate({
                 anime_id: animeId,
-                remove: true
+                remove: true,
             });
+
             return;
         }
 
         updateLibrary.mutate({
             anime_id: animeId,
-            status:value,
-            title: anime.title,
-            image:
-                anime.image ||
-                anime.images?.jpg?.image_url
-        })
+            status: value,
+            title,
+            image,
+        });
     };
 
     return (
-        <motion.div
-            className="anime-card"
+        <motion.article
+            className={`anime-card ${open ? "menu-open" : ""}`}
             whileHover={{ scale: 1.03 }}
         >
-
             {/* IMAGE */}
-            <div
+            <Link
+                to={`/anime/${animeId}`}
                 className="imageWrapper"
-                onClick={() => navigate(`/anime/${animeId}`)}
+                aria-label={`View ${title}`}
             >
                 <OptimizedImage
-                    src={
-                        anime.image ||
-                        anime.anime?.image ||
-                        anime.images?.jpg?.image_url
-                    }
-                    alt={
-                        anime.title ||
-                        anime.anime?.title ||
-                        "Unknown Anime"
-                    }
+                    src={image}
+                    alt={title}
                     className="image"
                 />
-            </div>
+            </Link>
 
             {/* FAVORITE */}
             <button
-                className="favIcon"
-                disabled={toggleFavorite.isPending}
+                type="button"
+                className={`favIcon ${
+                    isFavorited ? "active" : ""
+                }`}
+                disabled={
+                    !onToggleFavorite ||
+                    isFavoritePending
+                }
+                aria-label={
+                    isFavorited
+                        ? `Remove ${title} from favorites`
+                        : `Add ${title} to favorites`
+                }
                 onClick={(e) => {
-
                     e.stopPropagation();
-
-                    toggleFavorite.mutate({
-                        anime_id: animeId,
-                        title: anime.title,
-                        image:
-                            anime.image ||
-                            anime.images?.jpg?.image_url ||
-                            ""
-                    });
+                    onToggleFavorite?.(anime);
                 }}
             >
-                {toggleFavorite.isPending
+                {isFavoritePending
                     ? "⏳"
-                    : favoriteIds.has(animeId)
+                    : isFavorited
                         ? "❤️"
                         : "🤍"}
             </button>
 
-            {/* TITLE */}
+            {/* CONTENT */}
             <div className="content">
                 <h3 className="title">
-                    {anime.title || anime.anime?.title || "Unknown"}
+                    {title}
                 </h3>
 
-                {/* STATUS */}
-                <div
-                    className="status-wrapper"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setOpen(!open);
-                    }}
-                >
-
-                    <div className={`status-badge ${status || "none"}`}>
+                {/* LIBRARY STATUS */}
+                <div className="status-wrapper">
+                    <button
+                        type="button"
+                        className={`status-badge ${
+                            status || "none"
+                        }`}
+                        onClick={() =>
+                            setOpen((current) => !current)
+                        }
+                        disabled={updateLibrary.isPending}
+                    >
                         {updateLibrary.isPending
                             ? "Updating..."
-                            : status 
-                                ? status.replaceAll("_"," ")
-                                : "Add to list"
-                        }
-                    </div>
+                            : status
+                                ? status.replaceAll("_", " ")
+                                : "Add to list"}
+                    </button>
 
                     {open && (
                         <div className="status-menu">
-
-                            <div 
-                                onClick={() => !updateLibrary.isPending && handleUpdate("watching")}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    handleUpdate("watching")
+                                }
+                                disabled={
+                                    updateLibrary.isPending
+                                }
                             >
                                 📺 Watching
-                            </div>
+                            </button>
 
-                            <div 
-                                onClick={() => !updateLibrary.isPending && handleUpdate("completed")}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    handleUpdate("completed")
+                                }
+                                disabled={
+                                    updateLibrary.isPending
+                                }
                             >
                                 ✅ Completed
-                            </div>
+                            </button>
 
-                            <div 
-                                onClick={() => !updateLibrary.isPending && handleUpdate("dropped")}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    handleUpdate("dropped")
+                                }
+                                disabled={
+                                    updateLibrary.isPending
+                                }
                             >
                                 ❌ Dropped
-                            </div>
+                            </button>
 
-                            <div 
-                                onClick={() => !updateLibrary.isPending && handleUpdate("plan_to_watch")}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    handleUpdate("plan_to_watch")
+                                }
+                                disabled={
+                                    updateLibrary.isPending
+                                }
                             >
                                 📌 Plan to Watch
-                            </div>
+                            </button>
 
-                            <div
+                            <button
+                                type="button"
                                 className="danger"
-                                onClick={() => !updateLibrary.isPending && handleUpdate("remove")}
+                                onClick={() =>
+                                    handleUpdate("remove")
+                                }
+                                disabled={
+                                    updateLibrary.isPending
+                                }
                             >
                                 🗑 Remove from library
-                            </div>
-
+                            </button>
                         </div>
                     )}
-
                 </div>
             </div>
-
-        </motion.div>
+        </motion.article>
     );
 }
 
