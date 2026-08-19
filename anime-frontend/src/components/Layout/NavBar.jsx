@@ -5,7 +5,10 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavbarSearch } from "../../hooks/useNavbarSearch";
 import { useDebounce } from "../../hooks/useDebounce";
 import "./Navbar.css";
-function NavBar() {
+function NavBar({
+    onMenuToggle = () => {},
+    sidebarOpen = false,
+}) {
 
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
@@ -82,9 +85,22 @@ function NavBar() {
 
     return (
         <div className="navbar">
-
+            <button
+                type="button"
+                className="navbar-menu-button"
+                onClick={onMenuToggle}
+                aria-label={
+                    sidebarOpen
+                        ? "Close navigation"
+                        : "Open navigation"
+                }
+                aria-expanded={sidebarOpen}
+            >
+                {sidebarOpen ? "✕" : "☰"}
+            </button>
+            
             <div className="navbar-left">
-
+                
                 <Link to="/" className="navbar-logo">
                     <span className="logo-icon">🎬</span>
                     Anime Tracker
