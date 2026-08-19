@@ -69,24 +69,42 @@
 
 
 .navbar-search-input {
+    width: 100%;
 
-    width:100%;
+    padding: 12px 18px;
 
-    padding:
-        12px
-        18px;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
 
-    border-radius:14px;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
 
-    background:#18181b;
+    font-size: 15px;
 
-    border:
-        1px solid #3f3f46;
+    outline: none;
 
-    color:white;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
 
-    font-size:15px;
+.navbar-search-input::placeholder {
+    color: #9ca3af;
+}
 
+.navbar-search-input:hover {
+    border-color: rgba(255,255,255,0.18);
+}
+
+.navbar-search-input:focus {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(139,92,246,0.65);
+
+    box-shadow:
+        0 0 0 4px rgba(139,92,246,0.12),
+        0 10px 30px rgba(0,0,0,0.18);
 }
 
 
@@ -103,24 +121,6 @@
 
 }
 
-
-.navbar-search-input:hover {
-
-    border-color:
-    rgba(139,92,246,.5);
-
-}
-
-
-.navbar-search-input:focus {
-
-    background:
-    rgba(255,255,255,.08);
-
-    box-shadow:
-    0 0 0 4px rgba(139,92,246,.15);
-
-}
 
 
 
@@ -187,33 +187,34 @@
 
 
 .navbar-profile {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
 
-    padding:
-    9px 16px;
+    padding: 9px 14px;
 
-    border-radius:
-    10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
 
-    background:
-    rgba(255,255,255,.08);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
 
-    color:white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
 
-    text-decoration:none;
-
-    font-weight:600;
-
-    transition:.2s;
-
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
-
 
 .navbar-profile:hover {
-
-    background:
-    rgba(255,255,255,.15);
-
+    background: rgba(124,58,237,0.18);
+    border-color: rgba(139,92,246,0.45);
+    transform: translateY(-1px);
 }
+
 
 @media(max-width:900px){
 
@@ -252,22 +253,120 @@
 
 }
 
-.navbar-dropdown{
-    animation:
-    dropdown .15s ease;
+.navbar-dropdown {
+    position: absolute;
+
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+
+    max-height: 420px;
+    overflow-y: auto;
+
+    background: rgba(17,24,39,0.96);
+
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.45),
+        0 0 30px rgba(124,58,237,0.06);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    animation: navbarDropdownIn 0.16s ease;
+}
+
+@keyframes navbarDropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
-@keyframes dropdown{
-
-from{
-    opacity:0;
-    transform:translateY(-5px);
+.navbar-dropdown::-webkit-scrollbar {
+    width: 6px;
 }
 
-to{
-    opacity:1;
-    transform:translateY(0);
+.navbar-dropdown::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 999px;
 }
 
+.navbar-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+.navbar-result:hover {
+    background: rgba(124,58,237,0.10);
+}
+
+.navbar-result:active {
+    transform: scale(0.99);
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+
+        height: auto;
+        padding: 14px 18px;
+    }
+
+    .navbar-search-wrapper {
+        grid-column: 1 / -1;
+        grid-row: 2;
+
+        width: 100%;
+        max-width: none;
+    }
+
+    .navbar-right {
+        justify-content: flex-end;
+    }
+
+    .navbar-logo {
+        font-size: 18px;
+    }
+
+    .logo-icon {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 520px) {
+    .navbar {
+        padding: 12px 14px;
+    }
+
+    .navbar-logo {
+        font-size: 16px;
+    }
+
+    .navbar-register {
+        padding: 8px 11px;
+        font-size: 13px;
+    }
+
+    .navbar-login {
+        font-size: 13px;
+    }
 }

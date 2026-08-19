@@ -120,7 +120,7 @@ export default function Search() {
                 </div>
             ) : (
                 <>
-                    <div className="grid">
+                    <div className="search-results-grid">
 
                         {results.map(anime => (
                             <AnimeCard

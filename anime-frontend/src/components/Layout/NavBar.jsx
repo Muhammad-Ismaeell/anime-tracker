@@ -215,7 +215,8 @@ function Navbar() {
                             to="/profile"
                             className="navbar-profile"
                         >
-                            👤 Profile
+                            <span className="profile-icon">👤</span>
+                            <span>Profile</span>
                         </Link>
                     </>
                 )}

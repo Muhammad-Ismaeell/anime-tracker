@@ -1910,3 +1910,10 @@ button:disabled {
     font-size:18px;
 
 }
+
+.search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 210px));
+    gap: 18px;
+    justify-content: start;
+}
