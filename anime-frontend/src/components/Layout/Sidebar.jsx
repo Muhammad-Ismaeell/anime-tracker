@@ -35,7 +35,7 @@ const navItems = [
 ];
 
 
-export default function Sidebar({
+export default function SideBar({
     isOpen = false,
     onClose = () => {},
 }) {
