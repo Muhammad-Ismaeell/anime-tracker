@@ -13,3 +13,10 @@ class FavoriteRepository:
     @staticmethod
     def delete(favorite):
         favorite.delete()
+
+    @staticmethod
+    def exists(user, anime):
+        return FavoriteAnime.objects.filter(
+            user=user,
+            anime=anime,
+        ).exists()

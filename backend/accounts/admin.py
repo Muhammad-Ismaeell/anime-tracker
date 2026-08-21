@@ -12,11 +12,14 @@ class CustomUserAdmin(UserAdmin):
             "Additional Information",
             {
                 "fields": (
-                    "avatar",
-                    "email_verified",
                     "created_at",
                     "updated_at",
                 )
             },
         ),
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
     )

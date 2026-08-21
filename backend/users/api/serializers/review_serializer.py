@@ -7,6 +7,12 @@ from anime.api.serializers import AnimeSerializer
 class ReviewSerializer(serializers.ModelSerializer):
 
     anime = AnimeSerializer(read_only=True)
+
+    user_id = serializers.IntegerField(
+        source="user.id",
+        read_only=True,
+    )
+
     username = serializers.CharField(
         source="user.username",
         read_only=True,
@@ -17,6 +23,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "anime",
+            "user_id",
             "username",
             "rating",
             "text",

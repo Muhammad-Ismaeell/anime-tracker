@@ -10,18 +10,20 @@ class LibraryUpdateRequestSerializer(serializers.Serializer):
             "watching",
             "completed",
             "plan_to_watch",
-            "dropped"
-        ]
+            "dropped",
+        ],
+        required=False,
     )
 
     progress = serializers.IntegerField(
         required=False,
-        default=0
+        default=0,
+        min_value=0,
     )
 
     remove = serializers.BooleanField(
         required=False,
-        default=False
+        default=False,
     )
 
 

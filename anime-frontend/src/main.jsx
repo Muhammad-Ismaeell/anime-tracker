@@ -8,15 +8,13 @@ import AuthProvider from "./context/AuthProvider";
 import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
+import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
     QueryClient,
     QueryClientProvider
 } from "@tanstack/react-query";
 
-console.log(
-    "GOOGLE CLIENT:",
-    import.meta.env.VITE_GOOGLE_CLIENT_ID
-);
+
 const queryClient = new QueryClient({
 
     defaultOptions: {
@@ -89,7 +87,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                     <GoogleOAuthProvider
                         clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
                     >
-                        <App />
+                        <AuthPromptProvider>
+                            <App />
+                        </AuthPromptProvider>
+                        
                     </GoogleOAuthProvider>
 
                     <ReactQueryDevtools initialIsOpen={false} />

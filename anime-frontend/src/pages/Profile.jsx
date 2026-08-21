@@ -109,40 +109,65 @@ function Profile() {
     const [text, setText] = useState("");
 
     const saveReview = () => {
+        if (!editingReview) {
+            return;
+        }
 
-        if (!editingReview) return;
-
-        updateReview.mutate({
-            reviewId: editingReview.id,
-            payload: {
-                rating,
-                text
+        updateReview.mutate(
+            {
+                reviewId: editingReview.id,
+                payload: {
+                    rating,
+                    text,
+                },
+            },
+            {
+                onSuccess: () => {
+                    setEditingReview(null);
+                    setRating(10);
+                    setText("");
+                },
             }
-        });
-
-        setEditingReview(null);
-        setRating(10);
-        setText("");
+        );
     };
 
     if (isLoading) {
-
         return (
-
             <PageContainer>
+                <div className="profile-skeleton">
+                    <div className="profile-skeleton-hero">
+                        <div className="profile-skeleton-avatar" />
 
-                <div className="grid">
+                        <div className="profile-skeleton-info">
+                            <div className="profile-skeleton-line profile-skeleton-name" />
+                            <div className="profile-skeleton-line profile-skeleton-bio" />
+                            <div className="profile-skeleton-tag" />
+                        </div>
 
-                    {Array.from({length:8}).map((_,i)=>(
-                        <AnimeCardSkeleton key={i}/>
-                    ))}
+                        <div className="profile-skeleton-button" />
+                    </div>
 
+                    <div className="profile-skeleton-stats">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <div
+                                key={index}
+                                className="profile-skeleton-stat"
+                            />
+                        ))}
+                    </div>
+
+                    <div className="section">
+                        <div className="profile-skeleton-heading" />
+
+                        <div className="grid">
+                            {Array.from({ length: 4 }).map((_, index) => (
+                                <AnimeCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    </div>
                 </div>
-
             </PageContainer>
-
         );
-
     }
 
     if (isError) {
@@ -347,43 +372,60 @@ function Profile() {
 
             {/* ---------------- ACTIVITY ---------------- */}
             <section className="section">
-                <h2>⚡ Recent Activity</h2>
+                <div className="section-header">
+                    <h2>⚡ Recent Activity</h2>
+                </div>
 
                 <div className="activity-list">
-
                     {activity.length ? (
-                        activity.map(act => (
-                            <div key={act.id} className="activity-item">
-
+                        activity.map((act) => (
+                            <article
+                                key={act.id}
+                                className="activity-item"
+                            >
                                 <OptimizedImage
                                     src={act.anime?.image}
-                                    alt={act.anime?.title}
+                                    alt={act.anime?.title || "Anime"}
                                     className="activity-cover"
                                 />
 
                                 <div className="activity-content">
-
                                     <div className="activity-action">
-                                        {actionLabels[act.action] ?? act.action}
+                                        {actionLabels[act.action] ??
+                                            act.action}
                                     </div>
 
-                                    <strong>{act.anime?.title}</strong>
+                                    <strong>
+                                        {act.anime?.title ||
+                                            "Unknown Anime"}
+                                    </strong>
 
-                                    <small>
-                                        {new Date(act.created_at).toLocaleDateString()}
-                                    </small>
-
+                                    <time
+                                        dateTime={act.created_at}
+                                        className="activity-date"
+                                    >
+                                        {new Date(
+                                            act.created_at
+                                        ).toLocaleDateString(
+                                            undefined,
+                                            {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                            }
+                                        )}
+                                    </time>
                                 </div>
-                            </div>
+                            </article>
                         ))
                     ) : (
                         <EmptyState text="No activity yet" />
                     )}
-
                 </div>
 
                 {hasNextPage && (
                     <button
+                        type="button"
                         className="load-more-btn"
                         disabled={isFetchingNextPage}
                         onClick={() => fetchNextPage()}
@@ -397,86 +439,218 @@ function Profile() {
 
             {/* ---------------- REVIEWS ---------------- */}
             <section className="section">
-                <h2>📝 My Reviews</h2>
+                <div className="section-header">
+                    <h2>📝 My Reviews</h2>
+                </div>
 
                 <div className="reviews-list">
-
                     {myReviews.length ? (
-                        myReviews.map(review => (
-                            <div key={review.id} className="review-card">
+                        myReviews.map((review) => {
+                            const anime = review.anime;
 
-                                <div className="review-top">
-                                    <strong>{review.anime_title}</strong>
-                                    <span>⭐ {review.rating}/10</span>
-                                </div>
+                            const animeId =
+                                anime?.mal_id ??
+                                anime?.id ??
+                                anime?.anime_id;
 
-                                <p>{review.text}</p>
-
-                                <small>
-                                    {new Date(review.created_at).toLocaleDateString()}
-                                </small>
-
-                                <button
-                                    className="edit-btn"
-                                    onClick={() => {
-                                        setEditingReview(review);
-                                        setRating(review.rating);
-                                        setText(review.text);
-                                    }}
+                            return (
+                                <article
+                                    key={review.id}
+                                    className="review-card profile-review-card"
                                 >
-                                    ✏️ Edit
-                                </button>
+                                    <div className="profile-review-anime">
+                                        <OptimizedImage
+                                            src={
+                                                anime?.image ||
+                                                "/no-image.png"
+                                            }
+                                            alt={
+                                                anime?.title ||
+                                                "Anime"
+                                            }
+                                            className="profile-review-anime-image"
+                                        />
 
-                            </div>
-                        ))
+                                        <div className="profile-review-anime-info">
+                                            <strong>
+                                                {anime?.title ||
+                                                    "Unknown Anime"}
+                                            </strong>
+
+                                            {animeId != null && (
+                                                <button
+                                                    type="button"
+                                                    className="profile-review-anime-link"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/anime/${animeId}`
+                                                        )
+                                                    }
+                                                >
+                                                    View Anime
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <span className="review-rating">
+                                            ⭐ {review.rating}/10
+                                        </span>
+                                    </div>
+
+                                    <p className="review-text">
+                                        {review.text}
+                                    </p>
+
+                                    <div className="review-footer">
+                                        <time
+                                            dateTime={review.created_at}
+                                        >
+                                            {new Date(
+                                                review.created_at
+                                            ).toLocaleDateString(
+                                                undefined,
+                                                {
+                                                    year: "numeric",
+                                                    month: "short",
+                                                    day: "numeric",
+                                                }
+                                            )}
+                                        </time>
+
+                                        <button
+                                            type="button"
+                                            className="edit-btn"
+                                            onClick={() => {
+                                                setEditingReview(review);
+                                                setRating(review.rating);
+                                                setText(review.text);
+                                            }}
+                                        >
+                                            ✏️ Edit
+                                        </button>
+                                    </div>
+                                </article>
+                            );
+                        })
                     ) : (
                         <EmptyState text="No reviews yet" />
                     )}
-
                 </div>
             </section>
 
             {/* ---------------- EDIT MODAL ---------------- */}
             {editingReview && (
-                <div className="modal-overlay">
+                <div
+                    className="profile-review-modal-overlay"
+                    onClick={() => setEditingReview(null)}
+                >
+                    <div
+                        className="profile-review-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="profile-review-modal-header">
+                            <div className="profile-review-anime-edit">
+                                <OptimizedImage
+                                    src={
+                                        editingReview?.anime?.image ||
+                                        "/no-image.png"
+                                    }
+                                    alt={
+                                        editingReview?.anime?.title ||
+                                        "Anime"
+                                    }
+                                    className="profile-review-anime-edit-image"
+                                />
 
-                    <div className="edit-review-modal">
+                                <div>
+                                    <span className="profile-review-modal-eyebrow">
+                                        YOUR REVIEW
+                                    </span>
 
-                        <h3>Edit Review</h3>
+                                    <h3>Edit Review</h3>
 
-                        <select
-                            value={rating}
-                            onChange={(e) => setRating(Number(e.target.value))}
-                        >
-                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                                <option key={n} value={n}>
-                                    {n}/10
-                                </option>
-                            ))}
-                        </select>
-
-                        <textarea
-                            rows={6}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                        />
-
-                        <div className="modal-actions">
-
+                                    <p>
+                                        {editingReview?.anime?.title ||
+                                            "Unknown Anime"}
+                                    </p>
+                                </div>
+                            </div>
 
                             <button
+                                type="button"
+                                className="profile-review-modal-close"
+                                onClick={() =>
+                                    setEditingReview(null)
+                                }
+                                aria-label="Close review editor"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="profile-review-field">
+                            <label htmlFor="profile-review-rating">
+                                Rating
+                            </label>
+
+                            <select
+                                id="profile-review-rating"
+                                value={rating}
+                                onChange={(e) =>
+                                    setRating(Number(e.target.value))
+                                }
+                            >
+                                {[1,2,3,4,5,6,7,8,9,10].map((value) => (
+                                    <option
+                                        key={value}
+                                        value={value}
+                                    >
+                                        {value}/10
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="profile-review-field">
+                            <label htmlFor="profile-review-text">
+                                Review
+                            </label>
+
+                            <textarea
+                                id="profile-review-text"
+                                rows={7}
+                                value={text}
+                                onChange={(e) =>
+                                    setText(e.target.value)
+                                }
+                                placeholder="Write your thoughts about this anime..."
+                            />
+                        </div>
+
+                        <div className="profile-review-modal-actions">
+                            <button
+                                type="button"
+                                className="profile-review-cancel"
+                                onClick={() =>
+                                    setEditingReview(null)
+                                }
+                                disabled={updateReview.isPending}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="profile-review-save"
                                 onClick={saveReview}
                                 disabled={updateReview.isPending}
                             >
                                 {updateReview.isPending
                                     ? "Saving..."
-                                    : "Save"}
+                                    : "Save Changes"}
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
             )}
 

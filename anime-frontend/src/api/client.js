@@ -1,13 +1,35 @@
 import axios from "axios";
+
 import { tokenService } from "../auth/tokenService";
-import { AuthAPI } from "./auth.api";
+import {
+    notifyAccessTokenChanged,
+    notifySessionExpired,
+} from "../auth/authEvents";
+
+const baseURL =
+    import.meta.env.VITE_API_URL ||
+    "http://127.0.0.1:8000/api";
 
 
+/*
+ * Normal application API client.
+ * Requests from the application use this instance.
+ */
 const api = axios.create({
-    baseURL:
-        import.meta.env.VITE_API_URL ||
-        "http://127.0.0.1:8000/api"
+    baseURL,
+});
 
+
+/*
+ * Separate client used only for refreshing
+ * the access token.
+ *
+ * Important:
+ * this instance has NO auth interceptor,
+ * preventing refresh loops / circular dependencies.
+ */
+const refreshClient = axios.create({
+    baseURL,
 });
 
 
@@ -17,169 +39,171 @@ let failedQueue = [];
 
 
 const processQueue = (error, token = null) => {
-
-    failedQueue.forEach(prom => {
-
-        if(error){
-            prom.reject(error);
+    failedQueue.forEach(({ resolve, reject }) => {
+        if (error) {
+            reject(error);
+        } else {
+            resolve(token);
         }
-        else{
-            prom.resolve(token);
-        }
-
     });
 
     failedQueue = [];
 };
 
 
+/*
+ * Attach the current access token
+ * to every normal API request.
+ */
+api.interceptors.request.use(
+    (config) => {
+        const accessToken = tokenService.getAccess();
 
-api.interceptors.request.use((config)=>{
+        if (accessToken) {
+            config.headers = config.headers ?? {};
 
-    const token = tokenService.getAccess();
+            config.headers.Authorization =
+                `Bearer ${accessToken}`;
+        }
 
-    if(token){
-        config.headers.Authorization =
-            `Bearer ${token}`;
-    }
-
-    return config;
-
-});
-
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 
+/*
+ * Handle expired access tokens.
+ */
 api.interceptors.response.use(
+    (response) => response,
 
-    response => response,
+    async (error) => {
+        const originalRequest = error.config;
 
-
-    async error => {
-
-
-        const original =
-            error.config;
-
-
-        if(
-            error.response?.status === 401 &&
-            !original._retry &&
-            !original.url.includes("/auth/refresh/")
-        ){
-
-
-            if(isRefreshing){
-
-                return new Promise(
-                    (resolve,reject)=>{
-
-                        failedQueue.push({
-                            resolve,
-                            reject
-                        });
-
-                    }
-                )
-                .then(token=>{
-
-                    original.headers.Authorization =
-                    `Bearer ${token}`;
-
-                    return api(original);
-
-                });
-
-            }
-
-
-
-            original._retry = true;
-
-            isRefreshing = true;
-
-
-            const refresh =
-                tokenService.getRefresh();
-
-
-
-            if(!refresh){
-
-                tokenService.clear();
-
-                window.location.href="/login";
-
-                return Promise.reject(error);
-            }
-
-
-
-            try{
-
-
-                const res =
-                    await AuthAPI.refresh(refresh);
-
-
-                const newAccess =
-                    res.data.access;
-
-
-                tokenService.setAccess(newAccess);
-
-
-
-                processQueue(
-                    null,
-                    newAccess
-                );
-
-
-
-                original.headers.Authorization =
-                    `Bearer ${newAccess}`;
-
-
-
-                return api(original);
-
-
-
-            }
-
-            catch(err){
-
-
-                processQueue(
-                    err,
-                    null
-                );
-
-
-                tokenService.clear();
-
-
-                window.location.href="/login";
-
-
-                return Promise.reject(err);
-
-            }
-
-
-            finally{
-
-                isRefreshing=false;
-
-            }
-
+        if (!originalRequest) {
+            return Promise.reject(error);
         }
 
 
-        return Promise.reject(error);
+        /*
+         * Do not attempt refresh for authentication
+         * endpoints themselves.
+         */
+        const isAuthRequest =
+            originalRequest.url?.includes("/auth/login/") ||
+            originalRequest.url?.includes("/auth/register/") ||
+            originalRequest.url?.includes("/auth/google/") ||
+            originalRequest.url?.includes("/auth/logout/") ||
+            originalRequest.url?.includes("/auth/refresh/");
 
+
+        if (
+            error.response?.status !== 401 ||
+            originalRequest._retry ||
+            isAuthRequest
+        ) {
+            return Promise.reject(error);
+        }
+
+
+        /*
+         * Another request is already refreshing.
+         * Wait for it instead of starting another refresh.
+         */
+        if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+                failedQueue.push({
+                    resolve,
+                    reject,
+                });
+            }).then((newAccessToken) => {
+                originalRequest.headers =
+                    originalRequest.headers ?? {};
+
+                originalRequest.headers.Authorization =
+                    `Bearer ${newAccessToken}`;
+
+                return api(originalRequest);
+            });
+        }
+
+
+        originalRequest._retry = true;
+
+        isRefreshing = true;
+
+
+        const refreshToken =
+            tokenService.getRefresh();
+
+
+        if (!refreshToken) {
+            notifySessionExpired();
+
+            return Promise.reject(error);
+        }
+
+
+        try {
+            const response =
+                await refreshClient.post(
+                    "/auth/refresh/",
+                    {
+                        refresh: refreshToken,
+                    }
+                );
+
+
+            const newAccessToken =
+                response.data?.access;
+
+
+            if (!newAccessToken) {
+                throw new Error(
+                    "Refresh response did not contain an access token."
+                );
+            }
+
+
+            tokenService.setAccess(
+                newAccessToken
+            );
+
+            notifyAccessTokenChanged(
+                newAccessToken
+            );
+
+
+            processQueue(
+                null,
+                newAccessToken
+            );
+
+
+            originalRequest.headers =
+                originalRequest.headers ?? {};
+
+            originalRequest.headers.Authorization =
+                `Bearer ${newAccessToken}`;
+
+
+            return api(originalRequest);
+
+        } catch (refreshError) {
+            processQueue(
+                refreshError,
+                null
+            );
+
+            notifySessionExpired();
+
+            return Promise.reject(refreshError);
+
+        } finally {
+            isRefreshing = false;
+        }
     }
-
 );
 
 

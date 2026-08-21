@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import EmptyState from "../components/ui/EmptyState";
 import PageContainer from "../components/ui/PageContainer";
 import ReviewSection from "../components/review/ReviewSection";
 import AnimeDetailSkeleton from "../components/skeletons/AnimeDetailSkeleton";
 import { useAnimeDetail } from "../hooks/useAnimeDetail";
+import { useAuthPrompt } from "../context/useAuthPrompt";
+import { AuthContext } from "../context/AuthContext";
 import {
     useFavorites,
     useToggleFavorite
@@ -15,7 +17,11 @@ import OptimizedImage from "../components/ui/OptimizedImage";
 function Detail() {
 
     const { id } = useParams();
+    const { isAuthenticated } =
+        useContext(AuthContext);
 
+    const { showLoginRequired } =
+        useAuthPrompt();
     const {
         data: anime,
         isLoading,
@@ -90,6 +96,11 @@ function Detail() {
     });
 
     const handleFavorite = () => {
+        if (!isAuthenticated) {
+            showLoginRequired();
+            return;
+        }
+
         if (!anime?.id) {
             return;
         }
@@ -148,7 +159,10 @@ function Detail() {
                                 type="button"
                                 className={`favorite-button ${liked ? "active" : ""}`}
                                 onClick={handleFavorite}
-                                disabled={toggleFavorite.isPending}
+                                disabled={
+                                    isAuthenticated &&
+                                    toggleFavorite.isPending
+                                }
                                 aria-label={
                                     liked
                                         ? `Remove ${anime.title} from favorites`

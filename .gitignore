@@ -6,8 +6,6 @@ backend/db.sqlite3
 backend/.pytest_cache/
 backend/htmlcov/
 backend/.coverage
-backend/venv/
-backend/.pytest_cache/
 backend/media/
 backend/jikan.json
 

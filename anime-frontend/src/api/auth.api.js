@@ -1,58 +1,33 @@
 import api from "./client";
 
-
 export const AuthAPI = {
-
     login(data) {
-        return api.post(
-            "/auth/login/",
-            data
-        );
+        return api.post("/auth/login/", data);
     },
-
 
     register(data) {
-        return api.post(
-            "/auth/register/",
-            data
-        );
+        return api.post("/auth/register/", data);
     },
 
-
-    googleLogin(token) {
-        return api.post(
-            "/auth/google/",
-            {
-                token
-            }
-        );
+    googleLogin(credential) {
+        return api.post("/auth/google/", {
+            token: credential,
+        });
     },
 
-
-    refresh(refresh) {
-        return api.post(
-            "/auth/refresh/",
-            {
-                refresh
-            }
-        );
+    refresh(refreshToken) {
+        return api.post("/auth/refresh/", {
+            refresh: refreshToken,
+        });
     },
 
-
-    logout(refresh) {
-        return api.post(
-            "/auth/logout/",
-            {
-                refresh
-            }
-        );
+    logout(refreshToken) {
+        return api.post("/auth/logout/", {
+            refresh: refreshToken,
+        });
     },
-
 
     me() {
-        return api.get(
-            "/auth/me/"
-        );
-    }
-
+        return api.get("/auth/me/");
+    },
 };

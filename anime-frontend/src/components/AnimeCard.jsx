@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { memo, useState } from "react";
+import { memo, useContext, useState } from "react";
+
+import { AuthContext } from "../context/AuthContext";
+import { useAuthPrompt } from "../context/useAuthPrompt";
 
 import { useUpdateLibrary } from "../hooks/useLibrary";
 import OptimizedImage from "./ui/OptimizedImage";
@@ -13,6 +16,9 @@ function AnimeCard({
     onToggleFavorite,
     isFavoritePending = false,
 }) {
+    const { isAuthenticated } = useContext(AuthContext);
+    const { showLoginRequired } = useAuthPrompt();
+
     const updateLibrary = useUpdateLibrary();
 
     const [open, setOpen] = useState(false);
@@ -28,7 +34,36 @@ function AnimeCard({
     const title = anime?.title || "Unknown Anime";
     const image = anime?.image || "";
 
+
+    const handleFavoriteClick = (event) => {
+        event.stopPropagation();
+
+        if (!isAuthenticated) {
+            showLoginRequired();
+            return;
+        }
+
+        onToggleFavorite?.(anime);
+    };
+
+
+    const handleLibraryClick = () => {
+        if (!isAuthenticated) {
+            showLoginRequired();
+            return;
+        }
+
+        setOpen((current) => !current);
+    };
+
+
     const handleUpdate = (value) => {
+        if (!isAuthenticated) {
+            setOpen(false);
+            showLoginRequired();
+            return;
+        }
+
         setOpen(false);
 
         if (value === "remove") {
@@ -48,9 +83,12 @@ function AnimeCard({
         });
     };
 
+
     return (
         <motion.article
-            className={`anime-card ${open ? "menu-open" : ""}`}
+            className={`anime-card ${
+                open ? "menu-open" : ""
+            }`}
             whileHover={{ scale: 1.03 }}
         >
             {/* IMAGE */}
@@ -66,6 +104,7 @@ function AnimeCard({
                 />
             </Link>
 
+
             {/* FAVORITE */}
             <button
                 type="button"
@@ -73,18 +112,16 @@ function AnimeCard({
                     isFavorited ? "active" : ""
                 }`}
                 disabled={
-                    !onToggleFavorite ||
-                    isFavoritePending
+                    isAuthenticated &&
+                    (!onToggleFavorite ||
+                        isFavoritePending)
                 }
                 aria-label={
                     isFavorited
                         ? `Remove ${title} from favorites`
                         : `Add ${title} to favorites`
                 }
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleFavorite?.(anime);
-                }}
+                onClick={handleFavoriteClick}
             >
                 {isFavoritePending
                     ? "⏳"
@@ -93,11 +130,13 @@ function AnimeCard({
                         : "🤍"}
             </button>
 
+
             {/* CONTENT */}
             <div className="content">
                 <h3 className="title">
                     {title}
                 </h3>
+
 
                 {/* LIBRARY STATUS */}
                 <div className="status-wrapper">
@@ -106,24 +145,32 @@ function AnimeCard({
                         className={`status-badge ${
                             status || "none"
                         }`}
-                        onClick={() =>
-                            setOpen((current) => !current)
+                        onClick={handleLibraryClick}
+                        disabled={
+                            isAuthenticated &&
+                            updateLibrary.isPending
                         }
-                        disabled={updateLibrary.isPending}
                     >
-                        {updateLibrary.isPending
+                        {isAuthenticated &&
+                        updateLibrary.isPending
                             ? "Updating..."
                             : status
-                                ? status.replaceAll("_", " ")
+                                ? status.replaceAll(
+                                    "_",
+                                    " "
+                                )
                                 : "Add to list"}
                     </button>
 
-                    {open && (
+
+                    {open && isAuthenticated && (
                         <div className="status-menu">
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleUpdate("watching")
+                                    handleUpdate(
+                                        "watching"
+                                    )
                                 }
                                 disabled={
                                     updateLibrary.isPending
@@ -135,7 +182,9 @@ function AnimeCard({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleUpdate("completed")
+                                    handleUpdate(
+                                        "completed"
+                                    )
                                 }
                                 disabled={
                                     updateLibrary.isPending
@@ -147,7 +196,9 @@ function AnimeCard({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleUpdate("dropped")
+                                    handleUpdate(
+                                        "dropped"
+                                    )
                                 }
                                 disabled={
                                     updateLibrary.isPending
@@ -159,7 +210,9 @@ function AnimeCard({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    handleUpdate("plan_to_watch")
+                                    handleUpdate(
+                                        "plan_to_watch"
+                                    )
                                 }
                                 disabled={
                                     updateLibrary.isPending
@@ -172,7 +225,9 @@ function AnimeCard({
                                 type="button"
                                 className="danger"
                                 onClick={() =>
-                                    handleUpdate("remove")
+                                    handleUpdate(
+                                        "remove"
+                                    )
                                 }
                                 disabled={
                                     updateLibrary.isPending

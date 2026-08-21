@@ -1,54 +1,94 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import {
+    useNavigate,
+} from "react-router-dom";import toast from "react-hot-toast";
 
 import { useLogin } from "../auth/useAuth";
 import { AuthContext } from "../context/AuthContext";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 
+
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const { login: setAuth } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
+
     const loginMutation = useLogin();
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
-        e.preventDefault();
+    const handleLogin = (event) => {
+        event.preventDefault();
 
-        if (!username.trim() || !password) {
-            toast.error("Please enter your username and password.");
+        const cleanUsername = username.trim();
+
+        if (!cleanUsername || !password) {
+            toast.error(
+                "Please enter your username and password."
+            );
+
             return;
         }
 
         loginMutation.mutate(
             {
-                username: username.trim(),
+                username: cleanUsername,
                 password,
             },
             {
-                onSuccess: (res) => {
-                    const { access, refresh, user } = res.data;
+                onSuccess: async (response) => {
+                    const {
+                        access,
+                        refresh,
+                        user,
+                    } = response.data;
 
-                    setAuth(access, refresh, user);
+                    await login(
+                        access,
+                        refresh,
+                        user
+                    );
 
                     toast.success("Welcome back!");
-                    navigate("/");
-                },
-                onError: () => {
-                    toast.error("Invalid username or password.");
+
+                    window.location.href = "/";
+                                    },
+
+                onError: (error) => {
+                    const status =
+                        error.response?.status;
+
+                    const message =
+                        error.response?.data?.detail;
+
+                    if (status === 403) {
+                        toast.error(
+                            message ||
+                            "Please verify your email before logging in."
+                        );
+
+                        return;
+                    }
+
+                    toast.error(
+                        message ||
+                        "Invalid username or password."
+                    );
                 },
             }
         );
     };
+
 
     return (
         <main className="auth-page">
             <div className="auth-background" />
 
             <div className="auth-brand">
-                <span className="auth-brand-mark">✦</span>
+                <span className="auth-brand-mark">
+                    ✦
+                </span>
+
                 <span>Anime Tracker</span>
             </div>
 
@@ -58,7 +98,9 @@ export default function Login() {
                         WELCOME BACK
                     </span>
 
-                    <h1>Sign in to Anime Tracker</h1>
+                    <h1>
+                        Sign in to Anime Tracker
+                    </h1>
 
                     <p>
                         Keep track of what you're watching,
@@ -72,7 +114,9 @@ export default function Login() {
                 </div>
 
                 <div className="auth-divider">
-                    <span>or continue with username</span>
+                    <span>
+                        or continue with username
+                    </span>
                 </div>
 
                 <form
@@ -88,8 +132,10 @@ export default function Login() {
                             id="username"
                             type="text"
                             value={username}
-                            onChange={(e) =>
-                                setUsername(e.target.value)
+                            onChange={(event) =>
+                                setUsername(
+                                    event.target.value
+                                )
                             }
                             placeholder="Enter your username"
                             autoComplete="username"
@@ -105,8 +151,10 @@ export default function Login() {
                             id="password"
                             type="password"
                             value={password}
-                            onChange={(e) =>
-                                setPassword(e.target.value)
+                            onChange={(event) =>
+                                setPassword(
+                                    event.target.value
+                                )
                             }
                             placeholder="Enter your password"
                             autoComplete="current-password"
@@ -116,7 +164,9 @@ export default function Login() {
                     <button
                         type="submit"
                         className="auth-submit"
-                        disabled={loginMutation.isPending}
+                        disabled={
+                            loginMutation.isPending
+                        }
                     >
                         {loginMutation.isPending
                             ? "Signing in..."
@@ -126,10 +176,13 @@ export default function Login() {
 
                 <p className="auth-footer">
                     New to Anime Tracker?{" "}
+
                     <button
                         type="button"
                         className="auth-link"
-                        onClick={() => navigate("/register")}
+                        onClick={() =>
+                            navigate("/register")
+                        }
                     >
                         Create an account
                     </button>

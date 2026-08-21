@@ -1,123 +1,235 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+
 import {
     useReviews,
     useCreateReview,
-    useDeleteReview
+    useDeleteReview,
 } from "../../hooks/user/useReview";
+
+import { AuthContext } from "../../context/AuthContext";
+import { useAuthPrompt } from "../../context/useAuthPrompt";
+
 import EmptyState from "../ui/EmptyState";
 import AnimeCardSkeleton from "../skeletons/AnimeCardSkeleton";
 
-function ReviewSection({ animeId }) {
 
-    const { data, isLoading } = useReviews(animeId);
+function ReviewSection({ animeId }) {
+    const { user, isAuthenticated } =
+        useContext(AuthContext);
+
+    const { showLoginRequired } =
+        useAuthPrompt();
+
+    const {
+        data,
+        isLoading,
+    } = useReviews(animeId);
+
     const createReview = useCreateReview();
     const deleteReview = useDeleteReview();
 
     const [rating, setRating] = useState(10);
     const [text, setText] = useState("");
 
+
     if (isLoading) {
         return (
             <div className="reviews-list">
-                {Array.from({ length: 3 }).map((_, i) => (
-                    <AnimeCardSkeleton key={i} />
-                ))}
+                {Array.from({ length: 3 }).map(
+                    (_, index) => (
+                        <AnimeCardSkeleton
+                            key={index}
+                        />
+                    )
+                )}
             </div>
         );
     }
 
-    const reviews = data?.reviews || [];
-    const average = data?.average || 0;
 
-    const submit = () => {
-        if (!text.trim()) return;
+    const reviews = data?.reviews ?? [];
+    const average = Number(data?.average_rating ?? 0);
 
-        createReview.mutate({
-            anime_id: Number(animeId),
-            rating,
-            text
-        });
 
-        setText("");
+    const requireAuthentication = () => {
+        if (!isAuthenticated) {
+            showLoginRequired();
+            return false;
+        }
+
+        return true;
     };
 
-    return (
-        <div className="reviews-section">
 
-            {/* HEADER */}
+    const submit = () => {
+        if (!requireAuthentication()) {
+            return;
+        }
+
+        const reviewText = text.trim();
+
+        if (!reviewText) {
+            return;
+        }
+
+        createReview.mutate(
+            {
+                anime_id: Number(animeId),
+                rating,
+                text: reviewText,
+            },
+            {
+                onSuccess: () => {
+                    setText("");
+                },
+            }
+        );
+    };
+
+
+    return (
+        <section className="reviews-section">
+
             <div className="reviews-header">
                 <h2>⭐ Community Reviews</h2>
+
                 <div className="average-rating">
                     {average.toFixed(1)} / 10
                 </div>
             </div>
 
-            {/* FORM */}
+
             <div className="review-form">
 
                 <select
                     value={rating}
-                    onChange={(e) => setRating(Number(e.target.value))}
+                    onChange={(event) => {
+                        if (!requireAuthentication()) {
+                            return;
+                        }
+
+                        setRating(
+                            Number(event.target.value)
+                        );
+                    }}
+                    aria-label="Review rating"
                 >
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                        <option key={n} value={n}>
-                            {n}/10
-                        </option>
-                    ))}
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                        (value) => (
+                            <option
+                                key={value}
+                                value={value}
+                            >
+                                {value}/10
+                            </option>
+                        )
+                    )}
                 </select>
+
 
                 <textarea
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Share your thoughts..."
+                    onChange={(event) => {
+                        if (!isAuthenticated) {
+                            showLoginRequired();
+                            return;
+                        }
+
+                        setText(event.target.value);
+                    }}
+                    onFocus={() => {
+                        if (!isAuthenticated) {
+                            showLoginRequired();
+                        }
+                    }}
+                    placeholder={
+                        isAuthenticated
+                            ? "Share your thoughts..."
+                            : "Sign in to write a review..."
+                    }
+                    readOnly={!isAuthenticated}
+                    aria-label="Review text"
                 />
 
+
                 <button
+                    type="button"
                     onClick={submit}
-                    disabled={createReview.isPending}
+                    disabled={
+                        isAuthenticated &&
+                        createReview.isPending
+                    }
                 >
-                    {createReview.isPending ? "Posting..." : "Submit Review"}
+                    {isAuthenticated &&
+                    createReview.isPending
+                        ? "Posting..."
+                        : "Submit Review"}
                 </button>
 
             </div>
 
-            {/* LIST */}
+
             <div className="reviews-list">
 
                 {reviews.length === 0 ? (
-                    <EmptyState text="No reviews yet." />
+                    <EmptyState
+                        text="No reviews yet."
+                    />
                 ) : (
-                    reviews.map(r => (
-                        <div key={r.id} className="review-card">
+                    reviews.map((review) => {
+                        const isOwnReview =
+                            isAuthenticated &&
+                            String(user?.id) === String(review.user_id);
 
-                            <div className="review-top">
-                                <strong>{r.username}</strong>
-                                <span>⭐ {r.rating}/10</span>
-                            </div>
-
-                            <p>{r.text}</p>
-
-                            <small>
-                                {new Date(r.created_at).toLocaleDateString()}
-                            </small>
-
-                            <button
-                                className="delete-btn"
-                                onClick={() => {
-                                    if (confirm("Delete your review?")) {
-                                        deleteReview.mutate(r.id);
-                                    }
-                                }}
+                        return (
+                            <article
+                                key={review.id}
+                                className="review-card"
                             >
-                                Delete my review
-                            </button>
+                                <div className="review-top">
+                                    <strong>
+                                        {review.username}
+                                    </strong>
 
-                        </div>
-                    ))
+                                    <span>
+                                        ⭐ {review.rating}/10
+                                    </span>
+                                </div>
+
+                                <p>{review.text}</p>
+
+                                <small>
+                                    {new Date(
+                                        review.created_at
+                                    ).toLocaleDateString()}
+                                </small>
+
+                                {isOwnReview && (
+                                    <button
+                                        type="button"
+                                        className="delete-btn"
+                                        onClick={() => {
+                                            if (
+                                                window.confirm(
+                                                    "Delete your review?"
+                                                )
+                                            ) {
+                                                deleteReview.mutate(
+                                                    review.id
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        Delete my review
+                                    </button>
+                                )}
+                            </article>
+                        );
+                    })
                 )}
 
             </div>
-        </div>
+        </section>
     );
 }
 

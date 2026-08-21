@@ -4,7 +4,6 @@ import Sidebar from "../components/Layout/Sidebar";
 import Navbar from "../components/Layout/NavBar";
 import { Outlet } from "react-router-dom";
 
-
 export default function AppLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 

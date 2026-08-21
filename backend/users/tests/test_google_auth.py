@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.test import APITestCase
 
-
+from users.infrastructure.models import EmailVerification
 User = get_user_model()
 
 
@@ -32,7 +32,14 @@ class GoogleLoginTests(APITestCase):
             format="json"
         )
 
+        verification = EmailVerification.objects.get(
+            user__email="google@test.com"
+        )
 
+        self.assertIsNotNone(
+            verification.verified_at
+        )
+        
         self.assertEqual(
             response.status_code,
             200

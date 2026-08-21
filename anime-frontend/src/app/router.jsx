@@ -24,7 +24,7 @@ const Top = lazy(() => import("../pages/Top"));
 // AUTH
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
-
+const VerifyEmail = lazy(() => import("../pages/VerifyEmail"));
 
 // PROTECTED
 const Library = lazy(() => import("../pages/Library"));
@@ -66,7 +66,10 @@ export default function App() {
                         {/* AUTH */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-
+                        <Route
+                            path="/verify-email"
+                            element={<VerifyEmail />}
+                        />
 
                         {/* PROTECTED */}
                         <Route

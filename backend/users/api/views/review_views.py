@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from core.responses import APIResponse
 from users.application.review_service import ReviewService
@@ -54,7 +54,7 @@ def create_review(request):
     }
 )
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def anime_reviews(request, anime_id):
 
     result = review_service.get_anime_reviews(anime_id)

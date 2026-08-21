@@ -1,64 +1,167 @@
 import { useCallback, useEffect, useState } from "react";
+
 import { AuthAPI } from "../api/auth.api";
 import { tokenService } from "../auth/tokenService";
 import { AuthContext } from "./AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../lib/querykeys";
+import {
+    setAccessTokenListener,
+    setSessionExpiredListener,
+} from "../auth/authEvents";
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
 
-    const isAuthenticated = !!token;
+    const refreshPrivateCache = useCallback(() => {
+        queryClient.invalidateQueries({
+            queryKey: queryKeys.users.favorites,
+            exact: false,
+        });
 
-    const login = useCallback((access, refresh, userData = null) => {
-        tokenService.set(access, refresh);
-        setToken(access);
-        setUser(userData);
+        queryClient.invalidateQueries({
+            queryKey: queryKeys.users.library,
+            exact: false,
+        });
+
+        queryClient.invalidateQueries({
+            queryKey: queryKeys.users.dashboard,
+            exact: false,
+        });
+    }, [queryClient]);
+    const clearPrivateCache = useCallback(() => {
+        queryClient.resetQueries({
+            queryKey: queryKeys.users.favorites,
+            exact: false,
+        });
+
+        queryClient.resetQueries({
+            queryKey: queryKeys.users.library,
+            exact: false,
+        });
+
+        queryClient.resetQueries({
+            queryKey: queryKeys.users.dashboard,
+            exact: false,
+        });
+
+        queryClient.resetQueries({
+            queryKey: ["favoriteIds"],
+            exact: false,
+        });
+    }, [queryClient]);
+    const isAuthenticated = Boolean(token);
+
+    const loadUser = useCallback(async () => {
+        try {
+            const res = await AuthAPI.me();
+
+            setUser(res.data);
+
+            return res.data;
+        } catch {
+            setUser(null);
+            return null;
+        }
     }, []);
+
+    const login = useCallback(
+        async (access, refresh, userData = null) => {
+            tokenService.set(access, refresh);
+
+            setToken(access);
+
+            let loggedInUser = userData;
+
+            if (!loggedInUser) {
+                loggedInUser = await loadUser();
+            } else {
+                setUser(loggedInUser);
+            }
+
+            refreshPrivateCache();
+
+            return loggedInUser;
+        },
+        [loadUser, refreshPrivateCache]
+    );
 
     const logout = useCallback(async () => {
         const refresh = tokenService.getRefresh();
 
         try {
-            await AuthAPI.logout({ refresh });
+            if (refresh) {
+                await AuthAPI.logout({
+                    refresh,
+                });
+            }
         } catch {
-            // Logout should still clear the local session
-            // even when the server request fails.
+            // Local logout must still succeed.
         }
 
         tokenService.clear();
         setToken(null);
         setUser(null);
-    }, []);
 
-    const loadUser = useCallback(async () => {
-        try {
-            const res = await AuthAPI.me();
-            setUser(res.data);
-        } catch {
-            setUser(null);
-        }
+        window.location.href = "/";
     }, []);
 
     useEffect(() => {
-        const init = async () => {
+        const initializeAuth = async () => {
             const access = tokenService.getAccess();
 
-            if (access) {
-                setToken(access);
-                await loadUser();
+            if (!access) {
+                tokenService.clear();
+
+                setToken(null);
+                setUser(null);
                 setLoading(false);
+
                 return;
             }
 
-            tokenService.clear();
-            setToken(null);
-            setUser(null);
+            setToken(access);
+
+            await loadUser();
+
             setLoading(false);
         };
 
-        init();
+        initializeAuth();
     }, [loadUser]);
+
+    useEffect(() => {
+        setAccessTokenListener((newToken) => {
+            setToken(newToken);
+        });
+
+        return () => {
+            setAccessTokenListener(null);
+        };
+    }, []);
+
+    useEffect(() => {
+        setAccessTokenListener((newToken) => {
+            setToken(newToken);
+        });
+
+        setSessionExpiredListener(() => {
+            tokenService.clear();
+
+            setToken(null);
+            setUser(null);
+
+            clearPrivateCache();
+        });
+
+        return () => {
+            setAccessTokenListener(null);
+            setSessionExpiredListener(null);
+        };
+    }, [clearPrivateCache]);
 
     return (
         <AuthContext.Provider

@@ -1,56 +1,141 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import { useRegister } from "../auth/useAuth";
-import { AuthContext } from "../context/AuthContext";
 import GoogleLoginButton from "../components/GoogleLoginButton";
+
 
 export default function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [registrationComplete, setRegistrationComplete] =
+        useState(false);
+
+    const [registeredEmail, setRegisteredEmail] =
+        useState("");
+
     const registerMutation = useRegister();
-    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
 
-        if (!username.trim() || !email.trim() || !password) {
-            toast.error("Please fill in all fields.");
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const cleanUsername = username.trim();
+        const cleanEmail = email.trim().toLowerCase();
+
+        if (
+            !cleanUsername ||
+            !cleanEmail ||
+            !password
+        ) {
+            toast.error(
+                "Please fill in all fields."
+            );
             return;
         }
 
         registerMutation.mutate(
             {
-                username: username.trim(),
-                email: email.trim(),
+                username: cleanUsername,
+                email: cleanEmail,
                 password,
             },
             {
-                onSuccess: (res) => {
-                    const { access, refresh } = res.data;
+                onSuccess: (response) => {
+                    const data = response?.data ?? {};
 
-                    login(access, refresh);
+                    setRegisteredEmail(
+                        data.email || cleanEmail
+                    );
 
-                    toast.success("Account created!");
-                    navigate("/");
+                    setRegistrationComplete(true);
+
+                    toast.success(
+                        "Account created. Check your email."
+                    );
                 },
-                onError: () => {
-                    toast.error("Registration failed. Please try again.");
+
+                onError: (error) => {
+                    const message =
+                        error.response?.data?.detail ||
+                        "Registration failed. Please try again.";
+
+                    toast.error(message);
                 },
             }
         );
     };
+
+
+    if (registrationComplete) {
+        return (
+            <main className="auth-page">
+                <div className="auth-background" />
+
+                <div className="auth-brand">
+                    <span className="auth-brand-mark">
+                        ✦
+                    </span>
+
+                    <span>Anime Tracker</span>
+                </div>
+
+                <section className="auth-card verify-email-card">
+                    <div className="verify-email-icon success">
+                        ✓
+                    </div>
+
+                    <div className="auth-header">
+                        <span className="auth-eyebrow">
+                            ACCOUNT CREATED
+                        </span>
+
+                        <h1>
+                            Check your email
+                        </h1>
+
+                        <p>
+                            We've sent a verification link to:
+                        </p>
+
+                        <strong className="verification-email">
+                            {registeredEmail}
+                        </strong>
+
+                        <p>
+                            Verify your email address before
+                            signing in to Anime Tracker.
+                            The verification link expires
+                            after 24 hours.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="auth-submit"
+                        onClick={() => navigate("/login")}
+                    >
+                        Go to Login
+                    </button>
+                </section>
+            </main>
+        );
+    }
+
 
     return (
         <main className="auth-page">
             <div className="auth-background" />
 
             <div className="auth-brand">
-                <span className="auth-brand-mark">✦</span>
+                <span className="auth-brand-mark">
+                    ✦
+                </span>
+
                 <span>Anime Tracker</span>
             </div>
 
@@ -60,7 +145,9 @@ export default function Register() {
                         JOIN ANIME TRACKER
                     </span>
 
-                    <h1>Create your account</h1>
+                    <h1>
+                        Create your account
+                    </h1>
 
                     <p>
                         Build your library, track your progress,
@@ -73,7 +160,9 @@ export default function Register() {
                 </div>
 
                 <div className="auth-divider">
-                    <span>or register with username</span>
+                    <span>
+                        or register with username
+                    </span>
                 </div>
 
                 <form
@@ -89,8 +178,10 @@ export default function Register() {
                             id="register-username"
                             type="text"
                             value={username}
-                            onChange={(e) =>
-                                setUsername(e.target.value)
+                            onChange={(event) =>
+                                setUsername(
+                                    event.target.value
+                                )
                             }
                             placeholder="Choose a username"
                             autoComplete="username"
@@ -106,8 +197,10 @@ export default function Register() {
                             id="register-email"
                             type="email"
                             value={email}
-                            onChange={(e) =>
-                                setEmail(e.target.value)
+                            onChange={(event) =>
+                                setEmail(
+                                    event.target.value
+                                )
                             }
                             placeholder="you@example.com"
                             autoComplete="email"
@@ -123,8 +216,10 @@ export default function Register() {
                             id="register-password"
                             type="password"
                             value={password}
-                            onChange={(e) =>
-                                setPassword(e.target.value)
+                            onChange={(event) =>
+                                setPassword(
+                                    event.target.value
+                                )
                             }
                             placeholder="Create a password"
                             autoComplete="new-password"
@@ -134,7 +229,9 @@ export default function Register() {
                     <button
                         type="submit"
                         className="auth-submit"
-                        disabled={registerMutation.isPending}
+                        disabled={
+                            registerMutation.isPending
+                        }
                     >
                         {registerMutation.isPending
                             ? "Creating account..."
@@ -144,10 +241,13 @@ export default function Register() {
 
                 <p className="auth-footer">
                     Already have an account?{" "}
+
                     <button
                         type="button"
                         className="auth-link"
-                        onClick={() => navigate("/login")}
+                        onClick={() =>
+                            navigate("/login")
+                        }
                     >
                         Sign in
                     </button>

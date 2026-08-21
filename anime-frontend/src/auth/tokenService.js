@@ -1,27 +1,37 @@
 const ACCESS_KEY = "access_token";
 const REFRESH_KEY = "refresh_token";
 
-export const tokenService = {
+const storage = window.localStorage;
 
+export const tokenService = {
     set(access, refresh) {
-        localStorage.setItem(ACCESS_KEY, access);
-        localStorage.setItem(REFRESH_KEY, refresh);
+        if (access) {
+            storage.setItem(ACCESS_KEY, access);
+        }
+
+        if (refresh) {
+            storage.setItem(REFRESH_KEY, refresh);
+        }
     },
 
     getAccess() {
-        return localStorage.getItem(ACCESS_KEY);
+        return storage.getItem(ACCESS_KEY);
     },
 
     getRefresh() {
-        return localStorage.getItem(REFRESH_KEY);
+        return storage.getItem(REFRESH_KEY);
     },
 
-    setAccess(token) {
-        localStorage.setItem(ACCESS_KEY, token);
+    setAccess(access) {
+        if (!access) {
+            return;
+        }
+
+        storage.setItem(ACCESS_KEY, access);
     },
 
     clear() {
-        localStorage.removeItem(ACCESS_KEY);
-        localStorage.removeItem(REFRESH_KEY);
-    }
+        storage.removeItem(ACCESS_KEY);
+        storage.removeItem(REFRESH_KEY);
+    },
 };

@@ -8,13 +8,21 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from core.auth.docs import LoginRequestSerializer, ErrorSerializer, LoginResponseSerializer,RegisterRequestSerializer, RefreshResponseSerializer, RefreshRequestSerializer, GoogleLoginRequestSerializer, LogoutRequestSerializer
+import hashlib
 
+from django.utils import timezone
+
+from users.models import EmailVerification
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
 from core.auth.services.auth_service import AuthService
 from users.api.serializers import UserSerializer
+from django.db import transaction
 
+from core.auth.services.email_verification_service import (
+    EmailVerificationService,
+)
 User = get_user_model()
 
 
@@ -23,10 +31,13 @@ User = get_user_model()
 # =========================
 @extend_schema(
     summary="Register",
-    description="Create a new account.",
+    description=(
+        "Create a new account and send an email "
+        "verification link."
+    ),
     request=RegisterRequestSerializer,
     responses={
-        200: LoginResponseSerializer,
+        201: ErrorSerializer,
         400: ErrorSerializer,
     },
 )
@@ -34,28 +45,82 @@ User = get_user_model()
 @permission_classes([AllowAny])
 def register(request):
 
-    username = request.data.get("username")
-    email = request.data.get("email")
-    password = request.data.get("password")
+    username = (
+        request.data.get("username") or ""
+    ).strip()
 
-    if not username or not password:
-        return Response({"detail": "Missing fields"}, status=400)
+    email = (
+        request.data.get("email") or ""
+    ).strip().lower()
 
-    email = email or f"{username}@temp.local"
-
-    if User.objects.filter(username=username).exists():
-        return Response({"detail": "User already exists"}, status=400)
-
-    user = User.objects.create_user(
-        username=username,
-        email=email,
-        password=password,
+    password = (
+        request.data.get("password") or ""
     )
 
-    return Response({
-        **AuthService.create_tokens(user),
-        "user": UserSerializer(user).data,
-    })
+    if not username or not email or not password:
+        return Response(
+            {
+                "detail": (
+                    "Username, email and password "
+                    "are required."
+                )
+            },
+            status=400,
+        )
+
+    if User.objects.filter(
+        username=username
+    ).exists():
+        return Response(
+            {
+                "detail": "User already exists."
+            },
+            status=400,
+        )
+
+    if User.objects.filter(
+        email__iexact=email
+    ).exists():
+        return Response(
+            {
+                "detail": (
+                    "An account with this email "
+                    "already exists."
+                )
+            },
+            status=400,
+        )
+
+    with transaction.atomic():
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+        )
+
+        raw_token = (
+            EmailVerificationService.create_verification(
+                user
+            )
+        )
+
+        EmailVerificationService.send_verification_email(
+            user,
+            raw_token,
+        )
+
+    return Response(
+        {
+            "detail": (
+                "Registration successful. "
+                "Please check your email "
+                "to verify your account."
+            ),
+            "email": user.email,
+        },
+        status=201,
+    )
 
 
 # =========================
@@ -63,22 +128,34 @@ def register(request):
 # =========================
 @extend_schema(
     summary="Login",
-    description="Authenticate a user and return JWT access and refresh tokens.",
+    description=(
+        "Authenticate a verified user and return "
+        "JWT access and refresh tokens."
+    ),
     request=LoginRequestSerializer,
     responses={
         200: LoginResponseSerializer,
         400: ErrorSerializer,
+        403: ErrorSerializer,
     },
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
 
-    username = request.data.get("username")
-    password = request.data.get("password")
+    username = (
+        request.data.get("username") or ""
+    ).strip()
+
+    password = (
+        request.data.get("password") or ""
+    )
 
     if not username or not password:
-        return Response({"detail": "Missing credentials"}, status=400)
+        return Response(
+            {"detail": "Missing credentials."},
+            status=400,
+        )
 
     user = authenticate(
         username=username,
@@ -86,12 +163,45 @@ def login(request):
     )
 
     if user is None:
-        return Response({"detail": "Invalid credentials"}, status=400)
+        return Response(
+            {"detail": "Invalid credentials."},
+            status=400,
+        )
 
-    return Response({
-        **AuthService.create_tokens(user),
-        "user": UserSerializer(user).data,
-    })
+    verification = getattr(
+        user,
+        "email_verification",
+        None,
+    )
+
+    if verification is None:
+        return Response(
+            {
+                "detail": (
+                    "Please verify your email "
+                    "before logging in."
+                )
+            },
+            status=403,
+        )
+
+    if not verification.is_verified:
+        return Response(
+            {
+                "detail": (
+                    "Please verify your email "
+                    "before logging in."
+                )
+            },
+            status=403,
+        )
+
+    return Response(
+        {
+            **AuthService.create_tokens(user),
+            "user": UserSerializer(user).data,
+        }
+    )
 
 
 # =========================
@@ -194,6 +304,19 @@ def google_login(request):
         },
     )
 
+    verified_token_hash = hashlib.sha256(
+        f"google:{email}".encode("utf-8")
+    ).hexdigest()
+
+    EmailVerification.objects.update_or_create(
+        user=user,
+        defaults={
+            "token_hash": verified_token_hash,
+            "expires_at": timezone.now(),
+            "verified_at": timezone.now(),
+        },
+    )
+
     return Response({
         **AuthService.create_tokens(user),
         "user": UserSerializer(user).data,
@@ -237,4 +360,51 @@ def me(request):
 
     return Response(
         UserSerializer(request.user).data
+    )
+
+@extend_schema(
+    summary="Verify Email",
+    description="Verify a user's email address using a verification token.",
+    responses={
+        200: ErrorSerializer,
+        400: ErrorSerializer,
+    },
+)
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def verify_email(request):
+
+    token = (
+        request.query_params.get("token") or ""
+    ).strip()
+
+    if not token:
+        return Response(
+            {
+                "detail": (
+                    "Verification token is required."
+                )
+            },
+            status=400,
+        )
+
+    user, error_message = (
+        EmailVerificationService.verify_token(token)
+    )
+
+    if error_message:
+        return Response(
+            {
+                "detail": error_message
+            },
+            status=400,
+        )
+
+    return Response(
+        {
+            "detail": (
+                "Email verified successfully. "
+                "You can now log in."
+            )
+        }
     )

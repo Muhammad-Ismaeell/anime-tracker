@@ -8,4 +8,9 @@ urlpatterns = [
     path("logout/", views.logout),
     path("google/", views.google_login),
     path("me/", views.me),
+    path(
+        "verify-email/",
+        views.verify_email,
+        name="verify-email",
+    ),
 ]

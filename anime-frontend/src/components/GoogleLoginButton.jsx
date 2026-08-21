@@ -1,72 +1,69 @@
 import { useContext, useState } from "react";
+
 import { AuthContext } from "../context/AuthContext";
 import { AuthAPI } from "../api/auth.api";
-import { useNavigate } from "react-router-dom";
 import GoogleSignIn from "./GoogleSignIn";
 
 
-export default function GoogleLoginButton(){
-
+export default function GoogleLoginButton() {
     const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
 
-    const [error,setError] = useState(null);
+    const [error, setError] = useState(null);
 
-
-    const handleGoogleLogin = async (credentialResponse)=>{
-
-        console.log("STEP 1 GOOGLE CALLBACK");
+    const handleGoogleLogin = async (credentialResponse) => {
+        setError(null);
 
         try {
+            const credential = credentialResponse?.credential;
+
+            if (!credential) {
+                throw new Error("Missing Google credential.");
+            }
 
             const res = await AuthAPI.googleLogin(
-                credentialResponse.credential
+                credential
             );
-
-            console.log("STEP 2 BACKEND:", res.data);
-
 
             const {
                 access,
                 refresh,
-                user
+                user,
             } = res.data;
 
+            if (!access || !refresh) {
+                throw new Error(
+                    "Authentication response is incomplete."
+                );
+            }
 
-            console.log("STEP 3 TOKENS:", access);
-
-
-            login(
+            await login(
                 access,
                 refresh,
                 user
             );
 
-
-            console.log("STEP 4 BEFORE NAV");
-
-            navigate("/");
-
+            window.location.href = "/";
+        } catch {
+            setError(
+                "Google login failed. Please try again."
+            );
         }
-        catch(err){
-
-            console.log("GOOGLE ERROR", err);
-
-        }
-
     };
-
 
     return (
         <>
             <GoogleSignIn
                 onSuccess={handleGoogleLogin}
-                onError={()=>{
-                    setError("Google login failed");
+                onError={() => {
+                    setError("Google login failed.");
                 }}
             />
 
-            {error && <p>{error}</p>}
+            {error && (
+                <p className="auth-error">
+                    {error}
+                </p>
+            )}
         </>
     );
 }

@@ -3,6 +3,9 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from anime.infrastructure.models import Anime
+from datetime import timedelta
+
+from django.utils import timezone
 
 
 # =========================
@@ -51,8 +54,7 @@ class UserAnimeStatus(models.Model):
     status = models.CharField(
         max_length=30,
         choices=STATUS_CHOICES,
-        null=True,
-        blank=True
+        default="plan_to_watch",
     )
 
     progress = models.IntegerField(
@@ -93,8 +95,17 @@ class FavoriteAnime(models.Model):
     
     class Meta:
         ordering = ["-created_at"]
-        unique_together = ("user", "anime")
-        indexes = [models.Index(fields=["user"])]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "anime"],
+                name="unique_user_anime_favorite",
+            )
+        ]
+
+        indexes = [
+            models.Index(fields=["user"]),
+        ]
 
 
 # =========================
@@ -121,7 +132,12 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ("user", "anime")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "anime"],
+                name="unique_user_anime_review",
+            )
+        ]
         indexes = [
             models.Index(fields=["anime"]),
             models.Index(fields=["user"]),
@@ -152,5 +168,45 @@ class Activity(models.Model):
     action = models.CharField(max_length=20, choices=ACTION_TYPES)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    models.Index(
+        fields=["user", "-created_at"]
+    )
 
 
+class EmailVerification(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="email_verification",
+    )
+
+    token_hash = models.CharField(
+        max_length=128,
+        unique=True,
+    )
+
+    expires_at = models.DateTimeField()
+
+    verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        verbose_name = "Email Verification"
+        verbose_name_plural = "Email Verifications"
+
+    @property
+    def is_verified(self):
+        return self.verified_at is not None
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+    def __str__(self):
+        return f"Email verification for {self.user}"
