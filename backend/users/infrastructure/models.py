@@ -46,7 +46,7 @@ class UserAnimeStatus(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
@@ -86,7 +86,7 @@ class UserAnimeStatus(models.Model):
 class FavoriteAnime(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
@@ -114,7 +114,7 @@ class FavoriteAnime(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
 
     anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
@@ -160,17 +160,29 @@ class Activity(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE,
     )
 
-    anime = models.ForeignKey(Anime, on_delete=models.CASCADE)
-
-    action = models.CharField(max_length=20, choices=ACTION_TYPES)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    models.Index(
-        fields=["user", "-created_at"]
+    anime = models.ForeignKey(
+        Anime,
+        on_delete=models.CASCADE,
     )
+
+    action = models.CharField(
+        max_length=20,
+        choices=ACTION_TYPES,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["user", "-created_at"]
+            ),
+        ]
 
 
 class EmailVerification(models.Model):

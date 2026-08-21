@@ -1,18 +1,16 @@
 from django.urls import path
-
 from .api.views import (
     profile,
     review_analytics,
     top_rated_anime,
     update_profile,
-
     favorite_list,
     toggle_favorite,
 
     library,
     update_status,
     remove_from_library,
-
+    
     activity_feed,
     library_stats,
     dashboard,
@@ -22,7 +20,6 @@ from .api.views import (
     my_reviews,
     update_review,
 )
-
 urlpatterns = [
 
 
@@ -57,4 +54,5 @@ urlpatterns = [
     path("reviews/my-reviews/", my_reviews),
     path("reviews/analytics/",review_analytics),
     path("reviews/top-rated/",top_rated_anime),
+
 ]
