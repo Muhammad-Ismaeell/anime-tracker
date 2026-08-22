@@ -1,43 +1,62 @@
+import { useContext } from "react";
+
 import {
     useMutation,
     useQuery,
-    useQueryClient
+    useQueryClient,
 } from "@tanstack/react-query";
 
+import { AuthContext } from "../../context/AuthContext";
 import { FavoriteAPI } from "../../api/favorites";
 import { queryKeys } from "../../lib/querykeys";
 import toast from "react-hot-toast";
+
 
 // ============================
 // GET FAVORITES
 // ============================
 
 export function useFavorites(page = 1) {
+    const {
+        user,
+        isAuthenticated,
+        loading,
+    } = useContext(AuthContext);
+
+    const userId = user?.id ?? null;
 
     return useQuery({
-
         queryKey: [
             ...queryKeys.users.favorites,
-            page
+            userId,
+            page,
         ],
 
         queryFn: () =>
             FavoriteAPI.list(page),
 
-        select: (response) => {
+        enabled:
+            !loading &&
+            isAuthenticated &&
+            userId !== null,
 
-            const data = response?.data ?? response;
+        select: (response) => {
+            const data =
+                response?.data ?? response;
 
             return {
-                results: data?.results ?? [],
-                count: data?.count ?? 0,
-                next: data?.next ?? null,
-                previous: data?.previous ?? null,
+                results:
+                    data?.results ?? [],
+                count:
+                    data?.count ?? 0,
+                next:
+                    data?.next ?? null,
+                previous:
+                    data?.previous ?? null,
             };
-        }
+        },
     });
 }
-
 
 
 // ============================
@@ -45,33 +64,33 @@ export function useFavorites(page = 1) {
 // ============================
 
 export function useToggleFavorite() {
-
     const queryClient = useQueryClient();
 
-
     return useMutation({
-
         mutationFn: FavoriteAPI.toggle,
 
-
         onSuccess: () => {
-            toast.success("Favorite updated!")      
-            queryClient.invalidateQueries({
-                queryKey: queryKeys.users.favorites,
-                exact:false
-            });
+            toast.success(
+                "Favorite updated!"
+            );
 
+            queryClient.invalidateQueries({
+                queryKey:
+                    queryKeys.users.favorites,
+                exact: false,
+            });
 
             queryClient.invalidateQueries({
                 queryKey: [
-                    "favoriteIds"
-                ]
+                    "favoriteIds",
+                ],
             });
         },
-        
-        onError: () => {
-            toast.error("Failed to update favorite");
-        },
 
+        onError: () => {
+            toast.error(
+                "Failed to update favorite"
+            );
+        },
     });
 }

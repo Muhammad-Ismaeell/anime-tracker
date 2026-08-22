@@ -1,19 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 
 import { AuthAPI } from "../api/auth.api";
 import { tokenService } from "../auth/tokenService";
 import { AuthContext } from "./AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/querykeys";
+
 import {
     setAccessTokenListener,
     setSessionExpiredListener,
 } from "../auth/authEvents";
 
+
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const queryClient = useQueryClient();
 
     const refreshPrivateCache = useCallback(() => {
@@ -32,28 +39,46 @@ function AuthProvider({ children }) {
             exact: false,
         });
     }, [queryClient]);
+
+
     const clearPrivateCache = useCallback(() => {
-        queryClient.resetQueries({
+        /*
+         * IMPORTANT:
+         * removeQueries() removes the private cached data
+         * without triggering a refetch.
+         *
+         * This is what we want when logging out or when
+         * the session expires.
+         */
+        queryClient.removeQueries({
             queryKey: queryKeys.users.favorites,
             exact: false,
         });
 
-        queryClient.resetQueries({
+        queryClient.removeQueries({
             queryKey: queryKeys.users.library,
             exact: false,
         });
 
-        queryClient.resetQueries({
+        queryClient.removeQueries({
             queryKey: queryKeys.users.dashboard,
             exact: false,
         });
 
-        queryClient.resetQueries({
+        queryClient.removeQueries({
             queryKey: ["favoriteIds"],
             exact: false,
         });
+
+        queryClient.removeQueries({
+            queryKey: queryKeys.users.profile,
+            exact: false,
+        });
     }, [queryClient]);
+
+
     const isAuthenticated = Boolean(token);
+
 
     const loadUser = useCallback(async () => {
         try {
@@ -64,13 +89,22 @@ function AuthProvider({ children }) {
             return res.data;
         } catch {
             setUser(null);
+
             return null;
         }
     }, []);
 
+
     const login = useCallback(
-        async (access, refresh, userData = null) => {
-            tokenService.set(access, refresh);
+        async (
+            access,
+            refresh,
+            userData = null
+        ) => {
+            tokenService.set(
+                access,
+                refresh
+            );
 
             setToken(access);
 
@@ -86,11 +120,16 @@ function AuthProvider({ children }) {
 
             return loggedInUser;
         },
-        [loadUser, refreshPrivateCache]
+        [
+            loadUser,
+            refreshPrivateCache,
+        ]
     );
 
+
     const logout = useCallback(async () => {
-        const refresh = tokenService.getRefresh();
+        const refresh =
+            tokenService.getRefresh();
 
         try {
             if (refresh) {
@@ -103,11 +142,15 @@ function AuthProvider({ children }) {
         }
 
         tokenService.clear();
+
         setToken(null);
         setUser(null);
 
+        clearPrivateCache();
+
         window.location.href = "/";
-    }, []);
+    }, [clearPrivateCache]);
+
 
     useEffect(() => {
         const initializeAuth = async () => {
@@ -115,38 +158,37 @@ function AuthProvider({ children }) {
 
             if (!access) {
                 tokenService.clear();
-
                 setToken(null);
                 setUser(null);
                 setLoading(false);
+                return;
+            }
 
+            const loggedInUser = await loadUser();
+
+            if (!loggedInUser) {
+                tokenService.clear();
+                setToken(null);
+                setUser(null);
+                setLoading(false);
                 return;
             }
 
             setToken(access);
-
-            await loadUser();
-
+            setUser(loggedInUser);
             setLoading(false);
         };
 
         initializeAuth();
     }, [loadUser]);
 
-    useEffect(() => {
-        setAccessTokenListener((newToken) => {
-            setToken(newToken);
-        });
-
-        return () => {
-            setAccessTokenListener(null);
-        };
-    }, []);
 
     useEffect(() => {
-        setAccessTokenListener((newToken) => {
-            setToken(newToken);
-        });
+        setAccessTokenListener(
+            (newToken) => {
+                setToken(newToken);
+            }
+        );
 
         setSessionExpiredListener(() => {
             tokenService.clear();
@@ -162,6 +204,7 @@ function AuthProvider({ children }) {
             setSessionExpiredListener(null);
         };
     }, [clearPrivateCache]);
+
 
     return (
         <AuthContext.Provider
@@ -179,5 +222,6 @@ function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
+
 
 export default AuthProvider;
