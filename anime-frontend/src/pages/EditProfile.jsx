@@ -1,41 +1,79 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import {
     useProfile,
-    useUpdateProfile
+    useUpdateProfile,
 } from "../hooks/user/useProfile";
 import { getMediaUrl } from "../utils/mediaUrl";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
-import toast from "react-hot-toast";
+
 import "../index.css";
 
 
-function EditProfileForm({ profile }) {
+function EditProfileForm({ user, profile }) {
     const updateProfile = useUpdateProfile();
 
-    const [bio, setBio] = useState(profile?.bio || "");
-    const [genre, setGenre] = useState(profile?.favorite_genre || "");
+    const [username, setUsername] = useState(
+        user?.username || ""
+    );
+
+    const [bio, setBio] = useState(
+        profile?.bio || ""
+    );
+
+    const [genre, setGenre] = useState(
+        profile?.favorite_genre || ""
+    );
+
     const [avatar, setAvatar] = useState(null);
 
+
     const handleSubmit = () => {
-        const formData = new FormData();
+        const cleanUsername = username.trim();
 
-        formData.append("bio", bio);
-        formData.append("favorite_genre", genre);
+        if (!cleanUsername) {
+            toast.error(
+                "Username cannot be empty."
+            );
 
-        if (avatar) {
-            formData.append("avatar", avatar);
+            return;
         }
 
-        updateProfile.mutate(formData, {
-            onSuccess: () => {
-                toast.success("Profile updated!");
-            },
-            onError: () => {
-                toast.error("Failed to update profile.");
-            },
-        });
+        const formData = new FormData();
+
+        formData.append(
+            "username",
+            cleanUsername
+        );
+
+        formData.append(
+            "bio",
+            bio
+        );
+
+        formData.append(
+            "favorite_genre",
+            genre
+        );
+
+        if (avatar) {
+            formData.append(
+                "avatar",
+                avatar
+            );
+        }
+
+        updateProfile.mutate(
+            formData,
+            {
+                onSuccess: () => {
+                    window.location.href = "/profile";
+                },
+            }
+        );
     };
+
 
     return (
         <div className="edit-profile-page fade-in">
@@ -74,7 +112,9 @@ function EditProfileForm({ profile }) {
 
                         <div className="profile-extra">
                             <div className="profile-chip">
-                                🎭 {genre || "No genre selected"}
+                                🎭{" "}
+                                {genre ||
+                                    "No genre selected"}
                             </div>
 
                             <div className="profile-chip">
@@ -88,38 +128,80 @@ function EditProfileForm({ profile }) {
                 <div className="edit-profile-form">
 
                     <div className="form-group">
-                        <label>Bio</label>
+                        <label htmlFor="profile-username">
+                            Username
+                        </label>
+
+                        <input
+                            id="profile-username"
+                            type="text"
+                            value={username}
+                            onChange={(event) =>
+                                setUsername(
+                                    event.target.value
+                                )
+                            }
+                            placeholder="Choose a username"
+                            className="profile-input"
+                            maxLength={150}
+                        />
+                    </div>
+
+
+                    <div className="form-group">
+                        <label htmlFor="profile-bio">
+                            Bio
+                        </label>
 
                         <textarea
+                            id="profile-bio"
                             rows={5}
                             value={bio}
-                            onChange={(e) => setBio(e.target.value)}
+                            onChange={(event) =>
+                                setBio(
+                                    event.target.value
+                                )
+                            }
                             placeholder="Tell people about yourself..."
                             className="profile-textarea"
                         />
                     </div>
 
+
                     <div className="form-group">
-                        <label>Favorite Genre</label>
+                        <label htmlFor="profile-genre">
+                            Favorite Genre
+                        </label>
 
                         <input
+                            id="profile-genre"
                             type="text"
                             value={genre}
-                            onChange={(e) => setGenre(e.target.value)}
+                            onChange={(event) =>
+                                setGenre(
+                                    event.target.value
+                                )
+                            }
                             placeholder="Action, Romance, Fantasy..."
                             className="profile-input"
                         />
                     </div>
 
+
                     <div className="form-group">
-                        <label>Profile Picture</label>
+                        <label>
+                            Profile Picture
+                        </label>
 
                         <label className="upload-box">
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) =>
-                                    setAvatar(e.target.files?.[0] || null)
+                                onChange={(event) =>
+                                    setAvatar(
+                                        event.target.files?.[0] ||
+                                        null
+                                    )
                                 }
                                 hidden
                             />
@@ -130,7 +212,9 @@ function EditProfileForm({ profile }) {
                         </label>
                     </div>
 
+
                     <button
+                        type="button"
                         className="save-profile-btn"
                         onClick={handleSubmit}
                         disabled={updateProfile.isPending}
@@ -148,7 +232,10 @@ function EditProfileForm({ profile }) {
 
 
 function EditProfile() {
-    const { data, isLoading } = useProfile();
+    const {
+        data,
+        isLoading,
+    } = useProfile();
 
     if (isLoading) {
         return (
@@ -161,8 +248,12 @@ function EditProfile() {
                     padding: 20,
                 }}
             >
-                {Array.from({ length: 8 }).map((_, i) => (
-                    <AnimeCardSkeleton key={i} />
+                {Array.from({
+                    length: 8,
+                }).map((_, index) => (
+                    <AnimeCardSkeleton
+                        key={index}
+                    />
                 ))}
             </div>
         );
@@ -170,10 +261,16 @@ function EditProfile() {
 
     return (
         <EditProfileForm
-            key={data?.profile?.id ?? "profile-form"}
+            key={
+                data?.user?.id ??
+                data?.profile?.id ??
+                "profile-form"
+            }
+            user={data?.user}
             profile={data?.profile}
         />
     );
 }
+
 
 export default EditProfile;

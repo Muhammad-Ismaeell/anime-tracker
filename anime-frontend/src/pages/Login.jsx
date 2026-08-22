@@ -1,11 +1,14 @@
 import { useContext, useState } from "react";
-import {
-    useNavigate,
-} from "react-router-dom";import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { useLogin } from "../auth/useAuth";
 import { AuthContext } from "../context/AuthContext";
 import GoogleLoginButton from "../components/GoogleLoginButton";
+
+
+const GOOGLE_ONLY_AUTH =
+    import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
 
 
 export default function Login() {
@@ -16,6 +19,7 @@ export default function Login() {
 
     const loginMutation = useLogin();
     const navigate = useNavigate();
+
 
     const handleLogin = (event) => {
         event.preventDefault();
@@ -52,7 +56,7 @@ export default function Login() {
                     toast.success("Welcome back!");
 
                     window.location.href = "/";
-                                    },
+                },
 
                 onError: (error) => {
                     const status =
@@ -113,66 +117,76 @@ export default function Login() {
                     <GoogleLoginButton />
                 </div>
 
-                <div className="auth-divider">
-                    <span>
-                        or continue with username
-                    </span>
-                </div>
+                {!GOOGLE_ONLY_AUTH && (
+                    <>
+                        <div className="auth-divider">
+                            <span>
+                                or continue with username
+                            </span>
+                        </div>
 
-                <form
-                    onSubmit={handleLogin}
-                    className="auth-form"
-                >
-                    <div className="auth-field">
-                        <label htmlFor="username">
-                            Username
-                        </label>
+                        <form
+                            onSubmit={handleLogin}
+                            className="auth-form"
+                        >
+                            <div className="auth-field">
+                                <label htmlFor="username">
+                                    Username
+                                </label>
 
-                        <input
-                            id="username"
-                            type="text"
-                            value={username}
-                            onChange={(event) =>
-                                setUsername(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="Enter your username"
-                            autoComplete="username"
-                        />
-                    </div>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(event) =>
+                                        setUsername(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder="Enter your username"
+                                    autoComplete="username"
+                                />
+                            </div>
 
-                    <div className="auth-field">
-                        <label htmlFor="password">
-                            Password
-                        </label>
+                            <div className="auth-field">
+                                <label htmlFor="password">
+                                    Password
+                                </label>
 
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(event) =>
-                                setPassword(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="Enter your password"
-                            autoComplete="current-password"
-                        />
-                    </div>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder="Enter your password"
+                                    autoComplete="current-password"
+                                />
+                            </div>
 
-                    <button
-                        type="submit"
-                        className="auth-submit"
-                        disabled={
-                            loginMutation.isPending
-                        }
-                    >
-                        {loginMutation.isPending
-                            ? "Signing in..."
-                            : "Sign in"}
-                    </button>
-                </form>
+                            <button
+                                type="submit"
+                                className="auth-submit"
+                                disabled={
+                                    loginMutation.isPending
+                                }
+                            >
+                                {loginMutation.isPending
+                                    ? "Signing in..."
+                                    : "Sign in"}
+                            </button>
+                        </form>
+                    </>
+                )}
+
+                {GOOGLE_ONLY_AUTH && (
+                    <p className="auth-footer">
+                        Sign in securely with your Google account.
+                    </p>
+                )}
 
                 <p className="auth-footer">
                     New to Anime Tracker?{" "}

@@ -263,49 +263,124 @@ def google_login(request):
 
     token = request.data.get("token")
 
+    if not token:
+        return Response(
+            {
+                "detail": "Google token is required."
+            },
+            status=400,
+        )
+
     try:
         google_request = requests.Request()
 
         data = id_token.verify_oauth2_token(
             token,
             google_request,
-            settings.GOOGLE_CLIENT_ID
+            settings.GOOGLE_CLIENT_ID,
         )
 
     except ValueError:
         return Response(
             {
-                "detail": "Invalid Google token"
+                "detail": "Invalid Google token."
             },
-            status=400
+            status=400,
         )
 
-    email = data["email"]
+    email = (
+        data.get("email") or ""
+    ).strip().lower()
 
-    username = slugify(
-        email.split("@")[0]
+    google_sub = data.get("sub")
+
+    email_verified = data.get(
+        "email_verified",
+        False,
     )
 
-    base_username = slugify(email.split("@")[0])
+    if not email or not google_sub:
+        return Response(
+            {
+                "detail": "Invalid Google identity."
+            },
+            status=400,
+        )
 
-    username = base_username
-    counter = 1
+    if not email_verified:
+        return Response(
+            {
+                "detail": (
+                    "Google email is not verified."
+                )
+            },
+            status=400,
+        )
 
-    while User.objects.filter(username=username).exists():
-        username = f"{base_username}{counter}"
-        counter += 1
+    # First identify an existing Google account
+    user = User.objects.filter(
+        google_sub=google_sub
+    ).first()
 
+    if user is None:
+        # If a local account already exists with this
+        # verified Google email, link the Google identity
+        # to that account instead of creating a duplicate.
+        user = User.objects.filter(
+            email__iexact=email
+        ).first()
 
-    user, _ = User.objects.get_or_create(
-        email=email,
-        defaults={
-            "username": username,
-            "first_name": data.get("name", ""),
-        },
-    )
+    if user is None:
+        base_username = (
+            slugify(email.split("@")[0])
+            or "user"
+        )
 
+        username = base_username
+        counter = 1
+
+        while User.objects.filter(
+            username=username
+        ).exists():
+            username = (
+                f"{base_username}{counter}"
+            )
+            counter += 1
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            first_name=data.get("name", ""),
+            google_sub=google_sub,
+        )
+
+    else:
+        # Link the Google identity to the existing account.
+        user.google_sub = google_sub
+
+        # Keep the email synchronized with Google's
+        # verified email.
+        user.email = email
+
+        if not user.first_name:
+            user.first_name = data.get(
+                "name",
+                "",
+            )
+
+        user.save(
+            update_fields=[
+                "google_sub",
+                "email",
+                "first_name",
+                "updated_at",
+            ]
+        )
+
+    # Google has already verified the identity, so this
+    # account is immediately considered email-verified.
     verified_token_hash = hashlib.sha256(
-        f"google:{email}".encode("utf-8")
+        f"google:{google_sub}".encode("utf-8")
     ).hexdigest()
 
     EmailVerification.objects.update_or_create(

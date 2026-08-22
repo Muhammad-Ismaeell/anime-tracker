@@ -6,6 +6,10 @@ import { useRegister } from "../auth/useAuth";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 
 
+const GOOGLE_ONLY_AUTH =
+    import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
+
+
 export default function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -35,6 +39,7 @@ export default function Register() {
             toast.error(
                 "Please fill in all fields."
             );
+
             return;
         }
 
@@ -71,7 +76,10 @@ export default function Register() {
     };
 
 
-    if (registrationComplete) {
+    if (
+        !GOOGLE_ONLY_AUTH &&
+        registrationComplete
+    ) {
         return (
             <main className="auth-page">
                 <div className="auth-background" />
@@ -159,85 +167,96 @@ export default function Register() {
                     <GoogleLoginButton />
                 </div>
 
-                <div className="auth-divider">
-                    <span>
-                        or register with username
-                    </span>
-                </div>
+                {!GOOGLE_ONLY_AUTH && (
+                    <>
+                        <div className="auth-divider">
+                            <span>
+                                or register with username
+                            </span>
+                        </div>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="auth-form"
-                >
-                    <div className="auth-field">
-                        <label htmlFor="register-username">
-                            Username
-                        </label>
+                        <form
+                            onSubmit={handleSubmit}
+                            className="auth-form"
+                        >
+                            <div className="auth-field">
+                                <label htmlFor="register-username">
+                                    Username
+                                </label>
 
-                        <input
-                            id="register-username"
-                            type="text"
-                            value={username}
-                            onChange={(event) =>
-                                setUsername(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="Choose a username"
-                            autoComplete="username"
-                        />
-                    </div>
+                                <input
+                                    id="register-username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(event) =>
+                                        setUsername(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder="Choose a username"
+                                    autoComplete="username"
+                                />
+                            </div>
 
-                    <div className="auth-field">
-                        <label htmlFor="register-email">
-                            Email
-                        </label>
+                            <div className="auth-field">
+                                <label htmlFor="register-email">
+                                    Email
+                                </label>
 
-                        <input
-                            id="register-email"
-                            type="email"
-                            value={email}
-                            onChange={(event) =>
-                                setEmail(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="you@example.com"
-                            autoComplete="email"
-                        />
-                    </div>
+                                <input
+                                    id="register-email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(event) =>
+                                        setEmail(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder="you@example.com"
+                                    autoComplete="email"
+                                />
+                            </div>
 
-                    <div className="auth-field">
-                        <label htmlFor="register-password">
-                            Password
-                        </label>
+                            <div className="auth-field">
+                                <label htmlFor="register-password">
+                                    Password
+                                </label>
 
-                        <input
-                            id="register-password"
-                            type="password"
-                            value={password}
-                            onChange={(event) =>
-                                setPassword(
-                                    event.target.value
-                                )
-                            }
-                            placeholder="Create a password"
-                            autoComplete="new-password"
-                        />
-                    </div>
+                                <input
+                                    id="register-password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(
+                                            event.target.value
+                                        )
+                                    }
+                                    placeholder="Create a password"
+                                    autoComplete="new-password"
+                                />
+                            </div>
 
-                    <button
-                        type="submit"
-                        className="auth-submit"
-                        disabled={
-                            registerMutation.isPending
-                        }
-                    >
-                        {registerMutation.isPending
-                            ? "Creating account..."
-                            : "Create account"}
-                    </button>
-                </form>
+                            <button
+                                type="submit"
+                                className="auth-submit"
+                                disabled={
+                                    registerMutation.isPending
+                                }
+                            >
+                                {registerMutation.isPending
+                                    ? "Creating account..."
+                                    : "Create account"}
+                            </button>
+                        </form>
+                    </>
+                )}
+
+                {GOOGLE_ONLY_AUTH && (
+                    <p className="auth-footer">
+                        Use your Google account to create your
+                        Anime Tracker account.
+                    </p>
+                )}
 
                 <p className="auth-footer">
                     Already have an account?{" "}
