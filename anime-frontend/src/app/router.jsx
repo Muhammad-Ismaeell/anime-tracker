@@ -6,7 +6,6 @@ import NotFound from "../pages/NotFound";
 import AppLayout from "./AppLayout";
 
 import ScrollToTop from "../components/ScrollToTop";
-import ScrollRestorationFix from "../components/StoreRestoration";
 import ErrorBoundary from "../components/ErrorBoundary";
 import ProtectedRoute from "../components/ProtectedRoute";
 import PageLoader from "../components/ui/PageLoader";
@@ -45,7 +44,7 @@ export default function App() {
             }}
         >
 
-            <ScrollRestorationFix />
+            
             <ScrollToTop />
             <ErrorBoundary>
                 <Suspense fallback={<PageLoader />}>

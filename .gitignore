@@ -16,6 +16,8 @@ anime-frontend/.env
 # Node
 anime-frontend/node_modules/
 anime-frontend/dist/
+node_modules/
+**/node_modules/
 
 # VSCode
 .vscode/
