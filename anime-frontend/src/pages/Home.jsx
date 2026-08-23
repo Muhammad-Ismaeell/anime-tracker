@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
@@ -19,6 +19,10 @@ import { normalizeAnime } from "../utils/normalizeAnime";
 
 
 function Home() {
+    // ============================================================
+    // DATA
+    // ============================================================
+
     const trendingQuery = useInfiniteAnime("trending");
     const seasonalQuery = useInfiniteAnime("seasonal");
     const topQuery = useInfiniteAnime("top");
@@ -28,9 +32,20 @@ function Home() {
     const { statusMap } = useGlobalLibrary();
     const { data: favoritesRes } = useFavorites();
 
+
+    // ============================================================
+    // HERO STATE
+    // ============================================================
+
     const [featuredIndex, setFeaturedIndex] = useState(0);
     const [heroVisible, setHeroVisible] = useState(true);
 
+    const transitionTimeoutRef = useRef(null);
+
+
+    // ============================================================
+    // FAVORITES
+    // ============================================================
 
     const favoriteIds = useMemo(() => {
         return new Set(
@@ -51,14 +66,18 @@ function Home() {
     }, [favoritesRes]);
 
 
+    // ============================================================
+    // NORMALIZE PAGINATED DATA
+    // ============================================================
+
     const extractAnime = (data) => {
         const pages = data?.pages ?? [];
         const map = new Map();
 
         pages.forEach((page) => {
             const items =
-                page.items ??
-                page.data ??
+                page?.items ??
+                page?.data ??
                 [];
 
             items.forEach((item) => {
@@ -77,6 +96,10 @@ function Home() {
     };
 
 
+    // ============================================================
+    // ANIME LISTS
+    // ============================================================
+
     const trendingAnime = useMemo(
         () => extractAnime(trendingQuery.data),
         [trendingQuery.data]
@@ -93,23 +116,53 @@ function Home() {
     );
 
 
+    // ============================================================
+    // FEATURED ANIME
+    // ============================================================
+
     const featuredAnime = useMemo(
         () => trendingAnime.slice(0, 5),
         [trendingAnime]
     );
 
 
+    /*
+     * Do NOT reset featuredIndex inside an effect.
+     *
+     * If the list changes and the old index is no longer valid,
+     * safely use index 0 for rendering.
+     */
+    const safeFeaturedIndex =
+        featuredAnime.length > 0
+            ? featuredIndex % featuredAnime.length
+            : 0;
+
+    const currentFeatured =
+        featuredAnime[safeFeaturedIndex];
+
+
+    // ============================================================
+    // HERO TRANSITION
+    // ============================================================
+
     const changeFeatured = (nextIndex) => {
         if (featuredAnime.length <= 1) {
             return;
         }
 
+        if (transitionTimeoutRef.current) {
+            window.clearTimeout(
+                transitionTimeoutRef.current
+            );
+        }
+
         setHeroVisible(false);
 
-        window.setTimeout(() => {
-            setFeaturedIndex(nextIndex);
-            setHeroVisible(true);
-        }, 180);
+        transitionTimeoutRef.current =
+            window.setTimeout(() => {
+                setFeaturedIndex(nextIndex);
+                setHeroVisible(true);
+            }, 180);
     };
 
 
@@ -118,10 +171,11 @@ function Home() {
             return;
         }
 
-        changeFeatured(
-            (featuredIndex + 1) %
-                featuredAnime.length
-        );
+        const nextIndex =
+            (safeFeaturedIndex + 1) %
+            featuredAnime.length;
+
+        changeFeatured(nextIndex);
     };
 
 
@@ -130,46 +184,74 @@ function Home() {
             return;
         }
 
-        changeFeatured(
-            (featuredIndex - 1 + featuredAnime.length) %
-                featuredAnime.length
-        );
+        const previousIndex =
+            (safeFeaturedIndex - 1 + featuredAnime.length) %
+            featuredAnime.length;
+
+        changeFeatured(previousIndex);
     };
 
 
+    // ============================================================
+    // AUTO ROTATION
+    // ============================================================
+
     useEffect(() => {
         if (featuredAnime.length <= 1) {
-            return;
+            return undefined;
         }
 
         const interval = window.setInterval(() => {
             setHeroVisible(false);
 
-            window.setTimeout(() => {
-                setFeaturedIndex((current) =>
-                    (current + 1) %
-                    featuredAnime.length
-                );
+            transitionTimeoutRef.current =
+                window.setTimeout(() => {
+                    setFeaturedIndex((current) => {
+                        return (
+                            (current + 1) %
+                            featuredAnime.length
+                        );
+                    });
 
-                setHeroVisible(true);
-            }, 180);
+                    setHeroVisible(true);
+                }, 180);
         }, 7000);
 
         return () => {
             window.clearInterval(interval);
+
+            if (transitionTimeoutRef.current) {
+                window.clearTimeout(
+                    transitionTimeoutRef.current
+                );
+            }
         };
     }, [featuredAnime.length]);
 
 
-    const currentFeatured =
-        featuredAnime[featuredIndex];
+    // ============================================================
+    // CLEANUP
+    // ============================================================
 
+    useEffect(() => {
+        return () => {
+            if (transitionTimeoutRef.current) {
+                window.clearTimeout(
+                    transitionTimeoutRef.current
+                );
+            }
+        };
+    }, []);
+
+
+    // ============================================================
+    // LOADING / ERROR
+    // ============================================================
 
     const loading =
         trendingQuery.isLoading ||
         seasonalQuery.isLoading ||
         topQuery.isLoading;
-
 
     const error =
         trendingQuery.error ||
@@ -188,8 +270,13 @@ function Home() {
     }
 
 
+    // ============================================================
+    // RENDER
+    // ============================================================
+
     return (
         <PageContainer>
+
             <Helmet>
                 <title>Anime Tracker</title>
 
@@ -199,6 +286,10 @@ function Home() {
                 />
             </Helmet>
 
+
+            {/* ==================================================
+                HERO
+            ================================================== */}
 
             {!loading && currentFeatured && (
                 <section
@@ -212,13 +303,11 @@ function Home() {
                                 rgba(10, 10, 18, 0.35) 70%,
                                 rgba(10, 10, 18, 0.15) 100%
                             ),
-                            url(${
-                                currentFeatured.largeImage ||
-                                currentFeatured.image
-                            })
+                            url(${currentFeatured.largeImage || currentFeatured.image})
                         `,
                     }}
                 >
+
                     <div
                         className={
                             heroVisible
@@ -226,6 +315,7 @@ function Home() {
                                 : "home-hero-content hero-hidden"
                         }
                     >
+
                         <span className="home-hero-eyebrow">
                             🔥 FEATURED FROM TRENDING
                         </span>
@@ -235,12 +325,11 @@ function Home() {
                         </h1>
 
                         <div className="home-hero-meta">
+
                             {currentFeatured.score > 0 && (
                                 <span>
                                     ⭐{" "}
-                                    {currentFeatured.score.toFixed(
-                                        1
-                                    )}
+                                    {currentFeatured.score.toFixed(1)}
                                 </span>
                             )}
 
@@ -255,6 +344,7 @@ function Home() {
                                     {currentFeatured.year}
                                 </span>
                             )}
+
                         </div>
 
                         <p className="home-hero-description">
@@ -263,18 +353,24 @@ function Home() {
                         </p>
 
                         <div className="home-hero-actions">
+
                             <Link
                                 to={`/anime/${currentFeatured.id}`}
                                 className="home-hero-primary"
                             >
                                 View Details
                             </Link>
+
                         </div>
+
                     </div>
 
 
+                    {/* HERO NAVIGATION */}
+
                     {featuredAnime.length > 1 && (
                         <>
+
                             <button
                                 type="button"
                                 className="home-hero-nav home-hero-prev"
@@ -293,40 +389,48 @@ function Home() {
                                 →
                             </button>
 
+
                             <div className="home-hero-dots">
+
                                 {featuredAnime.map(
                                     (anime, index) => (
                                         <button
                                             key={anime.id}
                                             type="button"
                                             className={
-                                                index === featuredIndex
+                                                index === safeFeaturedIndex
                                                     ? "home-hero-dot active"
                                                     : "home-hero-dot"
                                             }
                                             onClick={() =>
                                                 changeFeatured(index)
                                             }
-                                            aria-label={`Show featured anime ${
-                                                index + 1
-                                            }`}
+                                            aria-label={`Show featured anime ${index + 1}`}
                                             aria-current={
-                                                index === featuredIndex
+                                                index === safeFeaturedIndex
                                                     ? "true"
                                                     : undefined
                                             }
                                         />
                                     )
                                 )}
+
                             </div>
+
                         </>
                     )}
+
                 </section>
             )}
 
 
+            {/* ==================================================
+                CONTENT
+            ================================================== */}
+
             {loading ? (
                 <div className="grid">
+
                     {Array.from({
                         length: 12,
                     }).map((_, index) => (
@@ -334,9 +438,11 @@ function Home() {
                             key={index}
                         />
                     ))}
+
                 </div>
             ) : (
                 <>
+
                     <AnimeSection
                         title="Trending Anime"
                         emoji="🔥"
@@ -346,6 +452,7 @@ function Home() {
                         toggleFavorite={toggleFavorite}
                         viewAllPath="/trending"
                     />
+
 
                     <AnimeSection
                         title="Current Season"
@@ -357,6 +464,7 @@ function Home() {
                         viewAllPath="/seasonal"
                     />
 
+
                     <AnimeSection
                         title="Top Rated Anime"
                         emoji="⭐"
@@ -366,8 +474,10 @@ function Home() {
                         toggleFavorite={toggleFavorite}
                         viewAllPath="/top"
                     />
+
                 </>
             )}
+
         </PageContainer>
     );
 }
