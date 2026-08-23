@@ -164,19 +164,20 @@ function AuthProvider({ children }) {
                 return;
             }
 
-            // We already know a session exists.
-            // Don't block the entire application on /auth/me/.
             setToken(access);
-            setLoading(false);
 
-            // Load the current user in the background.
             const loggedInUser = await loadUser();
 
             if (!loggedInUser) {
                 tokenService.clear();
                 setToken(null);
                 setUser(null);
+                setLoading(false);
+                return;
             }
+
+            setUser(loggedInUser);
+            setLoading(false);
         };
 
         initializeAuth();
