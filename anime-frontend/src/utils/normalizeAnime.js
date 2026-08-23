@@ -22,6 +22,7 @@ export const normalizeAnime = (anime) => {
         largeImage:
             anime.images?.webp?.large_image_url ??
             anime.images?.jpg?.large_image_url ??
+            anime.image_large ??
             anime.images?.webp?.image_url ??
             anime.images?.jpg?.image_url ??
             anime.image ??
