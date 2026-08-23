@@ -57,6 +57,10 @@ const processQueue = (error, token = null) => {
  */
 api.interceptors.request.use(
     (config) => {
+        if (config.skipAuth) {
+            return config;
+        }
+
         const accessToken = tokenService.getAccess();
 
         if (accessToken) {
@@ -101,7 +105,8 @@ api.interceptors.response.use(
         if (
             error.response?.status !== 401 ||
             originalRequest._retry ||
-            isAuthRequest
+            isAuthRequest ||
+            originalRequest.skipAuth
         ) {
             return Promise.reject(error);
         }

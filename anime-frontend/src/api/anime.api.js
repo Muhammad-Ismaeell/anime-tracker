@@ -1,10 +1,10 @@
 import api from "./client";
 
 export const AnimeAPI = {
-
     trending: async (page = 1) => {
         const res = await api.get("/anime/trending/", {
-            params: { page }
+            params: { page },
+            skipAuth: true,
         });
 
         return res.data;
@@ -12,7 +12,8 @@ export const AnimeAPI = {
 
     seasonal: async (page = 1) => {
         const res = await api.get("/anime/seasonal/", {
-            params: { page }
+            params: { page },
+            skipAuth: true,
         });
 
         return res.data;
@@ -20,14 +21,18 @@ export const AnimeAPI = {
 
     top: async (page = 1) => {
         const res = await api.get("/anime/top/", {
-            params: { page }
+            params: { page },
+            skipAuth: true,
         });
 
         return res.data;
     },
 
     detail: async (id) => {
-        const res = await api.get(`/anime/${id}/`);
+        const res = await api.get(`/anime/${id}/`, {
+            skipAuth: true,
+        });
+
         return res.data;
     },
 
@@ -36,10 +41,11 @@ export const AnimeAPI = {
             params: {
                 q: query,
                 page,
-                ...filters
-            }
+                ...filters,
+            },
+            skipAuth: true,
         });
 
         return res.data;
-    }
+    },
 };
