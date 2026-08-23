@@ -1,169 +1,136 @@
 from django.core.management.base import BaseCommand
 
+from anime.application.anime_service import AnimeService
+from anime.infrastructure.jikan.jikan_client import (
+    JikanClient,
+    is_nsfw,
+)
 from anime.infrastructure.models import Anime
-
-from anime.infrastructure.jikan.jikan_client import JikanClient
-
-import time
-
 
 
 class Command(BaseCommand):
+    help = "Sync anime from Jikan into the local database."
 
-    help = "Sync anime cards from Jikan"
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--pages",
+            type=int,
+            default=5,
+            help="Number of Jikan pages to import.",
+        )
 
+    def handle(self, *args, **options):
+        pages = options["pages"]
 
-
-    def handle(self, *args, **kwargs):
+        if pages < 1:
+            self.stdout.write(
+                self.style.ERROR(
+                    "Pages must be at least 1."
+                )
+            )
+            return
 
         client = JikanClient()
+        service = AnimeService(client=None)
 
+        created = 0
+        updated = 0
+        skipped = 0
 
-        total_saved = 0
-
-
-
-        for page in range(1, 20):
-
+        for page in range(1, pages + 1):
             self.stdout.write(
-                f"Fetching page {page}"
+                f"Fetching Jikan page {page}/{pages}..."
             )
 
+            data = client.get_top(page)
 
-            data = client.get_top(
-                page
-            )
+            if not data:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"Failed to fetch page {page}."
+                    )
+                )
+                break
 
-
-            items = data.get(
-                "items",
-                []
-            )
-
+            items = data.get("items", [])
 
             if not items:
-
                 self.stdout.write(
-                    "No items"
+                    f"Page {page} contains no anime."
                 )
+                break
 
-                continue
+            page_created = 0
+            page_updated = 0
+            page_skipped = 0
 
+            for raw in items:
+                if is_nsfw(raw):
+                    skipped += 1
+                    page_skipped += 1
+                    continue
 
+                mal_id = raw.get("mal_id")
 
-            for anime in items:
+                if not mal_id:
+                    skipped += 1
+                    page_skipped += 1
+                    continue
 
-
-                mal_id = anime.get(
-                    "mal_id"
-                )
-
-
-                self.stdout.write(
-                    f"Saving {mal_id}"
-                )
-
-
-                images = (
-                    anime.get(
-                        "images",
-                        {}
-                    )
-                    .get(
-                        "jpg",
-                        {}
-                    )
-                )
-
+                existed = Anime.objects.filter(
+                    mal_id=mal_id
+                ).exists()
 
                 try:
-                    Anime.objects.update_or_create(
+                    service.save_anime(raw)
+                except Exception as exc:
+                    skipped += 1
+                    page_skipped += 1
 
-                        mal_id=mal_id,
-
-
-                        defaults={
-
-                            "title":
-                                anime.get("title") or "",
-
-
-                            "title_english":
-                                anime.get("title_english") or "",
-
-
-                            "search_title":
-                                (
-                                    anime.get("title")
-                                    or ""
-                                ).lower(),
-
-
-                            "image":
-                                images.get("image_url"),
-
-
-                            "image_large":
-                                images.get("large_image_url"),
-
-
-                            "score":
-                                anime.get("score"),
-
-
-                            "popularity":
-                                anime.get("popularity"),
-
-
-                            "type":
-                                anime.get("type"),
-
-
-                            "episodes":
-                                anime.get("episodes"),
-
-
-                            "year":
-                                anime.get("year"),
-
-
-                            "season":
-                                anime.get("season"),
-
-
-                            "status":
-                                anime.get("status") or "",
-
-
-                            "rating":
-                                anime.get("rating") or "",
-
-                        }
-
-                    )
-
-                except Exception as e:
                     self.stdout.write(
-                        f"Failed {mal_id}: {e}"
+                        self.style.WARNING(
+                            f"Failed {mal_id}: {exc}"
+                        )
                     )
                     continue
-                total_saved += 1
 
+                if existed:
+                    updated += 1
+                    page_updated += 1
+                else:
+                    created += 1
+                    page_created += 1
 
-                # protect Jikan
-
-                time.sleep(
-                    1
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Page {page}: "
+                    f"{len(items)} processed | "
+                    f"+{page_created} created | "
+                    f"{page_updated} updated | "
+                    f"{page_skipped} skipped"
                 )
-
-
-
-        self.stdout.write(
-
-            self.style.SUCCESS(
-
-                f"SYNC COMPLETE. Saved {total_saved}"
-
             )
 
+        self.stdout.write("")
+        self.stdout.write(
+            self.style.SUCCESS(
+                "SYNC COMPLETE"
+            )
+        )
+
+        self.stdout.write(
+            f"Created: {created}"
+        )
+
+        self.stdout.write(
+            f"Updated: {updated}"
+        )
+
+        self.stdout.write(
+            f"Skipped: {skipped}"
+        )
+
+        self.stdout.write(
+            f"Total anime in database: "
+            f"{Anime.objects.count()}"
         )

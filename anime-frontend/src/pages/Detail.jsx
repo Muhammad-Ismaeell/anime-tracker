@@ -78,9 +78,16 @@ function Detail() {
 
     const image =
         anime.image ??
+        anime.images?.webp?.large_image_url ??
         anime.images?.jpg?.large_image_url ??
+        anime.images?.webp?.image_url ??
         anime.images?.jpg?.image_url ??
         "/no-image.png";
+
+    const title =
+        anime.title_english ||
+        anime.title ||
+        "Unknown Anime";
 
     const liked = favorites.some((favorite) => {
         const favoriteAnimeId =
@@ -135,29 +142,52 @@ function Detail() {
                     </div>
 
                     <div className="anime-detail-card">
-
                         <div className="anime-poster">
                             <OptimizedImage
                                 src={image}
-                                alt={anime.title}
+                                alt={title}
                                 loading="eager"
                             />
                         </div>
 
                         <div className="anime-main-info">
+                            <span className="anime-detail-eyebrow">
+                                ANIME DETAILS
+                            </span>
 
-                            <h1>{anime.title}</h1>
+                            <h1>{title}</h1>
 
                             <div className="detail-stats">
-                                <span>⭐ {anime.score ?? "N/A"}</span>
-                                <span>📺 {anime.type ?? "Unknown"}</span>
-                                <span>🎬 {anime.episodes ?? "?"}</span>
-                                <span>📅 {anime.year ?? "Unknown"}</span>
+                                {anime.score != null && (
+                                    <span className="detail-stat score">
+                                        ⭐ {anime.score}
+                                    </span>
+                                )}
+
+                                {anime.type && (
+                                    <span className="detail-stat">
+                                        📺 {anime.type}
+                                    </span>
+                                )}
+
+                                {anime.episodes != null && (
+                                    <span className="detail-stat">
+                                        🎬 {anime.episodes} Episodes
+                                    </span>
+                                )}
+
+                                {anime.year && (
+                                    <span className="detail-stat">
+                                        📅 {anime.year}
+                                    </span>
+                                )}
                             </div>
 
                             <button
                                 type="button"
-                                className={`favorite-button ${liked ? "active" : ""}`}
+                                className={`favorite-button ${
+                                    liked ? "active" : ""
+                                }`}
                                 onClick={handleFavorite}
                                 disabled={
                                     isAuthenticated &&
@@ -165,19 +195,17 @@ function Detail() {
                                 }
                                 aria-label={
                                     liked
-                                        ? `Remove ${anime.title} from favorites`
-                                        : `Add ${anime.title} to favorites`
+                                        ? `Remove ${title} from favorites`
+                                        : `Add ${title} to favorites`
                                 }
                             >
                                 {toggleFavorite.isPending
                                     ? "Saving..."
                                     : liked
                                         ? "❤️ Remove Favorite"
-                                        : "🤍 Add Favorite"}
+                                        : "♡ Add to Favorites"}
                             </button>
-
                         </div>
-
                     </div>
 
                     <div className="anime-section">

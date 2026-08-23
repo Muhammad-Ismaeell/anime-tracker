@@ -1,42 +1,73 @@
-import { useState, useRef, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import {
+    useState,
+    useRef,
+    useEffect,
+    useContext,
+} from "react";
 
-import { useNavbarSearch } from "../../hooks/useNavbarSearch";
-import { useDebounce } from "../../hooks/useDebounce";
+import {
+    Link,
+    useNavigate,
+} from "react-router-dom";
+
+import {
+    AuthContext,
+} from "../../context/AuthContext";
+
+import {
+    useNavbarSearch,
+} from "../../hooks/useNavbarSearch";
+
+import {
+    useDebounce,
+} from "../../hooks/useDebounce";
 
 import "./Navbar.css";
+
 
 function NavBar({
     onMenuToggle = () => {},
     sidebarOpen = false,
 }) {
     const navigate = useNavigate();
-    const { token } = useContext(AuthContext);
+
+    const {
+        isAuthenticated,
+        user,
+    } = useContext(AuthContext);
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
 
-    const debouncedQuery = useDebounce(query, 500);
+    const debouncedQuery =
+        useDebounce(query, 500);
 
     const {
         data: results = [],
         isLoading,
-    } = useNavbarSearch(debouncedQuery);
+    } = useNavbarSearch(
+        debouncedQuery
+    );
 
     const dropdownRef = useRef(null);
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
                 dropdownRef.current &&
-                !dropdownRef.current.contains(event.target)
+                !dropdownRef.current.contains(
+                    event.target
+                )
             ) {
                 setOpen(false);
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
 
         return () => {
             document.removeEventListener(
@@ -46,6 +77,7 @@ function NavBar({
         };
     }, []);
 
+
     useEffect(() => {
         const handleEscape = (event) => {
             if (event.key === "Escape") {
@@ -53,7 +85,10 @@ function NavBar({
             }
         };
 
-        window.addEventListener("keydown", handleEscape);
+        window.addEventListener(
+            "keydown",
+            handleEscape
+        );
 
         return () => {
             window.removeEventListener(
@@ -63,8 +98,11 @@ function NavBar({
         };
     }, []);
 
+
     const handleSelect = (anime) => {
-        const id = anime?.id ?? anime?.mal_id;
+        const id =
+            anime?.id ??
+            anime?.mal_id;
 
         if (id == null) {
             return;
@@ -76,6 +114,7 @@ function NavBar({
         navigate(`/anime/${id}`);
     };
 
+
     const handleSearchSubmit = () => {
         const value = query.trim();
 
@@ -85,8 +124,15 @@ function NavBar({
 
         setOpen(false);
 
-        navigate(`/search?q=${encodeURIComponent(value)}`);
+        navigate(
+            `/search?q=${encodeURIComponent(value)}`
+        );
     };
+
+
+    const hasSearchQuery =
+        query.trim().length >= 3;
+
 
     return (
         <header className="navbar">
@@ -106,50 +152,97 @@ function NavBar({
                     {sidebarOpen ? "✕" : "☰"}
                 </button>
 
-                <Link to="/" className="navbar-logo">
-                    <span className="logo-icon">🎬</span>
-                    <span>Anime Tracker</span>
+                <Link
+                    to="/"
+                    className="navbar-logo"
+                    aria-label="Anime Tracker home"
+                >
+                    <span className="logo-icon">
+                        🎬
+                    </span>
+
+                    <span className="navbar-logo-text">
+                        Anime Tracker
+                    </span>
                 </Link>
             </div>
+
 
             {/* CENTER SEARCH */}
             <div
                 ref={dropdownRef}
                 className="navbar-search-wrapper"
             >
-                <input
-                    value={query}
-                    onChange={(event) => {
-                        setQuery(event.target.value);
-                        setOpen(true);
-                    }}
-                    onFocus={() => setOpen(true)}
-                    onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                            handleSearchSubmit();
-                        }
+                <div className="navbar-search">
+                    <span
+                        className="navbar-search-icon"
+                        aria-hidden="true"
+                    >
+                        🔎
+                    </span>
 
-                        if (event.key === "Escape") {
-                            setOpen(false);
-                        }
-                    }}
-                    placeholder="🔎 Search anime..."
-                    className="navbar-search-input"
-                    aria-label="Search anime"
-                    aria-expanded={
-                        open && query.trim().length >= 3
-                    }
-                />
+                    <input
+                        value={query}
+                        onChange={(event) => {
+                            setQuery(
+                                event.target.value
+                            );
+                            setOpen(true);
+                        }}
+                        onFocus={() => {
+                            if (query.trim()) {
+                                setOpen(true);
+                            }
+                        }}
+                        onKeyDown={(event) => {
+                            if (
+                                event.key ===
+                                "Enter"
+                            ) {
+                                handleSearchSubmit();
+                            }
 
-                {open && query.trim().length >= 3 && (
+                            if (
+                                event.key ===
+                                "Escape"
+                            ) {
+                                setOpen(false);
+                            }
+                        }}
+                        placeholder="Search anime..."
+                        className="navbar-search-input"
+                        aria-label="Search anime"
+                        aria-expanded={
+                            open &&
+                            hasSearchQuery
+                        }
+                    />
+
+                    {query && (
+                        <button
+                            type="button"
+                            className="navbar-search-clear"
+                            onClick={() => {
+                                setQuery("");
+                                setOpen(false);
+                            }}
+                            aria-label="Clear search"
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
+
+
+                {open && hasSearchQuery && (
                     <div className="navbar-dropdown">
                         {isLoading ? (
                             <div className="navbar-message">
-                                🔎 Searching anime...
+                                Searching anime...
                             </div>
                         ) : results.length === 0 ? (
                             <div className="navbar-message">
-                                😢 No anime found
+                                No anime found
                             </div>
                         ) : (
                             results
@@ -163,58 +256,72 @@ function NavBar({
                                         }
                                         className="navbar-result"
                                         onClick={() =>
-                                            handleSelect(anime)
+                                            handleSelect(
+                                                anime
+                                            )
                                         }
                                     >
                                         <img
-                                            src={anime.image}
-                                            alt={anime.title}
+                                            src={
+                                                anime.image
+                                            }
+                                            alt=""
                                             className="navbar-thumb"
                                         />
 
                                         <span className="navbar-result-info">
                                             <span className="navbar-title">
-                                                {anime.title}
+                                                {
+                                                    anime.title
+                                                }
                                             </span>
 
                                             <span className="navbar-meta">
-                                                {anime.type ||
-                                                    "Anime"}
+                                                {
+                                                    anime.type
+                                                }
                                             </span>
                                         </span>
                                     </button>
                                 ))
                         )}
 
-                        {!isLoading && (
-                            <button
-                                type="button"
-                                className="navbar-view-all"
-                                onClick={handleSearchSubmit}
-                            >
-                                View all results →
-                            </button>
-                        )}
+                        {!isLoading &&
+                            results.length > 0 && (
+                                <button
+                                    type="button"
+                                    className="navbar-view-all"
+                                    onClick={
+                                        handleSearchSubmit
+                                    }
+                                >
+                                    View all results
+                                    <span>
+                                        →
+                                    </span>
+                                </button>
+                            )}
                     </div>
                 )}
             </div>
 
+
             {/* RIGHT */}
             <div className="navbar-right">
-                {!token ? (
+                {!isAuthenticated ? (
                     <>
                         <Link
                             to="/login"
                             className="navbar-login"
                         >
-                            Login
+                            Sign in
                         </Link>
 
                         <Link
                             to="/register"
                             className="navbar-register"
                         >
-                            Create Account
+                            Get Started
                         </Link>
                     </>
                 ) : (
@@ -222,13 +329,23 @@ function NavBar({
                         to="/profile"
                         className="navbar-profile"
                     >
-                        <span className="profile-icon">👤</span>
-                        <span>Profile</span>
+                        <span className="profile-avatar-mini">
+                            {user?.username
+                                ?.charAt(0)
+                                ?.toUpperCase() ||
+                                "👤"}
+                        </span>
+
+                        <span className="navbar-profile-name">
+                            {user?.username ||
+                                "Profile"}
+                        </span>
                     </Link>
                 )}
             </div>
         </header>
     );
 }
+
 
 export default NavBar;

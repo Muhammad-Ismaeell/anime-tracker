@@ -1,6 +1,6 @@
-/* =========================
+/* =========================================================
    NAVBAR
-========================= */
+   ========================================================= */
 
 .navbar {
     position: sticky;
@@ -8,31 +8,40 @@
     z-index: 1000;
 
     display: grid;
-    grid-template-columns: 240px minmax(280px, 520px) 240px;
+    grid-template-columns:
+        minmax(220px, 1fr)
+        minmax(320px, 640px)
+        minmax(220px, 1fr);
+
     align-items: center;
-    justify-content: space-between;
 
-    min-height: 70px;
+    min-height: 72px;
 
-    padding: 0 30px;
+    padding: 0 28px;
 
-    background: rgba(15, 23, 42, 0.88);
+    background:
+        rgba(8, 12, 24, 0.84);
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.07);
 
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 
-/* =========================
+/* =========================================================
    LEFT / BRAND
-========================= */
+   ========================================================= */
 
 .navbar-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+
+    gap: 12px;
 
     min-width: 0;
 }
@@ -40,25 +49,47 @@
 .navbar-logo {
     display: inline-flex;
     align-items: center;
+
     gap: 9px;
 
     color: #fff;
     text-decoration: none;
 
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 800;
+
+    letter-spacing: -0.02em;
 
     white-space: nowrap;
 }
 
 .logo-icon {
-    font-size: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139, 92, 246, 0.22),
+            rgba(99, 102, 241, 0.15)
+        );
+
+    border:
+        1px solid rgba(139, 92, 246, 0.18);
+
+    font-size: 18px;
 }
 
 
-/* =========================
+/* =========================================================
    MENU BUTTON
-========================= */
+   ========================================================= */
 
 .navbar-menu-button {
     display: none;
@@ -71,13 +102,17 @@
 
     padding: 0;
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
 
-    background: rgba(255, 255, 255, 0.05);
+    border-radius: 11px;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
     color: #fff;
 
-    font-size: 20px;
+    font-size: 19px;
 
     cursor: pointer;
 
@@ -88,18 +123,21 @@
 }
 
 .navbar-menu-button:hover {
-    background: rgba(124, 58, 237, 0.16);
-    border-color: rgba(139, 92, 246, 0.35);
+    background:
+        rgba(124, 58, 237, 0.16);
+
+    border-color:
+        rgba(139, 92, 246, 0.32);
 }
 
 .navbar-menu-button:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 
-/* =========================
+/* =========================================================
    SEARCH
-========================= */
+   ========================================================= */
 
 .navbar-search-wrapper {
     position: relative;
@@ -109,18 +147,45 @@
     justify-self: center;
 }
 
+.navbar-search {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+}
+
+.navbar-search-icon {
+    position: absolute;
+    left: 15px;
+
+    z-index: 1;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+    pointer-events: none;
+}
+
 .navbar-search-input {
     width: 100%;
 
-    padding: 12px 18px;
+    min-height: 44px;
 
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding:
+        0 44px 0 42px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.09);
+
     border-radius: 14px;
 
-    background: rgba(255, 255, 255, 0.05);
+    background:
+        rgba(255, 255, 255, 0.045);
+
     color: #fff;
 
-    font-size: 15px;
+    font-size: 14px;
 
     outline: none;
 
@@ -131,27 +196,67 @@
 }
 
 .navbar-search-input::placeholder {
-    color: #9ca3af;
+    color: #64748b;
 }
 
 .navbar-search-input:hover {
-    border-color: rgba(255, 255, 255, 0.18);
+    border-color:
+        rgba(255, 255, 255, 0.16);
 }
 
 .navbar-search-input:focus {
-    background: rgba(255, 255, 255, 0.07);
+    background:
+        rgba(255, 255, 255, 0.065);
 
-    border-color: rgba(139, 92, 246, 0.65);
+    border-color:
+        rgba(139, 92, 246, 0.58);
 
     box-shadow:
-        0 0 0 4px rgba(139, 92, 246, 0.12),
-        0 10px 30px rgba(0, 0, 0, 0.18);
+        0 0 0 4px
+            rgba(139, 92, 246, 0.11),
+        0 12px 28px
+            rgba(0, 0, 0, 0.18);
+}
+
+.navbar-search-clear {
+    position: absolute;
+    right: 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 26px;
+    height: 26px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    color: #94a3b8;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease;
+}
+
+.navbar-search-clear:hover {
+    background:
+        rgba(255, 255, 255, 0.12);
+
+    color: #fff;
 }
 
 
-/* =========================
+/* =========================================================
    SEARCH DROPDOWN
-========================= */
+   ========================================================= */
 
 .navbar-dropdown {
     position: absolute;
@@ -160,22 +265,28 @@
     left: 0;
     right: 0;
 
+    overflow: hidden;
+
     max-height: 420px;
     overflow-y: auto;
 
-    background: rgba(17, 24, 39, 0.97);
+    background:
+        rgba(13, 18, 32, 0.97);
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border:
+        1px solid rgba(255, 255, 255, 0.09);
+
     border-radius: 16px;
 
     box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.45),
-        0 0 30px rgba(124, 58, 237, 0.06);
+        0 24px 60px
+            rgba(0, 0, 0, 0.5);
 
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 
-    animation: navbarDropdownIn 0.16s ease;
+    animation:
+        navbarDropdownIn 0.16s ease;
 }
 
 @keyframes navbarDropdownIn {
@@ -195,27 +306,31 @@
 }
 
 .navbar-dropdown::-webkit-scrollbar-thumb {
-    background: #374151;
+    background:
+        #334155;
+
     border-radius: 999px;
 }
 
 
-/* =========================
+/* =========================================================
    SEARCH RESULT
-========================= */
+   ========================================================= */
 
 .navbar-result {
     width: 100%;
 
     display: flex;
     align-items: center;
-    gap: 10px;
 
-    padding: 10px;
+    gap: 11px;
+
+    padding: 10px 11px;
 
     border: none;
 
     background: transparent;
+
     color: inherit;
 
     text-align: left;
@@ -223,27 +338,25 @@
     cursor: pointer;
 
     transition:
-        background 0.18s ease,
-        transform 0.18s ease;
+        background 0.18s ease;
 }
 
 .navbar-result:hover {
-    background: rgba(124, 58, 237, 0.10);
-}
-
-.navbar-result:active {
-    transform: scale(0.99);
+    background:
+        rgba(124, 58, 237, 0.10);
 }
 
 .navbar-thumb {
-    width: 40px;
-    height: 50px;
+    width: 42px;
+    height: 54px;
 
     flex-shrink: 0;
 
     object-fit: cover;
 
-    border-radius: 6px;
+    border-radius: 7px;
+
+    background: #1e293b;
 }
 
 .navbar-result-info {
@@ -251,50 +364,61 @@
 
     display: flex;
     flex-direction: column;
-    gap: 3px;
+
+    gap: 4px;
 }
 
 .navbar-title {
     display: block;
 
     overflow: hidden;
+
+    color: #f8fafc;
+
+    font-size: 13px;
+    font-weight: 600;
+
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    color: #fff;
-
-    font-size: 14px;
 }
 
 .navbar-meta {
-    color: #9ca3af;
+    color: #94a3b8;
 
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .navbar-message {
-    padding: 14px;
+    padding: 16px;
 
-    color: #9ca3af;
+    color: #94a3b8;
 
     font-size: 13px;
+
+    text-align: center;
 }
 
 .navbar-view-all {
     width: 100%;
 
-    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 13px;
 
     border: none;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top:
+        1px solid rgba(255, 255, 255, 0.07);
 
     background: transparent;
 
-    color: #a78bfa;
+    color: #c4b5fd;
 
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
 
     cursor: pointer;
 
@@ -304,41 +428,53 @@
 }
 
 .navbar-view-all:hover {
-    background: rgba(124, 58, 237, 0.08);
-    color: #c4b5fd;
+    background:
+        rgba(124, 58, 237, 0.08);
+
+    color: #ddd6fe;
 }
 
 
-/* =========================
+/* =========================================================
    RIGHT / AUTH
-========================= */
+   ========================================================= */
 
 .navbar-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 12px;
+
+    gap: 10px;
 
     min-width: 0;
 }
 
 .navbar-login {
-    color: #d1d5db;
+    padding: 9px 11px;
+
+    color: #cbd5e1;
 
     text-decoration: none;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
 
-    transition: color 0.2s ease;
+    border-radius: 10px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 .navbar-login:hover {
+    background:
+        rgba(255, 255, 255, 0.05);
+
     color: #fff;
 }
 
 .navbar-register {
-    padding: 9px 16px;
+    padding: 9px 15px;
 
     border-radius: 10px;
 
@@ -353,8 +489,12 @@
 
     text-decoration: none;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
+
+    box-shadow:
+        0 6px 18px
+            rgba(99, 102, 241, 0.22);
 
     transition:
         transform 0.2s ease,
@@ -362,29 +502,35 @@
 }
 
 .navbar-register:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 
     box-shadow:
-        0 10px 25px rgba(139, 92, 246, 0.35);
+        0 10px 24px
+            rgba(139, 92, 246, 0.30);
 }
 
 .navbar-profile {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
 
-    padding: 9px 14px;
+    gap: 8px;
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 7px 11px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
     border-radius: 12px;
 
-    background: rgba(255, 255, 255, 0.05);
+    background:
+        rgba(255, 255, 255, 0.045);
+
     color: #fff;
 
     text-decoration: none;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
 
     transition:
         background 0.2s ease,
@@ -393,43 +539,91 @@
 }
 
 .navbar-profile:hover {
-    background: rgba(124, 58, 237, 0.18);
+    background:
+        rgba(124, 58, 237, 0.14);
 
-    border-color: rgba(139, 92, 246, 0.45);
+    border-color:
+        rgba(139, 92, 246, 0.32);
 
     transform: translateY(-1px);
 }
 
+.profile-avatar-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-/* =========================
-   TABLET / MOBILE
-========================= */
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
+
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.navbar-profile-name {
+    max-width: 110px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+    .navbar {
+        grid-template-columns:
+            auto
+            minmax(260px, 1fr)
+            auto;
+
+        padding: 0 20px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 900px) {
     .navbar {
-        grid-template-columns: 1fr auto;
+        grid-template-columns:
+            1fr auto;
 
         min-height: 64px;
 
-        padding: 12px 18px;
+        padding: 11px 16px;
 
-        gap: 12px;
+        gap: 10px;
     }
 
     .navbar-menu-button {
         display: inline-flex;
     }
 
-    .navbar-left {
-        min-width: 0;
-    }
-
     .navbar-logo {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .logo-icon {
-        font-size: 23px;
+        width: 32px;
+        height: 32px;
     }
 
     .navbar-search-wrapper {
@@ -437,56 +631,50 @@
         grid-row: 2;
 
         width: 100%;
-        max-width: none;
     }
 
     .navbar-right {
         justify-content: flex-end;
     }
-
-    .navbar-register {
-        padding: 8px 12px;
-    }
 }
 
 
-/* =========================
+/* =========================================================
    SMALL PHONES
-========================= */
+   ========================================================= */
 
 @media (max-width: 520px) {
     .navbar {
-        padding: 10px 14px;
+        padding: 10px 12px;
     }
 
-    .navbar-logo {
-        font-size: 16px;
-    }
+    .navbar-logo-text {
+        max-width: 150px;
 
-    .logo-icon {
-        font-size: 21px;
-    }
+        overflow: hidden;
 
-    .navbar-menu-button {
-        width: 38px;
-        height: 38px;
-
-        font-size: 18px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .navbar-login {
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .navbar-register {
         padding: 8px 10px;
-
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .navbar-profile {
-        padding: 8px 10px;
+        padding: 6px 8px;
+    }
 
-        font-size: 13px;
+    .navbar-profile-name {
+        display: none;
+    }
+
+    .navbar-search-input {
+        min-height: 42px;
     }
 }

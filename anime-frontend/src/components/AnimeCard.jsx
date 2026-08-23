@@ -16,26 +16,56 @@ function AnimeCard({
     onToggleFavorite,
     isFavoritePending = false,
 }) {
-    const { isAuthenticated } = useContext(AuthContext);
-    const { showLoginRequired } = useAuthPrompt();
+    const { isAuthenticated } =
+        useContext(AuthContext);
 
-    const updateLibrary = useUpdateLibrary();
+    const { showLoginRequired } =
+        useAuthPrompt();
 
-    const [open, setOpen] = useState(false);
+    const updateLibrary =
+        useUpdateLibrary();
 
-    const animeId = String(
+    const [open, setOpen] =
+        useState(false);
+
+
+    const rawAnimeId =
         anime?.mal_id ??
         anime?.id ??
-        anime?.anime_id
-    );
+        anime?.anime_id;
 
-    const status = statusMap.get(animeId);
+    if (rawAnimeId == null) {
+        return null;
+    }
 
-    const title = anime?.title || "Unknown Anime";
-    const image = anime?.image || "";
+    const animeId = String(rawAnimeId);
+
+    const status =
+        statusMap.get(animeId);
+
+    const title =
+        anime?.title ||
+        "Unknown Anime";
+
+    const image =
+        anime?.image ||
+        "";
+
+    const score =
+        anime?.score ?? 0;
+
+    const type =
+        anime?.type ||
+        "";
+
+    const year =
+        anime?.year ||
+        "";
 
 
-    const handleFavoriteClick = (event) => {
+    const handleFavoriteClick = (
+        event
+    ) => {
         event.stopPropagation();
 
         if (!isAuthenticated) {
@@ -53,11 +83,15 @@ function AnimeCard({
             return;
         }
 
-        setOpen((current) => !current);
+        setOpen(
+            (current) => !current
+        );
     };
 
 
-    const handleUpdate = (value) => {
+    const handleUpdate = (
+        value
+    ) => {
         if (!isAuthenticated) {
             setOpen(false);
             showLoginRequired();
@@ -87,9 +121,18 @@ function AnimeCard({
     return (
         <motion.article
             className={`anime-card ${
-                open ? "menu-open" : ""
+                open
+                    ? "menu-open"
+                    : ""
             }`}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{
+                y: -6,
+                scale: 1.015,
+            }}
+            transition={{
+                duration: 0.2,
+                ease: "easeOut",
+            }}
         >
             {/* IMAGE */}
             <Link
@@ -109,19 +152,25 @@ function AnimeCard({
             <button
                 type="button"
                 className={`favIcon ${
-                    isFavorited ? "active" : ""
+                    isFavorited
+                        ? "active"
+                        : ""
                 }`}
                 disabled={
                     isAuthenticated &&
-                    (!onToggleFavorite ||
-                        isFavoritePending)
+                    (
+                        !onToggleFavorite ||
+                        isFavoritePending
+                    )
                 }
                 aria-label={
                     isFavorited
                         ? `Remove ${title} from favorites`
                         : `Add ${title} to favorites`
                 }
-                onClick={handleFavoriteClick}
+                onClick={
+                    handleFavoriteClick
+                }
             >
                 {isFavoritePending
                     ? "⏳"
@@ -138,14 +187,42 @@ function AnimeCard({
                 </h3>
 
 
+                {/* METADATA */}
+                <div className="anime-card-meta">
+                    {score > 0 && (
+                        <span className="anime-card-score">
+                            ⭐{" "}
+                            {Number(
+                                score
+                            ).toFixed(1)}
+                        </span>
+                    )}
+
+                    {type && (
+                        <span>
+                            {type}
+                        </span>
+                    )}
+
+                    {year && (
+                        <span>
+                            {year}
+                        </span>
+                    )}
+                </div>
+
+
                 {/* LIBRARY STATUS */}
                 <div className="status-wrapper">
                     <button
                         type="button"
                         className={`status-badge ${
-                            status || "none"
+                            status ||
+                            "none"
                         }`}
-                        onClick={handleLibraryClick}
+                        onClick={
+                            handleLibraryClick
+                        }
                         disabled={
                             isAuthenticated &&
                             updateLibrary.isPending
@@ -159,11 +236,12 @@ function AnimeCard({
                                     "_",
                                     " "
                                 )
-                                : "Add to list"}
+                                : "＋ Add to list"}
                     </button>
 
 
-                    {open && isAuthenticated && (
+                    {open &&
+                    isAuthenticated && (
                         <div className="status-menu">
                             <button
                                 type="button"
@@ -242,5 +320,6 @@ function AnimeCard({
         </motion.article>
     );
 }
+
 
 export default memo(AnimeCard);
