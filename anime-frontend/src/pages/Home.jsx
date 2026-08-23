@@ -27,7 +27,7 @@ function Home() {
     const toggleFavorite = useToggleFavorite();
 
     const { statusMap } = useGlobalLibrary();
-
+    
     // ============================================================
     // HERO STATE
     // ============================================================
@@ -202,26 +202,38 @@ function Home() {
     // LOADING / ERROR
     // ============================================================
 
-    const loading =
-        trendingQuery.isLoading ||
-        seasonalQuery.isLoading ||
-        topQuery.isLoading;
+    // ============================================================
+// LOADING / ERROR
+// ============================================================
 
-    const error =
-        trendingQuery.error ||
-        seasonalQuery.error ||
-        topQuery.error;
+// ============================================================
+// LOADING / ERROR
+// ============================================================
+
+const loading =
+    trendingQuery.isPending ||
+    seasonalQuery.isPending ||
+    topQuery.isPending;
 
 
-    if (error) {
-        return (
-            <PageContainer>
-                <EmptyState
-                    text="Failed to load anime."
-                />
-            </PageContainer>
-        );
-    }
+const error =
+    trendingQuery.error ||
+    seasonalQuery.error ||
+    topQuery.error;
+
+
+
+if (error) {
+    return (
+        <PageContainer>
+
+            <EmptyState
+                text="Failed to load anime."
+            />
+
+        </PageContainer>
+    );
+}
 
 
     // ============================================================
@@ -379,62 +391,60 @@ function Home() {
 
 
             {/* ==================================================
-                CONTENT
-            ================================================== */}
+                    CONTENT
+                ================================================== */}
 
-            {trendingQuery.isLoading &&
-            seasonalQuery.isLoading &&
-            topQuery.isLoading ? (
+                {loading ? (
 
-                <div className="grid">
+                    <div className="grid">
 
-                    {Array.from({
-                        length: 12,
-                    }).map((_, index) => (
-                        <AnimeCardSkeleton
-                            key={index}
+                        {Array.from({
+                            length: 12,
+                        }).map((_, index) => (
+
+                            <AnimeCardSkeleton
+                                key={index}
+                            />
+
+                        ))}
+
+                    </div>
+
+                ) : (
+
+                    <>
+                        <AnimeSection
+                            title="Trending Anime"
+                            emoji="🔥"
+                            animeList={trendingAnime}
+                            statusMap={statusMap}
+                            favoriteIds={favoriteIds}
+                            toggleFavorite={toggleFavorite}
+                            viewAllPath="/trending"
                         />
-                    ))}
 
-                </div>
+                        <AnimeSection
+                            title="Current Season"
+                            emoji="🌸"
+                            animeList={seasonalAnime}
+                            statusMap={statusMap}
+                            favoriteIds={favoriteIds}
+                            toggleFavorite={toggleFavorite}
+                            viewAllPath="/seasonal"
+                        />
 
-            ) : (
-                <>
+                        <AnimeSection
+                            title="Top Rated Anime"
+                            emoji="⭐"
+                            animeList={topAnime}
+                            statusMap={statusMap}
+                            favoriteIds={favoriteIds}
+                            toggleFavorite={toggleFavorite}
+                            viewAllPath="/top"
+                        />
+                    </>
 
-                    <AnimeSection
-                        title="Trending Anime"
-                        emoji="🔥"
-                        animeList={trendingAnime}
-                        statusMap={statusMap}
-                        favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
-                        viewAllPath="/trending"
-                    />
-
-
-                    <AnimeSection
-                        title="Current Season"
-                        emoji="🌸"
-                        animeList={seasonalAnime}
-                        statusMap={statusMap}
-                        favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
-                        viewAllPath="/seasonal"
-                    />
-
-
-                    <AnimeSection
-                        title="Top Rated Anime"
-                        emoji="⭐"
-                        animeList={topAnime}
-                        statusMap={statusMap}
-                        favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
-                        viewAllPath="/top"
-                    />
-
-                </>
-            )}
+                )}
 
         </PageContainer>
     );

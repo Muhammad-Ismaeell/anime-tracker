@@ -1,10 +1,24 @@
 export function extractAnimePages(data) {
-    const pages = data?.pages ?? [];
+
+    if (!data) {
+        return [];
+    }
+
+    // React Query select result
+    if (data.anime) {
+        return data.anime;
+    }
+
+    // fallback for safety
+    const pages = data.pages ?? [];
+
     const map = new Map();
 
     pages.forEach((page) => {
+
         (page?.items ?? []).forEach((anime) => {
-            if (anime?.id == null) {
+
+            if (!anime?.id) {
                 return;
             }
 
@@ -12,7 +26,9 @@ export function extractAnimePages(data) {
                 String(anime.id),
                 anime
             );
+
         });
+
     });
 
     return Array.from(map.values());

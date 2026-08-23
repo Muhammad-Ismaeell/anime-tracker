@@ -34,7 +34,6 @@ class DatabaseAnimeService:
 
         month = now.month
 
-
         if month in [12,1,2]:
             season = "winter"
 
@@ -51,22 +50,11 @@ class DatabaseAnimeService:
         queryset = (
             Anime.objects
             .filter(
-                season__isnull=False,
-                year__isnull=False,
-            )
-            .annotate(
-                season_order=Case(
-                    When(season="winter", then=1),
-                    When(season="spring", then=2),
-                    When(season="summer", then=3),
-                    When(season="fall", then=4),
-                    output_field=IntegerField(),
-                )
+                season=season,
+                year=now.year,
             )
             .order_by(
-                "-year",
-                "season_order",
-                "-score",
+                "-score"
             )
         )
 
@@ -124,7 +112,7 @@ class DatabaseAnimeService:
             .filter(
                 popularity__isnull=False
             )
-            .order_by("popularity")
+            .order_by("popularity","-score")
         )
 
         return cls.paginate(

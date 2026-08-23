@@ -11,7 +11,6 @@ export default function AnimeSection({
     viewAllPath,
 }) 
 {
-    console.log("animeList:", animeList);
     return (
         <section className="home-section">
 
