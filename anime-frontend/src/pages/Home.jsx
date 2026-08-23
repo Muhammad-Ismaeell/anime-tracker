@@ -9,10 +9,8 @@ import AnimeSection from "../components/ui/AnimeSection";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
 
-import {
-    useToggleFavorite,
-    useFavorites,
-} from "../hooks/user/useFavorites";
+import { useToggleFavorite } from "../hooks/user/useFavorites";
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import { extractAnimePages } from "../utils/extractAnimePages";
@@ -29,8 +27,6 @@ function Home() {
     const toggleFavorite = useToggleFavorite();
 
     const { statusMap } = useGlobalLibrary();
-    const { data: favoritesRes } = useFavorites();
-
 
     // ============================================================
     // HERO STATE
@@ -46,23 +42,7 @@ function Home() {
     // FAVORITES
     // ============================================================
 
-    const favoriteIds = useMemo(() => {
-        return new Set(
-            (favoritesRes?.results ?? [])
-                .map((favorite) => {
-                    const id =
-                        favorite.anime?.mal_id ??
-                        favorite.anime?.id ??
-                        favorite.anime_id ??
-                        favorite.mal_id;
-
-                    return id != null
-                        ? String(id)
-                        : null;
-                })
-                .filter(Boolean)
-        );
-    }, [favoritesRes]);
+    const favoriteIds = useFavoriteIds();
 
 
     // ============================================================
