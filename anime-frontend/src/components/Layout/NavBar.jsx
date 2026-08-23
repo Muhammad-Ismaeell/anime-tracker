@@ -34,6 +34,7 @@ function NavBar({
     const {
         isAuthenticated,
         user,
+        loading,
     } = useContext(AuthContext);
 
     const [open, setOpen] = useState(false);
@@ -337,8 +338,9 @@ function NavBar({
                         </span>
 
                         <span className="navbar-profile-name">
-                            {user?.username ||
-                                "Profile"}
+                            {loading
+                                ? "Loading..."
+                                : user?.username || "Profile"}
                         </span>
                     </Link>
                 )}
