@@ -62,122 +62,7 @@
    MOBILE CATALOGUE LAYOUT
    ========================================================= */
 
-@media (max-width: 600px) {
-    .page-container {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
 
-    .results-grid,
-    .favorites-grid,
-    .grid,
-    .anime-grid,
-    .search-results-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        width: 100%;
-    }
-
-    .results-grid .anime-card,
-    .favorites-grid .anime-card,
-    .grid .anime-card,
-    .anime-grid .anime-card,
-    .search-results-grid .anime-card {
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-    }
-
-    .anime-card {
-        min-width: 0;
-    }
-
-    .content {
-        padding: 11px 10px 10px;
-    }
-
-    .title {
-        font-size: 13px;
-    }
-
-    .anime-card-meta {
-        font-size: 10px;
-        gap: 5px;
-    }
-
-    .anime-card-meta span + span::before {
-        margin-right: 5px;
-    }
-
-    .favIcon {
-        width: 34px;
-        height: 34px;
-        top: 8px;
-        right: 8px;
-        font-size: 15px;
-    }
-
-    .status-badge {
-        min-height: 32px;
-        padding: 7px 8px;
-        font-size: 11px;
-    }
-    
-    .horizontal-scroll .anime-card {
-        min-width: 150px;
-        max-width: 160px;
-    }
-    .home-hero {
-        min-height: 500px;
-        margin-bottom: 42px;
-        border-radius: 20px;
-        background-position: 68% center;
-    }
-
-    .home-hero-content {
-        width: 100%;
-        padding: 28px 20px 58px;
-    }
-
-    .home-hero-title {
-        font-size: 32px;
-        line-height: 1.08;
-    }
-
-    .home-hero-description {
-        margin-top: 16px;
-        font-size: 14px;
-        line-height: 1.6;
-        -webkit-line-clamp: 4;
-    }
-
-    .home-hero-actions {
-        margin-top: 22px;
-    }
-
-    .home-hero-primary {
-        width: 100%;
-    }
-
-    .home-hero-nav {
-        width: 34px;
-        height: 34px;
-    }
-
-    .home-hero-prev {
-        left: 10px;
-    }
-
-    .home-hero-next {
-        right: 10px;
-    }
-
-    .home-hero-dots {
-        bottom: 16px;
-    }
-    
-}
 
 /* =========================
    RESET
@@ -3821,7 +3706,7 @@ button:disabled {
     transform: none;
 }
 
-@meda (max-width: 600px) {
+@media (max-width: 600px) {
     .profile-review-modal-overlay {
         padding: 12px;
     }
@@ -4470,5 +4355,302 @@ button:disabled {
     .view-all-btn {
         padding: 7px 10px;
         font-size: 12px;
+    }
+}
+
+/* =========================================================
+   FINAL MOBILE RESPONSIVE OVERRIDES
+   Keep this block LAST in the stylesheet.
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    /* ---------- Page ---------- */
+
+    .page-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px 12px;
+    }
+
+
+    /* ---------- Catalogue grids ---------- */
+
+    .results-grid,
+    .favorites-grid,
+    .grid,
+    .anime-grid,
+    .search-results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .results-grid .anime-card,
+    .favorites-grid .anime-card,
+    .grid .anime-card,
+    .anime-grid .anime-card,
+    .search-results-grid .anime-card {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .anime-card {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+
+    /* ---------- Anime card ---------- */
+
+    .content {
+        padding: 10px;
+    }
+
+    .title {
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .anime-card-meta {
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    .anime-card-meta span + span::before {
+        margin-right: 5px;
+    }
+
+    .favIcon {
+        width: 34px;
+        height: 34px;
+        top: 8px;
+        right: 8px;
+        font-size: 15px;
+    }
+
+    .status-badge {
+        min-height: 32px;
+        padding: 7px 8px;
+        font-size: 11px;
+    }
+
+
+    /* ---------- Home horizontal sections ---------- */
+
+    .horizontal-scroll .anime-card {
+        min-width: 150px;
+        max-width: 160px;
+    }
+
+
+    /* ---------- Home hero ---------- */
+
+    .home-hero {
+        min-height: 500px;
+        margin-bottom: 42px;
+        border-radius: 20px;
+        background-position: 68% center;
+    }
+
+    .home-hero-content {
+        width: 100%;
+        padding: 28px 20px 58px;
+    }
+
+    .home-hero-title {
+        font-size: 32px;
+        line-height: 1.08;
+    }
+
+    .home-hero-description {
+        margin-top: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        -webkit-line-clamp: 4;
+    }
+
+    .home-hero-actions {
+        margin-top: 22px;
+    }
+
+    .home-hero-primary {
+        width: 100%;
+    }
+
+    .home-hero-nav {
+        width: 34px;
+        height: 34px;
+    }
+
+    .home-hero-prev {
+        left: 10px;
+    }
+
+    .home-hero-next {
+        right: 10px;
+    }
+
+    .home-hero-dots {
+        bottom: 16px;
+    }
+
+
+    /* ---------- Section headings ---------- */
+
+    .home-section {
+        margin-bottom: 48px;
+    }
+
+    .section-header {
+        gap: 10px;
+    }
+
+    .section-header h2 {
+        font-size: 20px;
+    }
+
+    .section-emoji {
+        font-size: 21px;
+    }
+
+    .view-all-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+
+    /* ---------- Profile ---------- */
+
+    .profile-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 22px 16px;
+        gap: 16px;
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+    }
+
+    .profile-info {
+        width: 100%;
+    }
+
+    .profile-info h1 {
+        font-size: 25px;
+    }
+
+    .profile-bio {
+        max-width: 100%;
+        margin: 0 auto 14px;
+    }
+
+    .edit-profile-btn {
+        width: 100%;
+        max-width: 260px;
+    }
+
+
+    /* ---------- Profile stats ---------- */
+
+    .stats-grid.premium {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .stat-card.glass {
+        padding: 14px 10px;
+    }
+
+    .stat-card.glass h3 {
+        font-size: 21px;
+    }
+
+    .stat-card.glass p {
+        font-size: 11px;
+    }
+
+
+    /* ---------- Activity ---------- */
+
+    .activity-item {
+        align-items: flex-start;
+        padding: 11px;
+        gap: 10px;
+    }
+
+    .activity-cover {
+        width: 48px;
+        height: 66px;
+    }
+
+
+    /* ---------- Review cards ---------- */
+
+    .review-card {
+        padding: 14px;
+    }
+
+    .review-header,
+    .review-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .page-container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .results-grid,
+    .favorites-grid,
+    .grid,
+    .anime-grid,
+    .search-results-grid {
+        gap: 10px;
+    }
+
+    .content {
+        padding: 9px;
+    }
+
+    .title {
+        font-size: 12px;
+    }
+
+    .anime-card-meta {
+        font-size: 9px;
+    }
+
+    .horizontal-scroll .anime-card {
+        min-width: 140px;
+        max-width: 145px;
+    }
+
+    .home-hero {
+        min-height: 470px;
+    }
+
+    .home-hero-content {
+        padding: 24px 16px 52px;
+    }
+
+    .home-hero-title {
+        font-size: 29px;
+    }
+
+    .home-hero-description {
+        font-size: 13px;
     }
 }
