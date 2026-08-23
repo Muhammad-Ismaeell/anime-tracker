@@ -1,116 +1,173 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
+
 import { ReviewAPI } from "../../api/review.api";
 import toast from "react-hot-toast";
-// --------------------
-// REVIEWS LIST
-// --------------------
+
+
+/* =========================================================
+   REVIEW QUERY KEYS
+========================================================= */
+
+const reviewKeys = {
+    all: ["reviews"],
+
+    anime: (animeId) => [
+        "reviews",
+        String(animeId),
+    ],
+
+    user: ["user-reviews"],
+
+    analytics: ["review-analytics"],
+
+    topRated: ["top-rated-anime"],
+};
+
+
+/* =========================================================
+   REVIEWS LIST
+========================================================= */
+
 export function useReviews(animeId) {
+    const normalizedAnimeId = String(animeId);
+
     return useQuery({
-        queryKey: ["reviews", animeId],
-        queryFn: () => ReviewAPI.list(animeId),
+        queryKey: reviewKeys.anime(
+            normalizedAnimeId
+        ),
+
+        queryFn: () =>
+            ReviewAPI.list(
+                normalizedAnimeId
+            ),
+
         enabled: !!animeId,
     });
 }
 
-// --------------------
-// CREATE REVIEW
-// --------------------
-export function useCreateReview() {
 
+/* =========================================================
+   CREATE REVIEW
+========================================================= */
+
+export function useCreateReview() {
     const queryClient = useQueryClient();
 
     return useMutation({
-
         mutationFn: ReviewAPI.create,
 
-        onSuccess: (_, variables) => {
+        onSuccess: async (_, variables) => {
+            const animeId = String(
+                variables.anime_id
+            );
+
+            await queryClient.refetchQueries({
+                queryKey: reviewKeys.anime(
+                    animeId
+                ),
+                type: "active",
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.user,
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.analytics,
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.topRated,
+            });
+
             toast.success("Review saved!");
-            queryClient.invalidateQueries({
-                queryKey: ["reviews", variables.anime_id]
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ["user-reviews"]
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ["review-analytics"]
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ["top-rated-anime"]
-            });
         },
 
         onError: () => {
-            toast.error("Failed to save review");
-        }
-
+            toast.error(
+                "Failed to save review"
+            );
+        },
     });
 }
 
-// --------------------
-// DELETE REVIEW
-// --------------------
-export function useDeleteReview() {
 
+/* =========================================================
+   DELETE REVIEW
+========================================================= */
+
+export function useDeleteReview() {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationFn: ({ reviewId }) =>
+            ReviewAPI.delete(reviewId),
 
-        mutationFn: ReviewAPI.delete,
-
-        onSuccess: (_, animeId) => {
-
-            queryClient.invalidateQueries({
-                queryKey: ["reviews", animeId]
+        onSuccess: async (_, variables) => {
+            await queryClient.refetchQueries({
+                queryKey: reviewKeys.anime(
+                    variables.animeId
+                ),
+                type: "active",
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ["user-reviews"]
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.user,
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ["review-analytics"]
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.analytics,
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ["top-rated-anime"]
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.topRated,
             });
+
             toast.success("Review deleted!");
-        }
+        },
+
+        onError: () => {
+            toast.error("Failed to delete review");
+        },
     });
 }
 
-// --------------------
-// USER REVIEWS
-// --------------------
-export function useUserReviews() {
 
+/* =========================================================
+   USER REVIEWS
+========================================================= */
+
+export function useUserReviews() {
     return useQuery({
-        queryKey: ["user-reviews"],
+        queryKey: reviewKeys.user,
         queryFn: ReviewAPI.myReviews,
     });
 }
 
-// --------------------
-// ANALYTICS
-// --------------------
-export function useReviewAnalytics() {
 
+/* =========================================================
+   REVIEW ANALYTICS
+========================================================= */
+
+export function useReviewAnalytics() {
     return useQuery({
-        queryKey: ["review-analytics"],
+        queryKey: reviewKeys.analytics,
         queryFn: ReviewAPI.analytics,
     });
 }
 
-// --------------------
-// TOP RATED
-// --------------------
-export function useTopRatedAnime() {
 
+/* =========================================================
+   TOP RATED ANIME
+========================================================= */
+
+export function useTopRatedAnime() {
     return useQuery({
-        queryKey: ["top-rated-anime"],
+        queryKey: reviewKeys.topRated,
 
         queryFn: ReviewAPI.topRated,
 
@@ -118,22 +175,50 @@ export function useTopRatedAnime() {
     });
 }
 
-export function useUpdateReview() {
 
+/* =========================================================
+   UPDATE REVIEW
+========================================================= */
+
+export function useUpdateReview() {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationFn: ({
+            reviewId,
+            payload,
+        }) =>
+            ReviewAPI.update(
+                reviewId,
+                payload
+            ),
 
-        mutationFn: ({ reviewId, payload }) =>
-            ReviewAPI.update(reviewId, payload),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.user,
+            });
 
-        onSuccess: () => {
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.all,
+            });
 
-            queryClient.invalidateQueries(["user-reviews"]);
-            queryClient.invalidateQueries(["reviews"]);
-            queryClient.invalidateQueries(["review-analytics"]);
-            queryClient.invalidateQueries(["top-rated-anime"]);
-            toast.success("Review updated!");
-        }
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.analytics,
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: reviewKeys.topRated,
+            });
+
+            toast.success(
+                "Review updated!"
+            );
+        },
+
+        onError: () => {
+            toast.error(
+                "Failed to update review"
+            );
+        },
     });
 }

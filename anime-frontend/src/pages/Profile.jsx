@@ -459,17 +459,20 @@ function Profile() {
                                     className="review-card profile-review-card"
                                 >
                                     <div className="profile-review-anime">
-                                        <OptimizedImage
-                                            src={
-                                                anime?.image ||
-                                                "/no-image.png"
-                                            }
-                                            alt={
-                                                anime?.title ||
-                                                "Anime"
-                                            }
-                                            className="profile-review-anime-image"
-                                        />
+                                        {anime?.image ? (
+                                            <OptimizedImage
+                                                src={anime.image}
+                                                alt={anime.title || "Anime"}
+                                                className="profile-review-anime-image"
+                                            />
+                                        ) : (
+                                            <div
+                                                className="profile-review-anime-image profile-review-image-fallback"
+                                                aria-label="No anime image available"
+                                            >
+                                                🎬
+                                            </div>
+                                        )}
 
                                         <div className="profile-review-anime-info">
                                             <strong>
@@ -550,17 +553,23 @@ function Profile() {
                     >
                         <div className="profile-review-modal-header">
                             <div className="profile-review-anime-edit">
-                                <OptimizedImage
-                                    src={
-                                        editingReview?.anime?.image ||
-                                        "/no-image.png"
-                                    }
-                                    alt={
-                                        editingReview?.anime?.title ||
-                                        "Anime"
-                                    }
-                                    className="profile-review-anime-edit-image"
-                                />
+                                {editingReview?.anime?.image ? (
+                                    <OptimizedImage
+                                        src={editingReview.anime.image}
+                                        alt={
+                                            editingReview.anime.title ||
+                                            "Anime"
+                                        }
+                                        className="profile-review-anime-edit-image"
+                                    />
+                                ) : (
+                                    <div
+                                        className="profile-review-anime-edit-image profile-review-image-fallback"
+                                        aria-label="No anime image available"
+                                    >
+                                        🎬
+                                    </div>
+                                )}
 
                                 <div>
                                     <span className="profile-review-modal-eyebrow">

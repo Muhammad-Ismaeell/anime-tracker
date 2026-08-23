@@ -3837,6 +3837,26 @@ button:disabled {
     object-fit: cover;
     border-radius: 8px;
 }
+.profile-review-image-fallback {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1e293b,
+            #111827
+        );
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    color: #94a3b8;
+
+    font-size: 20px;
+}
 
 .profile-review-anime-edit h3 {
     margin: 4px 0;
@@ -4167,4 +4187,209 @@ button:disabled {
     .home-hero-description {
         font-size: 13px;
     }
+}
+
+/* =========================
+   DELETE REVIEW MODAL
+========================= */
+
+.delete-review-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 12000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(3, 7, 18, 0.78);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.delete-review-modal {
+    width: min(420px, 100%);
+
+    padding: 28px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.10);
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(24, 24, 27, 0.98),
+            rgba(17, 24, 39, 0.98)
+        );
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.65),
+        0 0 50px rgba(239, 68, 68, 0.06);
+
+    text-align: center;
+}
+
+.delete-review-modal-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 16px;
+
+    border:
+        1px solid rgba(239, 68, 68, 0.25);
+
+    border-radius: 50%;
+
+    background:
+        rgba(239, 68, 68, 0.12);
+
+    font-size: 24px;
+}
+
+.delete-review-modal h3 {
+    margin: 0 0 10px;
+
+    color: #fff;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.delete-review-modal p {
+    margin: 0;
+
+    color: #9ca3af;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.delete-review-modal-actions {
+    display: flex;
+    gap: 10px;
+
+    margin-top: 24px;
+}
+
+.delete-review-cancel,
+.delete-review-confirm {
+    flex: 1;
+
+    min-height: 44px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.delete-review-cancel {
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    color: #d1d5db;
+}
+
+.delete-review-cancel:hover {
+    background:
+        rgba(255, 255, 255, 0.09);
+
+    transform: translateY(-1px);
+}
+
+.delete-review-confirm {
+    border:
+        1px solid rgba(239, 68, 68, 0.25);
+
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #ef4444
+        );
+
+    color: #fff;
+
+    box-shadow:
+        0 8px 24px rgba(239, 68, 68, 0.18);
+}
+
+.delete-review-confirm:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 12px 30px rgba(239, 68, 68, 0.28);
+}
+
+.delete-review-cancel:disabled,
+.delete-review-confirm:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+@media (max-width: 600px) {
+    .delete-review-modal-overlay {
+        padding: 12px;
+    }
+
+    .delete-review-modal {
+        padding: 22px 18px;
+
+        border-radius: 18px;
+    }
+
+    .delete-review-modal-actions {
+        flex-direction: column;
+    }
+
+    .delete-review-cancel,
+    .delete-review-confirm {
+        width: 100%;
+    }
+}
+
+.image-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1e293b,
+            #111827
+        );
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    color: #94a3b8;
+
+    font-size: 24px;
 }

@@ -25,7 +25,7 @@ export const ReviewAPI = {
 
     delete: async (reviewId) => {
         const res = await api.delete(
-            `/users/reviews/${reviewId}/`
+            `/users/reviews/${reviewId}/delete/`
         );
 
         return res.data.data;

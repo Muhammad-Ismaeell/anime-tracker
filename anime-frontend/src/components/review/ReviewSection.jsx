@@ -1,4 +1,7 @@
-import { useContext, useState } from "react";
+import {
+    useContext,
+    useState,
+} from "react";
 
 import {
     useReviews,
@@ -14,8 +17,10 @@ import AnimeCardSkeleton from "../skeletons/AnimeCardSkeleton";
 
 
 function ReviewSection({ animeId }) {
-    const { user, isAuthenticated } =
-        useContext(AuthContext);
+    const {
+        user,
+        isAuthenticated,
+    } = useContext(AuthContext);
 
     const { showLoginRequired } =
         useAuthPrompt();
@@ -25,11 +30,20 @@ function ReviewSection({ animeId }) {
         isLoading,
     } = useReviews(animeId);
 
-    const createReview = useCreateReview();
-    const deleteReview = useDeleteReview();
+    const createReview =
+        useCreateReview();
 
-    const [rating, setRating] = useState(10);
-    const [text, setText] = useState("");
+    const deleteReview =
+        useDeleteReview();
+
+    const [rating, setRating] =
+        useState(10);
+
+    const [text, setText] =
+        useState("");
+
+    const [reviewToDelete, setReviewToDelete] =
+        useState(null);
 
 
     if (isLoading) {
@@ -47,8 +61,13 @@ function ReviewSection({ animeId }) {
     }
 
 
-    const reviews = data?.reviews ?? [];
-    const average = Number(data?.average_rating ?? 0);
+    const reviews =
+        data?.reviews ?? [];
+
+    const average =
+        Number(
+            data?.average_rating ?? 0
+        );
 
 
     const requireAuthentication = () => {
@@ -66,7 +85,8 @@ function ReviewSection({ animeId }) {
             return;
         }
 
-        const reviewText = text.trim();
+        const reviewText =
+            text.trim();
 
         if (!reviewText) {
             return;
@@ -74,7 +94,8 @@ function ReviewSection({ animeId }) {
 
         createReview.mutate(
             {
-                anime_id: Number(animeId),
+                anime_id:
+                    Number(animeId),
                 rating,
                 text: reviewText,
             },
@@ -91,7 +112,9 @@ function ReviewSection({ animeId }) {
         <section className="reviews-section">
 
             <div className="reviews-header">
-                <h2>⭐ Community Reviews</h2>
+                <h2>
+                    ⭐ Community Reviews
+                </h2>
 
                 <div className="average-rating">
                     {average.toFixed(1)} / 10
@@ -99,31 +122,46 @@ function ReviewSection({ animeId }) {
             </div>
 
 
+            {/* REVIEW FORM */}
+
             <div className="review-form">
 
                 <select
                     value={rating}
                     onChange={(event) => {
-                        if (!requireAuthentication()) {
+                        if (
+                            !requireAuthentication()
+                        ) {
                             return;
                         }
 
                         setRating(
-                            Number(event.target.value)
+                            Number(
+                                event.target.value
+                            )
                         );
                     }}
                     aria-label="Review rating"
                 >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                        (value) => (
-                            <option
-                                key={value}
-                                value={value}
-                            >
-                                {value}/10
-                            </option>
-                        )
-                    )}
+                    {[
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                    ].map((value) => (
+                        <option
+                            key={value}
+                            value={value}
+                        >
+                            {value}/10
+                        </option>
+                    ))}
                 </select>
 
 
@@ -135,7 +173,9 @@ function ReviewSection({ animeId }) {
                             return;
                         }
 
-                        setText(event.target.value);
+                        setText(
+                            event.target.value
+                        );
                     }}
                     onFocus={() => {
                         if (!isAuthenticated) {
@@ -147,7 +187,9 @@ function ReviewSection({ animeId }) {
                             ? "Share your thoughts..."
                             : "Sign in to write a review..."
                     }
-                    readOnly={!isAuthenticated}
+                    readOnly={
+                        !isAuthenticated
+                    }
                     aria-label="Review text"
                 />
 
@@ -169,6 +211,8 @@ function ReviewSection({ animeId }) {
             </div>
 
 
+            {/* REVIEWS LIST */}
+
             <div className="reviews-list">
 
                 {reviews.length === 0 ? (
@@ -179,7 +223,10 @@ function ReviewSection({ animeId }) {
                     reviews.map((review) => {
                         const isOwnReview =
                             isAuthenticated &&
-                            String(user?.id) === String(review.user_id);
+                            String(user?.id) ===
+                                String(
+                                    review.user_id
+                                );
 
                         return (
                             <article
@@ -192,11 +239,17 @@ function ReviewSection({ animeId }) {
                                     </strong>
 
                                     <span>
-                                        ⭐ {review.rating}/10
+                                        ⭐{" "}
+                                        {review.rating}
+                                        /10
                                     </span>
                                 </div>
 
-                                <p>{review.text}</p>
+
+                                <p>
+                                    {review.text}
+                                </p>
+
 
                                 <small>
                                     {new Date(
@@ -204,20 +257,15 @@ function ReviewSection({ animeId }) {
                                     ).toLocaleDateString()}
                                 </small>
 
+
                                 {isOwnReview && (
                                     <button
                                         type="button"
                                         className="delete-btn"
                                         onClick={() => {
-                                            if (
-                                                window.confirm(
-                                                    "Delete your review?"
-                                                )
-                                            ) {
-                                                deleteReview.mutate(
-                                                    review.id
-                                                );
-                                            }
+                                            setReviewToDelete(
+                                                review
+                                            );
                                         }}
                                     >
                                         Delete my review
@@ -229,6 +277,100 @@ function ReviewSection({ animeId }) {
                 )}
 
             </div>
+
+
+            {/* DELETE CONFIRMATION MODAL */}
+
+            {reviewToDelete && (
+                <div
+                    className="delete-review-modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-review-title"
+                    onClick={() => {
+                        if (
+                            !deleteReview.isPending
+                        ) {
+                            setReviewToDelete(
+                                null
+                            );
+                        }
+                    }}
+                >
+                    <div
+                        className="delete-review-modal"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                    >
+                        <div className="delete-review-modal-icon">
+                            ⚠️
+                        </div>
+
+                        <h3 id="delete-review-title">
+                            Delete review?
+                        </h3>
+
+                        <p>
+                            Are you sure you want
+                            to delete your review?
+                            This action cannot be
+                            undone.
+                        </p>
+
+
+                        <div className="delete-review-modal-actions">
+
+                            <button
+                                type="button"
+                                className="delete-review-cancel"
+                                disabled={
+                                    deleteReview.isPending
+                                }
+                                onClick={() => {
+                                    setReviewToDelete(
+                                        null
+                                    );
+                                }}
+                            >
+                                Cancel
+                            </button>
+
+
+                            <button
+                                type="button"
+                                className="delete-review-confirm"
+                                disabled={
+                                    deleteReview.isPending
+                                }
+                                onClick={() => {
+                                    deleteReview.mutate(
+                                        {
+                                            reviewId:
+                                                reviewToDelete.id,
+                                            animeId,
+                                        },
+                                        {
+                                            onSuccess:
+                                                () => {
+                                                    setReviewToDelete(
+                                                        null
+                                                    );
+                                                },
+                                        }
+                                    );
+                                }}
+                            >
+                                {deleteReview.isPending
+                                    ? "Deleting..."
+                                    : "Delete Review"}
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </section>
     );
 }
