@@ -1,10 +1,13 @@
 import { useAnimeFeed } from "../../hooks/anime/useAnimeFeed";
 import AnimeCard from "../../components/AnimeCard";
 import { useFavorites } from "../../hooks/user/useFavorites";
+import ErrorState from "../../components/ui/ErrorState";
 import Section from "../../components/ui/Section";
+import EmptyState from "../../components/ui/EmptyState";
+import AnimeCardSkeleton from "../../components/ui/AnimeCardSkeleton";
 function TrendingSection() {
 
-    const { data, isLoading } = useAnimeFeed("trending");
+    const { data, isLoading,isError } = useAnimeFeed("trending");
     const { data: favorites = [] } = useFavorites();
 
     const items = data?.pages?.flatMap(p => p.items) || [];
@@ -15,7 +18,36 @@ function TrendingSection() {
         )
     );
 
-    if (isLoading) return null;
+    if (isLoading) {
+        return (
+            <Section title="🔥 Trending">
+
+                <div className="grid">
+
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <AnimeCardSkeleton key={index} />
+                    ))}
+
+                </div>
+
+            </Section>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Section title="🔥 Trending">
+                <ErrorState text="Failed loading trending anime" />
+            </Section>
+        );
+    }
+    if (!items.length) {
+        return (
+            <Section title="🔥 Trending">
+                <EmptyState text="No trending anime found" />
+            </Section>
+        );
+    }
 
     return (
         <Section title="🔥 Trending">

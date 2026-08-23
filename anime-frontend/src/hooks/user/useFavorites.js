@@ -67,24 +67,25 @@ export function useToggleFavorite() {
     const queryClient = useQueryClient();
 
     return useMutation({
+
         mutationFn: FavoriteAPI.toggle,
 
-        onSuccess: () => {
+        onSuccess: async () => {
+
             toast.success(
                 "Favorite updated!"
             );
 
-            queryClient.invalidateQueries({
-                queryKey:
-                    queryKeys.users.favorites,
-                exact: false,
+
+            await queryClient.invalidateQueries({
+                queryKey: queryKeys.users.favorites,
             });
 
-            queryClient.invalidateQueries({
-                queryKey: [
-                    "favoriteIds",
-                ],
+
+            await queryClient.invalidateQueries({
+                queryKey: queryKeys.users.activity,
             });
+
         },
 
         onError: () => {
@@ -92,5 +93,6 @@ export function useToggleFavorite() {
                 "Failed to update favorite"
             );
         },
+
     });
 }

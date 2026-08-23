@@ -77,6 +77,8 @@ Otherwise it will be added.
 def toggle_favorite(request):
 
     anime_id = request.data.get("anime_id")
+    title = request.data.get("title")
+    image = request.data.get("image")
 
     if not anime_id:
         return APIResponse.error(
@@ -86,6 +88,8 @@ def toggle_favorite(request):
     result = favorite_service.toggle(
         request.user,
         anime_id,
+        title,
+        image,
     )
 
     return APIResponse.success(

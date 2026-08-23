@@ -31,9 +31,8 @@ const actionLabels = {
 };
 
 function Profile() {
-
     const navigate = useNavigate();
-
+    
     // ---------------- PROFILE ----------------
     const {
         data: profile,

@@ -4,7 +4,13 @@ export const normalizeAnime = (anime) => {
     }
 
     return {
+        // Database ID
         id:
+            anime.id ?? 
+            anime.mal_id,
+
+        // MAL ID for detail requests
+        mal_id:
             anime.mal_id ??
             anime.id,
 
@@ -29,7 +35,7 @@ export const normalizeAnime = (anime) => {
             "",
 
         score:
-            anime.score ??
+            anime.score ?? 
             0,
 
         type:

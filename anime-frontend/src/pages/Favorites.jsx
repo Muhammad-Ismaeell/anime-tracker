@@ -88,7 +88,8 @@ function Favorites() {
 
                 {favorites.length === 0 ? (
                     <EmptyState
-                        text="No favorite anime yet."
+                        text="You haven't added any favorite anime yet."
+                        icon="❤️"
                     />
                 ) : (
                     <div className="grid">

@@ -7,6 +7,8 @@ import { Helmet } from "react-helmet-async";
 import PageContainer from "../components/ui/PageContainer";
 import LibrarySection from "../components/library/LibrarySection";
 import EmptyState from "../components/ui/EmptyState";
+
+
 function Library() {
 
     const {
@@ -19,50 +21,92 @@ function Library() {
         refetch
     } = useLibrary();
 
+
     const grouped = useMemo(() => {
+
         const library =
             data?.pages?.flatMap(
                 page => page.results || []
             ) || [];
 
-        return library.reduce((acc, item) => {
-            const status = (item.status || "").toLowerCase();
 
-            if (!acc[status]) {
-                acc[status] = [];
+        return library.reduce(
+            (acc, item) => {
+
+                const status =
+                    (item.status || "")
+                    .toLowerCase();
+
+
+                if (!acc[status]) {
+                    acc[status] = [];
+                }
+
+
+                acc[status].push(item);
+
+
+                return acc;
+
+            },
+            {
+                watching: [],
+                completed: [],
+                plan_to_watch: [],
+                dropped: [],
             }
+        );
 
-            acc[status].push(item);
-
-            return acc;
-        }, {
-            watching: [],
-            completed: [],
-            plan_to_watch: [],
-            dropped: [],
-        });
     }, [data]);
 
 
+    const totalLibraryItems =
+        Object.values(grouped)
+            .flat()
+            .length;
+
+
+
     // ---------------- LOADING ----------------
+
     if (isLoading) {
 
         return (
-            <div style={styles.loadingGrid}>
-                {Array.from({ length: 12 }).map((_, i) => (
-                    <AnimeCardSkeleton key={i} />
-                ))}
-            </div>
+            <PageContainer>
+
+                <div className="grid">
+
+                    {Array.from({
+                        length: 12
+                    }).map((_, index) => (
+
+                        <AnimeCardSkeleton
+                            key={index}
+                        />
+
+                    ))}
+
+                </div>
+
+            </PageContainer>
         );
+
     }
-    
+
+
+
+    // ---------------- ERROR ----------------
+
     if (error) {
+
         return (
             <PageContainer>
 
                 <EmptyState
                     text="Failed to load your library."
+                    icon="⚠️"
                 />
+
 
                 <button
                     className="retry-btn"
@@ -73,65 +117,115 @@ function Library() {
 
             </PageContainer>
         );
+
     }
+
+
 
     return (
         <>
+
             <Helmet>
-                <title>My Library | Anime Tracker</title>
+
+                <title>
+                    My Library | Anime Tracker
+                </title>
+
 
                 <meta
                     name="description"
                     content="Manage your anime watching list."
                 />
+
             </Helmet>
+
+
 
             <PageContainer>
 
-            <h1 style={styles.title}>
-                My Library
-            </h1>
+
+                <h1 style={styles.title}>
+                    My Library
+                </h1>
 
 
-            {/* GROUPS */}
-            {Object.entries(grouped).map(([key, items]) => (
 
-                <LibrarySection
-                    key={key}
-                    title={key.replaceAll("_", " ")}
-                    items={items}
-                />
+                {/* EMPTY STATE */}
 
-            ))}
-            {hasNextPage && (
+                {totalLibraryItems === 0 ? (
 
-                <button
-                    className="load-more-btn"
-                    disabled={isFetchingNextPage}
-                    onClick={() => fetchNextPage()}
-                >
-                    {isFetchingNextPage
-                        ? "Loading..."
-                        : "Load More Anime"}
-                </button>
+                    <EmptyState
+                        text="Your library is empty. Start adding anime to track your progress."
+                        icon="📚"
+                    />
 
-            )}
-        </PageContainer>
-    </>
+                ) : (
+
+
+                    Object.entries(grouped)
+                        .map(([key, items]) => (
+
+                            items.length > 0 && (
+
+                                <LibrarySection
+
+                                    key={key}
+
+                                    title={
+                                        key.replaceAll(
+                                            "_",
+                                            " "
+                                        )
+                                    }
+
+                                    items={items}
+
+                                />
+
+                            )
+
+                        ))
+
+                )}
+
+
+
+                {/* LOAD MORE */}
+
+                {hasNextPage && (
+
+                    <button
+                        className="load-more-btn"
+                        disabled={isFetchingNextPage}
+                        onClick={() => fetchNextPage()}
+                    >
+
+                        {isFetchingNextPage
+                            ? "Loading..."
+                            : "Load More Anime"}
+
+                    </button>
+
+                )}
+
+
+            </PageContainer>
+
+        </>
     );
+
 }
 
+
+
 const styles = {
+
     title: {
         fontSize: "42px",
         marginBottom: "30px"
-    },
-
-    loadingGrid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(6, 1fr)",
-        gap: 20
     }
+
 };
+
 
 export default Library;

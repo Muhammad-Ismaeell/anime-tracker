@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.models import Avg
 
 from anime.infrastructure.repositories.anime_repository import (
-    AnimeRepository,
+    AnimeRepository
 )
 
 from core.exceptions.custom_exceptions import (

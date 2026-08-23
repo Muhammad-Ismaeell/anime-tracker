@@ -1,5 +1,6 @@
 import { Component } from "react";
 
+
 class ErrorBoundary extends Component {
 
     constructor(props) {
@@ -7,57 +8,89 @@ class ErrorBoundary extends Component {
 
         this.state = {
             hasError: false,
-            error: null,
         };
     }
 
 
-    static getDerivedStateFromError(error) {
+    static getDerivedStateFromError() {
+
         return {
             hasError: true,
-            error,
         };
+
     }
 
 
     componentDidCatch(error, errorInfo) {
+
         if (import.meta.env.DEV) {
-            console.error("Error Boundary caught:", error, errorInfo);
+
+            console.error(
+                "Error Boundary caught:",
+                error,
+                errorInfo
+            );
+
         }
+
     }
+
+
+    handleReload = () => {
+
+        window.location.reload();
+
+    };
 
 
     render() {
 
         if (this.state.hasError) {
+
             return (
-                <div
-                    style={{
-                        minHeight: "100vh",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <h1>Something went wrong</h1>
 
-                    <p>
-                        {this.state.error?.message}
-                    </p>
+                <div className="error-page">
 
-                    <button
-                        onClick={() => window.location.reload()}
-                    >
-                        Reload
-                    </button>
+                    <div className="error-card">
+
+                        <div className="error-icon">
+                            💥
+                        </div>
+
+
+                        <h1>
+                            Something went wrong
+                        </h1>
+
+
+                        <p>
+                            We couldn't load this page.
+                            Please try again.
+                        </p>
+
+
+                        <button
+                            className="retry-btn"
+                            onClick={
+                                this.handleReload
+                            }
+                        >
+                            Reload
+                        </button>
+
+                    </div>
+
                 </div>
+
             );
+
         }
 
 
         return this.props.children;
+
     }
+
 }
 
 

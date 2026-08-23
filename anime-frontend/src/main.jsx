@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AuthProvider from "./context/AuthProvider";
 import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
+import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
@@ -68,40 +69,60 @@ const queryClient = new QueryClient({
 
 });
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-    
-    <HelmetProvider>
-        <BrowserRouter>
+ReactDOM.createRoot(
+    document.getElementById("root")
+).render(
 
-        <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-                <ThemeProvider>
+    <ErrorBoundary>
 
-                    <Toaster
-                        position="bottom-right"
-                        toastOptions={{
-                            duration: 2500,
-                        }}
-                    />
+        <HelmetProvider>
 
-                    <GoogleOAuthProvider
-                        clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
-                    >
-                        <AuthPromptProvider>
-                            <App />
-                        </AuthPromptProvider>
-                        
-                    </GoogleOAuthProvider>
+            <BrowserRouter>
 
-                    <ReactQueryDevtools initialIsOpen={false} />
+                <QueryClientProvider client={queryClient}>
 
-                </ThemeProvider>
-            </AuthProvider>
-        </QueryClientProvider>
+                    <AuthProvider>
 
-        </BrowserRouter>
-    </HelmetProvider>
-        
+                        <ThemeProvider>
 
-    
+                            <Toaster
+                                position="bottom-right"
+                                toastOptions={{
+                                    duration: 2500,
+                                }}
+                            />
+
+
+                            <GoogleOAuthProvider
+                                clientId={
+                                    import.meta.env.VITE_GOOGLE_CLIENT_ID
+                                }
+                            >
+
+                                <AuthPromptProvider>
+
+                                    <App />
+
+                                </AuthPromptProvider>
+
+                            </GoogleOAuthProvider>
+
+
+                            <ReactQueryDevtools
+                                initialIsOpen={false}
+                            />
+
+
+                        </ThemeProvider>
+
+                    </AuthProvider>
+
+                </QueryClientProvider>
+
+            </BrowserRouter>
+
+        </HelmetProvider>
+
+    </ErrorBoundary>
+
 );

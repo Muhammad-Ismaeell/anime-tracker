@@ -1,14 +1,29 @@
-function EmptyState({ text }) {
+function EmptyState({
+    text,
+    icon = "📭",
+    action,
+}) {
 
     return (
-        <div style={{
-            padding: "40px",
-            textAlign: "center",
-            borderRadius: "16px",
-            background: "#1e1e1e",
-            color: "#aaa"
-        }}>
-            {text}
+        <div className="empty-state">
+
+            <div className="empty-state-icon">
+                {icon}
+            </div>
+
+            <p className="empty-state-text">
+                {text}
+            </p>
+
+            {action && (
+                <button
+                    className="empty-state-btn"
+                    onClick={action.onClick}
+                >
+                    {action.label}
+                </button>
+            )}
+
         </div>
     );
 }

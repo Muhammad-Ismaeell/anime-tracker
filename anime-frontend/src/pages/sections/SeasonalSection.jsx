@@ -2,9 +2,12 @@ import { useAnimeFeed } from "../../hooks/anime/useAnimeFeed";
 import AnimeCard from "../../components/AnimeCard";
 import { useFavorites } from "../../hooks/user/useFavorites";
 import Section from "../../components/ui/Section";
+import ErrorState from "../../components/ui/ErrorState";
+import AnimeCardSkeleton from "../../components/ui/AnimeCardSkeleton";
+import EmptyState from "../../components/ui/EmptyState";
 function SeasonalSection() {
 
-    const { data, isLoading } = useAnimeFeed("seasonal");
+    const { data, isLoading, isError } = useAnimeFeed("seasonal");
     const { data: favorites = [] } = useFavorites();
 
     const items = data?.pages?.flatMap(p => p.items) || [];
@@ -15,7 +18,36 @@ function SeasonalSection() {
         )
     );
 
-    if (isLoading) return null;
+    if (isLoading) {
+        return (
+            <Section title="🌸 Seasonal">
+
+                <div className="grid">
+
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <AnimeCardSkeleton key={index} />
+                    ))}
+
+                </div>
+
+            </Section>
+        );
+    }
+
+    if (isError) {
+        return (
+            <Section title="🌸 Seasonal">
+                <ErrorState text="Failed loading seasonal anime" />
+            </Section>
+        );
+    }
+    if (!items.length) {
+        return (
+            <Section title="🔥 Seasonal">
+                <EmptyState text="No seasonal anime found" />
+            </Section>
+        );
+    }
 
     return (
         <Section title="🌸 Seasonal">

@@ -9,10 +9,14 @@ export default function AnimeSection({
     favoriteIds,
     toggleFavorite,
     viewAllPath,
-}) {
+}) 
+{
+    console.log("animeList:", animeList);
     return (
         <section className="home-section">
+
             <div className="section-header">
+
                 <div className="section-heading">
                     <span className="section-emoji">
                         {emoji}
@@ -20,6 +24,7 @@ export default function AnimeSection({
 
                     <h2>{title}</h2>
                 </div>
+
 
                 {viewAllPath && (
                     <Link
@@ -32,35 +37,57 @@ export default function AnimeSection({
                         </span>
                     </Link>
                 )}
+
             </div>
 
+
             <div className="grid">
+
                 {animeList
                     .slice(0, 8)
                     .map((anime) => {
 
+                        const animeId =
+                            anime.mal_id ??
+                            anime.id;
+
+
                         return (
                             <AnimeCard
-                                key={anime.id}
+
+                                key={animeId}
+
                                 anime={anime}
+
                                 statusMap={statusMap}
-                                isFavorited={favoriteIds.has(
-                                    String(anime.mal_id)
-                                )}
+
+
+                                isFavorited={
+                                    favoriteIds.has(
+                                        String(animeId)
+                                    )
+                                }
+
+
                                 isFavoritePending={
                                     toggleFavorite.isPending
                                 }
+
+
                                 onToggleFavorite={() =>
                                     toggleFavorite.mutate({
-                                        anime_id: anime.mal_id,
+                                        anime_id: anime.mal_id ?? anime.id,
                                         title: anime.title,
                                         image: anime.image || "",
                                     })
                                 }
+
                             />
                         );
                     })}
+
             </div>
+
         </section>
     );
 }

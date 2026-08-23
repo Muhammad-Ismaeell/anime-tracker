@@ -276,6 +276,68 @@ body {
 
 }
 
+.error-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+}
+
+
+.error-card {
+
+    width: 100%;
+
+    max-width: 420px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    border-radius: 24px;
+
+    background: rgba(255,255,255,0.05);
+
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+}
+
+
+.error-icon {
+
+    font-size: 56px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.error-card h1 {
+
+    margin-bottom: 12px;
+
+}
+
+
+.error-card p {
+
+    color: #aaa;
+
+    line-height: 1.6;
+
+    margin-bottom: 24px;
+
+}
+
 
 .retry-btn {
 
@@ -983,8 +1045,77 @@ body {
 }
 
 .empty-state {
-    opacity: 0.6;
-    padding: 20px;
+
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 40px 24px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.05);
+
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    text-align: center;
+
+    color: #aaa;
+
+}
+
+
+.empty-state-icon {
+
+    font-size: 48px;
+
+    opacity: 0.9;
+
+}
+
+
+.empty-state-text {
+
+    font-size: 18px;
+
+    max-width: 420px;
+
+    line-height: 1.6;
+
+}
+
+
+.empty-state-btn {
+
+    margin-top: 10px;
+
+    padding: 10px 22px;
+
+    border-radius: 999px;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: transform 0.2s ease;
+
+}
+
+
+.empty-state-btn:hover {
+
+    transform: translateY(-2px);
+
 }
 
 .anime-grid {

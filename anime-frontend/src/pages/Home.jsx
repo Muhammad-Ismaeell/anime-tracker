@@ -382,7 +382,10 @@ function Home() {
                 CONTENT
             ================================================== */}
 
-            {loading ? (
+            {trendingQuery.isLoading &&
+            seasonalQuery.isLoading &&
+            topQuery.isLoading ? (
+
                 <div className="grid">
 
                     {Array.from({
@@ -394,6 +397,7 @@ function Home() {
                     ))}
 
                 </div>
+
             ) : (
                 <>
 

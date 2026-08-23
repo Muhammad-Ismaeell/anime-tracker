@@ -73,7 +73,11 @@ function AnimeCard({
             return;
         }
 
-        onToggleFavorite?.(anime);
+        onToggleFavorite?.({
+            anime_id: animeId,
+            title,
+            image,
+        });
     };
 
 
