@@ -2196,7 +2196,7 @@ button:disabled {
     overflow: hidden;
 
     background-size: cover;
-    background-position: center;
+    background-position: center right;
 
     display: flex;
     align-items: center;
@@ -2225,6 +2225,19 @@ button:disabled {
 .home-hero-content {
     width: min(700px, 100%);
     padding: 56px;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+}
+.hero-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.hero-hidden {
+    opacity: 0;
+    transform: translateX(12px);
 }
 
 .home-hero-eyebrow {
@@ -2280,39 +2293,66 @@ button:disabled {
 .home-hero-nav {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    z-index: 3;
 
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
 
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 50%;
 
-    background: rgba(0, 0, 0, 0.35);
-    color: white;
+    background: rgba(15, 15, 25, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 
-    font-size: 30px;
+    color: rgba(255, 255, 255, 0.9);
+
+    font-size: 22px;
+    font-weight: 400;
     line-height: 1;
 
     cursor: pointer;
 
-    backdrop-filter: blur(10px);
+    opacity: 0.75;
+
+    transform: translateY(-50%) scale(1);
 
     transition:
-        background 0.2s ease,
-        transform 0.2s ease;
+        opacity 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 .home-hero-nav:hover {
-    background: rgba(255, 255, 255, 0.15);
+    opacity: 1;
+
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+
+    transform: translateY(-50%) scale(1.08);
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.home-hero-nav:active {
+    transform: translateY(-50%) scale(0.94);
 }
 
 .home-hero-prev {
-    left: 20px;
+    left: 22px;
 }
 
 .home-hero-next {
-    right: 20px;
+    right: 22px;
 }
 
 .home-hero-dots {
@@ -2389,8 +2429,7 @@ button:disabled {
     margin-top: 28px;
 }
 
-.home-hero-primary,
-.home-hero-secondary {
+.home-hero-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2418,16 +2457,9 @@ button:disabled {
     transform: translateY(-2px);
 }
 
-.home-hero-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: white;
-}
 
-.home-hero-secondary:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.12);
-}
+
+
 
 @media (max-width: 768px) {
     .home-hero {

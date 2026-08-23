@@ -1,12 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
-import {
-    useEffect,
-    useMemo,
-    useState,
-} from "react";import PageContainer from "../components/ui/PageContainer";
+
+import PageContainer from "../components/ui/PageContainer";
 import AnimeSection from "../components/ui/AnimeSection";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
@@ -17,7 +15,6 @@ import {
 } from "../hooks/user/useFavorites";
 
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-
 import { normalizeAnime } from "../utils/normalizeAnime";
 
 
@@ -29,28 +26,33 @@ function Home() {
     const toggleFavorite = useToggleFavorite();
 
     const { statusMap } = useGlobalLibrary();
-
     const { data: favoritesRes } = useFavorites();
 
-    const favoriteIds = new Set(
-        (favoritesRes?.results ?? [])
-            .map((favorite) => {
-                const id =
-                    favorite.anime?.mal_id ??
-                    favorite.anime?.id ??
-                    favorite.anime_id ??
-                    favorite.mal_id;
-
-                return id != null
-                    ? String(id)
-                    : null;
-            })
-            .filter(Boolean)
-    );
+    const [featuredIndex, setFeaturedIndex] = useState(0);
+    const [heroVisible, setHeroVisible] = useState(true);
 
 
-    const extractAnime = (query) => {
-        const pages = query.data?.pages ?? [];
+    const favoriteIds = useMemo(() => {
+        return new Set(
+            (favoritesRes?.results ?? [])
+                .map((favorite) => {
+                    const id =
+                        favorite.anime?.mal_id ??
+                        favorite.anime?.id ??
+                        favorite.anime_id ??
+                        favorite.mal_id;
+
+                    return id != null
+                        ? String(id)
+                        : null;
+                })
+                .filter(Boolean)
+        );
+    }, [favoritesRes]);
+
+
+    const extractAnime = (data) => {
+        const pages = data?.pages ?? [];
         const map = new Map();
 
         pages.forEach((page) => {
@@ -76,38 +78,91 @@ function Home() {
 
 
     const trendingAnime = useMemo(
-        () => extractAnime(trendingQuery),
+        () => extractAnime(trendingQuery.data),
         [trendingQuery.data]
     );
 
     const seasonalAnime = useMemo(
-        () => extractAnime(seasonalQuery),
+        () => extractAnime(seasonalQuery.data),
         [seasonalQuery.data]
     );
 
     const topAnime = useMemo(
-        () => extractAnime(topQuery),
+        () => extractAnime(topQuery.data),
         [topQuery.data]
     );
-    const featuredAnime = trendingAnime.slice(0, 5);
-    const [featuredIndex, setFeaturedIndex] = useState(0);
+
+
+    const featuredAnime = useMemo(
+        () => trendingAnime.slice(0, 5),
+        [trendingAnime]
+    );
+
+
+    const changeFeatured = (nextIndex) => {
+        if (featuredAnime.length <= 1) {
+            return;
+        }
+
+        setHeroVisible(false);
+
+        window.setTimeout(() => {
+            setFeaturedIndex(nextIndex);
+            setHeroVisible(true);
+        }, 180);
+    };
+
+
+    const handleNext = () => {
+        if (featuredAnime.length <= 1) {
+            return;
+        }
+
+        changeFeatured(
+            (featuredIndex + 1) %
+                featuredAnime.length
+        );
+    };
+
+
+    const handlePrevious = () => {
+        if (featuredAnime.length <= 1) {
+            return;
+        }
+
+        changeFeatured(
+            (featuredIndex - 1 + featuredAnime.length) %
+                featuredAnime.length
+        );
+    };
+
+
     useEffect(() => {
         if (featuredAnime.length <= 1) {
             return;
         }
 
-        const interval = setInterval(() => {
-            setFeaturedIndex((current) =>
-                (current + 1) % featuredAnime.length
-            );
+        const interval = window.setInterval(() => {
+            setHeroVisible(false);
+
+            window.setTimeout(() => {
+                setFeaturedIndex((current) =>
+                    (current + 1) %
+                    featuredAnime.length
+                );
+
+                setHeroVisible(true);
+            }, 180);
         }, 7000);
 
-        return () => clearInterval(interval);
+        return () => {
+            window.clearInterval(interval);
+        };
     }, [featuredAnime.length]);
+
 
     const currentFeatured =
         featuredAnime[featuredIndex];
-    
 
 
     const loading =
@@ -136,9 +191,7 @@ function Home() {
     return (
         <PageContainer>
             <Helmet>
-                <title>
-                    Anime Tracker
-                </title>
+                <title>Anime Tracker</title>
 
                 <meta
                     name="description"
@@ -159,11 +212,20 @@ function Home() {
                                 rgba(10, 10, 18, 0.35) 70%,
                                 rgba(10, 10, 18, 0.15) 100%
                             ),
-                            url(${currentFeatured.image})
+                            url(${
+                                currentFeatured.largeImage ||
+                                currentFeatured.image
+                            })
                         `,
                     }}
                 >
-                    <div className="home-hero-content">
+                    <div
+                        className={
+                            heroVisible
+                                ? "home-hero-content hero-visible"
+                                : "home-hero-content hero-hidden"
+                        }
+                    >
                         <span className="home-hero-eyebrow">
                             🔥 FEATURED FROM TRENDING
                         </span>
@@ -176,7 +238,9 @@ function Home() {
                             {currentFeatured.score > 0 && (
                                 <span>
                                     ⭐{" "}
-                                    {currentFeatured.score.toFixed(1)}
+                                    {currentFeatured.score.toFixed(
+                                        1
+                                    )}
                                 </span>
                             )}
 
@@ -205,64 +269,55 @@ function Home() {
                             >
                                 View Details
                             </Link>
-
-                            <Link
-                                to="/trending"
-                                className="home-hero-secondary"
-                            >
-                                Explore Trending
-                            </Link>
                         </div>
                     </div>
+
 
                     {featuredAnime.length > 1 && (
                         <>
                             <button
                                 type="button"
                                 className="home-hero-nav home-hero-prev"
-                                onClick={() =>
-                                    setFeaturedIndex(
-                                        (current) =>
-                                            (current - 1 + featuredAnime.length) %
-                                            featuredAnime.length
-                                    )
-                                }
+                                onClick={handlePrevious}
                                 aria-label="Previous featured anime"
                             >
-                                ‹
+                                ←
                             </button>
 
                             <button
                                 type="button"
                                 className="home-hero-nav home-hero-next"
-                                onClick={() =>
-                                    setFeaturedIndex(
-                                        (current) =>
-                                            (current + 1) %
-                                            featuredAnime.length
-                                    )
-                                }
+                                onClick={handleNext}
                                 aria-label="Next featured anime"
                             >
-                                ›
+                                →
                             </button>
 
                             <div className="home-hero-dots">
-                                {featuredAnime.map((anime, index) => (
-                                    <button
-                                        key={anime.id}
-                                        type="button"
-                                        className={
-                                            index === featuredIndex
-                                                ? "home-hero-dot active"
-                                                : "home-hero-dot"
-                                        }
-                                        onClick={() =>
-                                            setFeaturedIndex(index)
-                                        }
-                                        aria-label={`Show featured anime ${index + 1}`}
-                                    />
-                                ))}
+                                {featuredAnime.map(
+                                    (anime, index) => (
+                                        <button
+                                            key={anime.id}
+                                            type="button"
+                                            className={
+                                                index === featuredIndex
+                                                    ? "home-hero-dot active"
+                                                    : "home-hero-dot"
+                                            }
+                                            onClick={() =>
+                                                changeFeatured(index)
+                                            }
+                                            aria-label={`Show featured anime ${
+                                                index + 1
+                                            }`}
+                                            aria-current={
+                                                index === featuredIndex
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                        />
+                                    )
+                                )}
                             </div>
                         </>
                     )}
