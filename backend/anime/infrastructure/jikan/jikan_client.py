@@ -1,19 +1,17 @@
 import logging
 import time
 
-import requests
+import subprocess
+import json
+from urllib.parse import urlencode
+
+
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.jikan.moe/v4"
 
-session = requests.Session()
-session.headers.update(
-    {
-        "User-Agent": "AnimeTracker/1.0",
-        "Accept": "application/json",
-    }
-)
+
 
 BLOCKED_RATINGS = {
     "Rx - Hentai",
@@ -26,63 +24,73 @@ BLOCKED_GENRES = {
 }
 
 
+
 def safe_request(url, params=None, retries=3):
+
+    if params:
+        url = f"{url}?{urlencode(params)}"
 
     for attempt in range(retries):
 
         try:
-
-            response = session.get(
-                url,
-                params=params,
-                timeout=(10, 60),
+            result = subprocess.run(
+                [
+                    "curl",
+                    "-s",
+                    "-f",
+                    "-A",
+                    "Mozilla/5.0",
+                    url,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
             )
 
-            if response.status_code == 429:
+            if not result.stdout:
+                return None
 
-                wait = 3 * (attempt + 1)
+            data = json.loads(result.stdout)
 
+            # Jikan errors are JSON too
+            if "status" in data and data.get("status") != 200:
                 logger.warning(
-                    "Jikan rate limited. Retrying in %ss",
-                    wait,
+                    "Jikan error: %s",
+                    data
                 )
 
-                time.sleep(wait)
+                time.sleep(2 ** attempt)
                 continue
 
-            if response.status_code >= 500:
+            return data
 
-                wait = 2 ** attempt
 
-                logger.warning(
-                    "Jikan server error %s. Retrying in %ss",
-                    response.status_code,
-                    wait,
-                )
-
-                time.sleep(wait)
-                continue
-
-            response.raise_for_status()
-
-            return response.json()
-
-        except requests.exceptions.Timeout:
+        except subprocess.TimeoutExpired:
 
             logger.warning(
-                "Jikan timeout (%s/%s)",
+                "Curl timeout (%s/%s)",
                 attempt + 1,
                 retries,
             )
 
-        except requests.RequestException as exc:
+
+        except json.JSONDecodeError:
+
+            logger.warning(
+                "Invalid JSON response"
+            )
+
+
+        except Exception as exc:
 
             logger.warning(
                 "Jikan request failed: %s",
                 exc,
             )
 
+
         time.sleep(2 ** attempt)
+
 
     return None
 

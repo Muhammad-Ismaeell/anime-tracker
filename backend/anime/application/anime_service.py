@@ -9,58 +9,45 @@ class AnimeService:
     def __init__(self, client):
         self.client = client
 
-    def save_anime(self, raw):
+    def save_anime(self, data):
 
-        images = raw.get("images", {}).get("jpg", {})
+        anime, created = Anime.objects.update_or_create(
+            mal_id=data.get("mal_id"),
+            defaults={
+                "title": data.get("title", ""),
+                "title_english": data.get("title_english") or data.get("title"),
 
-        defaults = {
-            "title": raw.get("title") or "",
-            "title_english": raw.get("title_english") or "",
-            "search_title": (raw.get("title") or "").lower(),
-            "image": images.get("image_url"),
-            "image_large": images.get("large_image_url"),
-            "score": raw.get("score"),
-            "popularity": raw.get("popularity"),
-            "type": raw.get("type"),
-            "episodes": raw.get("episodes"),
-            "year": raw.get("year"),
-            "season": raw.get("season"),
-            "status": raw.get("status"),
-            "rating": raw.get("rating"),
-        }
+                "image": (
+                    data.get("images", {})
+                    .get("jpg", {})
+                    .get("image_url")
+                ),
 
-        # Don't overwrite an existing synopsis with None.
-        if raw.get("synopsis") is not None:
-            defaults["synopsis"] = raw["synopsis"]
+                "image_large": (
+                    data.get("images", {})
+                    .get("jpg", {})
+                    .get("large_image_url")
+                ),
 
-        anime, _ = Anime.objects.update_or_create(
-            mal_id=raw["mal_id"],
-            defaults=defaults,
+                "synopsis": data.get("synopsis"),
+
+                "score": data.get("score"),
+
+                "popularity": data.get("popularity"),
+
+                "type": data.get("type"),
+
+                "episodes": data.get("episodes"),
+
+                "year": data.get("year"),
+
+                "season": data.get("season"),
+
+                "status": data.get("status"),
+
+                "rating": data.get("rating") or "Unknown",
+            }
         )
-
-        # Sync genres from Jikan.
-        genres = []
-
-        for genre_data in raw.get("genres", []):
-            mal_id = genre_data.get("mal_id")
-            name = genre_data.get("name")
-
-            if not mal_id or not name:
-                continue
-
-            genre, _ = Genre.objects.get_or_create(
-                mal_id=mal_id,
-                defaults={"name": name},
-            )
-
-            # Keep the genre name updated if Jikan changes it.
-            if genre.name != name:
-                genre.name = name
-                genre.save(update_fields=["name"])
-
-            genres.append(genre)
-
-        anime.genres.set(genres)
 
         return anime
 
