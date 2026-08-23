@@ -2470,13 +2470,16 @@ button:disabled {
 
 .home-hero {
     position: relative;
+
     min-height: 420px;
     margin-bottom: 56px;
+
     border-radius: 28px;
+
     overflow: hidden;
 
     background-size: cover;
-    background-position: center right;
+    background-position: center;
 
     display: flex;
     align-items: center;
@@ -2487,19 +2490,42 @@ button:disabled {
     isolation: isolate;
 }
 
-.home-hero::after {
+.home-hero::before {
     content: "";
+
     position: absolute;
     inset: 0;
 
+    z-index: -2;
+
     background:
-        linear-gradient(
-            to top,
-            rgba(10, 10, 18, 0.65),
-            transparent 45%
-        );
+        inherit;
+
+    transform: scale(1.03);
+
+    filter: blur(12px);
+
+    opacity: 0.55;
+}
+
+.home-hero::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
 
     z-index: -1;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(10, 10, 18, 0.98) 0%,
+            rgba(10, 10, 18, 0.88) 34%,
+            rgba(10, 10, 18, 0.52) 65%,
+            rgba(10, 10, 18, 0.72) 100%
+        );
+
+    pointer-events: none;
 }
 
 .home-hero-content {
