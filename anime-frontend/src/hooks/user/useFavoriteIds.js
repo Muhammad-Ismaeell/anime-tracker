@@ -6,7 +6,8 @@ export function useFavoriteIds() {
     const { data } = useFavorites();
 
     return useMemo(() => {
-        const favorites = data?.results ?? [];
+        const favorites =
+            data?.results ?? [];
 
         return new Set(
             favorites
