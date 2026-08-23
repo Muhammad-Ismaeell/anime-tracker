@@ -1,3 +1,4 @@
+
 import {
     useInfiniteQuery,
     useMutation,
@@ -9,12 +10,14 @@ import { AuthContext } from "../context/AuthContext";
 
 import { LibraryAPI } from "../api/library";
 import { queryKeys } from "../lib/querykeys";
+
 import toast from "react-hot-toast";
 
 
-// --------------------
+// ============================================================
 // LIBRARY LIST
-// --------------------
+// ============================================================
+
 export function useLibrary() {
     const {
         user,
@@ -24,11 +27,13 @@ export function useLibrary() {
 
     const userId = user?.id ?? null;
 
+    const libraryQueryKey = [
+        ...queryKeys.users.library,
+        userId,
+    ];
+
     return useInfiniteQuery({
-        queryKey: [
-            ...queryKeys.users.library,
-            userId,
-        ],
+        queryKey: libraryQueryKey,
 
         queryFn: ({ pageParam = 1 }) =>
             LibraryAPI.list(pageParam),
@@ -52,36 +57,59 @@ export function useLibrary() {
                 lastPage.next
             );
 
-            return Number(
-                url.searchParams.get("page")
-            );
+            const page =
+                url.searchParams.get("page");
+
+            return page
+                ? Number(page)
+                : undefined;
         },
     });
 }
 
 
-// --------------------
-// UPDATE LIBRARY (OPTIMISTIC)
-// --------------------
+// ============================================================
+// UPDATE LIBRARY
+// OPTIMISTIC UPDATE
+// ============================================================
+
 export function useUpdateLibrary() {
-    const queryClient = useQueryClient();
+    const queryClient =
+        useQueryClient();
+
+    const {
+        user,
+    } = useContext(AuthContext);
+
+    const userId =
+        user?.id ?? null;
+
+    const libraryQueryKey = [
+        ...queryKeys.users.library,
+        userId,
+    ];
 
     return useMutation({
-        mutationFn: LibraryAPI.update,
+        mutationFn:
+            LibraryAPI.update,
+
+        // ----------------------------------------------------
+        // OPTIMISTIC UPDATE
+        // ----------------------------------------------------
 
         onMutate: async (payload) => {
             await queryClient.cancelQueries({
                 queryKey:
-                    queryKeys.users.library,
+                    libraryQueryKey,
             });
 
             const previous =
                 queryClient.getQueryData(
-                    queryKeys.users.library
+                    libraryQueryKey
                 );
 
             queryClient.setQueryData(
-                queryKeys.users.library,
+                libraryQueryKey,
                 (old) => {
                     if (!old?.pages) {
                         return old;
@@ -89,50 +117,82 @@ export function useUpdateLibrary() {
 
                     return {
                         ...old,
-                        pages: old.pages.map(
-                            (page) => ({
-                                ...page,
-                                results:
-                                    page.results
-                                        .map((item) => {
-                                            const match =
-                                                String(
-                                                    item.anime_id
-                                                ) ===
-                                                String(
-                                                    payload.anime_id
-                                                );
 
-                                            if (!match) {
-                                                return item;
-                                            }
+                        pages:
+                            old.pages.map(
+                                (page) => ({
+                                    ...page,
 
-                                            if (
-                                                payload.remove
-                                            ) {
-                                                return null;
-                                            }
+                                    results:
+                                        (
+                                            page.results ||
+                                            []
+                                        )
+                                            .map(
+                                                (
+                                                    item
+                                                ) => {
+                                                    const itemAnimeId =
+                                                        item.anime_id ??
+                                                        item.anime?.mal_id ??
+                                                        item.anime?.id;
 
-                                            return {
-                                                ...item,
-                                                status:
-                                                    payload.status,
-                                            };
-                                        })
-                                        .filter(Boolean),
-                            })
-                        ),
+                                                    const match =
+                                                        String(
+                                                            itemAnimeId
+                                                        ) ===
+                                                        String(
+                                                            payload.anime_id
+                                                        );
+
+                                                    if (
+                                                        !match
+                                                    ) {
+                                                        return item;
+                                                    }
+
+                                                    if (
+                                                        payload.remove
+                                                    ) {
+                                                        return null;
+                                                    }
+
+                                                    return {
+                                                        ...item,
+
+                                                        status:
+                                                            payload.status,
+                                                    };
+                                                }
+                                            )
+                                            .filter(
+                                                Boolean
+                                            ),
+                                })
+                            ),
                     };
                 }
             );
 
-            return { previous };
+            return {
+                previous,
+            };
         },
 
-        onError: (_, __, context) => {
-            if (context?.previous) {
+        // ----------------------------------------------------
+        // ERROR
+        // ----------------------------------------------------
+
+        onError: (
+            _error,
+            _payload,
+            context
+        ) => {
+            if (
+                context?.previous
+            ) {
                 queryClient.setQueryData(
-                    queryKeys.users.library,
+                    libraryQueryKey,
                     context.previous
                 );
             }
@@ -142,16 +202,24 @@ export function useUpdateLibrary() {
             );
         },
 
+        // ----------------------------------------------------
+        // SUCCESS
+        // ----------------------------------------------------
+
         onSuccess: () => {
             toast.success(
                 "Library updated!"
             );
         },
 
+        // ----------------------------------------------------
+        // SETTLED
+        // ----------------------------------------------------
+
         onSettled: () => {
             queryClient.invalidateQueries({
                 queryKey:
-                    queryKeys.users.library,
+                    libraryQueryKey,
             });
 
             queryClient.invalidateQueries({

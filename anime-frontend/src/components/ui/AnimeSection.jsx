@@ -37,27 +37,29 @@ export default function AnimeSection({
             <div className="grid">
                 {animeList
                     .slice(0, 8)
-                    .map((anime) => (
-                        <AnimeCard
-                            key={anime.id}
-                            anime={anime}
-                            statusMap={statusMap}
-                            isFavorited={favoriteIds.has(
-                                String(anime.id)
-                            )}
-                            isFavoritePending={
-                                toggleFavorite.isPending
-                            }
-                            onToggleFavorite={() =>
-                                toggleFavorite.mutate({
-                                    anime_id: anime.id,
-                                    title: anime.title,
-                                    image:
-                                        anime.image || "",
-                                })
-                            }
-                        />
-                    ))}
+                    .map((anime) => {
+
+                        return (
+                            <AnimeCard
+                                key={anime.id}
+                                anime={anime}
+                                statusMap={statusMap}
+                                isFavorited={favoriteIds.has(
+                                    String(anime.mal_id)
+                                )}
+                                isFavoritePending={
+                                    toggleFavorite.isPending
+                                }
+                                onToggleFavorite={() =>
+                                    toggleFavorite.mutate({
+                                        anime_id: anime.mal_id,
+                                        title: anime.title,
+                                        image: anime.image || "",
+                                    })
+                                }
+                            />
+                        );
+                    })}
             </div>
         </section>
     );

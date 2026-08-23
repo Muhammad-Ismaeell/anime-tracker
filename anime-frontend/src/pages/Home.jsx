@@ -44,7 +44,6 @@ function Home() {
 
     const favoriteIds = useFavoriteIds();
 
-
     // ============================================================
     // NORMALIZE PAGINATED DATA
     // ============================================================
@@ -69,7 +68,7 @@ function Home() {
         () => extractAnimePages(topQuery.data),
         [topQuery.data]
     );
-
+    
 
     // ============================================================
     // FEATURED ANIME
