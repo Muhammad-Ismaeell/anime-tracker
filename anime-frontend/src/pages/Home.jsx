@@ -15,8 +15,7 @@ import {
 } from "../hooks/user/useFavorites";
 
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-import { normalizeAnime } from "../utils/normalizeAnime";
-
+import { extractAnimePages } from "../utils/extractAnimePages";
 
 function Home() {
     // ============================================================
@@ -70,30 +69,6 @@ function Home() {
     // NORMALIZE PAGINATED DATA
     // ============================================================
 
-    const extractAnime = (data) => {
-        const pages = data?.pages ?? [];
-        const map = new Map();
-
-        pages.forEach((page) => {
-            const items =
-                page?.items ??
-                page?.data ??
-                [];
-
-            items.forEach((item) => {
-                const anime = normalizeAnime(item);
-
-                if (anime?.id) {
-                    map.set(
-                        String(anime.id),
-                        anime
-                    );
-                }
-            });
-        });
-
-        return Array.from(map.values());
-    };
 
 
     // ============================================================
@@ -101,17 +76,17 @@ function Home() {
     // ============================================================
 
     const trendingAnime = useMemo(
-        () => extractAnime(trendingQuery.data),
+        () => extractAnimePages(trendingQuery.data),
         [trendingQuery.data]
     );
 
     const seasonalAnime = useMemo(
-        () => extractAnime(seasonalQuery.data),
+        () => extractAnimePages(seasonalQuery.data),
         [seasonalQuery.data]
     );
 
     const topAnime = useMemo(
-        () => extractAnime(topQuery.data),
+        () => extractAnimePages(topQuery.data),
         [topQuery.data]
     );
 
