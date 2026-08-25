@@ -15,7 +15,8 @@ from django.utils import timezone
 from users.models import EmailVerification
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
-
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from core.auth.services.auth_service import AuthService
 from users.api.serializers import UserSerializer
 from django.db import transaction
@@ -64,6 +65,16 @@ def register(request):
                     "Username, email and password "
                     "are required."
                 )
+            },
+            status=400,
+        )
+
+    try:
+        validate_password(password)
+    except ValidationError as exc:
+        return Response(
+            {
+                "detail": exc.messages,
             },
             status=400,
         )
