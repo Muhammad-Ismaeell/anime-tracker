@@ -1,6 +1,8 @@
+
 from core.exceptions.custom_exceptions import NotFoundException
 
 from anime.infrastructure.models import Anime, Genre
+from anime.infrastructure.jikan.jikan_client import is_nsfw
 from anime.presentation.normalizer import normalize_anime_detail
 
 
@@ -11,45 +13,158 @@ class AnimeService:
 
     def save_anime(self, data):
 
+        if not data:
+            raise ValueError(
+                "Anime data is empty."
+            )
+
+        # ==========================================
+        # NSFW FILTER
+        # ==========================================
+
+        if is_nsfw(data):
+            raise ValueError(
+                "Anime blocked by NSFW filter."
+            )
+
+        mal_id = data.get("mal_id")
+
+        if not mal_id:
+            raise ValueError(
+                "Anime does not have a MAL ID."
+            )
+
+        # ==========================================
+        # ANIME
+        # ==========================================
+
         anime, created = Anime.objects.update_or_create(
-            mal_id=data.get("mal_id"),
+            mal_id=mal_id,
+
             defaults={
-                "title": data.get("title", ""),
-                "title_english": data.get("title_english") or data.get("title"),
+                "title": data.get(
+                    "title",
+                    "",
+                ),
+
+                "title_english": (
+                    data.get("title_english")
+                    or data.get("title")
+                ),
+
+                "search_title": (
+                    data.get(
+                        "title",
+                        "",
+                    ).lower()
+                ),
 
                 "image": (
-                    data.get("images", {})
-                    .get("jpg", {})
-                    .get("image_url")
+                    data.get(
+                        "images",
+                        {}
+                    )
+                    .get(
+                        "jpg",
+                        {}
+                    )
+                    .get(
+                        "image_url"
+                    )
                 ),
 
                 "image_large": (
-                    data.get("images", {})
-                    .get("jpg", {})
-                    .get("large_image_url")
+                    data.get(
+                        "images",
+                        {}
+                    )
+                    .get(
+                        "jpg",
+                        {}
+                    )
+                    .get(
+                        "large_image_url"
+                    )
                 ),
 
-                "synopsis": data.get("synopsis"),
+                "synopsis": data.get(
+                    "synopsis"
+                ),
 
-                "score": data.get("score"),
+                "score": data.get(
+                    "score"
+                ),
 
-                "popularity": data.get("popularity"),
+                "popularity": data.get(
+                    "popularity"
+                ),
 
-                "type": data.get("type"),
+                "type": data.get(
+                    "type"
+                ),
 
-                "episodes": data.get("episodes"),
+                "episodes": data.get(
+                    "episodes"
+                ),
 
-                "year": data.get("year"),
+                "year": data.get(
+                    "year"
+                ),
 
-                "season": data.get("season"),
+                "season": data.get(
+                    "season"
+                ),
 
-                "status": data.get("status"),
+                "status": data.get(
+                    "status"
+                ),
 
-                "rating": data.get("rating") or "Unknown",
+                "rating": (
+                    data.get("rating")
+                    or "Unknown"
+                ),
             }
         )
 
-        return anime
+        # ==========================================
+        # GENRES
+        # ==========================================
+
+        genres = []
+
+        for genre_data in data.get(
+            "genres",
+            [],
+        ):
+
+            genre_mal_id = genre_data.get(
+                "mal_id"
+            )
+
+            name = genre_data.get(
+                "name"
+            )
+
+            if not genre_mal_id or not name:
+                continue
+
+            genre, _ = Genre.objects.get_or_create(
+                mal_id=genre_mal_id,
+
+                defaults={
+                    "name": name,
+                },
+            )
+
+            genres.append(genre)
+
+        anime.genres.set(genres)
+
+        return anime, created
+
+    # ==============================================
+    # GET OR CREATE
+    # ==============================================
 
     def get_or_create(self, anime_id):
 
@@ -60,17 +175,33 @@ class AnimeService:
         if anime:
             return anime
 
-        raw = self.client.get_detail(anime_id)
+        raw = self.client.get_detail(
+            anime_id
+        )
 
         if not raw:
-            raise NotFoundException("Anime not found")
+            raise NotFoundException(
+                "Anime not found"
+            )
 
-        return self.save_anime(raw)
+        anime, _ = self.save_anime(
+            raw
+        )
+
+        return anime
+
+    # ==============================================
+    # DETAIL
+    # ==============================================
 
     def get_detail(self, anime_id):
 
-        anime = self.get_or_create(anime_id)
+        anime = self.get_or_create(
+            anime_id
+        )
 
         return {
-            "item": normalize_anime_detail(anime)
+            "item": normalize_anime_detail(
+                anime
+            )
         }
