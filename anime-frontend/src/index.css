@@ -2691,23 +2691,7 @@ button:disabled {
     object-fit: cover;
 }
 
-.home-hero::before {
-    content: "";
 
-    position: absolute;
-    inset: 0;
-
-    z-index: -2;
-
-    background:
-        inherit;
-
-    transform: scale(1.03);
-
-    filter: blur(12px);
-
-    opacity: 0.55;
-}
 
 .home-hero::after {
     content: "";
@@ -2985,9 +2969,8 @@ button:disabled {
 
 .search-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 210px));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 18px;
-    justify-content: start;
 }
 
 /* =========================================================
@@ -3767,10 +3750,6 @@ button:disabled {
     text-decoration: none;
 }
 
-.verify-email-login {
-    display: inline-block;
-    margin-top: 2px;
-}
 
 
 .verify-email-login {
