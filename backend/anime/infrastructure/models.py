@@ -22,8 +22,7 @@ class Genre(models.Model):
 class Anime(models.Model):
 
     mal_id = models.IntegerField(
-        unique=True,
-        db_index=True
+        unique=True
     )
 
     title = models.CharField(
