@@ -11,3 +11,5 @@ Pillow==12.2.0
 psycopg2-binary==2.9.12
 whitenoise==6.12.0
 requests==2.34.2
+cloudinary==1.46.0
+django-cloudinary-storage==0.3.0
