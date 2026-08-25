@@ -19,7 +19,7 @@ class AuthTests(APITestCase):
             {
                 "username": "testuser",
                 "email": "test@test.com",
-                "password": "password123",
+                "password": "AnimeTracker!2026",
             },
         )
 
