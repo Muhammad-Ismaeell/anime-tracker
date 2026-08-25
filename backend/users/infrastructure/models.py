@@ -75,8 +75,7 @@ class UserAnimeStatus(models.Model):
             )
         ]
         indexes = [
-            models.Index(fields=["user"]),
-            models.Index(fields=["status"]),
+            models.Index(fields=["user", "status"]),
         ]
 
 
@@ -104,7 +103,7 @@ class FavoriteAnime(models.Model):
         ]
 
         indexes = [
-            models.Index(fields=["user"]),
+            models.Index(fields=["user", "-created_at"]),
         ]
 
 
@@ -138,10 +137,12 @@ class Review(models.Model):
                 name="unique_user_anime_review",
             )
         ]
+
         indexes = [
-            models.Index(fields=["anime"]),
-            models.Index(fields=["user"]),
+            models.Index(fields=["anime", "-created_at"]),
+            models.Index(fields=["user", "-created_at"]),
         ]
+        
 
 
 # =========================

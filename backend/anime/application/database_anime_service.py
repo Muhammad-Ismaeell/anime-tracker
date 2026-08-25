@@ -64,25 +64,6 @@ class DatabaseAnimeService:
             page
         )
 
-    @staticmethod
-    def paginate(
-        queryset,
-        page=1,
-        size=DEFAULT_PAGE_SIZE,
-    ):
-
-        start = (page - 1) * size
-        end = start + size
-
-        total = queryset.count()
-
-        return {
-            "items": list(
-                queryset[start:end].values()
-            ),
-            "page": page,
-            "has_next": end < total,
-        }
 
     @classmethod
     def get_top(cls, page=1):

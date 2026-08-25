@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
 from users.infrastructure.models import Review
-from anime.api.serializers import AnimeSerializer
+from anime.api.serializers import AnimeListSerializer
 
 
 class ReviewSerializer(serializers.ModelSerializer):
 
-    anime = AnimeSerializer(read_only=True)
+    anime = AnimeListSerializer(read_only=True)
 
     user_id = serializers.IntegerField(
         source="user.id",

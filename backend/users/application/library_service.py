@@ -91,6 +91,7 @@ class LibraryService:
         obj = (
             UserAnimeStatus.objects
             .select_for_update()
+            .select_related("anime")
             .filter(
                 user=user,
                 anime=anime,

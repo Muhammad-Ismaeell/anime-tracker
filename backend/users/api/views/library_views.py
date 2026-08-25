@@ -128,10 +128,9 @@ def update_status(request):
         {
             "anime_id": anime_id,
             "status": status,
-            "progress": request.data.get(
-                "progress",
-                0,
-            ),
+            "progress": request.data.get("progress", 0),
+            "title": request.data.get("title"),
+            "image": request.data.get("image"),
         },
     )
 

@@ -17,3 +17,19 @@ class AnimeSerializer(serializers.ModelSerializer):
             "year",
             "season",
         ]
+
+class AnimeListSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source="mal_id")
+
+    class Meta:
+        model = Anime
+        fields = [
+            "id",
+            "title",
+            "image",
+            "score",
+            "episodes",
+            "type",
+            "year",
+        ]

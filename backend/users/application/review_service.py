@@ -134,7 +134,7 @@ class ReviewService:
         reviews = (
             Review.objects
             .filter(anime=anime)
-            .select_related("user")
+            .select_related("user", "anime")
             .order_by("-created_at")
         )
 
@@ -155,7 +155,7 @@ class ReviewService:
         return (
             Review.objects
             .filter(user=user)
-            .select_related("anime")
+            .select_related("anime", "user")
             .order_by("-created_at")
         )
 
