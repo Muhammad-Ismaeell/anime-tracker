@@ -85,15 +85,18 @@ class DatabaseAnimeService:
         }
 
     @classmethod
-    def get_top(
-        cls,
-        page=1,
-    ):
+    def get_top(cls, page=1):
 
         queryset = (
             Anime.objects
-            .all()
-            .order_by("-score")
+            .filter(
+                score__isnull=False,
+                score__gt=0,
+            )
+            .order_by(
+                "-score",
+                "mal_id",
+            )
         )
 
         return cls.paginate(
