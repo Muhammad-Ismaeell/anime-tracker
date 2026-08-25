@@ -239,8 +239,7 @@ FRONTEND_URL = env(
 )
 
 DEFAULT_FROM_EMAIL = env(
-    "DEFAULT_FROM_EMAIL",
-    default="yourgmail@gmail.com",
+    "DEFAULT_FROM_EMAIL"
 )
 
 if DEBUG:
