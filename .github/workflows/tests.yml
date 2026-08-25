@@ -13,7 +13,7 @@ jobs:
         working-directory: backend
 
     env:
-      SECRET_KEY: test-secret-key-for-ci
+      SECRET_KEY: test-secret-key-for-ci-that-is-long-enough-2026
       DEBUG: "True"
       DEFAULT_FROM_EMAIL: test@example.com
 
