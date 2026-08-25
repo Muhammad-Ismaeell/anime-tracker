@@ -1,24 +1,47 @@
+
+import {
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    useNavigate,
+} from "react-router-dom";
+
 import PageContainer from "../components/ui/PageContainer";
-import { useProfile } from "../hooks/user/useProfile";
+import EmptyState from "../components/ui/EmptyState";
+import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
+import OptimizedImage from "../components/ui/OptimizedImage";
+import AnimeCard from "../components/AnimeCard";
+
+import {
+    useProfile,
+} from "../hooks/user/useProfile";
+
 import {
     useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
-import { useActivity } from "../hooks/user/useActivity";
-import { getMediaUrl } from "../utils/mediaUrl";
+
+import {
+    useActivity,
+} from "../hooks/user/useActivity";
+
 import {
     useUserReviews,
     useReviewAnalytics,
     useTopRatedAnime,
-    useUpdateReview
+    useUpdateReview,
 } from "../hooks/user/useReview";
-import OptimizedImage from "../components/ui/OptimizedImage";
-import AnimeCard from "../components/AnimeCard";
-import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-import { useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
-import EmptyState from "../components/ui/EmptyState";
-import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
+
+import {
+    useGlobalLibrary,
+} from "../hooks/useGlobalLibrary";
+
+import {
+    getMediaUrl,
+} from "../utils/mediaUrl";
+
 
 const actionLabels = {
     FAVORITED: "❤️ Added to favorites",
@@ -30,31 +53,67 @@ const actionLabels = {
     REMOVED: "🗑️ Removed from library",
 };
 
+
 function Profile() {
     const navigate = useNavigate();
-    
-    // ---------------- PROFILE ----------------
+
     const {
         data: profile,
-        isLoading,
-        isError,
-        refetch
+        isLoading: profileLoading,
+        isError: profileError,
+        refetch: refetchProfile,
     } = useProfile();
+
+    const {
+        data: favoritesData,
+    } = useFavorites();
+
+    const {
+        data: activityPages,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useActivity();
+
+    const {
+        data: analytics,
+    } = useReviewAnalytics();
+
+    const {
+        data: topRatedList = [],
+    } = useTopRatedAnime();
+
+    const {
+        data: reviewsData,
+    } = useUserReviews();
+
+    const toggleFavorite = useToggleFavorite();
+    const updateReview = useUpdateReview();
+
+    const {
+        statusMap,
+    } = useGlobalLibrary();
+
+    const [editingReview, setEditingReview] =
+        useState(null);
+
+    const [rating, setRating] =
+        useState(10);
+
+    const [text, setText] =
+        useState("");
+
 
     const user = profile?.user;
     const profileData = profile?.profile;
 
-    // ---------------- FAVORITES ----------------
-    const favoritesRes = useFavorites();
-    const updateReview = useUpdateReview();
-    const favorites = useMemo(
-        () =>
-            favoritesRes?.data?.results ??
-            favoritesRes?.results ??
-            [],
-        [favoritesRes]
-    );
-    const toggleFavorite = useToggleFavorite();
+    const favorites =
+        favoritesData?.results ?? [];
+
+    const myReviews =
+        reviewsData?.results ?? [];
+
+
     const favoriteIds = useMemo(() => {
         return new Set(
             favorites
@@ -65,75 +124,101 @@ function Profile() {
                         favorite.anime_id ??
                         favorite.mal_id;
 
-                    return id != null ? String(id) : null;
+                    return id != null
+                        ? String(id)
+                        : null;
                 })
                 .filter(Boolean)
         );
     }, [favorites]);
-    // ---------------- ACTIVITY ----------------
-    const {
-        data: activityPages,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage
-    } = useActivity();
+
 
     const activity = useMemo(() => {
-        return activityPages?.pages?.flatMap(
-            page => page?.results ?? []
-        ) ?? [];
+        return (
+            activityPages?.pages?.flatMap(
+                (page) =>
+                    page?.results ?? []
+            ) ?? []
+        );
     }, [activityPages]);
-    // ---------------- ANALYTICS ----------------
-    const { data: analytics } = useReviewAnalytics();
 
-    const reviewCount = analytics?.review_count ?? 0;
-    const averageRating = analytics?.average_rating ?? 0;
 
-    // ---------------- TOP RATED ----------------
-   const { data: topRatedList = [] } = useTopRatedAnime();
+    const reviewCount =
+        analytics?.review_count ?? 0;
 
-    // ---------------- REVIEWS ----------------
-    const { data: reviewsResponse } = useUserReviews();
+    const averageRating =
+        analytics?.average_rating ?? 0;
 
-    const myReviews =
-        reviewsResponse?.results ??
-        [];
 
-    // ---------------- GLOBAL LIBRARY ----------------
-    const { statusMap } = useGlobalLibrary();
+    const openReviewEditor = (review) => {
+        setEditingReview(review);
+        setRating(review.rating);
+        setText(review.text);
+    };
 
-    // ---------------- UI STATE ----------------
-    const [editingReview, setEditingReview] = useState(null);
-    const [rating, setRating] = useState(10);
-    const [text, setText] = useState("");
+
+    const closeReviewEditor = () => {
+        if (updateReview.isPending) {
+            return;
+        }
+
+        setEditingReview(null);
+        setRating(10);
+        setText("");
+    };
+
 
     const saveReview = () => {
         if (!editingReview) {
             return;
         }
 
+        const cleanText = text.trim();
+
+        if (!cleanText) {
+            return;
+        }
+
         updateReview.mutate(
             {
                 reviewId: editingReview.id,
+
                 payload: {
                     rating,
-                    text,
+                    text: cleanText,
                 },
             },
             {
                 onSuccess: () => {
-                    setEditingReview(null);
-                    setRating(10);
-                    setText("");
+                    closeReviewEditor();
                 },
             }
         );
     };
 
-    if (isLoading) {
+
+    const handleToggleFavorite = (anime) => {
+        const animeId =
+            anime.id ??
+            anime.mal_id;
+
+        if (animeId == null) {
+            return;
+        }
+
+        toggleFavorite.mutate({
+            anime_id: animeId,
+            title: anime.title,
+            image: anime.image,
+        });
+    };
+
+
+    if (profileLoading) {
         return (
             <PageContainer>
                 <div className="profile-skeleton">
+
                     <div className="profile-skeleton-hero">
                         <div className="profile-skeleton-avatar" />
 
@@ -147,73 +232,87 @@ function Profile() {
                     </div>
 
                     <div className="profile-skeleton-stats">
-                        {Array.from({ length: 3 }).map((_, index) => (
-                            <div
-                                key={index}
-                                className="profile-skeleton-stat"
-                            />
-                        ))}
+                        {Array.from({ length: 3 }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className="profile-skeleton-stat"
+                                />
+                            )
+                        )}
                     </div>
 
-                    <div className="section">
+                    <section className="section">
                         <div className="profile-skeleton-heading" />
 
                         <div className="grid">
-                            {Array.from({ length: 4 }).map((_, index) => (
-                                <AnimeCardSkeleton key={index} />
-                            ))}
+                            {Array.from({ length: 4 }).map(
+                                (_, index) => (
+                                    <AnimeCardSkeleton
+                                        key={index}
+                                    />
+                                )
+                            )}
                         </div>
-                    </div>
+                    </section>
+
                 </div>
             </PageContainer>
         );
     }
 
-    if (isError) {
 
+    if (profileError) {
         return (
-
             <PageContainer>
-
                 <EmptyState
                     text="Couldn't load your profile."
                 />
 
                 <button
+                    type="button"
                     className="retry-btn"
-                    onClick={refetch}
+                    onClick={() =>
+                        refetchProfile()
+                    }
                 >
                     Retry
                 </button>
-
             </PageContainer>
-
         );
-
     }
+
 
     return (
         <PageContainer>
 
-            {/* ---------------- HEADER ---------------- */}
+            {/* PROFILE HEADER */}
+
             <div className="profile-hero">
 
                 <div className="profile-avatar">
                     {profileData?.avatar ? (
                         <OptimizedImage
-                            src={getMediaUrl(profileData.avatar)}
+                            src={getMediaUrl(
+                                profileData.avatar
+                            )}
                             alt="avatar"
                         />
                     ) : (
-                        <div className="avatar-placeholder">👤</div>
+                        <div className="avatar-placeholder">
+                            👤
+                        </div>
                     )}
                 </div>
 
                 <div className="profile-info">
-                    <h1>{user?.username}</h1>
+                    <h1>
+                        {user?.username}
+                    </h1>
 
                     <p className="profile-bio">
-                        {profileData?.bio || "Anime fan"}
+                        {profileData?.bio ||
+                            "Anime fan"}
                     </p>
 
                     <span className="profile-tag">
@@ -222,160 +321,239 @@ function Profile() {
                 </div>
 
                 <button
+                    type="button"
                     className="edit-profile-btn"
-                    onClick={() => navigate("/edit-profile")}
+                    onClick={() =>
+                        navigate(
+                            "/edit-profile"
+                        )
+                    }
                 >
                     ✏️ Edit Profile
                 </button>
+
             </div>
 
-            {/* ---------------- STATS ---------------- */}
+
+            {/* PROFILE STATS */}
+
             <div className="stats-grid premium">
 
                 <div className="stat-card glass">
-                    ❤️ <h3>{favorites.length}</h3>
-                    <p>Favorites</p>
+                    ❤️
+                    <h3>
+                        {favorites.length}
+                    </h3>
+                    <p>
+                        Favorites
+                    </p>
                 </div>
 
                 <div className="stat-card glass">
-                    📝 <h3>{reviewCount}</h3>
-                    <p>Reviews</p>
+                    📝
+                    <h3>
+                        {reviewCount}
+                    </h3>
+                    <p>
+                        Reviews
+                    </p>
                 </div>
 
                 <div className="stat-card glass">
-                    ⭐ <h3>{averageRating}</h3>
-                    <p>Average Rating</p>
+                    ⭐
+                    <h3>
+                        {averageRating}
+                    </h3>
+                    <p>
+                        Average Rating
+                    </p>
                 </div>
 
             </div>
 
-            {/* ---------------- FAVORITES ---------------- */}
+
+            {/* FAVORITES */}
+
             <section className="section">
-                <h2>❤️ Favorite Anime</h2>
+
+                <h2>
+                    ❤️ Favorite Anime
+                </h2>
 
                 <div className="anime-grid">
+
                     {favorites.length ? (
-                        favorites.slice(0, 8).map((item) => {
-                            const animeId =
-                                item.anime?.mal_id ??
-                                item.anime?.id ??
-                                item.anime_id ??
-                                item.id;
+                        favorites
+                            .slice(0, 8)
+                            .map((item) => {
 
-                            if (animeId == null) {
-                                return null;
-                            }
+                                const animeId =
+                                    item.anime?.mal_id ??
+                                    item.anime?.id ??
+                                    item.anime_id ??
+                                    item.id;
 
-                            const id = String(animeId);
+                                if (
+                                    animeId == null
+                                ) {
+                                    return null;
+                                }
 
-                            const anime = {
-                                id: animeId,
-                                title:
-                                    item.anime?.title ??
-                                    item.title ??
-                                    "Unknown Anime",
-                                image:
-                                    item.anime?.image ??
-                                    item.image ??
-                                    "",
-                                score:
-                                    item.anime?.score ??
-                                    item.score ??
-                                    0,
-                            };
+                                const id =
+                                    String(
+                                        animeId
+                                    );
 
-                            return (
-                                <AnimeCard
-                                    key={id}
-                                    anime={anime}
-                                    statusMap={statusMap}
-                                    isFavorited={favoriteIds.has(id)}
-                                    isFavoritePending={
-                                        toggleFavorite.isPending
-                                    }
-                                    onToggleFavorite={() =>
-                                        toggleFavorite.mutate({
-                                            anime_id: animeId,
-                                            title: anime.title,
-                                            image: anime.image,
-                                        })
-                                    }
-                                />
-                            );
-                        })
+                                const anime = {
+                                    id: animeId,
+
+                                    title:
+                                        item.anime?.title ??
+                                        item.title ??
+                                        "Unknown Anime",
+
+                                    image:
+                                        item.anime?.image ??
+                                        item.image ??
+                                        "",
+
+                                    score:
+                                        item.anime?.score ??
+                                        item.score ??
+                                        0,
+                                };
+
+                                return (
+                                    <AnimeCard
+                                        key={id}
+                                        anime={anime}
+                                        statusMap={
+                                            statusMap
+                                        }
+                                        isFavorited={
+                                            favoriteIds.has(
+                                                id
+                                            )
+                                        }
+                                        isFavoritePending={
+                                            toggleFavorite.isPending
+                                        }
+                                        onToggleFavorite={() =>
+                                            handleToggleFavorite(
+                                                anime
+                                            )
+                                        }
+                                    />
+                                );
+                            })
                     ) : (
-                        <EmptyState text="No favorite anime yet" />
+                        <EmptyState
+                            text="No favorite anime yet"
+                        />
                     )}
+
                 </div>
+
             </section>
 
-            {/* ---------------- TOP RATED ---------------- */}
+
+            {/* TOP RATED */}
+
             <section className="section">
-                <h2>🏆 Top Rated By You</h2>
+
+                <h2>
+                    🏆 Top Rated By You
+                </h2>
 
                 <div className="anime-grid">
+
                     {topRatedList.length ? (
-                        topRatedList.map((item) => {
-                            const animeId =
-                                item.anime_id ??
-                                item.anime?.mal_id ??
-                                item.anime?.id ??
-                                item.id;
+                        topRatedList.map(
+                            (item) => {
 
-                            if (animeId == null) {
-                                return null;
+                                const animeId =
+                                    item.anime_id ??
+                                    item.anime?.mal_id ??
+                                    item.anime?.id ??
+                                    item.id;
+
+                                if (
+                                    animeId == null
+                                ) {
+                                    return null;
+                                }
+
+                                const id =
+                                    String(
+                                        animeId
+                                    );
+
+                                const anime = {
+                                    id: animeId,
+
+                                    title:
+                                        item.title ??
+                                        item.anime?.title ??
+                                        "Unknown Anime",
+
+                                    image:
+                                        item.image ??
+                                        item.anime?.image ??
+                                        "",
+
+                                    score:
+                                        item.rating ??
+                                        item.anime?.score ??
+                                        0,
+                                };
+
+                                return (
+                                    <AnimeCard
+                                        key={id}
+                                        anime={anime}
+                                        statusMap={
+                                            statusMap
+                                        }
+                                        isFavorited={
+                                            favoriteIds.has(
+                                                id
+                                            )
+                                        }
+                                        isFavoritePending={
+                                            toggleFavorite.isPending
+                                        }
+                                        onToggleFavorite={() =>
+                                            handleToggleFavorite(
+                                                anime
+                                            )
+                                        }
+                                    />
+                                );
                             }
-
-                            const id = String(animeId);
-
-                            const anime = {
-                                id: animeId,
-                                title:
-                                    item.title ??
-                                    item.anime?.title ??
-                                    "Unknown Anime",
-                                image:
-                                    item.image ??
-                                    item.anime?.image ??
-                                    "",
-                                score:
-                                    item.rating ??
-                                    item.anime?.score ??
-                                    0,
-                            };
-
-                            return (
-                                <AnimeCard
-                                    key={id}
-                                    anime={anime}
-                                    statusMap={statusMap}
-                                    isFavorited={favoriteIds.has(id)}
-                                    isFavoritePending={
-                                        toggleFavorite.isPending
-                                    }
-                                    onToggleFavorite={() =>
-                                        toggleFavorite.mutate({
-                                            anime_id: animeId,
-                                            title: anime.title,
-                                            image: anime.image,
-                                        })
-                                    }
-                                />
-                            );
-                        })
+                        )
                     ) : (
-                        <EmptyState text="No top rated anime yet" />
+                        <EmptyState
+                            text="No top rated anime yet"
+                        />
                     )}
+
                 </div>
+
             </section>
 
-            {/* ---------------- ACTIVITY ---------------- */}
+
+            {/* ACTIVITY */}
+
             <section className="section">
+
                 <div className="section-header">
-                    <h2>⚡ Recent Activity</h2>
+                    <h2>
+                        ⚡ Recent Activity
+                    </h2>
                 </div>
 
                 <div className="activity-list">
+
                     {activity.length ? (
                         activity.map((act) => (
                             <article
@@ -383,24 +561,38 @@ function Profile() {
                                 className="activity-item"
                             >
                                 <OptimizedImage
-                                    src={act.anime?.image}
-                                    alt={act.anime?.title || "Anime"}
+                                    src={
+                                        act.anime?.image
+                                    }
+                                    alt={
+                                        act.anime?.title ||
+                                        "Anime"
+                                    }
                                     className="activity-cover"
                                 />
 
                                 <div className="activity-content">
+
                                     <div className="activity-action">
-                                        {actionLabels[act.action] ??
-                                            act.action}
+                                        {
+                                            actionLabels[
+                                                act.action
+                                            ] ??
+                                            act.action
+                                        }
                                     </div>
 
                                     <strong>
-                                        {act.anime?.title ||
-                                            "Unknown Anime"}
+                                        {
+                                            act.anime?.title ||
+                                            "Unknown Anime"
+                                        }
                                     </strong>
 
                                     <time
-                                        dateTime={act.created_at}
+                                        dateTime={
+                                            act.created_at
+                                        }
                                         className="activity-date"
                                     >
                                         {new Date(
@@ -414,149 +606,212 @@ function Profile() {
                                             }
                                         )}
                                     </time>
+
                                 </div>
+
                             </article>
                         ))
                     ) : (
-                        <EmptyState text="No activity yet" />
+                        <EmptyState
+                            text="No activity yet"
+                        />
                     )}
+
                 </div>
 
                 {hasNextPage && (
                     <button
                         type="button"
                         className="load-more-btn"
-                        disabled={isFetchingNextPage}
-                        onClick={() => fetchNextPage()}
+                        disabled={
+                            isFetchingNextPage
+                        }
+                        onClick={() =>
+                            fetchNextPage()
+                        }
                     >
                         {isFetchingNextPage
                             ? "Loading..."
                             : "Load More Activity"}
                     </button>
                 )}
+
             </section>
 
-            {/* ---------------- REVIEWS ---------------- */}
+
+            {/* MY REVIEWS */}
+
             <section className="section">
+
                 <div className="section-header">
-                    <h2>📝 My Reviews</h2>
+                    <h2>
+                        📝 My Reviews
+                    </h2>
                 </div>
 
                 <div className="reviews-list">
+
                     {myReviews.length ? (
-                        myReviews.map((review) => {
-                            const anime = review.anime;
+                        myReviews.map(
+                            (review) => {
 
-                            const animeId =
-                                anime?.mal_id ??
-                                anime?.id ??
-                                anime?.anime_id;
+                                const anime =
+                                    review.anime;
 
-                            return (
-                                <article
-                                    key={review.id}
-                                    className="review-card profile-review-card"
-                                >
-                                    <div className="profile-review-anime">
-                                        {anime?.image ? (
-                                            <OptimizedImage
-                                                src={anime.image}
-                                                alt={anime.title || "Anime"}
-                                                className="profile-review-anime-image"
-                                            />
-                                        ) : (
-                                            <div
-                                                className="profile-review-anime-image profile-review-image-fallback"
-                                                aria-label="No anime image available"
-                                            >
-                                                🎬
-                                            </div>
-                                        )}
+                                const animeId =
+                                    anime?.mal_id ??
+                                    anime?.id ??
+                                    anime?.anime_id;
 
-                                        <div className="profile-review-anime-info">
-                                            <strong>
-                                                {anime?.title ||
-                                                    "Unknown Anime"}
-                                            </strong>
+                                return (
+                                    <article
+                                        key={review.id}
+                                        className="review-card profile-review-card"
+                                    >
 
-                                            {animeId != null && (
-                                                <button
-                                                    type="button"
-                                                    className="profile-review-anime-link"
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/anime/${animeId}`
-                                                        )
+                                        <div className="profile-review-anime">
+
+                                            {anime?.image ? (
+                                                <OptimizedImage
+                                                    src={
+                                                        anime.image
                                                     }
+                                                    alt={
+                                                        anime.title ||
+                                                        "Anime"
+                                                    }
+                                                    className="profile-review-anime-image"
+                                                />
+                                            ) : (
+                                                <div
+                                                    className="profile-review-anime-image profile-review-image-fallback"
+                                                    aria-label="No anime image available"
                                                 >
-                                                    View Anime
-                                                </button>
+                                                    🎬
+                                                </div>
                                             )}
+
+                                            <div className="profile-review-anime-info">
+
+                                                <strong>
+                                                    {
+                                                        anime?.title ||
+                                                        "Unknown Anime"
+                                                    }
+                                                </strong>
+
+                                                {animeId != null && (
+                                                    <button
+                                                        type="button"
+                                                        className="profile-review-anime-link"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/anime/${animeId}`
+                                                            )
+                                                        }
+                                                    >
+                                                        View Anime
+                                                    </button>
+                                                )}
+
+                                            </div>
+
+                                            <span className="review-rating">
+                                                ⭐{" "}
+                                                {
+                                                    review.rating
+                                                }
+                                                /10
+                                            </span>
+
                                         </div>
 
-                                        <span className="review-rating">
-                                            ⭐ {review.rating}/10
-                                        </span>
-                                    </div>
+                                        <p className="review-text">
+                                            {
+                                                review.text
+                                            }
+                                        </p>
 
-                                    <p className="review-text">
-                                        {review.text}
-                                    </p>
+                                        <div className="review-footer">
 
-                                    <div className="review-footer">
-                                        <time
-                                            dateTime={review.created_at}
-                                        >
-                                            {new Date(
-                                                review.created_at
-                                            ).toLocaleDateString(
-                                                undefined,
-                                                {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                    day: "numeric",
+                                            <time
+                                                dateTime={
+                                                    review.created_at
                                                 }
-                                            )}
-                                        </time>
+                                            >
+                                                {new Date(
+                                                    review.created_at
+                                                ).toLocaleDateString(
+                                                    undefined,
+                                                    {
+                                                        year: "numeric",
+                                                        month: "short",
+                                                        day: "numeric",
+                                                    }
+                                                )}
+                                            </time>
 
-                                        <button
-                                            type="button"
-                                            className="edit-btn"
-                                            onClick={() => {
-                                                setEditingReview(review);
-                                                setRating(review.rating);
-                                                setText(review.text);
-                                            }}
-                                        >
-                                            ✏️ Edit
-                                        </button>
-                                    </div>
-                                </article>
-                            );
-                        })
+                                            <button
+                                                type="button"
+                                                className="edit-btn"
+                                                onClick={() =>
+                                                    openReviewEditor(
+                                                        review
+                                                    )
+                                                }
+                                            >
+                                                ✏️ Edit
+                                            </button>
+
+                                        </div>
+
+                                    </article>
+                                );
+                            }
+                        )
                     ) : (
-                        <EmptyState text="No reviews yet" />
+                        <EmptyState
+                            text="No reviews yet"
+                        />
                     )}
+
                 </div>
+
             </section>
 
-            {/* ---------------- EDIT MODAL ---------------- */}
+
+            {/* EDIT REVIEW MODAL */}
+
             {editingReview && (
                 <div
                     className="profile-review-modal-overlay"
-                    onClick={() => setEditingReview(null)}
+                    onClick={
+                        closeReviewEditor
+                    }
                 >
+
                     <div
                         className="profile-review-modal"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(event) =>
+                            event.stopPropagation()
+                        }
                     >
+
                         <div className="profile-review-modal-header">
+
                             <div className="profile-review-anime-edit">
+
                                 {editingReview?.anime?.image ? (
                                     <OptimizedImage
-                                        src={editingReview.anime.image}
+                                        src={
+                                            editingReview
+                                                .anime
+                                                .image
+                                        }
                                         alt={
-                                            editingReview.anime.title ||
+                                            editingReview
+                                                .anime
+                                                .title ||
                                             "Anime"
                                         }
                                         className="profile-review-anime-edit-image"
@@ -571,32 +826,44 @@ function Profile() {
                                 )}
 
                                 <div>
+
                                     <span className="profile-review-modal-eyebrow">
                                         YOUR REVIEW
                                     </span>
 
-                                    <h3>Edit Review</h3>
+                                    <h3>
+                                        Edit Review
+                                    </h3>
 
                                     <p>
-                                        {editingReview?.anime?.title ||
-                                            "Unknown Anime"}
+                                        {
+                                            editingReview
+                                                ?.anime
+                                                ?.title ||
+                                            "Unknown Anime"
+                                        }
                                     </p>
+
                                 </div>
+
                             </div>
 
                             <button
                                 type="button"
                                 className="profile-review-modal-close"
-                                onClick={() =>
-                                    setEditingReview(null)
+                                onClick={
+                                    closeReviewEditor
                                 }
                                 aria-label="Close review editor"
                             >
                                 ✕
                             </button>
+
                         </div>
 
+
                         <div className="profile-review-field">
+
                             <label htmlFor="profile-review-rating">
                                 Rating
                             </label>
@@ -604,11 +871,18 @@ function Profile() {
                             <select
                                 id="profile-review-rating"
                                 value={rating}
-                                onChange={(e) =>
-                                    setRating(Number(e.target.value))
+                                onChange={(event) =>
+                                    setRating(
+                                        Number(
+                                            event.target.value
+                                        )
+                                    )
                                 }
                             >
-                                {[1,2,3,4,5,6,7,8,9,10].map((value) => (
+                                {[
+                                    1, 2, 3, 4, 5,
+                                    6, 7, 8, 9, 10,
+                                ].map((value) => (
                                     <option
                                         key={value}
                                         value={value}
@@ -617,9 +891,12 @@ function Profile() {
                                     </option>
                                 ))}
                             </select>
+
                         </div>
 
+
                         <div className="profile-review-field">
+
                             <label htmlFor="profile-review-text">
                                 Review
                             </label>
@@ -628,21 +905,28 @@ function Profile() {
                                 id="profile-review-text"
                                 rows={7}
                                 value={text}
-                                onChange={(e) =>
-                                    setText(e.target.value)
+                                onChange={(event) =>
+                                    setText(
+                                        event.target.value
+                                    )
                                 }
                                 placeholder="Write your thoughts about this anime..."
                             />
+
                         </div>
 
+
                         <div className="profile-review-modal-actions">
+
                             <button
                                 type="button"
                                 className="profile-review-cancel"
-                                onClick={() =>
-                                    setEditingReview(null)
+                                onClick={
+                                    closeReviewEditor
                                 }
-                                disabled={updateReview.isPending}
+                                disabled={
+                                    updateReview.isPending
+                                }
                             >
                                 Cancel
                             </button>
@@ -651,14 +935,20 @@ function Profile() {
                                 type="button"
                                 className="profile-review-save"
                                 onClick={saveReview}
-                                disabled={updateReview.isPending}
+                                disabled={
+                                    updateReview.isPending ||
+                                    !text.trim()
+                                }
                             >
                                 {updateReview.isPending
                                     ? "Saving..."
                                     : "Save Changes"}
                             </button>
+
                         </div>
+
                     </div>
+
                 </div>
             )}
 
@@ -666,4 +956,6 @@ function Profile() {
     );
 }
 
+
 export default Profile;
+

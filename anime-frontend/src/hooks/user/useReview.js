@@ -1,49 +1,29 @@
+
 import {
-    useQuery,
     useMutation,
+    useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
 
 import { ReviewAPI } from "../../api/review.api";
+import { queryKeys } from "../../lib/querykeys";
 import toast from "react-hot-toast";
 
 
 /* =========================================================
-   REVIEW QUERY KEYS
-========================================================= */
-
-const reviewKeys = {
-    all: ["reviews"],
-
-    anime: (animeId) => [
-        "reviews",
-        String(animeId),
-    ],
-
-    user: ["user-reviews"],
-
-    analytics: ["review-analytics"],
-
-    topRated: ["top-rated-anime"],
-};
-
-
-/* =========================================================
-   REVIEWS LIST
+   ANIME REVIEWS
 ========================================================= */
 
 export function useReviews(animeId) {
     const normalizedAnimeId = String(animeId);
 
     return useQuery({
-        queryKey: reviewKeys.anime(
+        queryKey: queryKeys.reviews.anime(
             normalizedAnimeId
         ),
 
         queryFn: () =>
-            ReviewAPI.list(
-                normalizedAnimeId
-            ),
+            ReviewAPI.list(normalizedAnimeId),
 
         enabled: !!animeId,
     });
@@ -65,32 +45,30 @@ export function useCreateReview() {
                 variables.anime_id
             );
 
-            await queryClient.refetchQueries({
-                queryKey: reviewKeys.anime(
+            await queryClient.invalidateQueries({
+                queryKey: queryKeys.reviews.anime(
                     animeId
                 ),
-                type: "active",
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.user,
+                queryKey: queryKeys.users.reviews,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.analytics,
+                queryKey:
+                    queryKeys.users.reviewAnalytics,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.topRated,
+                queryKey: queryKeys.users.topRated,
             });
 
             toast.success("Review saved!");
         },
 
         onError: () => {
-            toast.error(
-                "Failed to save review"
-            );
+            toast.error("Failed to save review");
         },
     });
 }
@@ -108,23 +86,27 @@ export function useDeleteReview() {
             ReviewAPI.delete(reviewId),
 
         onSuccess: async (_, variables) => {
-            await queryClient.refetchQueries({
-                queryKey: reviewKeys.anime(
-                    variables.animeId
+            const animeId = String(
+                variables.animeId
+            );
+
+            await queryClient.invalidateQueries({
+                queryKey: queryKeys.reviews.anime(
+                    animeId
                 ),
-                type: "active",
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.user,
+                queryKey: queryKeys.users.reviews,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.analytics,
+                queryKey:
+                    queryKeys.users.reviewAnalytics,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.topRated,
+                queryKey: queryKeys.users.topRated,
             });
 
             toast.success("Review deleted!");
@@ -143,7 +125,8 @@ export function useDeleteReview() {
 
 export function useUserReviews() {
     return useQuery({
-        queryKey: reviewKeys.user,
+        queryKey: queryKeys.users.reviews,
+
         queryFn: ReviewAPI.myReviews,
     });
 }
@@ -155,7 +138,8 @@ export function useUserReviews() {
 
 export function useReviewAnalytics() {
     return useQuery({
-        queryKey: reviewKeys.analytics,
+        queryKey: queryKeys.users.reviewAnalytics,
+
         queryFn: ReviewAPI.analytics,
     });
 }
@@ -167,7 +151,7 @@ export function useReviewAnalytics() {
 
 export function useTopRatedAnime() {
     return useQuery({
-        queryKey: reviewKeys.topRated,
+        queryKey: queryKeys.users.topRated,
 
         queryFn: ReviewAPI.topRated,
 
@@ -195,30 +179,28 @@ export function useUpdateReview() {
 
         onSuccess: async () => {
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.user,
+                queryKey: queryKeys.reviews.all,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.all,
+                queryKey: queryKeys.users.reviews,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.analytics,
+                queryKey:
+                    queryKeys.users.reviewAnalytics,
             });
 
             await queryClient.invalidateQueries({
-                queryKey: reviewKeys.topRated,
+                queryKey: queryKeys.users.topRated,
             });
 
-            toast.success(
-                "Review updated!"
-            );
+            toast.success("Review updated!");
         },
 
         onError: () => {
-            toast.error(
-                "Failed to update review"
-            );
+            toast.error("Failed to update review");
         },
     });
 }
+

@@ -35,5 +35,13 @@ export const queryKeys = {
         reviews: ["users", "reviews"],
         reviewAnalytics: ["users", "review-analytics"],
         topRated: ["users", "top-rated"],
-    }
+    },
+    reviews: {
+        all: ["reviews"],
+
+        anime: (animeId) => [
+            "reviews",
+            String(animeId),
+        ],
+    },
 };
