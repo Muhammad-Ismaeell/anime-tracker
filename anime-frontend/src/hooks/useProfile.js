@@ -4,8 +4,8 @@ import {
     useQueryClient,
 } from "@tanstack/react-query";
 
-import api from "../../api/client";
-import { queryKeys } from "../../lib/querykeys";
+import api from "../api/client";
+import { queryKeys } from "../lib/querykeys";
 import toast from "react-hot-toast";
 
 

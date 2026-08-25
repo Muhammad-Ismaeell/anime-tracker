@@ -1,12 +1,6 @@
 
-import {
-    useMemo,
-    useState,
-} from "react";
-
-import {
-    useNavigate,
-} from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import PageContainer from "../components/ui/PageContainer";
 import EmptyState from "../components/ui/EmptyState";
@@ -14,33 +8,21 @@ import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import OptimizedImage from "../components/ui/OptimizedImage";
 import AnimeCard from "../components/AnimeCard";
 
-import {
-    useProfile,
-} from "../hooks/user/useProfile";
-
+import { useProfile } from "../hooks/useProfile";
 import {
     useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
-
-import {
-    useActivity,
-} from "../hooks/user/useActivity";
-
+import { useActivity } from "../hooks/user/useActivity";
 import {
     useUserReviews,
     useReviewAnalytics,
     useTopRatedAnime,
     useUpdateReview,
 } from "../hooks/user/useReview";
+import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 
-import {
-    useGlobalLibrary,
-} from "../hooks/useGlobalLibrary";
-
-import {
-    getMediaUrl,
-} from "../utils/mediaUrl";
+import { getMediaUrl } from "../utils/mediaUrl";
 
 
 const actionLabels = {
@@ -57,6 +39,10 @@ const actionLabels = {
 function Profile() {
     const navigate = useNavigate();
 
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
     const {
         data: profile,
         isLoading: profileLoading,
@@ -64,55 +50,20 @@ function Profile() {
         refetch: refetchProfile,
     } = useProfile();
 
-    const {
-        data: favoritesData,
-    } = useFavorites();
-
-    const {
-        data: activityPages,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useActivity();
-
-    const {
-        data: analytics,
-    } = useReviewAnalytics();
-
-    const {
-        data: topRatedList = [],
-    } = useTopRatedAnime();
-
-    const {
-        data: reviewsData,
-    } = useUserReviews();
-
-    const toggleFavorite = useToggleFavorite();
-    const updateReview = useUpdateReview();
-
-    const {
-        statusMap,
-    } = useGlobalLibrary();
-
-    const [editingReview, setEditingReview] =
-        useState(null);
-
-    const [rating, setRating] =
-        useState(10);
-
-    const [text, setText] =
-        useState("");
-
-
     const user = profile?.user;
     const profileData = profile?.profile;
 
-    const favorites =
-        favoritesData?.results ?? [];
 
-    const myReviews =
-        reviewsData?.results ?? [];
+    // =========================================================
+    // FAVORITES
+    // =========================================================
 
+    const { data: favoritesData } = useFavorites();
+
+    const favorites = useMemo(
+        () => favoritesData?.results ?? [],
+        [favoritesData?.results]
+    );
 
     const favoriteIds = useMemo(() => {
         return new Set(
@@ -132,16 +83,46 @@ function Profile() {
         );
     }, [favorites]);
 
+    const toggleFavorite = useToggleFavorite();
 
-    const activity = useMemo(() => {
-        return (
+
+    // =========================================================
+    // ACTIVITY
+    // =========================================================
+
+    const {
+        data: activityPages,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useActivity();
+
+    const activity = useMemo(
+        () =>
             activityPages?.pages?.flatMap(
-                (page) =>
-                    page?.results ?? []
-            ) ?? []
-        );
-    }, [activityPages]);
+                (page) => page?.results ?? []
+            ) ?? [],
+        [activityPages]
+    );
 
+
+    // =========================================================
+    // REVIEWS
+    // =========================================================
+
+    const { data: analytics } =
+        useReviewAnalytics();
+
+    const { data: topRatedList = [] } =
+        useTopRatedAnime();
+
+    const { data: reviewsData } =
+        useUserReviews();
+
+    const updateReview = useUpdateReview();
+
+    const myReviews =
+        reviewsData?.results ?? [];
 
     const reviewCount =
         analytics?.review_count ?? 0;
@@ -149,6 +130,32 @@ function Profile() {
     const averageRating =
         analytics?.average_rating ?? 0;
 
+
+    // =========================================================
+    // LIBRARY
+    // =========================================================
+
+    const { statusMap } =
+        useGlobalLibrary();
+
+
+    // =========================================================
+    // REVIEW EDITOR STATE
+    // =========================================================
+
+    const [editingReview, setEditingReview] =
+        useState(null);
+
+    const [rating, setRating] =
+        useState(10);
+
+    const [text, setText] =
+        useState("");
+
+
+    // =========================================================
+    // REVIEW ACTIONS
+    // =========================================================
 
     const openReviewEditor = (review) => {
         setEditingReview(review);
@@ -182,20 +189,21 @@ function Profile() {
         updateReview.mutate(
             {
                 reviewId: editingReview.id,
-
                 payload: {
                     rating,
                     text: cleanText,
                 },
             },
             {
-                onSuccess: () => {
-                    closeReviewEditor();
-                },
+                onSuccess: closeReviewEditor,
             }
         );
     };
 
+
+    // =========================================================
+    // FAVORITE ACTION
+    // =========================================================
 
     const handleToggleFavorite = (anime) => {
         const animeId =
@@ -213,6 +221,10 @@ function Profile() {
         });
     };
 
+
+    // =========================================================
+    // LOADING
+    // =========================================================
 
     if (profileLoading) {
         return (
@@ -262,6 +274,10 @@ function Profile() {
     }
 
 
+    // =========================================================
+    // ERROR
+    // =========================================================
+
     if (profileError) {
         return (
             <PageContainer>
@@ -272,9 +288,7 @@ function Profile() {
                 <button
                     type="button"
                     className="retry-btn"
-                    onClick={() =>
-                        refetchProfile()
-                    }
+                    onClick={refetchProfile}
                 >
                     Retry
                 </button>
@@ -283,19 +297,23 @@ function Profile() {
     }
 
 
+    // =========================================================
+    // RENDER
+    // =========================================================
+
     return (
         <PageContainer>
 
-            {/* PROFILE HEADER */}
+            {/* =================================================
+                PROFILE HEADER
+            ================================================= */}
 
             <div className="profile-hero">
 
                 <div className="profile-avatar">
                     {profileData?.avatar ? (
                         <OptimizedImage
-                            src={getMediaUrl(
-                                profileData.avatar
-                            )}
+                            src={getMediaUrl(profileData.avatar)}
                             alt="avatar"
                         />
                     ) : (
@@ -311,8 +329,7 @@ function Profile() {
                     </h1>
 
                     <p className="profile-bio">
-                        {profileData?.bio ||
-                            "Anime fan"}
+                        {profileData?.bio || "Anime fan"}
                     </p>
 
                     <span className="profile-tag">
@@ -324,9 +341,7 @@ function Profile() {
                     type="button"
                     className="edit-profile-btn"
                     onClick={() =>
-                        navigate(
-                            "/edit-profile"
-                        )
+                        navigate("/edit-profile")
                     }
                 >
                     ✏️ Edit Profile
@@ -335,50 +350,40 @@ function Profile() {
             </div>
 
 
-            {/* PROFILE STATS */}
+            {/* =================================================
+                PROFILE STATS
+            ================================================= */}
 
             <div className="stats-grid premium">
 
                 <div className="stat-card glass">
                     ❤️
-                    <h3>
-                        {favorites.length}
-                    </h3>
-                    <p>
-                        Favorites
-                    </p>
+                    <h3>{favorites.length}</h3>
+                    <p>Favorites</p>
                 </div>
 
                 <div className="stat-card glass">
                     📝
-                    <h3>
-                        {reviewCount}
-                    </h3>
-                    <p>
-                        Reviews
-                    </p>
+                    <h3>{reviewCount}</h3>
+                    <p>Reviews</p>
                 </div>
 
                 <div className="stat-card glass">
                     ⭐
-                    <h3>
-                        {averageRating}
-                    </h3>
-                    <p>
-                        Average Rating
-                    </p>
+                    <h3>{averageRating}</h3>
+                    <p>Average Rating</p>
                 </div>
 
             </div>
 
 
-            {/* FAVORITES */}
+            {/* =================================================
+                FAVORITES
+            ================================================= */}
 
             <section className="section">
 
-                <h2>
-                    ❤️ Favorite Anime
-                </h2>
+                <h2>❤️ Favorite Anime</h2>
 
                 <div className="anime-grid">
 
@@ -393,30 +398,22 @@ function Profile() {
                                     item.anime_id ??
                                     item.id;
 
-                                if (
-                                    animeId == null
-                                ) {
+                                if (animeId == null) {
                                     return null;
                                 }
 
-                                const id =
-                                    String(
-                                        animeId
-                                    );
+                                const id = String(animeId);
 
                                 const anime = {
                                     id: animeId,
-
                                     title:
                                         item.anime?.title ??
                                         item.title ??
                                         "Unknown Anime",
-
                                     image:
                                         item.anime?.image ??
                                         item.image ??
                                         "",
-
                                     score:
                                         item.anime?.score ??
                                         item.score ??
@@ -427,21 +424,15 @@ function Profile() {
                                     <AnimeCard
                                         key={id}
                                         anime={anime}
-                                        statusMap={
-                                            statusMap
-                                        }
+                                        statusMap={statusMap}
                                         isFavorited={
-                                            favoriteIds.has(
-                                                id
-                                            )
+                                            favoriteIds.has(id)
                                         }
                                         isFavoritePending={
                                             toggleFavorite.isPending
                                         }
                                         onToggleFavorite={() =>
-                                            handleToggleFavorite(
-                                                anime
-                                            )
+                                            handleToggleFavorite(anime)
                                         }
                                     />
                                 );
@@ -457,80 +448,64 @@ function Profile() {
             </section>
 
 
-            {/* TOP RATED */}
+            {/* =================================================
+                TOP RATED
+            ================================================= */}
 
             <section className="section">
 
-                <h2>
-                    🏆 Top Rated By You
-                </h2>
+                <h2>🏆 Top Rated By You</h2>
 
                 <div className="anime-grid">
 
                     {topRatedList.length ? (
-                        topRatedList.map(
-                            (item) => {
+                        topRatedList.map((item) => {
 
-                                const animeId =
-                                    item.anime_id ??
-                                    item.anime?.mal_id ??
-                                    item.anime?.id ??
-                                    item.id;
+                            const animeId =
+                                item.anime_id ??
+                                item.anime?.mal_id ??
+                                item.anime?.id ??
+                                item.id;
 
-                                if (
-                                    animeId == null
-                                ) {
-                                    return null;
-                                }
-
-                                const id =
-                                    String(
-                                        animeId
-                                    );
-
-                                const anime = {
-                                    id: animeId,
-
-                                    title:
-                                        item.title ??
-                                        item.anime?.title ??
-                                        "Unknown Anime",
-
-                                    image:
-                                        item.image ??
-                                        item.anime?.image ??
-                                        "",
-
-                                    score:
-                                        item.rating ??
-                                        item.anime?.score ??
-                                        0,
-                                };
-
-                                return (
-                                    <AnimeCard
-                                        key={id}
-                                        anime={anime}
-                                        statusMap={
-                                            statusMap
-                                        }
-                                        isFavorited={
-                                            favoriteIds.has(
-                                                id
-                                            )
-                                        }
-                                        isFavoritePending={
-                                            toggleFavorite.isPending
-                                        }
-                                        onToggleFavorite={() =>
-                                            handleToggleFavorite(
-                                                anime
-                                            )
-                                        }
-                                    />
-                                );
+                            if (animeId == null) {
+                                return null;
                             }
-                        )
+
+                            const id = String(animeId);
+
+                            const anime = {
+                                id: animeId,
+                                title:
+                                    item.title ??
+                                    item.anime?.title ??
+                                    "Unknown Anime",
+                                image:
+                                    item.image ??
+                                    item.anime?.image ??
+                                    "",
+                                score:
+                                    item.rating ??
+                                    item.anime?.score ??
+                                    0,
+                            };
+
+                            return (
+                                <AnimeCard
+                                    key={id}
+                                    anime={anime}
+                                    statusMap={statusMap}
+                                    isFavorited={
+                                        favoriteIds.has(id)
+                                    }
+                                    isFavoritePending={
+                                        toggleFavorite.isPending
+                                    }
+                                    onToggleFavorite={() =>
+                                        handleToggleFavorite(anime)
+                                    }
+                                />
+                            );
+                        })
                     ) : (
                         <EmptyState
                             text="No top rated anime yet"
@@ -542,14 +517,14 @@ function Profile() {
             </section>
 
 
-            {/* ACTIVITY */}
+            {/* =================================================
+                ACTIVITY
+            ================================================= */}
 
             <section className="section">
 
                 <div className="section-header">
-                    <h2>
-                        ⚡ Recent Activity
-                    </h2>
+                    <h2>⚡ Recent Activity</h2>
                 </div>
 
                 <div className="activity-list">
@@ -561,9 +536,7 @@ function Profile() {
                                 className="activity-item"
                             >
                                 <OptimizedImage
-                                    src={
-                                        act.anime?.image
-                                    }
+                                    src={act.anime?.image}
                                     alt={
                                         act.anime?.title ||
                                         "Anime"
@@ -574,25 +547,17 @@ function Profile() {
                                 <div className="activity-content">
 
                                     <div className="activity-action">
-                                        {
-                                            actionLabels[
-                                                act.action
-                                            ] ??
-                                            act.action
-                                        }
+                                        {actionLabels[act.action] ??
+                                            act.action}
                                     </div>
 
                                     <strong>
-                                        {
-                                            act.anime?.title ||
-                                            "Unknown Anime"
-                                        }
+                                        {act.anime?.title ||
+                                            "Unknown Anime"}
                                     </strong>
 
                                     <time
-                                        dateTime={
-                                            act.created_at
-                                        }
+                                        dateTime={act.created_at}
                                         className="activity-date"
                                     >
                                         {new Date(
@@ -608,7 +573,6 @@ function Profile() {
                                     </time>
 
                                 </div>
-
                             </article>
                         ))
                     ) : (
@@ -623,12 +587,8 @@ function Profile() {
                     <button
                         type="button"
                         className="load-more-btn"
-                        disabled={
-                            isFetchingNextPage
-                        }
-                        onClick={() =>
-                            fetchNextPage()
-                        }
+                        disabled={isFetchingNextPage}
+                        onClick={fetchNextPage}
                     >
                         {isFetchingNextPage
                             ? "Loading..."
@@ -639,140 +599,121 @@ function Profile() {
             </section>
 
 
-            {/* MY REVIEWS */}
+            {/* =================================================
+                MY REVIEWS
+            ================================================= */}
 
             <section className="section">
 
                 <div className="section-header">
-                    <h2>
-                        📝 My Reviews
-                    </h2>
+                    <h2>📝 My Reviews</h2>
                 </div>
 
                 <div className="reviews-list">
 
                     {myReviews.length ? (
-                        myReviews.map(
-                            (review) => {
+                        myReviews.map((review) => {
 
-                                const anime =
-                                    review.anime;
+                            const anime = review.anime;
 
-                                const animeId =
-                                    anime?.mal_id ??
-                                    anime?.id ??
-                                    anime?.anime_id;
+                            const animeId =
+                                anime?.mal_id ??
+                                anime?.id ??
+                                anime?.anime_id;
 
-                                return (
-                                    <article
-                                        key={review.id}
-                                        className="review-card profile-review-card"
-                                    >
+                            return (
+                                <article
+                                    key={review.id}
+                                    className="review-card profile-review-card"
+                                >
 
-                                        <div className="profile-review-anime">
+                                    <div className="profile-review-anime">
 
-                                            {anime?.image ? (
-                                                <OptimizedImage
-                                                    src={
-                                                        anime.image
+                                        {anime?.image ? (
+                                            <OptimizedImage
+                                                src={anime.image}
+                                                alt={
+                                                    anime.title ||
+                                                    "Anime"
+                                                }
+                                                className="profile-review-anime-image"
+                                            />
+                                        ) : (
+                                            <div
+                                                className="profile-review-anime-image profile-review-image-fallback"
+                                                aria-label="No anime image available"
+                                            >
+                                                🎬
+                                            </div>
+                                        )}
+
+                                        <div className="profile-review-anime-info">
+
+                                            <strong>
+                                                {anime?.title ||
+                                                    "Unknown Anime"}
+                                            </strong>
+
+                                            {animeId != null && (
+                                                <button
+                                                    type="button"
+                                                    className="profile-review-anime-link"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/anime/${animeId}`
+                                                        )
                                                     }
-                                                    alt={
-                                                        anime.title ||
-                                                        "Anime"
-                                                    }
-                                                    className="profile-review-anime-image"
-                                                />
-                                            ) : (
-                                                <div
-                                                    className="profile-review-anime-image profile-review-image-fallback"
-                                                    aria-label="No anime image available"
                                                 >
-                                                    🎬
-                                                </div>
+                                                    View Anime
+                                                </button>
                                             )}
 
-                                            <div className="profile-review-anime-info">
+                                        </div>
 
-                                                <strong>
-                                                    {
-                                                        anime?.title ||
-                                                        "Unknown Anime"
-                                                    }
-                                                </strong>
+                                        <span className="review-rating">
+                                            ⭐ {review.rating}/10
+                                        </span>
 
-                                                {animeId != null && (
-                                                    <button
-                                                        type="button"
-                                                        className="profile-review-anime-link"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/anime/${animeId}`
-                                                            )
-                                                        }
-                                                    >
-                                                        View Anime
-                                                    </button>
-                                                )}
+                                    </div>
 
-                                            </div>
+                                    <p className="review-text">
+                                        {review.text}
+                                    </p>
 
-                                            <span className="review-rating">
-                                                ⭐{" "}
+                                    <div className="review-footer">
+
+                                        <time
+                                            dateTime={review.created_at}
+                                        >
+                                            {new Date(
+                                                review.created_at
+                                            ).toLocaleDateString(
+                                                undefined,
                                                 {
-                                                    review.rating
+                                                    year: "numeric",
+                                                    month: "short",
+                                                    day: "numeric",
                                                 }
-                                                /10
-                                            </span>
+                                            )}
+                                        </time>
 
-                                        </div>
-
-                                        <p className="review-text">
-                                            {
-                                                review.text
+                                        <button
+                                            type="button"
+                                            className="edit-btn"
+                                            onClick={() =>
+                                                openReviewEditor(review)
                                             }
-                                        </p>
+                                        >
+                                            ✏️ Edit
+                                        </button>
 
-                                        <div className="review-footer">
+                                    </div>
 
-                                            <time
-                                                dateTime={
-                                                    review.created_at
-                                                }
-                                            >
-                                                {new Date(
-                                                    review.created_at
-                                                ).toLocaleDateString(
-                                                    undefined,
-                                                    {
-                                                        year: "numeric",
-                                                        month: "short",
-                                                        day: "numeric",
-                                                    }
-                                                )}
-                                            </time>
-
-                                            <button
-                                                type="button"
-                                                className="edit-btn"
-                                                onClick={() =>
-                                                    openReviewEditor(
-                                                        review
-                                                    )
-                                                }
-                                            >
-                                                ✏️ Edit
-                                            </button>
-
-                                        </div>
-
-                                    </article>
-                                );
-                            }
-                        )
+                                </article>
+                            );
+                        })
                     ) : (
-                        <EmptyState
-                            text="No reviews yet"
-                        />
+                        <EmptyState text="No reviews yet" />
                     )}
 
                 </div>
@@ -780,14 +721,14 @@ function Profile() {
             </section>
 
 
-            {/* EDIT REVIEW MODAL */}
+            {/* =================================================
+                EDIT REVIEW MODAL
+            ================================================= */}
 
             {editingReview && (
                 <div
                     className="profile-review-modal-overlay"
-                    onClick={
-                        closeReviewEditor
-                    }
+                    onClick={closeReviewEditor}
                 >
 
                     <div
@@ -804,14 +745,10 @@ function Profile() {
                                 {editingReview?.anime?.image ? (
                                     <OptimizedImage
                                         src={
-                                            editingReview
-                                                .anime
-                                                .image
+                                            editingReview.anime.image
                                         }
                                         alt={
-                                            editingReview
-                                                .anime
-                                                .title ||
+                                            editingReview.anime.title ||
                                             "Anime"
                                         }
                                         className="profile-review-anime-edit-image"
@@ -831,17 +768,11 @@ function Profile() {
                                         YOUR REVIEW
                                     </span>
 
-                                    <h3>
-                                        Edit Review
-                                    </h3>
+                                    <h3>Edit Review</h3>
 
                                     <p>
-                                        {
-                                            editingReview
-                                                ?.anime
-                                                ?.title ||
-                                            "Unknown Anime"
-                                        }
+                                        {editingReview?.anime?.title ||
+                                            "Unknown Anime"}
                                     </p>
 
                                 </div>
@@ -851,9 +782,7 @@ function Profile() {
                             <button
                                 type="button"
                                 className="profile-review-modal-close"
-                                onClick={
-                                    closeReviewEditor
-                                }
+                                onClick={closeReviewEditor}
                                 aria-label="Close review editor"
                             >
                                 ✕
@@ -873,9 +802,7 @@ function Profile() {
                                 value={rating}
                                 onChange={(event) =>
                                     setRating(
-                                        Number(
-                                            event.target.value
-                                        )
+                                        Number(event.target.value)
                                     )
                                 }
                             >
@@ -906,9 +833,7 @@ function Profile() {
                                 rows={7}
                                 value={text}
                                 onChange={(event) =>
-                                    setText(
-                                        event.target.value
-                                    )
+                                    setText(event.target.value)
                                 }
                                 placeholder="Write your thoughts about this anime..."
                             />
@@ -921,12 +846,8 @@ function Profile() {
                             <button
                                 type="button"
                                 className="profile-review-cancel"
-                                onClick={
-                                    closeReviewEditor
-                                }
-                                disabled={
-                                    updateReview.isPending
-                                }
+                                onClick={closeReviewEditor}
+                                disabled={updateReview.isPending}
                             >
                                 Cancel
                             </button>
@@ -958,4 +879,3 @@ function Profile() {
 
 
 export default Profile;
-
