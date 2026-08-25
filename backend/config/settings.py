@@ -3,7 +3,6 @@ from pathlib import Path
 
 import dj_database_url
 import environ
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
@@ -318,3 +317,10 @@ CACHES = {
 
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": env("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": env("CLOUDINARY_API_KEY"),
+    "API_SECRET": env("CLOUDINARY_API_SECRET"),
+}
