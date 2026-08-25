@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import {
     useProfile,
     useUpdateProfile,
-} from "../hooks/user/useProfile";
+} from "../hooks/useProfile";
 import { getMediaUrl } from "../utils/mediaUrl";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 
