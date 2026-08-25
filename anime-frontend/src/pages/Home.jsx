@@ -44,10 +44,6 @@ function Home() {
 
     const favoriteIds = useFavoriteIds();
 
-    // ============================================================
-    // NORMALIZE PAGINATED DATA
-    // ============================================================
-
 
 
     // ============================================================
@@ -183,28 +179,7 @@ function Home() {
     }, [featuredAnime.length]);
 
 
-    // ============================================================
-    // CLEANUP
-    // ============================================================
 
-    useEffect(() => {
-        return () => {
-            if (transitionTimeoutRef.current) {
-                window.clearTimeout(
-                    transitionTimeoutRef.current
-                );
-            }
-        };
-    }, []);
-
-
-    // ============================================================
-    // LOADING / ERROR
-    // ============================================================
-
-    // ============================================================
-// LOADING / ERROR
-// ============================================================
 
 // ============================================================
 // LOADING / ERROR
@@ -395,23 +370,28 @@ if (error) {
                 ================================================== */}
 
                 {loading ? (
+                    <>
+                        <div className="home-hero-skeleton">
+                            <div className="home-hero-skeleton-content">
+                                <div className="home-hero-skeleton-eyebrow shimmer" />
 
-                    <div className="grid">
+                                <div className="home-hero-skeleton-title shimmer" />
 
-                        {Array.from({
-                            length: 12,
-                        }).map((_, index) => (
+                                <div className="home-hero-skeleton-meta shimmer" />
 
-                            <AnimeCardSkeleton
-                                key={index}
-                            />
+                                <div className="home-hero-skeleton-description shimmer" />
 
-                        ))}
+                                <div className="home-hero-skeleton-button shimmer" />
+                            </div>
+                        </div>
 
-                    </div>
-
+                        <div className="grid">
+                            {Array.from({ length: 12 }).map((_, index) => (
+                                <AnimeCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    </>
                 ) : (
-
                     <>
                         <AnimeSection
                             title="Trending Anime"
