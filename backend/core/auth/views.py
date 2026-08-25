@@ -209,7 +209,7 @@ def login(request):
 # =========================
 @extend_schema(
     summary="Refresh Access Token",
-    description="Generate a new access token using a refresh token.",
+    description="Generate new access and refresh tokens using a refresh token.",
     request=RefreshRequestSerializer,
     responses={
         200: RefreshResponseSerializer,
@@ -234,11 +234,22 @@ def refresh_token(request):
     try:
         refresh = RefreshToken(token)
 
+        new_access = str(refresh.access_token)
+
+        refresh.blacklist()
+
+        new_refresh = RefreshToken.for_user(
+            User.objects.get(
+                id=refresh["user_id"]
+            )
+        )
+
         return Response({
-            "access": str(refresh.access_token)
+            "access": new_access,
+            "refresh": str(new_refresh),
         })
 
-    except TokenError:
+    except (TokenError, User.DoesNotExist):
         return Response(
             {"detail": "Invalid refresh token"},
             status=401,
@@ -416,7 +427,7 @@ def logout(request):
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-        except Exception:
+        except TokenError:
             pass
 
     return Response({
