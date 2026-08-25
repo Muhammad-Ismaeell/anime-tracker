@@ -22,7 +22,7 @@ def custom_exception_handler(exc, context):
         return Response(
             {
                 "success": False,
-                "message": "Token expired. Please login again.",
+                "message": "Invalid or expired token. Please login again.",
             },
             status=status.HTTP_401_UNAUTHORIZED,
         )
