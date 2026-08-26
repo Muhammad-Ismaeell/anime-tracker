@@ -307,6 +307,11 @@ function Home() {
                             }}
                             style={{
                                 backgroundImage: `
+                                    linear-gradient(
+                                        90deg,
+                                        rgba(10,10,18,0.95),
+                                        rgba(10,10,18,0.55)
+                                    ),
                                     url(${currentFeatured.largeImage || currentFeatured.image})
                                 `,
                             }}
