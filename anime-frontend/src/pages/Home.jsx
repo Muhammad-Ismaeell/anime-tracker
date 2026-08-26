@@ -335,6 +335,7 @@ function Home() {
                         >
 
                             <motion.img
+
                                 key={currentFeatured.id}
 
                                 src={
@@ -348,28 +349,33 @@ function Home() {
 
                                 custom={slideDirection}
 
+
                                 initial={{
-                                    opacity: 0,
-                                    x: slideDirection * 45,
-                                    scale: 0.985,
+                                    opacity:0,
+                                    x: slideDirection * 80,
+                                    scale:0.95,
                                 }}
+
 
                                 animate={{
-                                    opacity: 1,
-                                    x: 0,
-                                    scale: 1,
+                                    opacity:1,
+                                    x:0,
+                                    scale:1,
                                 }}
+
 
                                 exit={{
-                                    opacity: 0,
-                                    x: slideDirection * -45,
-                                    scale: 0.985,
+                                    opacity:0,
+                                    x: slideDirection * -80,
+                                    scale:0.95,
                                 }}
 
+
                                 transition={{
-                                    duration: 0.30,
-                                    ease: [0.22, 1, 0.36, 1],
+                                    duration:0.32,
+                                    ease:[0.22,1,0.36,1],
                                 }}
+
                             />
 
                         </AnimatePresence>
@@ -386,31 +392,25 @@ function Home() {
                         initial={false}
                         custom={slideDirection}
                     >
-
                         <motion.div
-                            key={`content-${currentFeatured.id}`}
+                            key={currentFeatured.id}
                             className="home-hero-content"
-
                             custom={slideDirection}
-
                             initial={{
                                 opacity: 0,
-                                x: slideDirection * 20,
+                                x: slideDirection * 25,
                             }}
-
                             animate={{
                                 opacity: 1,
                                 x: 0,
                             }}
-
                             exit={{
                                 opacity: 0,
-                                x: slideDirection * -20,
+                                x: slideDirection * -25,
                             }}
-
                             transition={{
-                                duration: 0.26,
-                                ease: [0.22, 1, 0.36, 1],
+                                duration: 0.25,
+                                ease: [0.22,1,0.36,1],
                             }}
                         >
 
@@ -428,8 +428,7 @@ function Home() {
 
                                 {currentFeatured.score > 0 && (
                                     <span>
-                                        ⭐{" "}
-                                        {currentFeatured.score.toFixed(1)}
+                                        ⭐ {currentFeatured.score.toFixed(1)}
                                     </span>
                                 )}
 
@@ -447,12 +446,22 @@ function Home() {
 
                             </div>
 
+                            <div className="home-hero-genres">
+
+                                {currentFeatured.genres?.slice(0,3).map(
+                                    (genre)=>(
+                                        <span key={genre}>
+                                            {genre}
+                                        </span>
+                                    )
+                                )}
+
+                            </div>
+
 
                             <p className="home-hero-description">
-
                                 {currentFeatured.synopsis ||
                                     "Discover this anime and add it to your library."}
-
                             </p>
 
 
@@ -464,6 +473,14 @@ function Home() {
                                 >
                                     View Details
                                 </Link>
+
+
+                                <button
+                                    className="home-hero-secondary"
+                                    type="button"
+                                >
+                                    + Add to Library
+                                </button>
 
                             </div>
 
