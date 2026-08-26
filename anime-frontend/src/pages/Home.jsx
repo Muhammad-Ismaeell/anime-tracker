@@ -1,7 +1,17 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import {
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
+
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+    AnimatePresence,
+    motion,
+} from "framer-motion";
+
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 
 import PageContainer from "../components/ui/PageContainer";
@@ -15,7 +25,9 @@ import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import { extractAnimePages } from "../utils/extractAnimePages";
 
+
 function Home() {
+
     // ============================================================
     // DATA
     // ============================================================
@@ -27,7 +39,8 @@ function Home() {
     const toggleFavorite = useToggleFavorite();
 
     const { statusMap } = useGlobalLibrary();
-    
+
+
     // ============================================================
     // HERO STATE
     // ============================================================
@@ -35,7 +48,8 @@ function Home() {
     const [featuredIndex, setFeaturedIndex] = useState(0);
     const [slideDirection, setSlideDirection] = useState(1);
 
-    const transitionTimeoutRef = useRef(null);
+    const touchStartX = useRef(null);
+    const touchStartY = useRef(null);
 
 
     // ============================================================
@@ -43,7 +57,6 @@ function Home() {
     // ============================================================
 
     const favoriteIds = useFavoriteIds();
-
 
 
     // ============================================================
@@ -64,7 +77,7 @@ function Home() {
         () => extractAnimePages(topQuery.data),
         [topQuery.data]
     );
-    
+
 
     // ============================================================
     // FEATURED ANIME
@@ -75,13 +88,6 @@ function Home() {
         [trendingAnime]
     );
 
-
-    /*
-     * Do NOT reset featuredIndex inside an effect.
-     *
-     * If the list changes and the old index is no longer valid,
-     * safely use index 0 for rendering.
-     */
     const safeFeaturedIndex =
         featuredAnime.length > 0
             ? featuredIndex % featuredAnime.length
@@ -92,95 +98,162 @@ function Home() {
 
 
     // ============================================================
-    // HERO TRANSITION
+    // HERO NAVIGATION
     // ============================================================
 
-    const changeFeatured = (nextIndex, direction = 1) => {
-        if (featuredAnime.length <= 1) {
-            return;
-        }
-
-        if (transitionTimeoutRef.current) {
-            window.clearTimeout(transitionTimeoutRef.current);
-        }
-
-        setSlideDirection(direction);
-        setFeaturedIndex(nextIndex);
-    };
-
     const handleNext = () => {
+
         if (featuredAnime.length <= 1) {
             return;
         }
 
-        const nextIndex =
-            (safeFeaturedIndex + 1) %
-            featuredAnime.length;
+        setSlideDirection(1);
 
-        changeFeatured(nextIndex, 1);
+        setFeaturedIndex(
+            (current) =>
+                (current + 1) % featuredAnime.length
+        );
     };
+
 
     const handlePrevious = () => {
+
         if (featuredAnime.length <= 1) {
             return;
         }
 
-        const previousIndex =
-            (safeFeaturedIndex - 1 + featuredAnime.length) %
-            featuredAnime.length;
+        setSlideDirection(-1);
 
-        changeFeatured(previousIndex, -1);
+        setFeaturedIndex(
+            (current) =>
+                (current - 1 + featuredAnime.length) %
+                featuredAnime.length
+        );
     };
 
+
+    const handleDotClick = (index) => {
+
+        if (index === safeFeaturedIndex) {
+            return;
+        }
+
+        setSlideDirection(
+            index > safeFeaturedIndex ? 1 : -1
+        );
+
+        setFeaturedIndex(index);
+    };
+
+
+    // ============================================================
+    // MOBILE SWIPE
+    // ============================================================
+
+    const handleTouchStart = (event) => {
+
+        const touch = event.touches[0];
+
+        touchStartX.current = touch.clientX;
+        touchStartY.current = touch.clientY;
+    };
+
+
+    const handleTouchEnd = (event) => {
+
+        if (touchStartX.current === null) {
+            return;
+        }
+
+        const touch = event.changedTouches[0];
+
+        const deltaX =
+            touch.clientX - touchStartX.current;
+
+        const deltaY =
+            touch.clientY - touchStartY.current;
+
+        touchStartX.current = null;
+        touchStartY.current = null;
+
+
+        // Ignore vertical scrolling
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            return;
+        }
+
+
+        // Ignore tiny movements
+        if (Math.abs(deltaX) < 45) {
+            return;
+        }
+
+
+        if (deltaX < 0) {
+            handleNext();
+        } else {
+            handlePrevious();
+        }
+    };
+
+
+    // ============================================================
+    // AUTO ROTATION
+    // ============================================================
+
     useEffect(() => {
+
         if (featuredAnime.length <= 1) {
             return undefined;
         }
 
         const interval = window.setInterval(() => {
+
             setSlideDirection(1);
 
-            setFeaturedIndex((current) => {
-                return (current + 1) % featuredAnime.length;
-            });
+            setFeaturedIndex(
+                (current) =>
+                    (current + 1) % featuredAnime.length
+            );
+
         }, 7000);
+
 
         return () => {
             window.clearInterval(interval);
         };
+
     }, [featuredAnime.length]);
 
 
+    // ============================================================
+    // LOADING / ERROR
+    // ============================================================
+
+    const loading =
+        trendingQuery.isPending ||
+        seasonalQuery.isPending ||
+        topQuery.isPending;
 
 
-// ============================================================
-// LOADING / ERROR
-// ============================================================
-
-const loading =
-    trendingQuery.isPending ||
-    seasonalQuery.isPending ||
-    topQuery.isPending;
+    const error =
+        trendingQuery.error ||
+        seasonalQuery.error ||
+        topQuery.error;
 
 
-const error =
-    trendingQuery.error ||
-    seasonalQuery.error ||
-    topQuery.error;
+    if (error) {
 
+        return (
+            <PageContainer>
 
+                <EmptyState
+                    text="Failed to load anime."
+                />
 
-if (error) {
-    return (
-        <PageContainer>
-
-            <EmptyState
-                text="Failed to load anime."
-            />
-
-        </PageContainer>
-    );
-}
+            </PageContainer>
+        );
+    }
 
 
     // ============================================================
@@ -191,12 +264,16 @@ if (error) {
         <PageContainer>
 
             <Helmet>
-                <title>Anime Tracker</title>
+
+                <title>
+                    Anime Tracker
+                </title>
 
                 <meta
                     name="description"
                     content="Discover trending, seasonal, and top-rated anime."
                 />
+
             </Helmet>
 
 
@@ -205,137 +282,236 @@ if (error) {
             ================================================== */}
 
             {!loading && currentFeatured && (
-                <section className="home-hero">
+
+                <section
+                    className="home-hero"
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                >
+
+                    {/* ==================================================
+                        BACKGROUND
+                    ================================================== */}
+
                     <AnimatePresence
                         initial={false}
                         mode="sync"
-                        custom={slideDirection}
                     >
+
                         <motion.div
                             key={currentFeatured.id}
                             className="home-hero-background"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.55, ease: "easeInOut" }}
+
+                            initial={{
+                                opacity: 0,
+                                scale: 1.025,
+                            }}
+
+                            animate={{
+                                opacity: 1,
+                                scale: 1,
+                            }}
+
+                            exit={{
+                                opacity: 0,
+                                scale: 1.01,
+                            }}
+
+                            transition={{
+                                duration: 0.36,
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
+                            }}
+
                             style={{
                                 backgroundImage: `
                                     linear-gradient(
                                         90deg,
                                         rgba(10, 10, 18, 0.98) 0%,
-                                        rgba(10, 10, 18, 0.88) 35%,
-                                        rgba(10, 10, 18, 0.42) 68%,
-                                        rgba(10, 10, 18, 0.16) 100%
+                                        rgba(10, 10, 18, 0.90) 32%,
+                                        rgba(10, 10, 18, 0.55) 58%,
+                                        rgba(10, 10, 18, 0.18) 100%
                                     ),
                                     url(${currentFeatured.largeImage || currentFeatured.image})
                                 `,
                             }}
                         />
+
                     </AnimatePresence>
 
-                    <AnimatePresence mode="wait" initial={false} custom={slideDirection}>
+
+                    {/* ==================================================
+                        CONTENT
+                    ================================================== */}
+
+                    <AnimatePresence
+                        mode="wait"
+                        initial={false}
+                        custom={slideDirection}
+                    >
+
                         <motion.div
                             key={currentFeatured.id}
                             className="home-hero-content"
+
                             custom={slideDirection}
+
                             initial={{
                                 opacity: 0,
-                                x: slideDirection * 24,
+                                x: slideDirection * 22,
                             }}
+
                             animate={{
                                 opacity: 1,
                                 x: 0,
                             }}
+
                             exit={{
                                 opacity: 0,
-                                x: slideDirection * -24,
+                                x: slideDirection * -22,
                             }}
+
                             transition={{
-                                duration: 0.4,
-                                ease: [0.22, 1, 0.36, 1],
+                                duration: 0.28,
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
                             }}
                         >
+
                             <span className="home-hero-eyebrow">
                                 🔥 FEATURED FROM TRENDING
                             </span>
+
 
                             <h1 className="home-hero-title">
                                 {currentFeatured.title}
                             </h1>
 
+
                             <div className="home-hero-meta">
+
                                 {currentFeatured.score > 0 && (
                                     <span>
-                                        ⭐ {currentFeatured.score.toFixed(1)}
+                                        ⭐{" "}
+                                        {currentFeatured.score.toFixed(1)}
                                     </span>
                                 )}
 
                                 {currentFeatured.type && (
-                                    <span>{currentFeatured.type}</span>
+                                    <span>
+                                        {currentFeatured.type}
+                                    </span>
                                 )}
 
                                 {currentFeatured.year && (
-                                    <span>{currentFeatured.year}</span>
+                                    <span>
+                                        {currentFeatured.year}
+                                    </span>
                                 )}
+
                             </div>
 
+
                             <p className="home-hero-description">
+
                                 {currentFeatured.synopsis ||
                                     "Discover this anime and add it to your library."}
+
                             </p>
 
+
                             <div className="home-hero-actions">
+
                                 <Link
                                     to={`/anime/${currentFeatured.id}`}
                                     className="home-hero-primary"
                                 >
                                     View Details
                                 </Link>
+
                             </div>
+
                         </motion.div>
+
                     </AnimatePresence>
 
-                    {/* ONE LARGE POSTER */}
+
+                    {/* ==================================================
+                        POSTER
+                    ================================================== */}
+
                     <div className="home-hero-poster-stage">
+
                         <AnimatePresence
                             initial={false}
                             mode="wait"
                             custom={slideDirection}
                         >
+
                             <motion.img
                                 key={currentFeatured.id}
+
                                 src={
                                     currentFeatured.largeImage ||
                                     currentFeatured.image
                                 }
+
                                 alt={currentFeatured.title}
+
                                 className="home-hero-poster-image"
+
                                 custom={slideDirection}
+
                                 initial={{
                                     opacity: 0,
                                     x: slideDirection * 90,
-                                    scale: 0.97,
+                                    scale: 0.94,
                                 }}
+
                                 animate={{
                                     opacity: 1,
                                     x: 0,
                                     scale: 1,
                                 }}
+
                                 exit={{
                                     opacity: 0,
                                     x: slideDirection * -90,
-                                    scale: 0.97,
+                                    scale: 0.94,
                                 }}
+
                                 transition={{
-                                    duration: 0.55,
-                                    ease: [0.22, 1, 0.36, 1],
+                                    duration: 0.36,
+                                    ease: [
+                                        0.22,
+                                        1,
+                                        0.36,
+                                        1,
+                                    ],
                                 }}
                             />
+
                         </AnimatePresence>
+
                     </div>
 
+
+                    {/* ==================================================
+                        NAVIGATION
+                    ================================================== */}
+
                     {featuredAnime.length > 1 && (
+
                         <>
+
                             <button
                                 type="button"
                                 className="home-hero-nav home-hero-prev"
@@ -344,6 +520,7 @@ if (error) {
                             >
                                 ←
                             </button>
+
 
                             <button
                                 type="button"
@@ -354,92 +531,127 @@ if (error) {
                                 →
                             </button>
 
+
                             <div className="home-hero-dots">
-                                {featuredAnime.map((anime, index) => (
-                                    <button
-                                        key={anime.id}
-                                        type="button"
-                                        className={
-                                            index === safeFeaturedIndex
-                                                ? "home-hero-dot active"
-                                                : "home-hero-dot"
-                                        }
-                                        onClick={() =>
-                                            changeFeatured(
-                                                index,
-                                                index > safeFeaturedIndex ? 1 : -1
-                                            )
-                                        }
-                                        aria-label={`Show featured anime ${index + 1}`}
-                                    />
-                                ))}
+
+                                {featuredAnime.map(
+                                    (anime, index) => (
+
+                                        <button
+                                            key={anime.id}
+                                            type="button"
+
+                                            className={
+                                                index === safeFeaturedIndex
+                                                    ? "home-hero-dot active"
+                                                    : "home-hero-dot"
+                                            }
+
+                                            onClick={() =>
+                                                handleDotClick(index)
+                                            }
+
+                                            aria-label={
+                                                `Show featured anime ${index + 1}`
+                                            }
+                                        />
+
+                                    )
+                                )}
+
                             </div>
+
                         </>
+
                     )}
+
                 </section>
+
             )}
 
 
             {/* ==================================================
-                    CONTENT
-                ================================================== */}
+                CONTENT
+            ================================================== */}
 
-                {loading ? (
-                    <>
-                        <div className="home-hero-skeleton">
-                            <div className="home-hero-skeleton-content">
-                                <div className="home-hero-skeleton-eyebrow shimmer" />
+            {loading ? (
 
-                                <div className="home-hero-skeleton-title shimmer" />
+                <>
 
-                                <div className="home-hero-skeleton-meta shimmer" />
+                    <div className="home-hero-skeleton">
 
-                                <div className="home-hero-skeleton-description shimmer" />
+                        <div className="home-hero-skeleton-content">
 
-                                <div className="home-hero-skeleton-button shimmer" />
-                            </div>
+                            <div className="home-hero-skeleton-eyebrow shimmer" />
+
+                            <div className="home-hero-skeleton-title shimmer" />
+
+                            <div className="home-hero-skeleton-meta shimmer" />
+
+                            <div className="home-hero-skeleton-description shimmer" />
+
+                            <div className="home-hero-skeleton-button shimmer" />
+
                         </div>
 
-                        <div className="grid">
-                            {Array.from({ length: 12 }).map((_, index) => (
-                                <AnimeCardSkeleton key={index} />
-                            ))}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <AnimeSection
-                            title="Trending Anime"
-                            emoji="🔥"
-                            animeList={trendingAnime}
-                            statusMap={statusMap}
-                            favoriteIds={favoriteIds}
-                            toggleFavorite={toggleFavorite}
-                            viewAllPath="/trending"
-                        />
+                    </div>
 
-                        <AnimeSection
-                            title="Current Season"
-                            emoji="🌸"
-                            animeList={seasonalAnime}
-                            statusMap={statusMap}
-                            favoriteIds={favoriteIds}
-                            toggleFavorite={toggleFavorite}
-                            viewAllPath="/seasonal"
-                        />
 
-                        <AnimeSection
-                            title="Top Rated Anime"
-                            emoji="⭐"
-                            animeList={topAnime}
-                            statusMap={statusMap}
-                            favoriteIds={favoriteIds}
-                            toggleFavorite={toggleFavorite}
-                            viewAllPath="/top"
-                        />
-                    </>
+                    <div className="grid">
 
-                )}
+                        {Array.from({
+                            length: 12,
+                        }).map((_, index) => (
+
+                            <AnimeCardSkeleton
+                                key={index}
+                            />
+
+                        ))}
+
+                    </div>
+
+                </>
+
+            ) : (
+
+                <>
+
+                    <AnimeSection
+                        title="Trending Anime"
+                        emoji="🔥"
+                        animeList={trendingAnime}
+                        statusMap={statusMap}
+                        favoriteIds={favoriteIds}
+                        toggleFavorite={toggleFavorite}
+                        viewAllPath="/trending"
+                    />
+
+
+                    <AnimeSection
+                        title="Current Season"
+                        emoji="🌸"
+                        animeList={seasonalAnime}
+                        statusMap={statusMap}
+                        favoriteIds={favoriteIds}
+                        toggleFavorite={toggleFavorite}
+                        viewAllPath="/seasonal"
+                    />
+
+
+                    <AnimeSection
+                        title="Top Rated Anime"
+                        emoji="⭐"
+                        animeList={topAnime}
+                        statusMap={statusMap}
+                        favoriteIds={favoriteIds}
+                        toggleFavorite={toggleFavorite}
+                        viewAllPath="/top"
+                    />
+
+                </>
+
+            )}
 
         </PageContainer>
     );
