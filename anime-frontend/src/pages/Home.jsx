@@ -321,68 +321,6 @@ function Home() {
 
                     <div className="home-hero-overlay" />
 
-
-                    {/* ==================================================
-                        SHARP ARTWORK
-                    ================================================== */}
-
-                    <div className="home-hero-art">
-
-                        <AnimatePresence
-                            initial={false}
-                            mode="sync"
-                            custom={slideDirection}
-                        >
-
-                            <motion.img
-
-                                key={currentFeatured.id}
-
-                                src={
-                                    currentFeatured.largeImage ||
-                                    currentFeatured.image
-                                }
-
-                                alt={currentFeatured.title}
-
-                                className="home-hero-art-image"
-
-                                custom={slideDirection}
-
-
-                                initial={{
-                                    opacity:0,
-                                    x: slideDirection * 80,
-                                    scale:0.95,
-                                }}
-
-
-                                animate={{
-                                    opacity:1,
-                                    x:0,
-                                    scale:1,
-                                }}
-
-
-                                exit={{
-                                    opacity:0,
-                                    x: slideDirection * -80,
-                                    scale:0.95,
-                                }}
-
-
-                                transition={{
-                                    duration:0.32,
-                                    ease:[0.22,1,0.36,1],
-                                }}
-
-                            />
-
-                        </AnimatePresence>
-
-                    </div>
-
-
                     {/* ==================================================
                         CONTENT
                     ================================================== */}
