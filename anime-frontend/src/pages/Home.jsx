@@ -312,7 +312,7 @@ function Home() {
                                         rgba(10,10,18,0.95),
                                         rgba(10,10,18,0.55)
                                     ),
-                                    url(${currentFeatured.largeImage || currentFeatured.image})
+                                    url(${currentFeatured.background || currentFeatured.largeImage || currentFeatured.image})
                                 `,
                             }}
                         />
