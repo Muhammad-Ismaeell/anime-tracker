@@ -40,6 +40,8 @@ function Home() {
 
     const { statusMap } = useGlobalLibrary();
 
+    const favoriteIds = useFavoriteIds();
+
 
     // ============================================================
     // HERO STATE
@@ -50,13 +52,6 @@ function Home() {
 
     const touchStartX = useRef(null);
     const touchStartY = useRef(null);
-
-
-    // ============================================================
-    // FAVORITES
-    // ============================================================
-
-    const favoriteIds = useFavoriteIds();
 
 
     // ============================================================
@@ -177,13 +172,13 @@ function Home() {
         touchStartY.current = null;
 
 
-        // Ignore vertical scrolling
+        // Let normal vertical scrolling happen.
         if (Math.abs(deltaY) > Math.abs(deltaX)) {
             return;
         }
 
 
-        // Ignore tiny movements
+        // Ignore tiny movements.
         if (Math.abs(deltaX) < 45) {
             return;
         }
@@ -216,7 +211,7 @@ function Home() {
                     (current + 1) % featuredAnime.length
             );
 
-        }, 7000);
+        }, 6500);
 
 
         return () => {
@@ -235,7 +230,6 @@ function Home() {
         seasonalQuery.isPending ||
         topQuery.isPending;
 
-
     const error =
         trendingQuery.error ||
         seasonalQuery.error ||
@@ -246,11 +240,9 @@ function Home() {
 
         return (
             <PageContainer>
-
                 <EmptyState
                     text="Failed to load anime."
                 />
-
             </PageContainer>
         );
     }
@@ -264,16 +256,12 @@ function Home() {
         <PageContainer>
 
             <Helmet>
-
-                <title>
-                    Anime Tracker
-                </title>
+                <title>Anime Tracker</title>
 
                 <meta
                     name="description"
                     content="Discover trending, seasonal, and top-rated anime."
                 />
-
             </Helmet>
 
 
@@ -290,7 +278,7 @@ function Home() {
                 >
 
                     {/* ==================================================
-                        BACKGROUND
+                        BLURRED BACKGROUND
                     ================================================== */}
 
                     <AnimatePresence
@@ -299,43 +287,26 @@ function Home() {
                     >
 
                         <motion.div
-                            key={currentFeatured.id}
+                            key={`background-${currentFeatured.id}`}
                             className="home-hero-background"
-
                             initial={{
                                 opacity: 0,
-                                scale: 1.025,
+                                scale: 1.04,
                             }}
-
                             animate={{
                                 opacity: 1,
                                 scale: 1,
                             }}
-
                             exit={{
                                 opacity: 0,
-                                scale: 1.01,
+                                scale: 1.02,
                             }}
-
                             transition={{
-                                duration: 0.36,
-                                ease: [
-                                    0.22,
-                                    1,
-                                    0.36,
-                                    1,
-                                ],
+                                duration: 0.32,
+                                ease: [0.22, 1, 0.36, 1],
                             }}
-
                             style={{
                                 backgroundImage: `
-                                    linear-gradient(
-                                        90deg,
-                                        rgba(10, 10, 18, 0.98) 0%,
-                                        rgba(10, 10, 18, 0.90) 32%,
-                                        rgba(10, 10, 18, 0.55) 58%,
-                                        rgba(10, 10, 18, 0.18) 100%
-                                    ),
                                     url(${currentFeatured.largeImage || currentFeatured.image})
                                 `,
                             }}
@@ -345,24 +316,86 @@ function Home() {
 
 
                     {/* ==================================================
+                        DARK OVERLAY
+                    ================================================== */}
+
+                    <div className="home-hero-overlay" />
+
+
+                    {/* ==================================================
+                        SHARP ARTWORK
+                    ================================================== */}
+
+                    <div className="home-hero-art">
+
+                        <AnimatePresence
+                            initial={false}
+                            mode="sync"
+                            custom={slideDirection}
+                        >
+
+                            <motion.img
+                                key={currentFeatured.id}
+
+                                src={
+                                    currentFeatured.largeImage ||
+                                    currentFeatured.image
+                                }
+
+                                alt={currentFeatured.title}
+
+                                className="home-hero-art-image"
+
+                                custom={slideDirection}
+
+                                initial={{
+                                    opacity: 0,
+                                    x: slideDirection * 45,
+                                    scale: 0.985,
+                                }}
+
+                                animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    scale: 1,
+                                }}
+
+                                exit={{
+                                    opacity: 0,
+                                    x: slideDirection * -45,
+                                    scale: 0.985,
+                                }}
+
+                                transition={{
+                                    duration: 0.30,
+                                    ease: [0.22, 1, 0.36, 1],
+                                }}
+                            />
+
+                        </AnimatePresence>
+
+                    </div>
+
+
+                    {/* ==================================================
                         CONTENT
                     ================================================== */}
 
                     <AnimatePresence
-                        mode="wait"
+                        mode="sync"
                         initial={false}
                         custom={slideDirection}
                     >
 
                         <motion.div
-                            key={currentFeatured.id}
+                            key={`content-${currentFeatured.id}`}
                             className="home-hero-content"
 
                             custom={slideDirection}
 
                             initial={{
                                 opacity: 0,
-                                x: slideDirection * 22,
+                                x: slideDirection * 20,
                             }}
 
                             animate={{
@@ -372,17 +405,12 @@ function Home() {
 
                             exit={{
                                 opacity: 0,
-                                x: slideDirection * -22,
+                                x: slideDirection * -20,
                             }}
 
                             transition={{
-                                duration: 0.28,
-                                ease: [
-                                    0.22,
-                                    1,
-                                    0.36,
-                                    1,
-                                ],
+                                duration: 0.26,
+                                ease: [0.22, 1, 0.36, 1],
                             }}
                         >
 
@@ -445,67 +473,7 @@ function Home() {
 
 
                     {/* ==================================================
-                        POSTER
-                    ================================================== */}
-
-                    <div className="home-hero-poster-stage">
-
-                        <AnimatePresence
-                            initial={false}
-                            mode="wait"
-                            custom={slideDirection}
-                        >
-
-                            <motion.img
-                                key={currentFeatured.id}
-
-                                src={
-                                    currentFeatured.largeImage ||
-                                    currentFeatured.image
-                                }
-
-                                alt={currentFeatured.title}
-
-                                className="home-hero-poster-image"
-
-                                custom={slideDirection}
-
-                                initial={{
-                                    opacity: 0,
-                                    x: slideDirection * 90,
-                                    scale: 0.94,
-                                }}
-
-                                animate={{
-                                    opacity: 1,
-                                    x: 0,
-                                    scale: 1,
-                                }}
-
-                                exit={{
-                                    opacity: 0,
-                                    x: slideDirection * -90,
-                                    scale: 0.94,
-                                }}
-
-                                transition={{
-                                    duration: 0.36,
-                                    ease: [
-                                        0.22,
-                                        1,
-                                        0.36,
-                                        1,
-                                    ],
-                                }}
-                            />
-
-                        </AnimatePresence>
-
-                    </div>
-
-
-                    {/* ==================================================
-                        NAVIGATION
+                        DESKTOP NAVIGATION
                     ================================================== */}
 
                     {featuredAnime.length > 1 && (

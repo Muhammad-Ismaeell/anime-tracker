@@ -2878,24 +2878,7 @@ button:disabled {
     background: white;
 }
 
-@media (max-width: 768px) {
-    .home-hero-nav {
-        width: 36px;
-        height: 36px;
-    }
 
-    .home-hero-prev {
-        left: 12px;
-    }
-
-    .home-hero-next {
-        right: 12px;
-    }
-
-    .home-hero-content {
-        padding: 32px 24px 56px;
-    }
-}
 
 .home-hero-description {
     max-width: 620px;
@@ -2950,20 +2933,153 @@ button:disabled {
 
 
 @media (max-width: 768px) {
+
     .home-hero {
-        min-height: 460px;
+        min-height: 560px;
+
+        margin-bottom: 36px;
+
+        border-radius: 16px;
+
+        touch-action: pan-y;
     }
+
+
+    /* --------------------------------------------------------
+       BACKGROUND
+       -------------------------------------------------------- */
+
+    .home-hero-background {
+        background-position: center top;
+    }
+
+
+    /* --------------------------------------------------------
+       POSTER
+       -------------------------------------------------------- */
+
+    .home-hero-poster-stage {
+        position: absolute;
+
+        z-index: 2;
+
+        top: 24px;
+        left: 50%;
+        right: auto;
+
+        transform: translateX(-50%);
+
+        width: 210px;
+        height: 300px;
+
+        pointer-events: none;
+    }
+
+    .home-hero-poster-image {
+        width: 100%;
+        height: 100%;
+
+        object-fit: contain;
+
+        border-radius: 14px;
+    }
+
+
+    /* --------------------------------------------------------
+       CONTENT
+       -------------------------------------------------------- */
 
     .home-hero-content {
-        padding: 32px 24px;
+        z-index: 3;
+
+        justify-content: flex-end;
+
+        min-height: 560px;
+
+        width: 100%;
+
+        padding: 340px 24px 72px;
+
+        box-sizing: border-box;
     }
+
+
+    .home-hero-eyebrow {
+        margin-bottom: 12px;
+
+        font-size: 0.7rem;
+    }
+
 
     .home-hero-title {
-        font-size: 38px;
+        max-width: 100%;
+
+        margin-bottom: 12px;
+
+        font-size: clamp(2rem, 9vw, 3rem);
     }
 
+
+    .home-hero-meta {
+        gap: 7px;
+
+        margin-bottom: 12px;
+    }
+
+
+    .home-hero-meta span {
+        min-height: 27px;
+
+        padding: 4px 8px;
+
+        font-size: 0.72rem;
+    }
+
+
     .home-hero-description {
-        font-size: 15px;
+        max-width: 100%;
+
+        font-size: 0.86rem;
+
+        line-height: 1.55;
+
+        -webkit-line-clamp: 3;
+    }
+
+
+    .home-hero-actions {
+        margin-top: 20px;
+    }
+
+
+    .home-hero-primary {
+        min-height: 42px;
+
+        padding: 0 18px;
+
+        font-size: 0.82rem;
+    }
+
+
+    /* --------------------------------------------------------
+       ARROWS
+       -------------------------------------------------------- */
+
+    .home-hero-nav {
+        display: none;
+    }
+
+
+    /* --------------------------------------------------------
+       DOTS
+       -------------------------------------------------------- */
+
+    .home-hero-dots {
+        left: 50%;
+
+        bottom: 22px;
+
+        transform: translateX(-50%);
     }
 }
 
@@ -3070,6 +3186,38 @@ button:disabled {
     }
 }
 
+
+@media (max-width: 420px) {
+
+    .home-hero {
+        min-height: 540px;
+    }
+
+
+    .home-hero-poster-stage {
+        top: 20px;
+
+        width: 190px;
+        height: 275px;
+    }
+
+
+    .home-hero-content {
+        min-height: 540px;
+
+        padding: 315px 20px 68px;
+    }
+
+
+    .home-hero-title {
+        font-size: 2rem;
+    }
+
+
+    .home-hero-description {
+        font-size: 0.82rem;
+    }
+}
 
 @media (max-width: 500px) {
     .anime-backdrop {
@@ -4358,6 +4506,30 @@ button:disabled {
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
+    }
+}
+
+@media (max-width: 360px) {
+
+    .home-hero-poster-stage {
+        width: 170px;
+        height: 245px;
+    }
+
+    .home-hero-content {
+        padding-top: 285px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-hero-background,
+    .home-hero-content,
+    .home-hero-poster-image,
+    .home-hero-primary,
+    .home-hero-nav,
+    .home-hero-dot {
+        transition: none !important;
     }
 }
 
