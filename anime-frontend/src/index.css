@@ -3004,12 +3004,211 @@ button:disabled {
 @media (max-width: 768px) {
 
     .home-hero {
-        min-height: 620px;
+        min-height: 650px;
+
+        position: relative;
+
+        overflow: hidden;
 
         touch-action: pan-y;
+    }
+
+
+    /* ========================================================
+       MOBILE BACKGROUND
+       ======================================================== */
+
+    .home-hero-background {
+        background-position: center top !important;
+        background-size: cover !important;
+    }
+
+
+    /* ========================================================
+       POSTER
+       ======================================================== */
+
+    .home-hero-poster-stage {
+        position: absolute;
+
+        top: 0;
+        left: 50%;
+
+        right: auto;
+
+        width: 300px;
+        height: 440px;
+
+        transform: translateX(-50%);
+
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: center;
+
+        opacity: 0.75;
+
+        z-index: 1;
+
+        pointer-events: none;
+    }
+
+
+    .home-hero-poster-image {
+        width: 100%;
+        height: 100%;
+
+        object-fit: contain;
+
+        object-position: center top;
+
+        border-radius: 14px;
+
+        filter:
+            drop-shadow(
+                0 25px 40px rgba(0, 0, 0, 0.65)
+            );
+    }
+
+
+    /* ========================================================
+       CONTENT
+       ======================================================== */
+
+    .home-hero-content {
+        position: relative;
+
+        z-index: 3;
+
+        width: 100%;
+
+        min-height: 650px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        justify-content: flex-end;
+
+        padding:
+            2rem
+            1.5rem
+            5.5rem;
+
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(10, 10, 18, 0.05) 0%,
+                rgba(10, 10, 18, 0.15) 25%,
+                rgba(10, 10, 18, 0.65) 52%,
+                rgba(10, 10, 18, 0.96) 78%,
+                rgba(10, 10, 18, 1) 100%
+            );
+    }
+
+
+    /* ========================================================
+       TITLE
+       ======================================================== */
+
+    .home-hero-title {
+        max-width: 100%;
+
+        margin-bottom: 0.75rem;
+
+        font-size: 2rem;
+
+        line-height: 1.1;
+    }
+
+
+    /* ========================================================
+       META
+       ======================================================== */
+
+    .home-hero-meta {
+        margin-bottom: 0.75rem;
+
+        position: relative;
+
+        z-index: 4;
+    }
+
+
+    /* ========================================================
+       DESCRIPTION
+       ======================================================== */
+
+    .home-hero-description {
+        position: relative;
+
+        z-index: 4;
+
+        max-width: 100%;
+
+        margin-bottom: 1rem;
+
+        font-size: 0.92rem;
+
+        line-height: 1.55;
+
+        display: -webkit-box;
+
+        -webkit-line-clamp: 3;
+
+        -webkit-box-orient: vertical;
 
         overflow: hidden;
     }
+
+
+    /* ========================================================
+       BUTTON
+       ======================================================== */
+
+    .home-hero-actions {
+        position: relative;
+
+        z-index: 4;
+    }
+
+
+    /* ========================================================
+       NAVIGATION
+       ======================================================== */
+
+    .home-hero-nav {
+        display: none;
+    }
+
+
+    /* ========================================================
+       DOTS
+       ======================================================== */
+
+    .home-hero-dots {
+        position: absolute;
+
+        bottom: 1.5rem;
+
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        z-index: 6;
+    }
+
+
+    .home-hero-dot {
+        width: 7px;
+        height: 7px;
+    }
+
+
+    .home-hero-dot.active {
+        width: 22px;
+    }
+}
 
 
     .home-hero-content {
@@ -3098,7 +3297,7 @@ button:disabled {
     .home-hero-dot.active {
         width: 22px;
     }
-}
+
 
 .search-results-grid {
     display: grid;
@@ -4547,15 +4746,25 @@ button:disabled {
 @media (max-width: 480px) {
 
     .home-hero {
-        min-height: 590px;
+        min-height: 620px;
+    }
+
+
+    .home-hero-poster-stage {
+        width: 260px;
+        height: 385px;
+
+        top: 0;
     }
 
 
     .home-hero-content {
+        min-height: 620px;
+
         padding:
             1.5rem
             1.25rem
-            7rem;
+            5rem;
     }
 
 
@@ -4565,15 +4774,9 @@ button:disabled {
 
 
     .home-hero-description {
-        font-size: 0.9rem;
-    }
+        font-size: 0.88rem;
 
-
-    .home-hero-poster-stage {
-        width: 230px;
-        height: 345px;
-
-        right: -20px;
+        -webkit-line-clamp: 3;
     }
 
 }
