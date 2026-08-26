@@ -2783,21 +2783,21 @@ button:disabled {
 }
 
 .home-hero-background {
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 0;
+    filter: blur(0px);
+    animation: heroZoom 18s ease infinite alternate;
+}
 
 
-    background-size: cover;
+@keyframes heroZoom {
 
-    background-position: center;
+    from {
+        transform:scale(1);
+    }
 
-    background-repeat: no-repeat;
+    to {
+        transform:scale(1.08);
+    }
 
-    transform: scale(1.02);
 }
 
 .home-hero-backdrop::after {

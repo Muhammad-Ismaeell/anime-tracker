@@ -11,6 +11,7 @@ def normalize_anime_card(raw):
         "id": raw.get("mal_id"),
         "title": raw.get("title") or "Unknown",
         "image": images.get("large_image_url") or images.get("image_url"),
+        "backgroundText": raw.get("background"),
         "score": raw.get("score"),
         "episodes": raw.get("episodes"),
         "type": raw.get("type"),
@@ -33,6 +34,7 @@ def normalize_anime_detail(anime, embed_url=None):
             "genres": [genre.name for genre in anime.genres.all()],
             "studios": [],
             "synopsis": anime.synopsis,
+            "backgroundText": None,
             "trailer": {
                 "embed_url": embed_url,
             },
@@ -50,9 +52,16 @@ def normalize_anime_detail(anime, embed_url=None):
         "type": anime.get("type"),
         "year": anime.get("year"),
         "season": anime.get("season"),
-        "genres": [genre["name"] for genre in anime.get("genres", [])],
-        "studios": [studio["name"] for studio in anime.get("studios", [])],
+        "genres": [
+            genre["name"]
+            for genre in anime.get("genres", [])
+        ],
+        "studios": [
+            studio["name"]
+            for studio in anime.get("studios", [])
+        ],
         "synopsis": anime.get("synopsis"),
+        "backgroundText": anime.get("background"),
         "trailer": {
             "embed_url": embed_url,
         },
