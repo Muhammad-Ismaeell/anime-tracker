@@ -1,3 +1,4 @@
+
 import {
     useEffect,
     useMemo,
@@ -7,6 +8,7 @@ import {
 
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+
 import {
     AnimatePresence,
     motion,
@@ -40,7 +42,57 @@ function Home() {
 
     const { statusMap } = useGlobalLibrary();
 
-    const favoriteIds = useFavoriteIds();
+    const favoriteIdsData = useFavoriteIds();
+
+
+    // ============================================================
+    // NORMALIZE FAVORITE IDS
+    // ============================================================
+    //
+    // AnimeSection expects:
+    //
+    //     favoriteIds.has(anime.id)
+    //
+    // But useFavoriteIds() may return an array, object, Set,
+    // or an object containing the actual IDs.
+    //
+    // Normalize everything into a Set here so the rest of
+    // the component has one consistent data type.
+    //
+
+    const favoriteIds = useMemo(() => {
+
+        if (favoriteIdsData instanceof Set) {
+            return favoriteIdsData;
+        }
+
+        if (Array.isArray(favoriteIdsData)) {
+            return new Set(
+                favoriteIdsData.map(Number)
+            );
+        }
+
+        if (
+            favoriteIdsData &&
+            Array.isArray(favoriteIdsData.ids)
+        ) {
+            return new Set(
+                favoriteIdsData.ids.map(Number)
+            );
+        }
+
+        if (
+            favoriteIdsData &&
+            Array.isArray(favoriteIdsData.data)
+        ) {
+            return new Set(
+                favoriteIdsData.data.map(Number)
+            );
+        }
+
+        return new Set();
+
+    }, [favoriteIdsData]);
 
 
     // ============================================================
@@ -48,9 +100,12 @@ function Home() {
     // ============================================================
 
     const [featuredIndex, setFeaturedIndex] = useState(0);
-    const [slideDirection, setSlideDirection] = useState(1);
+
+    const [slideDirection, setSlideDirection] =
+        useState(1);
 
     const touchStartX = useRef(null);
+
     const touchStartY = useRef(null);
 
 
@@ -59,17 +114,26 @@ function Home() {
     // ============================================================
 
     const trendingAnime = useMemo(
-        () => extractAnimePages(trendingQuery.data),
+        () =>
+            extractAnimePages(
+                trendingQuery.data
+            ),
         [trendingQuery.data]
     );
 
     const seasonalAnime = useMemo(
-        () => extractAnimePages(seasonalQuery.data),
+        () =>
+            extractAnimePages(
+                seasonalQuery.data
+            ),
         [seasonalQuery.data]
     );
 
     const topAnime = useMemo(
-        () => extractAnimePages(topQuery.data),
+        () =>
+            extractAnimePages(
+                topQuery.data
+            ),
         [topQuery.data]
     );
 
@@ -79,7 +143,8 @@ function Home() {
     // ============================================================
 
     const featuredAnime = useMemo(
-        () => trendingAnime.slice(0, 5),
+        () =>
+            trendingAnime.slice(0, 5),
         [trendingAnime]
     );
 
@@ -106,7 +171,8 @@ function Home() {
 
         setFeaturedIndex(
             (current) =>
-                (current + 1) % featuredAnime.length
+                (current + 1) %
+                featuredAnime.length
         );
     };
 
@@ -121,7 +187,11 @@ function Home() {
 
         setFeaturedIndex(
             (current) =>
-                (current - 1 + featuredAnime.length) %
+                (
+                    current -
+                    1 +
+                    featuredAnime.length
+                ) %
                 featuredAnime.length
         );
     };
@@ -134,7 +204,9 @@ function Home() {
         }
 
         setSlideDirection(
-            index > safeFeaturedIndex ? 1 : -1
+            index > safeFeaturedIndex
+                ? 1
+                : -1
         );
 
         setFeaturedIndex(index);
@@ -149,31 +221,52 @@ function Home() {
 
         const touch = event.touches[0];
 
-        touchStartX.current = touch.clientX;
-        touchStartY.current = touch.clientY;
+        if (!touch) {
+            return;
+        }
+
+        touchStartX.current =
+            touch.clientX;
+
+        touchStartY.current =
+            touch.clientY;
     };
 
 
     const handleTouchEnd = (event) => {
 
-        if (touchStartX.current === null) {
+        if (
+            touchStartX.current === null ||
+            touchStartY.current === null
+        ) {
             return;
         }
 
-        const touch = event.changedTouches[0];
+        const touch =
+            event.changedTouches[0];
+
+        if (!touch) {
+            return;
+        }
 
         const deltaX =
-            touch.clientX - touchStartX.current;
+            touch.clientX -
+            touchStartX.current;
 
         const deltaY =
-            touch.clientY - touchStartY.current;
+            touch.clientY -
+            touchStartY.current;
 
         touchStartX.current = null;
+
         touchStartY.current = null;
 
 
         // Let normal vertical scrolling happen.
-        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        if (
+            Math.abs(deltaY) >
+            Math.abs(deltaX)
+        ) {
             return;
         }
 
@@ -202,20 +295,26 @@ function Home() {
             return undefined;
         }
 
-        const interval = window.setInterval(() => {
+        const interval =
+            window.setInterval(() => {
 
-            setSlideDirection(1);
+                setSlideDirection(1);
 
-            setFeaturedIndex(
-                (current) =>
-                    (current + 1) % featuredAnime.length
-            );
+                setFeaturedIndex(
+                    (current) =>
+                        (current + 1) %
+                        featuredAnime.length
+                );
 
-        }, 6500);
+            }, 6500);
 
 
         return () => {
-            window.clearInterval(interval);
+
+            window.clearInterval(
+                interval
+            );
+
         };
 
     }, [featuredAnime.length]);
@@ -240,9 +339,11 @@ function Home() {
 
         return (
             <PageContainer>
+
                 <EmptyState
                     text="Failed to load anime."
                 />
+
             </PageContainer>
         );
     }
@@ -256,12 +357,16 @@ function Home() {
         <PageContainer>
 
             <Helmet>
-                <title>Anime Tracker</title>
+
+                <title>
+                    Anime Tracker
+                </title>
 
                 <meta
                     name="description"
                     content="Discover trending, seasonal, and top-rated anime."
                 />
+
             </Helmet>
 
 
@@ -278,7 +383,7 @@ function Home() {
                 >
 
                     {/* ==================================================
-                        BLURRED BACKGROUND
+                        CINEMATIC BACKGROUND
                     ================================================== */}
 
                     <AnimatePresence
@@ -287,32 +392,47 @@ function Home() {
                     >
 
                         <motion.div
-                            key={`background-${currentFeatured.id}`}
+                            key={
+                                `background-${currentFeatured.id}`
+                            }
+
                             className="home-hero-background"
+
                             initial={{
                                 opacity: 0,
                                 scale: 1.04,
                             }}
+
                             animate={{
                                 opacity: 1,
                                 scale: 1,
                             }}
+
                             exit={{
                                 opacity: 0,
                                 scale: 1.02,
                             }}
+
                             transition={{
                                 duration: 0.32,
-                                ease: [0.22, 1, 0.36, 1],
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
                             }}
+
                             style={{
                                 backgroundImage: `
                                     linear-gradient(
                                         90deg,
-                                        rgba(10,10,18,0.95),
-                                        rgba(10,10,18,0.55)
+                                        rgba(8, 8, 15, 0.98) 0%,
+                                        rgba(8, 8, 15, 0.82) 32%,
+                                        rgba(8, 8, 15, 0.48) 60%,
+                                        rgba(8, 8, 15, 0.68) 100%
                                     ),
-                                    url(${currentFeatured.largeImage || currentFeatured.image})
+                                    url(${currentFeatured.image || ""})
                                 `,
                             }}
                         />
@@ -321,10 +441,82 @@ function Home() {
 
 
                     {/* ==================================================
-                        DARK OVERLAY
+                        OVERLAY
                     ================================================== */}
 
                     <div className="home-hero-overlay" />
+
+
+                    {/* ==================================================
+                        POSTER
+                    ================================================== */}
+
+                    <AnimatePresence
+                        initial={false}
+                        mode="sync"
+                        custom={slideDirection}
+                    >
+
+                        <motion.div
+                            key={
+                                `poster-${currentFeatured.id}`
+                            }
+
+                            className="home-hero-poster-stage"
+
+                            custom={slideDirection}
+
+                            initial={{
+                                opacity: 0,
+                                x:
+                                    slideDirection *
+                                    60,
+                                scale: 0.96,
+                            }}
+
+                            animate={{
+                                opacity: 1,
+                                x: 0,
+                                scale: 1,
+                            }}
+
+                            exit={{
+                                opacity: 0,
+                                x:
+                                    slideDirection *
+                                    -60,
+                                scale: 0.96,
+                            }}
+
+                            transition={{
+                                duration: 0.3,
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
+                            }}
+                        >
+
+                            <img
+                                src={
+                                    currentFeatured.image ||
+                                    ""
+                                }
+
+                                alt={
+                                    currentFeatured.title ||
+                                    "Featured anime"
+                                }
+
+                                className="home-hero-poster-image"
+                            />
+
+                        </motion.div>
+
+                    </AnimatePresence>
+
 
                     {/* ==================================================
                         CONTENT
@@ -335,25 +527,41 @@ function Home() {
                         initial={false}
                         custom={slideDirection}
                     >
+
                         <motion.div
                             key={currentFeatured.id}
+
                             className="home-hero-content"
+
                             custom={slideDirection}
+
                             initial={{
                                 opacity: 0,
-                                x: slideDirection * 25,
+                                x:
+                                    slideDirection *
+                                    25,
                             }}
+
                             animate={{
                                 opacity: 1,
                                 x: 0,
                             }}
+
                             exit={{
                                 opacity: 0,
-                                x: slideDirection * -25,
+                                x:
+                                    slideDirection *
+                                    -25,
                             }}
+
                             transition={{
                                 duration: 0.25,
-                                ease: [0.22,1,0.36,1],
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
                             }}
                         >
 
@@ -370,41 +578,67 @@ function Home() {
                             <div className="home-hero-meta">
 
                                 {currentFeatured.score > 0 && (
+
                                     <span>
-                                        ⭐ {currentFeatured.score.toFixed(1)}
+                                        ⭐{" "}
+                                        {currentFeatured.score.toFixed(
+                                            1
+                                        )}
                                     </span>
+
                                 )}
 
+
                                 {currentFeatured.type && (
+
                                     <span>
                                         {currentFeatured.type}
                                     </span>
+
                                 )}
 
+
                                 {currentFeatured.year && (
+
                                     <span>
                                         {currentFeatured.year}
                                     </span>
+
                                 )}
 
                             </div>
 
-                            <div className="home-hero-genres">
 
-                                {currentFeatured.genres?.slice(0,3).map(
-                                    (genre)=>(
-                                        <span key={genre}>
-                                            {genre}
-                                        </span>
-                                    )
-                                )}
+                            {currentFeatured.genres?.length > 0 && (
 
-                            </div>
+                                <div className="home-hero-genres">
+
+                                    {currentFeatured.genres
+                                        .slice(0, 3)
+                                        .map(
+                                            (genre) => (
+
+                                                <span
+                                                    key={
+                                                        genre
+                                                    }
+                                                >
+                                                    {genre}
+                                                </span>
+
+                                            )
+                                        )}
+
+                                </div>
+
+                            )}
 
 
                             <p className="home-hero-description">
+
                                 {currentFeatured.synopsis ||
                                     "Discover this anime and add it to your library."}
+
                             </p>
 
 
@@ -419,10 +653,24 @@ function Home() {
 
 
                                 <button
-                                    className="home-hero-secondary"
                                     type="button"
+                                    className="home-hero-secondary"
+
+                                    onClick={() =>
+                                        toggleFavorite(
+                                            currentFeatured.id
+                                        )
+                                    }
                                 >
-                                    + Add to Library
+
+                                    {favoriteIds.has(
+                                        Number(
+                                            currentFeatured.id
+                                        )
+                                    )
+                                        ? "✓ In Favorites"
+                                        : "+ Add to Library"}
+
                                 </button>
 
                             </div>
@@ -433,7 +681,7 @@ function Home() {
 
 
                     {/* ==================================================
-                        DESKTOP NAVIGATION
+                        NAVIGATION
                     ================================================== */}
 
                     {featuredAnime.length > 1 && (
@@ -442,8 +690,16 @@ function Home() {
 
                             <button
                                 type="button"
-                                className="home-hero-nav home-hero-prev"
-                                onClick={handlePrevious}
+
+                                className="
+                                    home-hero-nav
+                                    home-hero-prev
+                                "
+
+                                onClick={
+                                    handlePrevious
+                                }
+
                                 aria-label="Previous featured anime"
                             >
                                 ←
@@ -452,8 +708,16 @@ function Home() {
 
                             <button
                                 type="button"
-                                className="home-hero-nav home-hero-next"
-                                onClick={handleNext}
+
+                                className="
+                                    home-hero-nav
+                                    home-hero-next
+                                "
+
+                                onClick={
+                                    handleNext
+                                }
+
                                 aria-label="Next featured anime"
                             >
                                 →
@@ -463,24 +727,35 @@ function Home() {
                             <div className="home-hero-dots">
 
                                 {featuredAnime.map(
-                                    (anime, index) => (
+                                    (
+                                        anime,
+                                        index
+                                    ) => (
 
                                         <button
-                                            key={anime.id}
+                                            key={
+                                                anime.id
+                                            }
+
                                             type="button"
 
                                             className={
-                                                index === safeFeaturedIndex
+                                                index ===
+                                                safeFeaturedIndex
                                                     ? "home-hero-dot active"
                                                     : "home-hero-dot"
                                             }
 
                                             onClick={() =>
-                                                handleDotClick(index)
+                                                handleDotClick(
+                                                    index
+                                                )
                                             }
 
                                             aria-label={
-                                                `Show featured anime ${index + 1}`
+                                                `Show featured anime ${
+                                                    index + 1
+                                                }`
                                             }
                                         />
 
@@ -510,15 +785,30 @@ function Home() {
 
                         <div className="home-hero-skeleton-content">
 
-                            <div className="home-hero-skeleton-eyebrow shimmer" />
+                            <div className="
+                                home-hero-skeleton-eyebrow
+                                shimmer
+                            " />
 
-                            <div className="home-hero-skeleton-title shimmer" />
+                            <div className="
+                                home-hero-skeleton-title
+                                shimmer
+                            " />
 
-                            <div className="home-hero-skeleton-meta shimmer" />
+                            <div className="
+                                home-hero-skeleton-meta
+                                shimmer
+                            " />
 
-                            <div className="home-hero-skeleton-description shimmer" />
+                            <div className="
+                                home-hero-skeleton-description
+                                shimmer
+                            " />
 
-                            <div className="home-hero-skeleton-button shimmer" />
+                            <div className="
+                                home-hero-skeleton-button
+                                shimmer
+                            " />
 
                         </div>
 
@@ -529,13 +819,15 @@ function Home() {
 
                         {Array.from({
                             length: 12,
-                        }).map((_, index) => (
+                        }).map(
+                            (_, index) => (
 
-                            <AnimeCardSkeleton
-                                key={index}
-                            />
+                                <AnimeCardSkeleton
+                                    key={index}
+                                />
 
-                        ))}
+                            )
+                        )}
 
                     </div>
 
@@ -551,7 +843,9 @@ function Home() {
                         animeList={trendingAnime}
                         statusMap={statusMap}
                         favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
+                        toggleFavorite={
+                            toggleFavorite
+                        }
                         viewAllPath="/trending"
                     />
 
@@ -562,7 +856,9 @@ function Home() {
                         animeList={seasonalAnime}
                         statusMap={statusMap}
                         favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
+                        toggleFavorite={
+                            toggleFavorite
+                        }
                         viewAllPath="/seasonal"
                     />
 
@@ -573,7 +869,9 @@ function Home() {
                         animeList={topAnime}
                         statusMap={statusMap}
                         favoriteIds={favoriteIds}
-                        toggleFavorite={toggleFavorite}
+                        toggleFavorite={
+                            toggleFavorite
+                        }
                         viewAllPath="/top"
                     />
 
