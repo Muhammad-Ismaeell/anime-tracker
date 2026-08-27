@@ -1268,11 +1268,14 @@ body {
 }
 
 .section-emoji {
-    display: inline-flex;
+    display: flex;
+
     align-items: center;
     justify-content: center;
 
-    font-size: 24px;
+    flex-shrink: 0;
+
+    font-size: 1rem;
 }
 
 .section-header h2 {
