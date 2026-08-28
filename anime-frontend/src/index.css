@@ -6742,12 +6742,11 @@ button:disabled {
 
 .home-trending-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
-    gap: 28px;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 2rem;
     align-items: start;
-    margin-top: 36px;
+    margin-bottom: 0;
 }
-
 
 /* ============================================================
    MAIN HOME SECTIONS
@@ -6755,9 +6754,12 @@ button:disabled {
 
 .home-trending-main {
     min-width: 0;
+    align-self: start;
 }
 
-
+.home-trending-main .home-section {
+    margin-top: 0;
+}
 /* ============================================================
    TRENDING SIDEBAR
    ============================================================ */
@@ -6855,16 +6857,8 @@ button:disabled {
 }
 
 .home-trending-sidebar {
-    position: sticky;
-    top: 24px;
-
-    background: var(--card);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius);
-
-    padding: 20px;
-
-    box-shadow: var(--shadow);
+    min-width: 0;
+    align-self: start;
 }
 
 
@@ -7912,4 +7906,77 @@ button:disabled {
         padding: 0.5rem;
     }
 
+}
+
+/* ============================================================
+   HOME SECTION SPACING
+   ============================================================ */
+
+.home-section {
+    margin-top: 2.25rem;
+    margin-bottom: 0;
+}
+
+.home-section + .home-section {
+    margin-top: 2.75rem;
+}
+
+
+/* ============================================================
+   TRENDING LAYOUT
+   ============================================================ */
+
+
+
+/*
+ * The Current Season section follows the trending layout,
+ * so don't give it an excessive top margin.
+ */
+.home-trending-layout + .home-section {
+    margin-top: 42px;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+
+.section-header {
+    margin-bottom: 1rem;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 699px) {
+
+    .home-section {
+        margin-top: 2rem;
+    }
+
+    .home-section + .home-section {
+        margin-top: 2.25rem;
+    }
+
+    .home-trending-layout {
+        margin-bottom: 2.25rem;
+    }
+
+    .home-trending-layout + .home-section {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .home-trending-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .home-trending-sidebar {
+        width: 100%;
+    }
 }
