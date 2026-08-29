@@ -2921,9 +2921,32 @@ button:disabled {
 }
 
 @media (max-width: 1100px) {
-    .anime-section-grid {
+
+    .home-trending-layout {
         grid-template-columns:
-            repeat(5, minmax(0, 1fr));
+            minmax(0, 1fr)
+            300px;
+
+        gap: 1.5rem;
+    }
+
+    .home-trending-sidebar-item {
+        grid-template-columns:
+            30px
+            44px
+            minmax(0, 1fr)
+            16px;
+
+        column-gap: 0.55rem;
+    }
+
+    .home-trending-sidebar-image {
+        width: 44px;
+        height: 57px;
+    }
+
+    .home-trending-sidebar-info strong {
+        font-size: 0.82rem;
     }
 }
 
@@ -6764,36 +6787,44 @@ button:disabled {
 .home-trending-sidebar-eyebrow {
     display: block;
 
-    margin-bottom: 4px;
+    margin-bottom: 0.35rem;
+
+    font-size: 0.72rem;
+    font-weight: 800;
+
+    letter-spacing: 0.12em;
 
     color: var(--text-light);
-
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
 }
 
+
+.home-trending-sidebar-header > div {
+    min-width: 0;
+}
 
 .home-trending-sidebar-header h2 {
     margin: 0;
 
+    font-size: 1.15rem;
+    line-height: 1.2;
+
     color: var(--heading);
-
-    font-size: 1.05rem;
-    font-weight: 700;
 }
-
 
 .home-trending-sidebar-view {
     flex-shrink: 0;
 
-    color: var(--text-light);
-    text-decoration: none;
+    padding-top: 0.15rem;
 
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 600;
 
-    transition: color var(--transition);
+    color: var(--text-light);
+
+    text-decoration: none;
+
+    transition:
+        color var(--transition);
 }
 
 
@@ -6803,9 +6834,9 @@ button:disabled {
 
 
 .home-trending-sidebar-arrow {
-    color: var(--text-light);
+    font-size: 0.85rem;
 
-    font-size: 0.9rem;
+    color: var(--text-light);
 
     opacity: 0;
 
@@ -6820,42 +6851,70 @@ button:disabled {
 .home-trending-sidebar-item:hover
 .home-trending-sidebar-arrow {
     opacity: 1;
+
     transform: translateX(0);
 }
 
 
+.home-trending-sidebar-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0.18rem;
+}
+
+
 .home-trending-sidebar-info strong {
-    color: var(--heading);
-
-    font-size: 0.85rem;
-    font-weight: 600;
-
-    line-height: 1.25;
-
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    display: block;
 
     overflow: hidden;
+
+    font-size: 0.88rem;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    color: var(--heading);
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 
 .home-trending-sidebar-info > span {
+    display: block;
+
+    overflow: hidden;
+
+    font-size: 0.72rem;
+    line-height: 1.2;
+
     color: var(--text-light);
 
-    font-size: 0.7rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 
 .home-trending-sidebar-info small {
-    color: var(--text);
+    display: block;
 
-    font-size: 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    color: var(--text);
 }
+
 
 .home-trending-sidebar {
     min-width: 0;
-    height: fit-content;
+    align-self: start;
+
+    padding-top: 4px;
 }
 
 
@@ -6863,11 +6922,14 @@ button:disabled {
 
 .home-trending-sidebar-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
 
-    margin-bottom: 18px;
+    gap: 1rem;
+
+    margin-bottom: 1rem;
 }
+
 
 
 .home-trending-sidebar-title {
@@ -6892,7 +6954,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
 
-    gap: 0.75rem;
+    gap: 0.55rem;
 }
 
 
@@ -6901,24 +6963,34 @@ button:disabled {
     display: grid;
 
     grid-template-columns:
-        32px
-        64px
+        34px
+        48px
         minmax(0, 1fr)
-        20px;
+        18px;
 
     align-items: center;
 
-    gap: 0.75rem;
+    column-gap: 0.65rem;
 
-    min-height: 76px;
+    min-height: 58px;
 
+    padding: 0.2rem 0;
+
+    color: inherit;
     text-decoration: none;
+
+    border-radius: 10px;
+
+    transition:
+        transform var(--transition),
+        background-color var(--transition);
 }
 
 
 .home-trending-sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.05);
     transform: translateX(3px);
+
+    background: rgba(255, 255, 255, 0.025);
 }
 
 
@@ -6927,12 +6999,14 @@ button:disabled {
    ============================================================ */
 
 .home-trending-sidebar-rank {
-    color: var(--text-light);
-
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 700;
 
-    text-align: center;
+    text-align: right;
+
+    color: var(--text-light);
+
+    opacity: 0.9;
 }
 
 
@@ -6941,16 +7015,22 @@ button:disabled {
    ============================================================ */
 
 .home-trending-sidebar-image {
-    width: 64px;
-    height: 76px;
+    width: 48px;
+    height: 62px;
 
     overflow: hidden;
 
-    border-radius: 10px;
+    border-radius: 8px;
+
+    background: var(--card);
+
+    flex-shrink: 0;
 }
 
 
 .home-trending-sidebar-image img {
+    display: block;
+
     width: 100%;
     height: 100%;
 
@@ -6958,17 +7038,10 @@ button:disabled {
 }
 
 
+
 /* ============================================================
    INFO
    ============================================================ */
-
-.home-trending-sidebar-info {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
 
 
 .home-trending-sidebar-name {
@@ -7970,5 +8043,45 @@ button:disabled {
 
     .home-trending-sidebar {
         width: 100%;
+    }
+}
+@media (max-width: 850px) {
+
+    .home-trending-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .home-trending-sidebar {
+        margin-top: 0;
+    }
+
+    .home-trending-sidebar-list {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 0.65rem 1rem;
+    }
+}
+
+
+@media (max-width: 550px) {
+
+    .home-trending-sidebar-list {
+        grid-template-columns: 1fr;
+    }
+
+    .home-trending-sidebar-item {
+        grid-template-columns:
+            30px
+            48px
+            minmax(0, 1fr)
+            16px;
+    }
+
+    .home-trending-sidebar-image {
+        width: 48px;
+        height: 62px;
     }
 }
