@@ -6341,9 +6341,8 @@ button:disabled {
    HOME SECTIONS
    ============================================================ */
 
-.home-section {
-    width: 100%;
-    margin-top: 0;
+.home-section + .home-section {
+    margin-top: 2.5rem;
 }
 
 .home-section:last-child {
@@ -6737,9 +6736,10 @@ button:disabled {
    ============================================================ */
 
 .home-trending-layout {
-    position: relative;
-
-    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 2rem;
+    align-items: start;
 
     margin-bottom: 3rem;
 }
@@ -6750,10 +6750,6 @@ button:disabled {
 
 .home-trending-main {
     min-width: 0;
-
-    width: calc(
-        100% - 340px - 2rem
-    );
 }
 
 
@@ -6858,14 +6854,8 @@ button:disabled {
 }
 
 .home-trending-sidebar {
-    position: absolute;
-
-    top: 0;
-    right: 0;
-
-    width: 340px;
-
     min-width: 0;
+    height: fit-content;
 }
 
 
@@ -7938,7 +7928,7 @@ button:disabled {
  * so don't give it an excessive top margin.
  */
 .home-trending-layout + .home-section {
-    margin-top: 42px;
+    margin-top: 0;
 }
 
 
