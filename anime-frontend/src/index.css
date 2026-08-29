@@ -6760,21 +6760,30 @@ button:disabled {
 
 .home-trending-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 2rem;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        340px;
+
+    column-gap: 2rem;
+    row-gap: 2.5rem;
+
     align-items: start;
 
-    margin-bottom: 3rem;
+    margin-bottom: 0;
 }
+
 
 /* ============================================================
    MAIN HOME SECTIONS
    ============================================================ */
 
 .home-trending-main {
+    grid-column: 1;
+    grid-row: 1;
+
     min-width: 0;
 }
-
 
 .home-trending-main .home-section {
     margin-top: 0;
@@ -6911,10 +6920,21 @@ button:disabled {
 
 
 .home-trending-sidebar {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
     min-width: 0;
+
     align-self: start;
 
     padding-top: 4px;
+}
+
+.home-trending-lower {
+    grid-column: 1;
+    grid-row: 2;
+
+    min-width: 0;
 }
 
 

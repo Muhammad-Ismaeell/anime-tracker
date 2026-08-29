@@ -1178,219 +1178,156 @@ function Home() {
                             CURRENT SEASON + TRENDING SIDEBAR
                         ================================================== */}
 
-                        <section
-                            className="home-trending-layout"
-                        >
+                        <section className="home-trending-layout">
 
-                            {/* CURRENT SEASON */}
+                            {/* ==================================================
+                                CURRENT SEASON
+                            ================================================== */}
 
-                            <div
-                                className="home-trending-main"
-                            >
+                            <div className="home-trending-main">
 
                                 <AnimeSection
                                     title="Current Season"
                                     emoji="🌸"
-
-                                    animeList={
-                                        seasonalAnime
-                                    }
-
-                                    statusMap={
-                                        statusMap
-                                    }
-
-                                    favoriteIds={
-                                        favoriteIds
-                                    }
-
-                                    toggleFavorite={
-                                        toggleFavorite
-                                    }
-
+                                    animeList={seasonalAnime}
+                                    statusMap={statusMap}
+                                    favoriteIds={favoriteIds}
+                                    toggleFavorite={toggleFavorite}
                                     viewAllPath="/seasonal"
                                 />
 
                             </div>
 
 
-                            {/* TRENDING SIDEBAR */}
+                            {/* ==================================================
+                                TRENDING SIDEBAR
+                            ================================================== */}
 
-                            {
-                                trendingSideAnime.length >
-                                0 && (
+                            {trendingSideAnime.length > 0 && (
 
-                                    <aside
-                                        className="home-trending-sidebar"
-                                    >
+                                <aside className="home-trending-sidebar">
 
-                                        <div
-                                            className="home-trending-sidebar-header"
-                                        >
+                                    <div className="home-trending-sidebar-header">
 
-                                            <div>
+                                        <div>
 
-                                                <span
-                                                    className="home-trending-sidebar-eyebrow"
-                                                >
-                                                    🔥 TRENDING NOW
-                                                </span>
+                                            <span className="home-trending-sidebar-eyebrow">
+                                                🔥 TRENDING NOW
+                                            </span>
 
-
-                                                <h2>
-                                                    Popular right now
-                                                </h2>
-
-                                            </div>
-
-
-                                            <Link
-                                                to="/trending"
-
-                                                className="home-trending-sidebar-view"
-                                            >
-                                                View All →
-                                            </Link>
+                                            <h2>
+                                                Popular right now
+                                            </h2>
 
                                         </div>
 
-
-                                        <div
-                                            className="home-trending-sidebar-list"
+                                        <Link
+                                            to="/trending"
+                                            className="home-trending-sidebar-view"
                                         >
+                                            View All →
+                                        </Link>
 
-                                            {
-                                                trendingSideAnime.map(
-                                                    (
-                                                        anime,
-                                                        index
-                                                    ) => {
-
-                                                        const animeId =
-                                                            anime?.mal_id ??
-                                                            anime?.id;
+                                    </div>
 
 
-                                                        if (
-                                                            animeId ==
-                                                            null
-                                                        ) {
-                                                            return null;
-                                                        }
+                                    <div className="home-trending-sidebar-list">
+
+                                        {trendingSideAnime.map(
+                                            (anime, index) => {
+
+                                                const animeId =
+                                                    anime?.mal_id ??
+                                                    anime?.id;
+
+                                                if (animeId == null) {
+                                                    return null;
+                                                }
+
+                                                return (
+                                                    <Link
+                                                        key={animeId}
+                                                        to={`/anime/${animeId}`}
+                                                        className="home-trending-sidebar-item"
+                                                    >
+
+                                                        <span className="home-trending-sidebar-rank">
+                                                            {String(index + 1).padStart(2, "0")}
+                                                        </span>
 
 
-                                                        return (
+                                                        <div className="home-trending-sidebar-image">
 
-                                                            <Link
-                                                                key={
-                                                                    animeId
-                                                                }
+                                                            <img
+                                                                src={anime.image || ""}
+                                                                alt=""
+                                                                loading="lazy"
+                                                            />
 
-                                                                to={
-                                                                    `/anime/${animeId}`
-                                                                }
-
-                                                                className="home-trending-sidebar-item"
-                                                            >
-
-                                                                <span
-                                                                    className="home-trending-sidebar-rank"
-                                                                >
-                                                                    {
-                                                                        String(
-                                                                            index + 1
-                                                                        ).padStart(
-                                                                            2,
-                                                                            "0"
-                                                                        )
-                                                                    }
-                                                                </span>
+                                                        </div>
 
 
-                                                                <div
-                                                                    className="home-trending-sidebar-image"
-                                                                >
+                                                        <div className="home-trending-sidebar-info">
 
-                                                                    <img
-                                                                        src={
-                                                                            anime.image ||
-                                                                            ""
-                                                                        }
+                                                            <strong>
+                                                                {anime.title}
+                                                            </strong>
 
-                                                                        alt=""
+                                                            <span>
+                                                                {anime.type}
 
-                                                                        loading="lazy"
-                                                                    />
+                                                                {anime.year &&
+                                                                    ` • ${anime.year}`}
+                                                            </span>
 
-                                                                </div>
+                                                            {anime.score > 0 && (
+                                                                <small>
+                                                                    ⭐{" "}
+                                                                    {Number(
+                                                                        anime.score
+                                                                    ).toFixed(1)}
+                                                                </small>
+                                                            )}
 
-
-                                                                <div
-                                                                    className="home-trending-sidebar-info"
-                                                                >
-
-                                                                    <strong>
-                                                                        {
-                                                                            anime.title
-                                                                        }
-                                                                    </strong>
+                                                        </div>
 
 
-                                                                    <span>
+                                                        <span
+                                                            className="home-trending-sidebar-arrow"
+                                                            aria-hidden="true"
+                                                        >
+                                                            →
+                                                        </span>
 
-                                                                        {
-                                                                            anime.type
-                                                                        }
-
-                                                                        {
-                                                                            anime.year &&
-                                                                            ` • ${anime.year}`
-                                                                        }
-
-                                                                    </span>
-
-
-                                                                    {
-                                                                        anime.score >
-                                                                        0 && (
-
-                                                                            <small>
-                                                                                ⭐{" "}
-                                                                                {
-                                                                                    Number(
-                                                                                        anime.score
-                                                                                    ).toFixed(
-                                                                                        1
-                                                                                    )
-                                                                                }
-                                                                            </small>
-
-                                                                        )
-                                                                    }
-
-                                                                </div>
-
-
-                                                                <span
-                                                                    className="home-trending-sidebar-arrow"
-                                                                    aria-hidden="true"
-                                                                >
-                                                                    →
-                                                                </span>
-
-                                                            </Link>
-
-                                                        );
-                                                    }
-                                                )
+                                                    </Link>
+                                                );
                                             }
+                                        )}
 
-                                        </div>
+                                    </div>
 
-                                    </aside>
+                                </aside>
 
-                                )
-                            }
+                            )}
+
+
+                            {/* ==================================================
+                                TOP RATED
+                            ================================================== */}
+
+                            <div className="home-trending-lower">
+
+                                <AnimeSection
+                                    title="Top Rated Anime"
+                                    emoji="⭐"
+                                    animeList={topAnime}
+                                    statusMap={statusMap}
+                                    favoriteIds={favoriteIds}
+                                    toggleFavorite={toggleFavorite}
+                                    viewAllPath="/top"
+                                />
+
+                            </div>
 
                         </section>
 
