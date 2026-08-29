@@ -1331,34 +1331,6 @@ function Home() {
 
                         </section>
 
-
-                        {/* ==================================================
-                            TOP RATED
-                        ================================================== */}
-
-                        <AnimeSection
-                            title="Top Rated Anime"
-                            emoji="⭐"
-
-                            animeList={
-                                topAnime
-                            }
-
-                            statusMap={
-                                statusMap
-                            }
-
-                            favoriteIds={
-                                favoriteIds
-                            }
-
-                            toggleFavorite={
-                                toggleFavorite
-                            }
-
-                            viewAllPath="/top"
-                        />
-
                     </>
 
                 )
