@@ -8085,3 +8085,123 @@ button:disabled {
         height: 62px;
     }
 }
+
+/* ============================================================
+   HOME TRENDING / CURRENT SEASON BALANCE
+   ============================================================ */
+
+@media (min-width: 761px) {
+
+    .home-trending-layout {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            340px;
+
+        gap: 2rem;
+
+        align-items: start;
+
+        margin-bottom: 3rem;
+    }
+
+
+    .home-trending-main {
+        min-width: 0;
+    }
+
+
+    .home-trending-sidebar {
+        min-width: 0;
+        align-self: start;
+
+        padding-top: 4px;
+    }
+
+
+    /*
+     * Keep the sidebar compact enough that it doesn't
+     * create a huge vertical gap before the next section.
+     */
+
+    .home-trending-sidebar-list {
+        gap: 0.35rem;
+    }
+
+
+    .home-trending-sidebar-item {
+        grid-template-columns:
+            30px
+            44px
+            minmax(0, 1fr)
+            16px;
+
+        column-gap: 0.55rem;
+
+        min-height: 54px;
+
+        padding: 0.15rem 0;
+    }
+
+
+    .home-trending-sidebar-image {
+        width: 44px;
+        height: 56px;
+    }
+
+
+    .home-trending-sidebar-info {
+        gap: 0.12rem;
+    }
+
+
+    .home-trending-sidebar-info strong {
+        font-size: 0.84rem;
+    }
+
+
+    .home-trending-sidebar-info > span {
+        font-size: 0.68rem;
+    }
+
+
+    .home-trending-sidebar-info small {
+        font-size: 0.68rem;
+    }
+
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (min-width: 761px) and (max-width: 1000px) {
+
+    .home-trending-layout {
+        grid-template-columns:
+            minmax(0, 1fr)
+            240px;
+
+        gap: 20px;
+    }
+
+
+    .home-trending-sidebar-item {
+        grid-template-columns:
+            26px
+            42px
+            minmax(0, 1fr)
+            14px;
+
+        column-gap: 0.45rem;
+    }
+
+
+    .home-trending-sidebar-image {
+        width: 42px;
+        height: 54px;
+    }
+
+}
