@@ -2589,33 +2589,7 @@ body {
 }
 
 
-.advanced-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 20px 0 30px;
-    padding: 20px;
-    background: #18181b;
-    border: 1px solid #27272a;
-    border-radius: 16px;
-}
 
-.filter-input {
-    min-width: 160px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #374151;
-    background: #111827;
-    color: white;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.filter-input:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
-}
 
 .filter-input option {
     background: #111827;
@@ -8226,4 +8200,403 @@ button:disabled {
     width: 100%;
 
     overflow: hidden;
+}
+
+.discover-genres {
+    margin-top: 32px;
+    margin-bottom: 42px;
+}
+
+.discover-genres-header {
+    margin-bottom: 18px;
+}
+
+.discover-genres-eyebrow {
+    display: block;
+    margin-bottom: 5px;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--text-light);
+}
+
+.discover-genres-title {
+    margin: 0;
+
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--heading);
+}
+
+.discover-genres-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+
+    padding-bottom: 4px;
+}
+
+.discover-genres-row::-webkit-scrollbar {
+    display: none;
+}
+
+.discover-genre {
+    flex: 0 0 auto;
+
+    padding: 10px 17px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+
+    background: var(--card);
+
+    color: var(--text);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.discover-genre:hover {
+    transform: translateY(-2px);
+
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+
+    color: var(--heading);
+}
+
+.discover-genres-arrow {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    margin-left: 2px;
+
+    border-radius: 50%;
+
+    color: var(--heading);
+
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.discover-genres-arrow:hover {
+    transform: translateX(3px);
+
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   SEARCH / DISCOVER HERO
+============================================================ */
+
+.search-hero {
+    margin-bottom: 2.5rem;
+}
+
+.search-hero-content {
+    max-width: 720px;
+    margin-bottom: 1.75rem;
+}
+
+.search-hero-eyebrow {
+    display: inline-block;
+    margin-bottom: 0.6rem;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+
+    color: var(--text-light);
+}
+
+.search-hero-title {
+    margin: 0;
+
+    font-size: clamp(
+        2rem,
+        4vw,
+        3rem
+    );
+
+    line-height: 1.1;
+    color: var(--heading);
+}
+
+.search-hero-description {
+    max-width: 620px;
+
+    margin: 0.9rem 0 0;
+
+    font-size: 0.98rem;
+    line-height: 1.7;
+
+    color: var(--text-light);
+}
+
+
+/* ============================================================
+   SEARCH BOX
+============================================================ */
+
+.search-box {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+
+    margin-bottom: 1rem;
+}
+
+.search-box-icon {
+    position: absolute;
+    left: 1rem;
+
+    display: flex;
+    align-items: center;
+
+    font-size: 1rem;
+
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+
+    min-height: 54px;
+
+    padding: 0 3rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+
+    background: var(--card);
+    color: var(--text);
+
+    font-size: 0.95rem;
+
+    outline: none;
+
+    box-shadow: var(--shadow);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.search-input::placeholder {
+    color: var(--text-light);
+}
+
+.search-input:focus {
+    border-color: rgba(255, 255, 255, 0.2);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.04),
+        var(--shadow);
+}
+
+.search-box-clear {
+    position: absolute;
+    right: 0.8rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: transparent;
+    color: var(--text-light);
+
+    font-size: 1.3rem;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.search-box-clear:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--heading);
+}
+
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+.advanced-filters {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(150px, 1fr)
+        );
+
+    gap: 0.75rem;
+}
+
+.filter-input {
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 0 0.9rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 11px;
+
+    background: var(--card);
+    color: var(--text);
+
+    font-size: 0.86rem;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.filter-input:hover {
+    border-color: rgba(255, 255, 255, 0.13);
+}
+
+.filter-input:focus {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-input:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   ACTIVE FILTERS
+============================================================ */
+
+.active-search-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 0.5rem;
+
+    margin-top: 1rem;
+}
+
+.active-filters-label {
+    margin-right: 0.25rem;
+
+    font-size: 0.78rem;
+    color: var(--text-light);
+}
+
+.active-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+
+    min-height: 30px;
+
+    padding: 0.35rem 0.65rem;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+
+    font-size: 0.76rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.active-filter:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.active-filter span {
+    font-size: 0.95rem;
+    line-height: 1;
+    color: var(--text-light);
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .search-hero {
+        margin-bottom: 2rem;
+    }
+
+    .search-hero-title {
+        font-size: 2rem;
+    }
+
+    .advanced-filters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 460px) {
+
+    .advanced-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .search-input {
+        min-height: 50px;
+    }
+
 }

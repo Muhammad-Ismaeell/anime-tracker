@@ -1,4 +1,3 @@
-
 import {
     useEffect,
     useMemo,
@@ -19,6 +18,7 @@ import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import PageContainer from "../components/ui/PageContainer";
 import AnimeSection from "../components/ui/AnimeSection";
 import EmptyState from "../components/ui/EmptyState";
+import DiscoverGenres from "../components/ui/DiscoverGenres";
 
 import { useToggleFavorite } from "../hooks/user/useFavorites";
 import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
@@ -495,19 +495,6 @@ function Home() {
 
         };
 
-
-    // ============================================================
-    // EXPLORE GENRES
-    // ============================================================
-
-    const exploreGenres = [
-        "Action",
-        "Adventure",
-        "Comedy",
-        "Drama",
-        "Fantasy",
-        "Romance",
-    ];
 
 
     // ============================================================
@@ -1116,80 +1103,10 @@ function Home() {
 
 
             {/* ==================================================
-                EXPLORE
+                EXPLORE / DISCOVER
             ================================================== */}
 
-            <section
-                className="home-explore"
-            >
-
-                <div
-                    className="home-explore-content"
-                >
-
-                    <span
-                        className="home-explore-eyebrow"
-                    >
-                        EXPLORE
-                    </span>
-
-
-                    <h2
-                        className="home-explore-title"
-                    >
-                        Discover something new
-                    </h2>
-
-
-                    <p
-                        className="home-explore-description"
-                    >
-                        Search through anime and find your
-                        next favorite series.
-                    </p>
-
-
-                    <Link
-                        to="/search"
-                        className="home-explore-submit"
-                    >
-                        Explore Anime →
-                    </Link>
-
-                </div>
-
-
-                <div
-                    className="home-explore-links"
-                >
-
-                    {
-                        exploreGenres.map(
-                            (genre) => (
-
-                                <Link
-                                    key={
-                                        genre
-                                    }
-
-                                    to={
-                                        `/search?genre=${encodeURIComponent(
-                                            genre
-                                        )}`
-                                    }
-
-                                    className="home-explore-link"
-                                >
-                                    {genre}
-                                </Link>
-
-                            )
-                        )
-                    }
-
-                </div>
-
-            </section>
+            <DiscoverGenres />
 
 
             {/* ==================================================

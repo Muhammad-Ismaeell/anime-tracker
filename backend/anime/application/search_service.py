@@ -69,7 +69,7 @@ class AnimeSearchService:
 
         if value := filters.get("genres"):
             queryset = queryset.filter(
-                genres__name__icontains=value
+                genres__name__iexact=value
             ).distinct()
 
         # --------------------
