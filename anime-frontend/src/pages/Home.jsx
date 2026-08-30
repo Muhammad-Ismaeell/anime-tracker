@@ -455,45 +455,26 @@ function Home() {
     // FEATURED FAVORITE
     // ============================================================
 
-    const isFeaturedFavorite =
-        currentFeatured
-            ? favoriteIds instanceof Set &&
-              favoriteIds.has(
-                  String(
-                      currentFeatured.mal_id ??
-                      currentFeatured.id
-                  )
-              )
-            : false;
+    
 
 
-    const handleFeaturedFavorite =
-        () => {
+        toggleFavorite.mutate({
 
-            if (
-                !currentFeatured
-            ) {
-                return;
-            }
+            anime_id:
+                currentFeatured.mal_id ??
+                currentFeatured.id,
 
+            title:
+                currentFeatured.title ??
+                "",
 
-            toggleFavorite.mutate({
+            image:
+                currentFeatured.image ??
+                "",
 
-                anime_id:
-                    currentFeatured.mal_id ??
-                    currentFeatured.id,
+        });
 
-                title:
-                    currentFeatured.title ??
-                    "",
-
-                image:
-                    currentFeatured.image ??
-                    "",
-
-            });
-
-        };
+    };
 
 
 
@@ -956,44 +937,6 @@ function Home() {
                                     className="home-hero-actions"
                                 >
 
-                                    <Link
-                                        to={
-                                            `/anime/${
-                                                currentFeatured.mal_id ??
-                                                currentFeatured.id
-                                            }`
-                                        }
-
-                                        className="home-hero-primary"
-                                    >
-                                        View Details
-                                    </Link>
-
-
-                                    <button
-                                        type="button"
-
-                                        className="home-hero-secondary"
-
-                                        onClick={
-                                            handleFeaturedFavorite
-                                        }
-
-                                        disabled={
-                                            toggleFavorite.isPending
-                                        }
-                                    >
-
-                                        {
-                                            toggleFavorite.isPending
-                                                ? "⏳ Updating..."
-                                                : isFeaturedFavorite
-                                                    ? "❤️ In Favorites"
-                                                    : "🤍 Add to Favorites"
-                                        }
-
-                                    </button>
-
                                 </div>
 
                             </motion.div>
@@ -1390,7 +1333,7 @@ function Home() {
 
         </PageContainer>
     );
-}
+
 
 
 export default Home;
