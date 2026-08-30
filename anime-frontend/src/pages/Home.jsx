@@ -448,7 +448,7 @@ function Home() {
             () =>
                 trendingAnime.slice(
                     0,
-                    5
+                    8
                 ),
             [trendingAnime]
         );
@@ -1181,10 +1181,14 @@ function Home() {
                         <section className="home-trending-layout">
 
                             {/* ==================================================
-                                CURRENT SEASON
+                                MAIN CONTENT
                             ================================================== */}
 
                             <div className="home-trending-main">
+
+                                {/* ==================================================
+                                    CURRENT SEASON
+                                ================================================== */}
 
                                 <AnimeSection
                                     title="Current Season"
@@ -1195,6 +1199,25 @@ function Home() {
                                     toggleFavorite={toggleFavorite}
                                     viewAllPath="/seasonal"
                                 />
+
+
+                                {/* ==================================================
+                                    TOP RATED
+                                ================================================== */}
+
+                                <div className="home-trending-lower">
+
+                                    <AnimeSection
+                                        title="Top Rated Anime"
+                                        emoji="⭐"
+                                        animeList={topAnime}
+                                        statusMap={statusMap}
+                                        favoriteIds={favoriteIds}
+                                        toggleFavorite={toggleFavorite}
+                                        viewAllPath="/top"
+                                    />
+
+                                </div>
 
                             </div>
 
@@ -1306,28 +1329,27 @@ function Home() {
 
                                     </div>
 
+
+                                    {/* ==================================================
+                                        TRENDING VIEW MORE
+                                    ================================================== */}
+
+                                    <Link
+                                        to="/trending"
+                                        className="home-trending-sidebar-more"
+                                    >
+                                        <span>
+                                            View more
+                                        </span>
+
+                                        <span aria-hidden="true">
+                                            ↓
+                                        </span>
+                                    </Link>
+
                                 </aside>
 
                             )}
-
-
-                            {/* ==================================================
-                                TOP RATED
-                            ================================================== */}
-
-                            <div className="home-trending-lower">
-
-                                <AnimeSection
-                                    title="Top Rated Anime"
-                                    emoji="⭐"
-                                    animeList={topAnime}
-                                    statusMap={statusMap}
-                                    favoriteIds={favoriteIds}
-                                    toggleFavorite={toggleFavorite}
-                                    viewAllPath="/top"
-                                />
-
-                            </div>
 
                         </section>
 

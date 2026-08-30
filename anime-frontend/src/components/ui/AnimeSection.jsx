@@ -32,7 +32,7 @@ export default function AnimeSection({
 
             return animeId != null;
         })
-        .slice(0, 10);
+        .slice(0,4);
 
     return (
         <section className="home-section">
