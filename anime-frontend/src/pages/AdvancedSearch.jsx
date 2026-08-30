@@ -555,19 +555,10 @@ export default function AdvancedSearch() {
                                     filters.year
                                 }
                                 onChange={(e) =>
-                                    setFilters(
-                                        (prev) => ({
-                                            ...prev,
-
-                                            year:
-                                                e.target.value,
-
-                                            season:
-                                                e.target.value
-                                                    ? prev.season
-                                                    : "",
-                                        })
-                                    )
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        year: e.target.value,
+                                    }))
                                 }
                             />
 
@@ -586,21 +577,12 @@ export default function AdvancedSearch() {
                             <select
                                 id="search-season"
                                 className="filter-input"
-                                disabled={
-                                    !filters.year
-                                }
-                                value={
-                                    filters.season
-                                }
+                                value={filters.season}
                                 onChange={(e) =>
-                                    setFilters(
-                                        (prev) => ({
-                                            ...prev,
-
-                                            season:
-                                                e.target.value,
-                                        })
-                                    )
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        season: e.target.value,
+                                    }))
                                 }
                             >
 
@@ -900,8 +882,7 @@ export default function AdvancedSearch() {
                                             (prev) => ({
                                                 ...prev,
 
-                                                year: "",
-                                                season: "",
+                                                year: ""
                                             })
                                         )
                                     }

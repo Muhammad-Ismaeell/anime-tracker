@@ -8742,22 +8742,8 @@ button:disabled {
     position: relative;
 }
 
-.search-filter-field select.filter-input {
-    padding-right: 42px;
-}
 
-.search-filter-field::after {
-    content: "⌄";
 
-    position: absolute;
-    right: 14px;
-    bottom: 12px;
-
-    color: var(--text-light);
-    font-size: 16px;
-
-    pointer-events: none;
-}
 
 /* Dropdown options */
 .search-filter-field select.filter-input option {
@@ -8788,29 +8774,7 @@ button:disabled {
    INPUTS
 ============================================================ */
 
-.search-filter-field .filter-input {
-    width: 100%;
-    min-width: 0;
 
-    height: 40px;
-
-    padding: 0 10px;
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9px;
-
-    background: rgba(255, 255, 255, 0.035);
-
-    color: var(--text);
-
-    font-size: 0.82rem;
-
-    outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        background 0.2s ease;
-}
 
 .search-filter-field select.filter-input:focus {
     outline: none;
