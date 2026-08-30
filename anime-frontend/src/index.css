@@ -122,34 +122,21 @@
 }
 
 .home-hero-poster {
-    display: block;
-
     width: 100%;
     height: 100%;
 
-    aspect-ratio: 2 / 3;
-
     object-fit: cover;
 
-    object-position: center;
-
-    background:
-        var(--surface);
-
-    transition:
-        transform 0.35s ease;
-    backface-visibility: hidden;
-    transform: translateZ(0);
+    border-radius: 12px;
 }
 
 
 
 .home-hero-poster-container {
-    flex: 0 0 auto;
+    width: 105px;
+    height: 160px;
 
-    width: 230px;
-
-    perspective: 1000px;
+    flex-shrink: 0;
 }
 
 /* =========================================================
@@ -3341,16 +3328,13 @@ button:disabled {
     position: relative;
 
     width: 100%;
-
-    min-height: 470px;
-
-    margin-bottom: 3rem;
+    height: 220px;
 
     overflow: hidden;
 
-    border-radius: 1rem;
+    border-radius: var(--radius);
 
-    background: var(--surface);
+    isolation: isolate;
 }
 
 
@@ -3404,28 +3388,16 @@ button:disabled {
 
 .home-hero-inner {
     position: relative;
-
     z-index: 2;
 
-    display: flex;
+    height: 100%;
 
+    display: flex;
     align-items: center;
 
-    gap: clamp(
-        2rem,
-        5vw,
-        5rem
-    );
+    gap: 1.5rem;
 
-    min-height: 470px;
-
-    padding:
-        2.5rem
-        clamp(
-            2rem,
-            5vw,
-            5rem
-        );
+    padding: 1.5rem 2rem;
 }
 
 .home-hero-overlay {
@@ -6719,7 +6691,7 @@ button:disabled {
 
     gap: 2rem;
 
-    align-items: stretch;
+    align-items: start;
 }
 
 
@@ -6824,14 +6796,14 @@ button:disabled {
 }
 
 .home-trending-sidebar-info strong {
+    font-size: 0.95rem;
+    line-height: 1.3;
+
     overflow: hidden;
 
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-
-    font-size: 0.9rem;
-    line-height: 1.25;
 
     color: var(--heading);
 }
@@ -6839,15 +6811,11 @@ button:disabled {
 
 
 .home-trending-sidebar-info span {
-    font-size: 0.75rem;
-
-    color: var(--text-light);
+    font-size: 0.78rem;
 }
 
 .home-trending-sidebar-info small {
-    font-size: 0.75rem;
-
-    color: var(--text-light);
+    font-size: 0.78rem;
 }
 
 
@@ -6857,45 +6825,53 @@ button:disabled {
     display: flex;
     flex-direction: column;
 
-    height: 100%;
+    align-self: start;
 }
 
 .home-trending-sidebar-more {
     display: flex;
-
     align-items: center;
     justify-content: center;
 
-    gap: 0.5rem;
+    width: 100%;
+    height: 42px;
 
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
+    margin-top: 10px;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
 
     color: var(--text-light);
 
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 500;
 
-    text-decoration: none;
-
-    border-top: 1px solid
-        rgba(255, 255, 255, 0.08);
+    cursor: pointer;
 
     transition:
-        color var(--transition),
-        gap var(--transition);
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .home-trending-sidebar-more:hover {
     color: var(--heading);
-    gap: 0.7rem;
+    transform: translateY(2px);
+}
+
+.home-trending-sidebar-more:focus-visible {
+    outline: 2px solid var(--text-light);
+    outline-offset: 4px;
+    border-radius: 6px;
 }
 
 .home-trending-lower {
-    grid-column: 1;
-    grid-row: 2;
+    margin-top: 70px;
+}
 
-    min-width: 65px;
+.home-trending-lower .home-section {
+    margin-top: 0;
 }
 
 
@@ -6945,15 +6921,15 @@ button:disabled {
 
     grid-template-columns:
         32px
-        52px
+        72px
         minmax(0, 1fr)
         24px;
 
     align-items: center;
 
-    gap: 0.8rem;
+    gap: 0.9rem;
 
-    padding: 0.75rem 0;
+    padding: 0.85rem 0;
 
     color: inherit;
     text-decoration: none;
@@ -6965,7 +6941,6 @@ button:disabled {
         background-color var(--transition),
         transform var(--transition);
 }
-
 
 .home-trending-sidebar-item:hover {
     transform: translateX(3px);
@@ -6995,12 +6970,11 @@ button:disabled {
    ============================================================ */
 
 .home-trending-sidebar-image {
-    width: 52px;
-    height: 68px;
+    width: 72px;
+    height: 94px;
 
     overflow: hidden;
-
-    border-radius: 8px;
+    border-radius: 10px;
 
     flex-shrink: 0;
 }
@@ -7008,9 +6982,7 @@ button:disabled {
 .home-trending-sidebar-image img {
     width: 100%;
     height: 100%;
-
     display: block;
-
     object-fit: cover;
 }
 
@@ -7247,11 +7219,11 @@ button:disabled {
    TRENDING LIST
    ============================================================ */
 
-.home-trending-list {
+.home-trending-sidebar-list {
     display: flex;
     flex-direction: column;
 
-    gap: 0.35rem;
+    gap: 0;
 }
 
 
