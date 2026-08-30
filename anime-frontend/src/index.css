@@ -8409,14 +8409,6 @@ button:disabled {
 
 }
 
-/* ============================================================
-   SEARCH PAGE
-============================================================ */
-
-.search-page {
-    padding-top: 32px;
-    padding-bottom: 60px;
-}
 
 
 /* ============================================================
@@ -8747,7 +8739,37 @@ button:disabled {
 ============================================================ */
 
 .search-filter-field {
-    min-width: 0;
+    position: relative;
+}
+
+.search-filter-field select.filter-input {
+    padding-right: 42px;
+}
+
+.search-filter-field::after {
+    content: "⌄";
+
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+
+    color: var(--text-light);
+    font-size: 16px;
+
+    pointer-events: none;
+}
+
+/* Dropdown options */
+.search-filter-field select.filter-input option {
+    color: var(--text);
+    background-color: var(--card);
+}
+
+/* Disabled select */
+.search-filter-field select.filter-input:disabled {
+    color: var(--text-light);
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 .search-filter-field label {
@@ -8790,14 +8812,16 @@ button:disabled {
         background 0.2s ease;
 }
 
-.search-filter-field .filter-input:focus {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.055);
+.search-filter-field select.filter-input:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.7);
+
+    box-shadow:
+        0 0 0 3px rgba(139, 92, 246, 0.12);
 }
 
-.search-filter-field .filter-input:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+.search-filter-field select.filter-input:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.18);
 }
 
 
@@ -8929,244 +8953,114 @@ button:disabled {
    SEARCH PAGE
 ============================================================ */
 
+/* ============================================================
+   SEARCH PAGE — COMPACT DESKTOP LAYOUT
+   Keeps results visible above the fold
+   ============================================================ */
+
 .search-page {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 28px 32px 70px;
+    padding-top: 24px;
+    padding-bottom: 50px;
 }
 
 
 /* ============================================================
    SEARCH HERO
-============================================================ */
+   ============================================================ */
 
 .search-hero {
-    position: relative;
-    margin-bottom: 28px;
-    padding: 30px 32px 26px;
-
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-
-    background:
-        radial-gradient(
-            circle at 85% 20%,
-            rgba(99, 102, 241, 0.10),
-            transparent 35%
-        ),
-        var(--card);
-
-    overflow: hidden;
+    padding: 22px 28px 24px;
+    margin-bottom: 14px;
 }
 
 .search-hero-content {
-    max-width: 720px;
+    margin-bottom: 14px;
 }
 
 .search-hero-eyebrow {
-    display: block;
-
-    margin-bottom: 7px;
-
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-
-    color: var(--text-light);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
 }
 
 .search-hero-title {
-    margin: 0;
+    margin: 4px 0 6px;
 
-    font-size: clamp(28px, 3vw, 40px);
+    font-size: clamp(
+        1.8rem,
+        3vw,
+        2.35rem
+    );
+
     line-height: 1.1;
-
-    color: var(--heading);
 }
 
 .search-hero-description {
-    margin: 10px 0 22px;
+    margin: 0;
 
-    max-width: 600px;
+    max-width: 620px;
 
-    font-size: 14px;
-    line-height: 1.6;
-
-    color: var(--text-light);
+    font-size: 0.88rem;
+    line-height: 1.45;
 }
 
 
 /* ============================================================
    SEARCH BOX
-============================================================ */
+   ============================================================ */
 
 .search-box {
-    position: relative;
+    min-height: 48px;
+    height: 48px;
 
-    display: flex;
-    align-items: center;
-
-    width: 100%;
-    max-width: 760px;
-
-    height: 54px;
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-
-    background: rgba(15, 17, 23, 0.75);
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    border-radius: 12px;
 }
 
-.search-box:focus-within {
-    border-color: rgba(129, 140, 248, 0.55);
+.search-box .search-input {
+    height: 48px;
 
-    box-shadow:
-        0 0 0 3px rgba(99, 102, 241, 0.10);
-}
-
-.search-box-icon {
-    flex-shrink: 0;
-
-    margin-left: 17px;
-
-    font-size: 17px;
-
-    opacity: 0.65;
-}
-
-.search-input {
-    width: 100%;
-    height: 100%;
-
-    padding: 0 46px 0 13px;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-
-    color: var(--heading);
-
-    font-size: 15px;
-}
-
-.search-input::placeholder {
-    color: var(--text-light);
-}
-
-.search-box-clear {
-    position: absolute;
-    right: 12px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 30px;
-    height: 30px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.07);
-
-    color: var(--text-light);
-
-    font-size: 19px;
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
-}
-
-.search-box-clear:hover {
-    background: rgba(255, 255, 255, 0.13);
-    color: var(--heading);
+    font-size: 0.92rem;
 }
 
 
 /* ============================================================
    FILTER PANEL
-============================================================ */
+   ============================================================ */
 
 .search-filters {
-    margin-bottom: 32px;
-    padding: 20px 22px;
-
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 18px;
-
-    background: var(--card);
-}
-
-.search-filters-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 18px 22px 16px;
 
     margin-bottom: 16px;
+
+    border-radius: 14px;
 }
 
-.search-filters-heading {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
+
+/* FILTER HEADER */
+
+.search-filters-header {
+    margin-bottom: 12px;
 }
 
 .search-filters-eyebrow {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-
-    color: var(--text-light);
+    font-size: 0.65rem;
+    letter-spacing: 0.13em;
 }
 
 .search-filters-title {
-    margin: 0;
+    margin: 2px 0 0;
 
-    font-size: 16px;
-    font-weight: 600;
-
-    color: var(--heading);
+    font-size: 1.15rem;
+    line-height: 1.2;
 }
 
 .search-filters-clear {
-    padding: 6px 10px;
-
-    border: none;
-    border-radius: 7px;
-
-    background: transparent;
-
-    color: var(--text-light);
-
-    font-size: 12px;
-    font-weight: 500;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
-}
-
-.search-filters-clear:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--heading);
+    font-size: 0.75rem;
 }
 
 
 /* ============================================================
    FILTER GRID
-============================================================ */
+   ============================================================ */
 
 .advanced-filters {
     display: grid;
@@ -9174,8 +9068,11 @@ button:disabled {
     grid-template-columns:
         repeat(6, minmax(0, 1fr));
 
-    gap: 12px;
+    gap: 10px;
 }
+
+
+/* FILTER FIELD */
 
 .search-filter-field {
     min-width: 0;
@@ -9184,379 +9081,221 @@ button:disabled {
 .search-filter-field label {
     display: block;
 
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 
-    font-size: 11px;
+    font-size: 0.68rem;
     font-weight: 600;
 
-    color: var(--text-light);
+    color: var(--text-muted);
 }
 
-.filter-input {
+
+/* INPUTS */
+
+.search-filter-field .filter-input {
     width: 100%;
-    height: 40px;
 
-    padding: 0 11px;
+    min-height: 38px;
+    height: 38px;
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9px;
+    padding:
+        0.45rem
+        0.65rem;
 
-    outline: none;
+    border-radius: 8px;
 
-    background: rgba(255, 255, 255, 0.035);
-
-    color: var(--heading);
-
-    font-size: 12px;
-
-    transition:
-        border-color 0.2s ease,
-        background 0.2s ease;
-}
-
-.filter-input:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.filter-input:focus {
-    border-color: rgba(129, 140, 248, 0.5);
-
-    background: rgba(255, 255, 255, 0.045);
-}
-
-.filter-input:disabled {
-    opacity: 0.4;
-
-    cursor: not-allowed;
-}
-
-.filter-input option {
-    background: #111827;
-    color: #ffffff;
+    font-size: 0.75rem;
 }
 
 
 /* ============================================================
    ACTIVE FILTERS
-============================================================ */
+   ============================================================ */
 
 .active-search-filters {
     display: flex;
+
     align-items: center;
+
     flex-wrap: wrap;
 
-    gap: 7px;
+    gap: 6px;
 
-    margin-top: 14px;
-    padding-top: 14px;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 10px;
 }
 
 .active-filters-label {
-    margin-right: 3px;
-
-    font-size: 11px;
-    font-weight: 600;
-
-    color: var(--text-light);
+    font-size: 0.68rem;
 }
 
 .active-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
+    padding:
+        4px
+        8px;
 
-    min-height: 28px;
-
-    padding: 4px 9px;
-
-    border: 1px solid rgba(129, 140, 248, 0.18);
     border-radius: 7px;
 
-    background: rgba(99, 102, 241, 0.08);
-
-    color: var(--text);
-
-    font-size: 11px;
-    font-weight: 500;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
-}
-
-.active-filter span {
-    font-size: 14px;
-    line-height: 1;
-
-    opacity: 0.7;
-}
-
-.active-filter:hover {
-    background: rgba(99, 102, 241, 0.14);
-
-    border-color: rgba(129, 140, 248, 0.3);
+    font-size: 0.68rem;
 }
 
 
 /* ============================================================
    RESULTS SECTION
-============================================================ */
+   ============================================================ */
 
 .search-results-section {
-    width: 100%;
-}
-
-.search-results-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-
-    margin-bottom: 18px;
-}
-
-.search-results-eyebrow {
-    display: block;
-
-    margin-bottom: 5px;
-
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-
-    color: var(--text-light);
-}
-
-.search-results-title {
-    margin: 0;
-
-    font-size: 22px;
-    font-weight: 650;
-
-    color: var(--heading);
-}
-
-.search-results-count {
-    padding-bottom: 2px;
-
-    font-size: 12px;
-
-    color: var(--text-light);
-}
-
-
-/* ============================================================
-   RESULTS GRID
-============================================================ */
-
-.search-results-section .grid {
     margin-top: 0;
 }
 
-
-/* ============================================================
-   ERROR STATE
-============================================================ */
-
-.search-error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 70px 20px;
-
-    text-align: center;
+.search-results-header {
+    margin-bottom: 12px;
 }
 
-.search-error-icon {
-    margin-bottom: 14px;
-
-    font-size: 36px;
+.search-results-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.13em;
 }
 
-.search-error-state h2 {
-    margin: 0 0 8px;
+.search-results-title {
+    margin: 2px 0 0;
 
-    font-size: 20px;
-
-    color: var(--heading);
+    font-size: 1.25rem;
+    line-height: 1.2;
 }
 
-.search-error-state p {
-    max-width: 420px;
-
-    margin: 0 0 20px;
-
-    font-size: 13px;
-    line-height: 1.5;
-
-    color: var(--text-light);
-}
-
-.retry-btn {
-    padding: 9px 16px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: rgba(255, 255, 255, 0.08);
-
-    color: var(--heading);
-
-    font-size: 12px;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease;
-}
-
-.retry-btn:hover {
-    background: rgba(255, 255, 255, 0.13);
-
-    transform: translateY(-1px);
+.search-results-count {
+    font-size: 0.75rem;
 }
 
 
 /* ============================================================
-   EMPTY STATE
-============================================================ */
+   RESULT GRID
+   ============================================================ */
 
-.search-empty-state {
-    padding: 30px 0 60px;
+.search-results-section .grid {
+    gap: 18px;
 }
 
 
 /* ============================================================
-   INFINITE SCROLL
-============================================================ */
+   DESKTOP HEIGHT OPTIMIZATION
+   ============================================================ */
 
-.search-load-more {
-    height: 1px;
-}
+@media (min-width: 1000px) {
 
-.search-loading-more {
-    padding: 20px;
+    .search-page {
+        padding-top: 18px;
+    }
 
-    text-align: center;
+    .search-hero {
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
 
-    font-size: 12px;
+    .search-hero-content {
+        margin-bottom: 10px;
+    }
 
-    color: var(--text-light);
+    .search-filters {
+        padding-top: 14px;
+        padding-bottom: 12px;
+    }
+
+    .search-filters-header {
+        margin-bottom: 9px;
+    }
+
+    .advanced-filters {
+        gap: 8px;
+    }
+
+    .search-filter-field label {
+        margin-bottom: 3px;
+    }
+
+    .search-filter-field .filter-input {
+        height: 36px;
+        min-height: 36px;
+    }
+
+    .active-search-filters {
+        margin-top: 8px;
+    }
+
+    .search-results-header {
+        margin-bottom: 10px;
+    }
 }
 
 
 /* ============================================================
-   RESPONSIVE — LAPTOP
-============================================================ */
+   TABLET
+   ============================================================ */
 
-@media (max-width: 1100px) {
+@media (max-width: 999px) {
 
     .advanced-filters {
         grid-template-columns:
             repeat(3, minmax(0, 1fr));
     }
-
 }
 
 
 /* ============================================================
-   RESPONSIVE — TABLET
-============================================================ */
+   MOBILE
+   ============================================================ */
 
-@media (max-width: 700px) {
+@media (max-width: 699px) {
 
     .search-page {
-        padding: 20px 16px 50px;
+        padding-top: 14px;
     }
 
     .search-hero {
-        padding: 24px 20px 22px;
+        padding: 18px 16px 18px;
+
+        margin-bottom: 12px;
     }
 
     .search-hero-title {
-        font-size: 28px;
+        font-size: 1.7rem;
     }
 
     .search-hero-description {
-        font-size: 13px;
+        font-size: 0.82rem;
     }
 
     .search-filters {
-        padding: 17px;
+        padding: 15px;
+
+        margin-bottom: 12px;
     }
 
     .advanced-filters {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
 
-        gap: 10px;
+        gap: 8px;
     }
 
-    .search-filters-heading {
-        display: block;
-    }
-
-    .search-filters-eyebrow {
-        display: block;
-        margin-bottom: 3px;
+    .search-filter-field .filter-input {
+        height: 38px;
+        min-height: 38px;
     }
 
     .search-results-title {
-        font-size: 19px;
+        font-size: 1.1rem;
     }
-
 }
 
 
 /* ============================================================
-   RESPONSIVE — MOBILE
-============================================================ */
+   VERY SMALL MOBILE
+   ============================================================ */
 
 @media (max-width: 480px) {
-
-    .search-page {
-        padding: 14px 12px 40px;
-    }
-
-    .search-hero {
-        margin-bottom: 18px;
-        padding: 20px 16px;
-    }
-
-    .search-hero-title {
-        font-size: 25px;
-    }
-
-    .search-box {
-        height: 48px;
-    }
-
-    .search-filters {
-        padding: 15px;
-        margin-bottom: 24px;
-    }
-
-    .search-filters-header {
-        align-items: flex-start;
-    }
 
     .advanced-filters {
         grid-template-columns: 1fr;
     }
-
-    .search-results-header {
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .search-results-count {
-        white-space: nowrap;
-    }
-
 }
