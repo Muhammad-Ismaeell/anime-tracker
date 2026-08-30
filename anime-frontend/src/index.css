@@ -8154,3 +8154,76 @@ button:disabled {
     }
 
 }
+
+/* ============================================================
+   SECTION SLIDER
+============================================================ */
+
+.section-slider-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.section-slider-btn {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--card);
+
+    color: var(--text);
+
+    font-size: 18px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.section-slider-btn:hover:not(:disabled) {
+    background: var(--bg);
+    border-color: var(--text-light);
+
+    transform: translateY(-1px);
+}
+
+
+.section-slider-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+
+.section-slider-btn:disabled,
+.section-slider-btn.disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+
+/* ============================================================
+   SLIDER CONTAINER
+============================================================ */
+
+.anime-section-slider {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+}

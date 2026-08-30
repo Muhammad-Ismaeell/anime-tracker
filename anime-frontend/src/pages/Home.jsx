@@ -1253,7 +1253,6 @@ function Home() {
                                     statusMap={statusMap}
                                     favoriteIds={favoriteIds}
                                     toggleFavorite={toggleFavorite}
-                                    viewAllPath="/seasonal"
                                 />
 
 
@@ -1270,7 +1269,6 @@ function Home() {
                                         statusMap={statusMap}
                                         favoriteIds={favoriteIds}
                                         toggleFavorite={toggleFavorite}
-                                        viewAllPath="/top"
                                     />
 
                                 </div>

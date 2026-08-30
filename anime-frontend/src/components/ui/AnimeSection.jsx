@@ -1,6 +1,16 @@
 
-import { Link } from "react-router-dom";
+import {
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    AnimatePresence,
+    motion,
+} from "framer-motion";
+
 import AnimeCard from "../AnimeCard";
+
 
 export default function AnimeSection({
     title,
@@ -9,33 +19,198 @@ export default function AnimeSection({
     statusMap,
     favoriteIds,
     toggleFavorite,
-    viewAllPath,
 }) {
-    const safeAnimeList = Array.isArray(animeList)
-        ? animeList
-        : [];
+
+    // ============================================================
+    // CONSTANTS
+    // ============================================================
+
+    const CARDS_PER_PAGE = 4;
+
+
+    // ============================================================
+    // SAFE FAVORITE IDS
+    // ============================================================
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
             ? favoriteIds
             : new Set(
-                  Array.isArray(favoriteIds)
-                      ? favoriteIds.map(String)
-                      : []
-              );
+                Array.isArray(favoriteIds)
+                    ? favoriteIds.map(String)
+                    : []
+            );
 
-    const visibleAnime = safeAnimeList
-        .filter((anime) => {
-            const animeId =
-                anime?.mal_id ??
-                anime?.id;
 
-            return animeId != null;
-        })
-        .slice(0,4);
+    // ============================================================
+    // VALID ANIME
+    // ============================================================
+
+    const validAnime =
+        useMemo(
+            () => {
+
+                const list =
+                    Array.isArray(animeList)
+                        ? animeList
+                        : [];
+
+
+                return list.filter(
+                    (anime) => {
+
+                        const animeId =
+                            anime?.mal_id ??
+                            anime?.id;
+
+                        return animeId != null;
+                    }
+                );
+
+            },
+            [animeList]
+        );
+
+
+    // ============================================================
+    // SLIDER STATE
+    // ============================================================
+
+    const [
+        currentPage,
+        setCurrentPage,
+    ] = useState(0);
+
+
+    const [
+        slideDirection,
+        setSlideDirection,
+    ] = useState(1);
+
+
+    // ============================================================
+    // PAGE INFORMATION
+    // ============================================================
+
+    const totalPages =
+        Math.ceil(
+            validAnime.length /
+            CARDS_PER_PAGE
+        );
+
+
+    const hasMultiplePages =
+        totalPages > 1;
+
+
+    const isFirstPage =
+        currentPage === 0;
+
+
+    const isLastPage =
+        currentPage >=
+        totalPages - 1;
+
+
+    // ============================================================
+    // VISIBLE ANIME
+    // ============================================================
+
+    const visibleAnime =
+        validAnime.slice(
+            currentPage * CARDS_PER_PAGE,
+            (currentPage + 1) * CARDS_PER_PAGE
+        );
+
+
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
+
+    const handlePrevious = () => {
+
+        if (isFirstPage) {
+            return;
+        }
+
+
+        setSlideDirection(-1);
+
+
+        setCurrentPage(
+            (current) =>
+                Math.max(
+                    current - 1,
+                    0
+                )
+        );
+    };
+
+
+    const handleNext = () => {
+
+        if (isLastPage) {
+            return;
+        }
+
+
+        setSlideDirection(1);
+
+
+        setCurrentPage(
+            (current) =>
+                Math.min(
+                    current + 1,
+                    totalPages - 1
+                )
+        );
+    };
+
+
+    // ============================================================
+    // SLIDE ANIMATION
+    // ============================================================
+
+    const slideVariants = {
+
+        enter: (direction) => ({
+            x:
+                direction > 0
+                    ? 45
+                    : -45,
+
+            opacity: 0,
+        }),
+
+
+        center: {
+            x: 0,
+            opacity: 1,
+        },
+
+
+        exit: (direction) => ({
+            x:
+                direction > 0
+                    ? -45
+                    : 45,
+
+            opacity: 0,
+        }),
+
+    };
+
+
+    // ============================================================
+    // RENDER
+    // ============================================================
 
     return (
         <section className="home-section">
+
+            {/* ==================================================
+                SECTION HEADER
+            ================================================== */}
 
             <div className="section-header">
 
@@ -45,6 +220,7 @@ export default function AnimeSection({
                         {emoji}
                     </span>
 
+
                     <h2>
                         {title}
                     </h2>
@@ -52,72 +228,191 @@ export default function AnimeSection({
                 </div>
 
 
-                {viewAllPath && (
-                    <Link
-                        to={viewAllPath}
-                        className="view-all-btn"
-                    >
-                        <span>
-                            View All
-                        </span>
+                {/* ==================================================
+                    SLIDER CONTROLS
+                ================================================== */}
 
-                        <span aria-hidden="true">
+                {hasMultiplePages && (
+
+                    <div className="section-slider-controls">
+
+                        <button
+                            type="button"
+
+                            className={
+                                `section-slider-btn ${
+                                    isFirstPage
+                                        ? "disabled"
+                                        : ""
+                                }`
+                            }
+
+                            onClick={
+                                handlePrevious
+                            }
+
+                            disabled={
+                                isFirstPage
+                            }
+
+                            aria-label={
+                                `Previous ${title.toLowerCase()}`
+                            }
+                        >
+                            ←
+                        </button>
+
+
+                        <button
+                            type="button"
+
+                            className={
+                                `section-slider-btn ${
+                                    isLastPage
+                                        ? "disabled"
+                                        : ""
+                                }`
+                            }
+
+                            onClick={
+                                handleNext
+                            }
+
+                            disabled={
+                                isLastPage
+                            }
+
+                            aria-label={
+                                `Next ${title.toLowerCase()}`
+                            }
+                        >
                             →
-                        </span>
-                    </Link>
+                        </button>
+
+                    </div>
+
                 )}
 
             </div>
 
 
-            <div className="anime-section-grid">
+            {/* ==================================================
+                ANIME CARDS
+            ================================================== */}
 
-                {visibleAnime.map((anime) => {
+            <div className="anime-section-slider">
 
-                    const animeId =
-                        anime.mal_id ??
-                        anime.id;
+                <AnimatePresence
+                    initial={false}
+                    mode="wait"
+                    custom={
+                        slideDirection
+                    }
+                >
 
-                    const normalizedAnimeId =
-                        String(animeId);
+                    <motion.div
+                        key={
+                            currentPage
+                        }
 
-                    return (
-                        <AnimeCard
-                            key={normalizedAnimeId}
+                        className="anime-section-grid"
 
-                            anime={anime}
+                        custom={
+                            slideDirection
+                        }
 
-                            statusMap={statusMap}
+                        variants={
+                            slideVariants
+                        }
 
-                            isFavorited={
-                                safeFavoriteIds.has(
-                                    normalizedAnimeId
-                                )
+                        initial="enter"
+
+                        animate="center"
+
+                        exit="exit"
+
+                        transition={{
+                            x: {
+                                duration: 0.38,
+                                ease: [
+                                    0.22,
+                                    1,
+                                    0.36,
+                                    1,
+                                ],
+                            },
+
+                            opacity: {
+                                duration: 0.25,
+                                ease: "easeOut",
+                            },
+                        }}
+                    >
+
+                        {visibleAnime.map(
+                            (anime) => {
+
+                                const animeId =
+                                    anime.mal_id ??
+                                    anime.id;
+
+
+                                const normalizedAnimeId =
+                                    String(
+                                        animeId
+                                    );
+
+
+                                return (
+                                    <AnimeCard
+                                        key={
+                                            normalizedAnimeId
+                                        }
+
+                                        anime={
+                                            anime
+                                        }
+
+                                        statusMap={
+                                            statusMap
+                                        }
+
+                                        isFavorited={
+                                            safeFavoriteIds.has(
+                                                normalizedAnimeId
+                                            )
+                                        }
+
+                                        isFavoritePending={
+                                            toggleFavorite?.isPending ??
+                                            false
+                                        }
+
+                                        onToggleFavorite={() =>
+                                            toggleFavorite.mutate({
+
+                                                anime_id:
+                                                    anime.mal_id ??
+                                                    anime.id,
+
+                                                title:
+                                                    anime.title ??
+                                                    "",
+
+                                                image:
+                                                    anime.image ??
+                                                    "",
+
+                                            })
+                                        }
+                                    />
+                                );
                             }
+                        )}
 
-                            isFavoritePending={
-                                toggleFavorite?.isPending ??
-                                false
-                            }
+                    </motion.div>
 
-                            onToggleFavorite={() =>
-                                toggleFavorite.mutate({
-                                    anime_id:
-                                        anime.mal_id ??
-                                        anime.id,
-
-                                    title:
-                                        anime.title ??
-                                        "",
-
-                                    image:
-                                        anime.image ??
-                                        "",
-                                })
-                            }
-                        />
-                    );
-                })}
+                </AnimatePresence>
 
             </div>
 
