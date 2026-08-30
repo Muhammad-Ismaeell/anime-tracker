@@ -6,37 +6,49 @@ import {
     useState,
 } from "react";
 
-import { useSearchParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import {
+    useSearchParams,
+} from "react-router-dom";
 
-import { useAnimeSearch } from "../hooks/useAnimeSearch";
-import { useDebouncedSearch } from "../hooks/useDebouncedSearch";
+import {
+    Helmet,
+} from "react-helmet-async";
+
+import {
+    useAnimeSearch,
+} from "../hooks/useAnimeSearch";
+
+import {
+    useDebouncedSearch,
+} from "../hooks/useDebouncedSearch";
 
 import {
     useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
 
-import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
+import {
+    useGlobalLibrary,
+} from "../hooks/useGlobalLibrary";
 
 import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
 
 
-const GENRES = [
-    "Action",
-    "Adventure",
-    "Comedy",
-    "Drama",
-    "Fantasy",
-    "Horror",
-    "Mystery",
-    "Romance",
-    "Sci-Fi",
-    "Sports",
-    "Supernatural",
-];
+
+
+
+const INITIAL_FILTERS = {
+    year: "",
+    season: "",
+    type: "",
+    status: "",
+    genres: "",
+    min_score: "",
+    order_by: "",
+    sort: "",
+};
 
 
 export default function AdvancedSearch() {
@@ -56,8 +68,9 @@ export default function AdvancedSearch() {
     ] = useSearchParams();
 
 
-    const { statusMap } =
-        useGlobalLibrary();
+    const {
+        statusMap,
+    } = useGlobalLibrary();
 
 
     // ============================================================
@@ -79,41 +92,33 @@ export default function AdvancedSearch() {
     const [
         filters,
         setFilters,
-    ] = useState({
+    ] = useState(() => ({
+        ...INITIAL_FILTERS,
 
         year:
-            params.get("year") ||
-            "",
+            params.get("year") || "",
 
         season:
-            params.get("season") ||
-            "",
+            params.get("season") || "",
 
         type:
-            params.get("type") ||
-            "",
+            params.get("type") || "",
 
         status:
-            params.get("status") ||
-            "",
+            params.get("status") || "",
 
         genres:
-            params.get("genres") ||
-            "",
+            params.get("genres") || "",
 
         min_score:
-            params.get("min_score") ||
-            "",
+            params.get("min_score") || "",
 
         order_by:
-            params.get("order_by") ||
-            "",
+            params.get("order_by") || "",
 
         sort:
-            params.get("sort") ||
-            "",
-
-    });
+            params.get("sort") || "",
+    }));
 
 
     const loadMoreRef =
@@ -138,7 +143,6 @@ export default function AdvancedSearch() {
     const normalizedFilters =
         useMemo(
             () => ({
-
                 type:
                     filters.type ||
                     undefined,
@@ -170,15 +174,10 @@ export default function AdvancedSearch() {
                 sort:
                     filters.sort ||
                     undefined,
-
             }),
             [filters]
         );
 
-
-    // ============================================================
-    // SEARCH STATE
-    // ============================================================
 
     const hasFilters =
         Object.values(
@@ -198,7 +197,7 @@ export default function AdvancedSearch() {
 
 
     // ============================================================
-    // SEARCH QUERY
+    // SEARCH
     // ============================================================
 
     const {
@@ -229,39 +228,30 @@ export default function AdvancedSearch() {
         useToggleFavorite();
 
 
-    const { favoriteIds } =
+    const favoriteIds =
         useMemo(() => {
 
-            const ids =
-                new Set(
+            return new Set(
+                (
+                    favoritesRes?.results ??
+                    []
+                )
+                    .map(
+                        (favorite) => {
 
-                    (
-                        favoritesRes?.results ??
-                        []
+                            const id =
+                                favorite.anime?.mal_id ??
+                                favorite.anime?.id ??
+                                favorite.anime_id ??
+                                favorite.mal_id;
+
+                            return id != null
+                                ? String(id)
+                                : null;
+                        }
                     )
-                        .map(
-                            (favorite) => {
-
-                                const id =
-                                    favorite.anime?.mal_id ??
-                                    favorite.anime?.id ??
-                                    favorite.anime_id ??
-                                    favorite.mal_id;
-
-                                return id != null
-                                    ? String(id)
-                                    : null;
-
-                            }
-                        )
-                        .filter(Boolean)
-
-                );
-
-
-            return {
-                favoriteIds: ids,
-            };
+                    .filter(Boolean)
+            );
 
         }, [
             favoritesRes,
@@ -273,20 +263,23 @@ export default function AdvancedSearch() {
     // ============================================================
 
     const results =
-        useMemo(() => {
-
-            return (
-                data?.pages ??
-                []
-            ).flatMap(
-                (page) =>
-                    page?.items ??
+        useMemo(
+            () =>
+                (
+                    data?.pages ??
                     []
-            );
+                ).flatMap(
+                    (page) =>
+                        page?.items ??
+                        []
+                ),
+            [data]
+        );
 
-        }, [
-            data,
-        ]);
+
+    const totalResults =
+        data?.pages?.[0]?.total ??
+        0;
 
 
     // ============================================================
@@ -302,10 +295,8 @@ export default function AdvancedSearch() {
 
 
                 if (query.trim()) {
-
                     nextParams.q =
                         query.trim();
-
                 }
 
 
@@ -315,21 +306,14 @@ export default function AdvancedSearch() {
                     ([key, value]) => {
 
                         if (value) {
-
                             nextParams[key] =
                                 value;
-
                         }
 
                     }
                 );
 
 
-                /*
-                 * Replace the current URL instead
-                 * of creating a new browser history
-                 * entry for every search/filter change.
-                 */
                 setParams(
                     nextParams,
                     {
@@ -348,6 +332,8 @@ export default function AdvancedSearch() {
         filters,
         setParams,
     ]);
+
+
 
 
     // ============================================================
@@ -400,37 +386,6 @@ export default function AdvancedSearch() {
 
 
     // ============================================================
-    // FILTER HELPERS
-    // ============================================================
-
-    const clearFilter = (
-        filterName
-    ) => {
-
-        setFilters(
-            (prev) => ({
-                ...prev,
-                [filterName]: "",
-            })
-        );
-
-    };
-
-
-    const clearYear = () => {
-
-        setFilters(
-            (prev) => ({
-                ...prev,
-                year: "",
-                season: "",
-            })
-        );
-
-    };
-
-
-    // ============================================================
     // RENDER
     // ============================================================
 
@@ -440,22 +395,21 @@ export default function AdvancedSearch() {
             <Helmet>
 
                 <title>
-                    Discover Anime | Anime Tracker
+                    Search Anime | Anime Tracker
                 </title>
-
 
                 <meta
                     name="description"
-                    content="Discover and search anime by title, genre, year, season, type, status and score."
+                    content="Search and discover anime by title, genre, year, season, type, status and score."
                 />
 
             </Helmet>
 
 
-            <div className="page">
+            <main className="search-page">
 
                 {/* ==================================================
-                    SEARCH / DISCOVER HERO
+                    SEARCH HERO
                 ================================================== */}
 
                 <section className="search-hero">
@@ -473,16 +427,14 @@ export default function AdvancedSearch() {
 
 
                         <p className="search-hero-description">
-                            Search and explore anime by title,
-                            genre, season, type, status, and score.
+                            Search through thousands of anime
+                            and find something worth watching.
                         </p>
 
                     </div>
 
 
-                    {/* ==================================================
-                        SEARCH BOX
-                    ================================================== */}
+                    {/* SEARCH INPUT */}
 
                     <div className="search-box">
 
@@ -496,19 +448,13 @@ export default function AdvancedSearch() {
 
                         <input
                             className="search-input"
-
-                            value={
-                                query
-                            }
-
-                            onChange={(e) =>
+                            value={query}
+                            onChange={(event) =>
                                 setQuery(
-                                    e.target.value
+                                    event.target.value
                                 )
                             }
-
                             placeholder="Search anime..."
-
                             aria-label="Search anime"
                         />
 
@@ -517,13 +463,10 @@ export default function AdvancedSearch() {
 
                             <button
                                 type="button"
-
                                 className="search-box-clear"
-
                                 onClick={() =>
                                     setQuery("")
                                 }
-
                                 aria-label="Clear search"
                             >
                                 ×
@@ -533,421 +476,625 @@ export default function AdvancedSearch() {
 
                     </div>
 
+                </section>
 
-                    {/* ==================================================
-                        FILTERS
-                    ================================================== */}
+
+                {/* ==================================================
+                    FILTER PANEL
+                ================================================== */}
+
+                <section className="search-filters">
+
+                    <div className="search-filters-header">
+
+                        <div className="search-filters-heading">
+
+                            <span className="search-filters-eyebrow">
+                                FILTERS
+                            </span>
+
+                            <h2 className="search-filters-title">
+                                Narrow your search
+                            </h2>
+
+                        </div>
+
+
+                        {hasFilters && (
+                            <button
+                                type="button"
+                                className="search-filters-clear"
+                                onClick={() => {
+                                    setFilters({
+                                        year: "",
+                                        season: "",
+                                        type: "",
+                                        status: "",
+                                        genres: "",
+                                        min_score: "",
+                                        order_by: "",
+                                        sort: "",
+                                    });
+                                }}
+                            >
+                                Clear all
+                            </button>
+                        )}
+
+                    </div>
+
 
                     <div className="advanced-filters">
 
                         {/* YEAR */}
 
-                        <input
-                            className="filter-input"
+                        <div className="search-filter-field">
 
-                            type="number"
+                            <label htmlFor="search-year">
+                                Year
+                            </label>
 
-                            placeholder="Year"
-
-                            value={
-                                filters.year
-                            }
-
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
+                            <input
+                                id="search-year"
+                                className="filter-input"
+                                type="number"
+                                placeholder="Any year"
+                                value={filters.year}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
                                         ...prev,
-                                        year:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        />
+                                        year: e.target.value,
+                                        season: e.target.value
+                                            ? prev.season
+                                            : "",
+                                    }))
+                                }
+                            />
+
+                        </div>
 
 
                         {/* SEASON */}
 
-                        <select
-                            className="filter-input"
+                        <div className="search-filter-field">
 
-                            disabled={
-                                !filters.year
-                            }
+                            <label htmlFor="search-season">
+                                Season
+                            </label>
 
-                            value={
-                                filters.season
-                            }
-
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
+                            <select
+                                id="search-season"
+                                className="filter-input"
+                                disabled={!filters.year}
+                                value={filters.season}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
                                         ...prev,
-                                        season:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        >
+                                        season: e.target.value,
+                                    }))
+                                }
+                            >
 
-                            <option value="">
-                                Any Season
-                            </option>
+                                <option value="">
+                                    Any season
+                                </option>
 
-                            <option value="winter">
-                                Winter
-                            </option>
+                                <option value="winter">
+                                    Winter
+                                </option>
 
-                            <option value="spring">
-                                Spring
-                            </option>
+                                <option value="spring">
+                                    Spring
+                                </option>
 
-                            <option value="summer">
-                                Summer
-                            </option>
+                                <option value="summer">
+                                    Summer
+                                </option>
 
-                            <option value="fall">
-                                Fall
-                            </option>
+                                <option value="fall">
+                                    Fall
+                                </option>
 
-                        </select>
+                            </select>
+
+                        </div>
 
 
                         {/* TYPE */}
 
-                        <select
-                            className="filter-input"
+                        <div className="search-filter-field">
 
-                            value={
-                                filters.type
-                            }
+                            <label htmlFor="search-type">
+                                Type
+                            </label>
 
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
+                            <select
+                                id="search-type"
+                                className="filter-input"
+                                value={filters.type}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
                                         ...prev,
-                                        type:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        >
+                                        type: e.target.value,
+                                    }))
+                                }
+                            >
 
-                            <option value="">
-                                Any Type
-                            </option>
+                                <option value="">
+                                    Any type
+                                </option>
 
-                            <option value="tv">
-                                TV
-                            </option>
+                                <option value="tv">
+                                    TV
+                                </option>
 
-                            <option value="movie">
-                                Movie
-                            </option>
+                                <option value="movie">
+                                    Movie
+                                </option>
 
-                            <option value="ova">
-                                OVA
-                            </option>
+                                <option value="ova">
+                                    OVA
+                                </option>
 
-                            <option value="ona">
-                                ONA
-                            </option>
+                                <option value="ona">
+                                    ONA
+                                </option>
 
-                            <option value="special">
-                                Special
-                            </option>
+                                <option value="special">
+                                    Special
+                                </option>
 
-                        </select>
+                            </select>
+
+                        </div>
 
 
                         {/* STATUS */}
 
-                        <select
-                            className="filter-input"
+                        <div className="search-filter-field">
 
-                            value={
-                                filters.status
-                            }
+                            <label htmlFor="search-status">
+                                Status
+                            </label>
 
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
+                            <select
+                                id="search-status"
+                                className="filter-input"
+                                value={filters.status}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
                                         ...prev,
-                                        status:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        >
+                                        status: e.target.value,
+                                    }))
+                                }
+                            >
 
-                            <option value="">
-                                Any Status
-                            </option>
+                                <option value="">
+                                    Any status
+                                </option>
 
-                            <option value="airing">
-                                Airing
-                            </option>
+                                <option value="airing">
+                                    Airing
+                                </option>
 
-                            <option value="complete">
-                                Completed
-                            </option>
+                                <option value="complete">
+                                    Completed
+                                </option>
 
-                            <option value="upcoming">
-                                Upcoming
-                            </option>
+                                <option value="upcoming">
+                                    Upcoming
+                                </option>
 
-                        </select>
+                            </select>
+
+                        </div>
 
 
                         {/* GENRE */}
 
-                        <select
-                            className="filter-input"
+                        <div className="search-filter-field">
 
-                            value={
-                                filters.genres
-                            }
+                            <label htmlFor="search-genre">
+                                Genre
+                            </label>
 
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
+                            <select
+                                id="search-genre"
+                                className="filter-input"
+                                value={filters.genres}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
                                         ...prev,
-                                        genres:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        >
+                                        genres: e.target.value,
+                                    }))
+                                }
+                            >
 
-                            <option value="">
-                                Any Genre
-                            </option>
+                                <option value="">
+                                    Any genre
+                                </option>
 
-                            {GENRES.map(
-                                (genre) => (
+                                <option value="Action">
+                                    Action
+                                </option>
 
-                                    <option
-                                        key={
-                                            genre
-                                        }
+                                <option value="Adventure">
+                                    Adventure
+                                </option>
 
-                                        value={
-                                            genre
-                                        }
-                                    >
-                                        {
-                                            genre
-                                        }
-                                    </option>
+                                <option value="Comedy">
+                                    Comedy
+                                </option>
 
-                                )
+                                <option value="Drama">
+                                    Drama
+                                </option>
+
+                                <option value="Fantasy">
+                                    Fantasy
+                                </option>
+
+                                <option value="Horror">
+                                    Horror
+                                </option>
+
+                                <option value="Mystery">
+                                    Mystery
+                                </option>
+
+                                <option value="Romance">
+                                    Romance
+                                </option>
+
+                                <option value="Sci-Fi">
+                                    Sci-Fi
+                                </option>
+
+                                <option value="Sports">
+                                    Sports
+                                </option>
+
+                                <option value="Supernatural">
+                                    Supernatural
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        {/* SCORE */}
+
+                        <div className="search-filter-field">
+
+                            <label htmlFor="search-score">
+                                Minimum score
+                            </label>
+
+                            <input
+                                id="search-score"
+                                className="filter-input"
+                                type="number"
+                                min="0"
+                                max="10"
+                                step="0.1"
+                                placeholder="0 - 10"
+                                value={filters.min_score}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        min_score: e.target.value,
+                                    }))
+                                }
+                            />
+
+                        </div>
+
+                    </div>
+
+
+                    {/* ACTIVE FILTERS */}
+
+                    {hasFilters && (
+                        <div className="active-search-filters">
+
+                            <span className="active-filters-label">
+                                Active:
+                            </span>
+
+                            {filters.genres && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            genres: "",
+                                        }))
+                                    }
+                                >
+                                    Genre: {filters.genres}
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
                             )}
 
-                        </select>
+                            {filters.year && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            year: "",
+                                            season: "",
+                                        }))
+                                    }
+                                >
+                                    Year: {filters.year}
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
+                            )}
+
+                            {filters.season && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            season: "",
+                                        }))
+                                    }
+                                >
+                                    Season: {filters.season}
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
+                            )}
+
+                            {filters.type && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            type: "",
+                                        }))
+                                    }
+                                >
+                                    Type: {filters.type}
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
+                            )}
+
+                            {filters.status && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            status: "",
+                                        }))
+                                    }
+                                >
+                                    Status: {filters.status}
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
+                            )}
+
+                            {filters.min_score && (
+                                <button
+                                    type="button"
+                                    className="active-filter"
+                                    onClick={() =>
+                                        setFilters((prev) => ({
+                                            ...prev,
+                                            min_score: "",
+                                        }))
+                                    }
+                                >
+                                    Score: {filters.min_score}+
+                                    <span aria-hidden="true">
+                                        ×
+                                    </span>
+                                </button>
+                            )}
+
+                        </div>
+                    )}
+
+                </section>
 
 
-                        {/* MINIMUM SCORE */}
+                {/* ==================================================
+                    RESULTS HEADER
+                ================================================== */}
 
-                        <input
-                            className="filter-input"
+                <section className="search-results-section">
 
-                            type="number"
+                    <div className="search-results-header">
 
-                            min="0"
+                        <div>
 
-                            max="10"
+                            <span className="search-results-eyebrow">
+                                {isSearching
+                                    ? "RESULTS"
+                                    : "BROWSE"}
+                            </span>
 
-                            step="0.1"
 
-                            placeholder="Min Score"
+                            <h2 className="search-results-title">
+                                {isSearching
+                                    ? "Search Results"
+                                    : "Discover Anime"}
+                            </h2>
 
-                            value={
-                                filters.min_score
-                            }
+                        </div>
 
-                            onChange={(e) =>
-                                setFilters(
-                                    (prev) => ({
-                                        ...prev,
-                                        min_score:
-                                            e.target.value,
-                                    })
-                                )
-                            }
-                        />
+
+                        {isSearching &&
+                        !isLoading &&
+                        results.length > 0 && (
+
+                            <span className="search-results-count">
+                                {totalResults.toLocaleString()}{" "}
+                                anime found
+                            </span>
+
+                        )}
 
                     </div>
 
 
                     {/* ==================================================
-                        ACTIVE FILTERS
+                        LOADING
                     ================================================== */}
 
-                    {hasFilters && (
+                    {isLoading &&
+                    results.length === 0 ? (
 
-                        <div className="active-search-filters">
+                        <div className="grid">
 
-                            <span className="active-filters-label">
-                                Active filters:
-                            </span>
+                            {Array.from({
+                                length: 12,
+                            }).map(
+                                (_, index) => (
 
+                                    <AnimeCardSkeleton
+                                        key={index}
+                                    />
 
-                            {filters.genres && (
-
-                                <button
-                                    type="button"
-
-                                    className="active-filter"
-
-                                    onClick={() =>
-                                        clearFilter(
-                                            "genres"
-                                        )
-                                    }
-                                >
-
-                                    {
-                                        filters.genres
-                                    }
-
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
-
-                                </button>
-
+                                )
                             )}
 
+                        </div>
 
-                            {filters.year && (
+                    ) : isError ? (
 
-                                <button
-                                    type="button"
+                        /* ==================================================
+                            ERROR
+                        ================================================== */
 
-                                    className="active-filter"
+                        <div className="search-error-state">
 
-                                    onClick={
-                                        clearYear
-                                    }
-                                >
+                            <div className="search-error-icon">
+                                😢
+                            </div>
 
-                                    {
-                                        filters.year
-                                    }
+                            <h2>
+                                Something went wrong
+                            </h2>
 
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
+                            <p>
+                                {
+                                    error?.message ||
+                                    "Failed to load anime."
+                                }
+                            </p>
 
-                                </button>
+                            <button
+                                type="button"
+                                onClick={refetch}
+                                className="retry-btn"
+                            >
+                                Try again
+                            </button>
 
-                            )}
+                        </div>
 
+                    ) : results.length === 0 ? (
 
-                            {filters.season && (
+                        /* ==================================================
+                            EMPTY
+                        ================================================== */
 
-                                <button
-                                    type="button"
+                        <div className="search-empty-state">
 
-                                    className="active-filter"
+                            <EmptyState
+                                text={
+                                    isSearching
+                                        ? "No anime found matching your search."
+                                        : "Start searching to discover anime."
+                                }
+                            />
 
-                                    onClick={() =>
-                                        clearFilter(
-                                            "season"
-                                        )
-                                    }
-                                >
+                        </div>
 
-                                    {
-                                        filters.season
-                                    }
+                    ) : (
 
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
+                        /* ==================================================
+                            RESULTS GRID
+                        ================================================== */
 
-                                </button>
+                        <div className="grid">
 
-                            )}
+                            {results.map(
+                                (anime) => {
 
+                                    const animeId =
+                                        anime.id ??
+                                        anime.mal_id;
 
-                            {filters.type && (
-
-                                <button
-                                    type="button"
-
-                                    className="active-filter"
-
-                                    onClick={() =>
-                                        clearFilter(
-                                            "type"
-                                        )
-                                    }
-                                >
-
-                                    {
-                                        filters.type
-                                    }
-
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
-
-                                </button>
-
-                            )}
-
-
-                            {filters.status && (
-
-                                <button
-                                    type="button"
-
-                                    className="active-filter"
-
-                                    onClick={() =>
-                                        clearFilter(
-                                            "status"
-                                        )
-                                    }
-                                >
-
-                                    {
-                                        filters.status
+                                    if (
+                                        animeId == null
+                                    ) {
+                                        return null;
                                     }
 
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
 
-                                </button>
-
-                            )}
+                                    const id =
+                                        String(
+                                            animeId
+                                        );
 
 
-                            {filters.min_score && (
+                                    return (
 
-                                <button
-                                    type="button"
+                                        <AnimeCard
+                                            key={id}
+                                            anime={anime}
+                                            statusMap={
+                                                statusMap
+                                            }
+                                            isFavorited={
+                                                favoriteIds.has(
+                                                    id
+                                                )
+                                            }
+                                            isFavoritePending={
+                                                toggleFavorite.isPending
+                                            }
+                                            onToggleFavorite={() =>
+                                                toggleFavorite.mutate(
+                                                    {
+                                                        anime_id:
+                                                            animeId,
 
-                                    className="active-filter"
+                                                        title:
+                                                            anime.title,
 
-                                    onClick={() =>
-                                        clearFilter(
-                                            "min_score"
-                                        )
-                                    }
-                                >
+                                                        image:
+                                                            anime.image ||
+                                                            "",
+                                                    }
+                                                )
+                                            }
+                                        />
 
-                                    {
-                                        `Score ${filters.min_score}+`
-                                    }
+                                    );
 
-                                    <span aria-hidden="true">
-                                        ×
-                                    </span>
-
-                                </button>
-
+                                }
                             )}
 
                         </div>
@@ -958,209 +1105,25 @@ export default function AdvancedSearch() {
 
 
                 {/* ==================================================
-                    RESULTS
-                ================================================== */}
-
-                {
-                    isLoading &&
-                    results.length === 0 ? (
-
-                        <div className="grid">
-
-                            {
-                                Array.from({
-                                    length: 12,
-                                }).map(
-                                    (_, index) => (
-
-                                        <AnimeCardSkeleton
-                                            key={
-                                                index
-                                            }
-                                        />
-
-                                    )
-                                )
-                            }
-
-                        </div>
-
-                    ) : isError ? (
-
-                        <div className="error-state">
-
-                            <h2>
-                                😢 Something went wrong
-                            </h2>
-
-
-                            <p>
-                                {
-                                    error?.message ||
-                                    "Failed to load anime."
-                                }
-                            </p>
-
-
-                            <button
-                                type="button"
-
-                                onClick={
-                                    refetch
-                                }
-
-                                className="retry-btn"
-                            >
-                                Retry
-                            </button>
-
-                        </div>
-
-                    ) : results.length === 0 ? (
-
-                        <EmptyState
-                            text={
-                                isSearching
-                                    ? "No anime found matching your filters."
-                                    : "Start searching to discover anime."
-                            }
-                        />
-
-                    ) : (
-
-                        <>
-
-                            <div className="search-results-header">
-
-                                <div>
-
-                                    <span className="search-results-eyebrow">
-                                        {isSearching
-                                            ? "RESULTS"
-                                            : "DISCOVER"
-                                        }
-                                    </span>
-
-
-                                    <h2 className="search-results-title">
-                                        {isSearching
-                                            ? "Search Results"
-                                            : "Discover Anime"
-                                        }
-                                    </h2>
-
-                                </div>
-
-
-                                <span className="search-results-count">
-                                    {results.length}
-                                    {hasNextPage
-                                        ? "+"
-                                        : ""
-                                    } anime
-                                </span>
-
-                            </div>
-
-
-                            <div className="grid">
-
-                                {
-                                    results.map(
-                                        (anime) => {
-
-                                            const animeId =
-                                                anime.id ??
-                                                anime.mal_id;
-
-                                            const id =
-                                                String(
-                                                    animeId
-                                                );
-
-
-                                            return (
-
-                                                <AnimeCard
-                                                    key={
-                                                        id
-                                                    }
-
-                                                    anime={
-                                                        anime
-                                                    }
-
-                                                    statusMap={
-                                                        statusMap
-                                                    }
-
-                                                    isFavorited={
-                                                        favoriteIds.has(
-                                                            id
-                                                        )
-                                                    }
-
-                                                    isFavoritePending={
-                                                        toggleFavorite.isPending
-                                                    }
-
-                                                    onToggleFavorite={() =>
-                                                        toggleFavorite.mutate(
-                                                            {
-                                                                anime_id:
-                                                                    animeId,
-
-                                                                title:
-                                                                    anime.title,
-
-                                                                image:
-                                                                    anime.image ||
-                                                                    "",
-                                                            }
-                                                        )
-                                                    }
-                                                />
-
-                                            );
-
-                                        }
-                                    )
-                                }
-
-                            </div>
-
-                        </>
-
-                    )
-                }
-
-
-                {/* ==================================================
-                    INFINITE SCROLL SENTINEL
+                    INFINITE SCROLL
                 ================================================== */}
 
                 <div
-                    ref={
-                        loadMoreRef
-                    }
-
-                    style={{
-                        height: 40,
-                    }}
+                    ref={loadMoreRef}
+                    className="search-load-more"
+                    aria-hidden="true"
                 />
 
 
-                {
-                    isFetchingNextPage && (
+                {isFetchingNextPage && (
 
-                        <div className="empty-state">
-                            Loading more anime...
-                        </div>
+                    <div className="search-loading-more">
+                        Loading more anime...
+                    </div>
 
-                    )
-                }
+                )}
 
-            </div>
+            </main>
 
         </>
     );
