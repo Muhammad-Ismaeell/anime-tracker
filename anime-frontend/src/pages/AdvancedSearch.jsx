@@ -1,4 +1,3 @@
-
 import {
     useEffect,
     useMemo,
@@ -34,9 +33,6 @@ import {
 import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
-
-
-
 
 
 const INITIAL_FILTERS = {
@@ -179,6 +175,10 @@ export default function AdvancedSearch() {
         );
 
 
+    // ============================================================
+    // SEARCH STATE
+    // ============================================================
+
     const hasFilters =
         Object.values(
             normalizedFilters
@@ -295,8 +295,10 @@ export default function AdvancedSearch() {
 
 
                 if (query.trim()) {
+
                     nextParams.q =
                         query.trim();
+
                 }
 
 
@@ -306,8 +308,10 @@ export default function AdvancedSearch() {
                     ([key, value]) => {
 
                         if (value) {
+
                             nextParams[key] =
                                 value;
+
                         }
 
                     }
@@ -332,8 +336,6 @@ export default function AdvancedSearch() {
         filters,
         setParams,
     ]);
-
-
 
 
     // ============================================================
@@ -386,6 +388,19 @@ export default function AdvancedSearch() {
 
 
     // ============================================================
+    // CLEAR FILTERS
+    // ============================================================
+
+    const clearFilters = () => {
+
+        setFilters({
+            ...INITIAL_FILTERS,
+        });
+
+    };
+
+
+    // ============================================================
     // RENDER
     // ============================================================
 
@@ -407,6 +422,7 @@ export default function AdvancedSearch() {
 
 
             <main className="search-page">
+
 
                 {/* ==================================================
                     SEARCH HERO
@@ -493,6 +509,7 @@ export default function AdvancedSearch() {
                                 FILTERS
                             </span>
 
+
                             <h2 className="search-filters-title">
                                 Narrow your search
                             </h2>
@@ -501,30 +518,24 @@ export default function AdvancedSearch() {
 
 
                         {hasFilters && (
+
                             <button
                                 type="button"
                                 className="search-filters-clear"
-                                onClick={() => {
-                                    setFilters({
-                                        year: "",
-                                        season: "",
-                                        type: "",
-                                        status: "",
-                                        genres: "",
-                                        min_score: "",
-                                        order_by: "",
-                                        sort: "",
-                                    });
-                                }}
+                                onClick={
+                                    clearFilters
+                                }
                             >
                                 Clear all
                             </button>
+
                         )}
 
                     </div>
 
 
                     <div className="advanced-filters">
+
 
                         {/* YEAR */}
 
@@ -534,20 +545,29 @@ export default function AdvancedSearch() {
                                 Year
                             </label>
 
+
                             <input
                                 id="search-year"
                                 className="filter-input"
                                 type="number"
                                 placeholder="Any year"
-                                value={filters.year}
+                                value={
+                                    filters.year
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        year: e.target.value,
-                                        season: e.target.value
-                                            ? prev.season
-                                            : "",
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            year:
+                                                e.target.value,
+
+                                            season:
+                                                e.target.value
+                                                    ? prev.season
+                                                    : "",
+                                        })
+                                    )
                                 }
                             />
 
@@ -562,16 +582,25 @@ export default function AdvancedSearch() {
                                 Season
                             </label>
 
+
                             <select
                                 id="search-season"
                                 className="filter-input"
-                                disabled={!filters.year}
-                                value={filters.season}
+                                disabled={
+                                    !filters.year
+                                }
+                                value={
+                                    filters.season
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        season: e.target.value,
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            season:
+                                                e.target.value,
+                                        })
+                                    )
                                 }
                             >
 
@@ -608,15 +637,22 @@ export default function AdvancedSearch() {
                                 Type
                             </label>
 
+
                             <select
                                 id="search-type"
                                 className="filter-input"
-                                value={filters.type}
+                                value={
+                                    filters.type
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        type: e.target.value,
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            type:
+                                                e.target.value,
+                                        })
+                                    )
                                 }
                             >
 
@@ -657,15 +693,22 @@ export default function AdvancedSearch() {
                                 Status
                             </label>
 
+
                             <select
                                 id="search-status"
                                 className="filter-input"
-                                value={filters.status}
+                                value={
+                                    filters.status
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        status: e.target.value,
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            status:
+                                                e.target.value,
+                                        })
+                                    )
                                 }
                             >
 
@@ -698,15 +741,22 @@ export default function AdvancedSearch() {
                                 Genre
                             </label>
 
+
                             <select
                                 id="search-genre"
                                 className="filter-input"
-                                value={filters.genres}
+                                value={
+                                    filters.genres
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        genres: e.target.value,
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            genres:
+                                                e.target.value,
+                                        })
+                                    )
                                 }
                             >
 
@@ -771,6 +821,7 @@ export default function AdvancedSearch() {
                                 Minimum score
                             </label>
 
+
                             <input
                                 id="search-score"
                                 className="filter-input"
@@ -779,12 +830,18 @@ export default function AdvancedSearch() {
                                 max="10"
                                 step="0.1"
                                 placeholder="0 - 10"
-                                value={filters.min_score}
+                                value={
+                                    filters.min_score
+                                }
                                 onChange={(e) =>
-                                    setFilters((prev) => ({
-                                        ...prev,
-                                        min_score: e.target.value,
-                                    }))
+                                    setFilters(
+                                        (prev) => ({
+                                            ...prev,
+
+                                            min_score:
+                                                e.target.value,
+                                        })
+                                    )
                                 }
                             />
 
@@ -793,166 +850,242 @@ export default function AdvancedSearch() {
                     </div>
 
 
-                    {/* ACTIVE FILTERS */}
+                    {/* ==================================================
+                        ACTIVE FILTERS
+                    ================================================== */}
 
                     {hasFilters && (
+
                         <div className="active-search-filters">
 
                             <span className="active-filters-label">
                                 Active:
                             </span>
 
+
                             {filters.genres && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            genres: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+                                                genres: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Genre: {filters.genres}
+                                    Genre: {
+                                        filters.genres
+                                    }
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
+
 
                             {filters.year && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            year: "",
-                                            season: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+
+                                                year: "",
+                                                season: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Year: {filters.year}
+                                    Year: {
+                                        filters.year
+                                    }
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
+
 
                             {filters.season && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            season: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+
+                                                season: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Season: {filters.season}
+                                    Season: {
+                                        filters.season
+                                    }
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
+
 
                             {filters.type && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            type: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+
+                                                type: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Type: {filters.type}
+                                    Type: {
+                                        filters.type
+                                    }
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
+
 
                             {filters.status && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            status: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+
+                                                status: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Status: {filters.status}
+                                    Status: {
+                                        filters.status
+                                    }
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
 
+
                             {filters.min_score && (
+
                                 <button
                                     type="button"
                                     className="active-filter"
                                     onClick={() =>
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            min_score: "",
-                                        }))
+                                        setFilters(
+                                            (prev) => ({
+                                                ...prev,
+
+                                                min_score: "",
+                                            })
+                                        )
                                     }
                                 >
-                                    Score: {filters.min_score}+
+                                    Score: {
+                                        filters.min_score
+                                    }+
+
                                     <span aria-hidden="true">
                                         ×
                                     </span>
+
                                 </button>
+
                             )}
 
                         </div>
+
                     )}
 
                 </section>
 
 
                 {/* ==================================================
-                    RESULTS HEADER
+                    RESULTS
                 ================================================== */}
 
                 <section className="search-results-section">
+
+
+                    {/* RESULTS HEADER */}
 
                     <div className="search-results-header">
 
                         <div>
 
                             <span className="search-results-eyebrow">
-                                {isSearching
-                                    ? "RESULTS"
-                                    : "BROWSE"}
+                                {
+                                    isSearching
+                                        ? "RESULTS"
+                                        : "BROWSE"
+                                }
                             </span>
 
 
                             <h2 className="search-results-title">
-                                {isSearching
-                                    ? "Search Results"
-                                    : "Discover Anime"}
+
+                                {
+                                    isSearching
+                                        ? "Search Results"
+                                        : "Discover Anime"
+                                }
+
                             </h2>
 
                         </div>
 
 
-                        {isSearching &&
-                        !isLoading &&
-                        results.length > 0 && (
+                        {
+                            totalResults > 0 &&
+                            !isLoading && (
+                                <span className="search-results-count">
 
-                            <span className="search-results-count">
-                                {totalResults.toLocaleString()}{" "}
-                                anime found
-                            </span>
+                                    {
+                                        totalResults.toLocaleString()
+                                    }{" "}
 
-                        )}
+                                    anime found
+
+                                </span>
+                            )
+                        }
 
                     </div>
 
@@ -961,145 +1094,166 @@ export default function AdvancedSearch() {
                         LOADING
                     ================================================== */}
 
-                    {isLoading &&
-                    results.length === 0 ? (
+                    {
+                        isLoading &&
+                        results.length === 0 ? (
 
-                        <div className="grid">
+                            <div className="grid">
 
-                            {Array.from({
-                                length: 12,
-                            }).map(
-                                (_, index) => (
+                                {
+                                    Array.from({
+                                        length: 12,
+                                    }).map(
+                                        (_, index) => (
 
-                                    <AnimeCardSkeleton
-                                        key={index}
-                                    />
+                                            <AnimeCardSkeleton
+                                                key={
+                                                    index
+                                                }
+                                            />
 
-                                )
-                            )}
+                                        )
+                                    )
+                                }
 
-                        </div>
-
-                    ) : isError ? (
-
-                        /* ==================================================
-                            ERROR
-                        ================================================== */
-
-                        <div className="search-error-state">
-
-                            <div className="search-error-icon">
-                                😢
                             </div>
 
-                            <h2>
-                                Something went wrong
-                            </h2>
+                        ) : isError ? (
 
-                            <p>
-                                {
-                                    error?.message ||
-                                    "Failed to load anime."
-                                }
-                            </p>
+                            /* ==================================================
+                                ERROR
+                            ================================================== */
 
-                            <button
-                                type="button"
-                                onClick={refetch}
-                                className="retry-btn"
-                            >
-                                Try again
-                            </button>
+                            <div className="search-error-state">
 
-                        </div>
+                                <div className="search-error-icon">
+                                    😢
+                                </div>
 
-                    ) : results.length === 0 ? (
 
-                        /* ==================================================
-                            EMPTY
-                        ================================================== */
+                                <h2>
+                                    Something went wrong
+                                </h2>
 
-                        <div className="search-empty-state">
 
-                            <EmptyState
-                                text={
-                                    isSearching
-                                        ? "No anime found matching your search."
-                                        : "Start searching to discover anime."
-                                }
-                            />
-
-                        </div>
-
-                    ) : (
-
-                        /* ==================================================
-                            RESULTS GRID
-                        ================================================== */
-
-                        <div className="grid">
-
-                            {results.map(
-                                (anime) => {
-
-                                    const animeId =
-                                        anime.id ??
-                                        anime.mal_id;
-
-                                    if (
-                                        animeId == null
-                                    ) {
-                                        return null;
+                                <p>
+                                    {
+                                        error?.message ||
+                                        "Failed to load anime."
                                     }
+                                </p>
 
 
-                                    const id =
-                                        String(
-                                            animeId
-                                        );
+                                <button
+                                    type="button"
+                                    onClick={
+                                        refetch
+                                    }
+                                    className="retry-btn"
+                                >
+                                    Try again
+                                </button>
+
+                            </div>
+
+                        ) : results.length === 0 ? (
+
+                            /* ==================================================
+                                EMPTY
+                            ================================================== */
+
+                            <div className="search-empty-state">
+
+                                <EmptyState
+                                    text={
+                                        isSearching
+                                            ? "No anime found matching your search."
+                                            : "Start searching to discover anime."
+                                    }
+                                />
+
+                            </div>
+
+                        ) : (
+
+                            /* ==================================================
+                                RESULTS GRID
+                            ================================================== */
+
+                            <div className="grid">
+
+                                {
+                                    results.map(
+                                        (anime) => {
+
+                                            const animeId =
+                                                anime.id ??
+                                                anime.mal_id;
 
 
-                                    return (
-
-                                        <AnimeCard
-                                            key={id}
-                                            anime={anime}
-                                            statusMap={
-                                                statusMap
+                                            if (
+                                                animeId == null
+                                            ) {
+                                                return null;
                                             }
-                                            isFavorited={
-                                                favoriteIds.has(
-                                                    id
-                                                )
-                                            }
-                                            isFavoritePending={
-                                                toggleFavorite.isPending
-                                            }
-                                            onToggleFavorite={() =>
-                                                toggleFavorite.mutate(
-                                                    {
-                                                        anime_id:
-                                                            animeId,
 
-                                                        title:
-                                                            anime.title,
 
-                                                        image:
-                                                            anime.image ||
-                                                            "",
+                                            const id =
+                                                String(
+                                                    animeId
+                                                );
+
+
+                                            return (
+
+                                                <AnimeCard
+                                                    key={id}
+
+                                                    anime={
+                                                        anime
                                                     }
-                                                )
-                                            }
-                                        />
 
-                                    );
+                                                    statusMap={
+                                                        statusMap
+                                                    }
 
+                                                    isFavorited={
+                                                        favoriteIds.has(
+                                                            id
+                                                        )
+                                                    }
+
+                                                    isFavoritePending={
+                                                        toggleFavorite.isPending
+                                                    }
+
+                                                    onToggleFavorite={() =>
+                                                        toggleFavorite.mutate(
+                                                            {
+                                                                anime_id:
+                                                                    animeId,
+
+                                                                title:
+                                                                    anime.title,
+
+                                                                image:
+                                                                    anime.image ||
+                                                                    "",
+                                                            }
+                                                        )
+                                                    }
+                                                />
+
+                                            );
+
+                                        }
+                                    )
                                 }
-                            )}
 
-                        </div>
+                            </div>
 
-                    )}
+                        )
+                    }
 
                 </section>
 
@@ -1109,23 +1263,28 @@ export default function AdvancedSearch() {
                 ================================================== */}
 
                 <div
-                    ref={loadMoreRef}
+                    ref={
+                        loadMoreRef
+                    }
+
                     className="search-load-more"
+
                     aria-hidden="true"
                 />
 
 
-                {isFetchingNextPage && (
+                {
+                    isFetchingNextPage && (
 
-                    <div className="search-loading-more">
-                        Loading more anime...
-                    </div>
+                        <div className="search-loading-more">
+                            Loading more anime...
+                        </div>
 
-                )}
+                    )
+                }
 
             </main>
 
         </>
     );
 }
-

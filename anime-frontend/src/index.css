@@ -8904,3 +8904,659 @@ button:disabled {
     }
 
 }
+
+
+/* ============================================================
+   SEARCH PAGE — COMPACT CATALOGUE LAYOUT
+   ============================================================ */
+
+/*
+ * The search page should prioritize the anime results.
+ *
+ * The previous layout gave too much vertical space to:
+ * - the hero
+ * - the filter heading
+ * - individual filter fields
+ *
+ * These overrides make the page feel more like a catalogue.
+ */
+
+
+/* ============================================================
+   SEARCH PAGE
+   ============================================================ */
+/* ============================================================
+   SEARCH PAGE
+============================================================ */
+
+.search-page {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 32px 70px;
+}
+
+
+/* ============================================================
+   SEARCH HERO
+============================================================ */
+
+.search-hero {
+    position: relative;
+    margin-bottom: 28px;
+    padding: 30px 32px 26px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(99, 102, 241, 0.10),
+            transparent 35%
+        ),
+        var(--card);
+
+    overflow: hidden;
+}
+
+.search-hero-content {
+    max-width: 720px;
+}
+
+.search-hero-eyebrow {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+
+    color: var(--text-light);
+}
+
+.search-hero-title {
+    margin: 0;
+
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+
+    color: var(--heading);
+}
+
+.search-hero-description {
+    margin: 10px 0 22px;
+
+    max-width: 600px;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: var(--text-light);
+}
+
+
+/* ============================================================
+   SEARCH BOX
+============================================================ */
+
+.search-box {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    max-width: 760px;
+
+    height: 54px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+
+    background: rgba(15, 17, 23, 0.75);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.search-box:focus-within {
+    border-color: rgba(129, 140, 248, 0.55);
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.10);
+}
+
+.search-box-icon {
+    flex-shrink: 0;
+
+    margin-left: 17px;
+
+    font-size: 17px;
+
+    opacity: 0.65;
+}
+
+.search-input {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 46px 0 13px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: var(--heading);
+
+    font-size: 15px;
+}
+
+.search-input::placeholder {
+    color: var(--text-light);
+}
+
+.search-box-clear {
+    position: absolute;
+    right: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    color: var(--text-light);
+
+    font-size: 19px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.search-box-clear:hover {
+    background: rgba(255, 255, 255, 0.13);
+    color: var(--heading);
+}
+
+
+/* ============================================================
+   FILTER PANEL
+============================================================ */
+
+.search-filters {
+    margin-bottom: 32px;
+    padding: 20px 22px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+
+    background: var(--card);
+}
+
+.search-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+}
+
+.search-filters-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.search-filters-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+
+    color: var(--text-light);
+}
+
+.search-filters-title {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    color: var(--heading);
+}
+
+.search-filters-clear {
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: var(--text-light);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.search-filters-clear:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--heading);
+}
+
+
+/* ============================================================
+   FILTER GRID
+============================================================ */
+
+.advanced-filters {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+.search-filter-field {
+    min-width: 0;
+}
+
+.search-filter-field label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    color: var(--text-light);
+}
+
+.filter-input {
+    width: 100%;
+    height: 40px;
+
+    padding: 0 11px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    color: var(--heading);
+
+    font-size: 12px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.filter-input:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.filter-input:focus {
+    border-color: rgba(129, 140, 248, 0.5);
+
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.filter-input:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+}
+
+.filter-input option {
+    background: #111827;
+    color: #ffffff;
+}
+
+
+/* ============================================================
+   ACTIVE FILTERS
+============================================================ */
+
+.active-search-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 14px;
+    padding-top: 14px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.active-filters-label {
+    margin-right: 3px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    color: var(--text-light);
+}
+
+.active-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    min-height: 28px;
+
+    padding: 4px 9px;
+
+    border: 1px solid rgba(129, 140, 248, 0.18);
+    border-radius: 7px;
+
+    background: rgba(99, 102, 241, 0.08);
+
+    color: var(--text);
+
+    font-size: 11px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.active-filter span {
+    font-size: 14px;
+    line-height: 1;
+
+    opacity: 0.7;
+}
+
+.active-filter:hover {
+    background: rgba(99, 102, 241, 0.14);
+
+    border-color: rgba(129, 140, 248, 0.3);
+}
+
+
+/* ============================================================
+   RESULTS SECTION
+============================================================ */
+
+.search-results-section {
+    width: 100%;
+}
+
+.search-results-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.search-results-eyebrow {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+
+    color: var(--text-light);
+}
+
+.search-results-title {
+    margin: 0;
+
+    font-size: 22px;
+    font-weight: 650;
+
+    color: var(--heading);
+}
+
+.search-results-count {
+    padding-bottom: 2px;
+
+    font-size: 12px;
+
+    color: var(--text-light);
+}
+
+
+/* ============================================================
+   RESULTS GRID
+============================================================ */
+
+.search-results-section .grid {
+    margin-top: 0;
+}
+
+
+/* ============================================================
+   ERROR STATE
+============================================================ */
+
+.search-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 70px 20px;
+
+    text-align: center;
+}
+
+.search-error-icon {
+    margin-bottom: 14px;
+
+    font-size: 36px;
+}
+
+.search-error-state h2 {
+    margin: 0 0 8px;
+
+    font-size: 20px;
+
+    color: var(--heading);
+}
+
+.search-error-state p {
+    max-width: 420px;
+
+    margin: 0 0 20px;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: var(--text-light);
+}
+
+.retry-btn {
+    padding: 9px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: var(--heading);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.retry-btn:hover {
+    background: rgba(255, 255, 255, 0.13);
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.search-empty-state {
+    padding: 30px 0 60px;
+}
+
+
+/* ============================================================
+   INFINITE SCROLL
+============================================================ */
+
+.search-load-more {
+    height: 1px;
+}
+
+.search-loading-more {
+    padding: 20px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    color: var(--text-light);
+}
+
+
+/* ============================================================
+   RESPONSIVE — LAPTOP
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .advanced-filters {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .search-page {
+        padding: 20px 16px 50px;
+    }
+
+    .search-hero {
+        padding: 24px 20px 22px;
+    }
+
+    .search-hero-title {
+        font-size: 28px;
+    }
+
+    .search-hero-description {
+        font-size: 13px;
+    }
+
+    .search-filters {
+        padding: 17px;
+    }
+
+    .advanced-filters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+    .search-filters-heading {
+        display: block;
+    }
+
+    .search-filters-eyebrow {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .search-results-title {
+        font-size: 19px;
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+============================================================ */
+
+@media (max-width: 480px) {
+
+    .search-page {
+        padding: 14px 12px 40px;
+    }
+
+    .search-hero {
+        margin-bottom: 18px;
+        padding: 20px 16px;
+    }
+
+    .search-hero-title {
+        font-size: 25px;
+    }
+
+    .search-box {
+        height: 48px;
+    }
+
+    .search-filters {
+        padding: 15px;
+        margin-bottom: 24px;
+    }
+
+    .search-filters-header {
+        align-items: flex-start;
+    }
+
+    .advanced-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .search-results-header {
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .search-results-count {
+        white-space: nowrap;
+    }
+
+}
