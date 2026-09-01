@@ -1,7 +1,10 @@
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { memo, useContext, useState } from "react";
+import {
+    memo,
+    useContext,
+    useState,
+} from "react";
 
 import { AuthContext } from "../context/AuthContext";
 import { useAuthPrompt } from "../context/useAuthPrompt";
@@ -17,6 +20,7 @@ function AnimeCard({
     onToggleFavorite,
     isFavoritePending = false,
 }) {
+
     const { isAuthenticated } =
         useContext(AuthContext);
 
@@ -28,6 +32,12 @@ function AnimeCard({
 
     const [open, setOpen] =
         useState(false);
+
+    const [showProgressInput, setShowProgressInput] =
+        useState(false);
+
+    const [progress, setProgress] =
+        useState(0);
 
 
     // ============================================================
@@ -65,6 +75,9 @@ function AnimeCard({
         anime?.year ||
         "";
 
+    const episodeCount =
+        Number(anime?.episodes) || 0;
+
     const status =
         statusMap instanceof Map
             ? statusMap.get(animeId)
@@ -78,6 +91,7 @@ function AnimeCard({
     const handleFavoriteClick = (
         event
     ) => {
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -101,6 +115,7 @@ function AnimeCard({
     const handleLibraryClick = (
         event
     ) => {
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -112,21 +127,49 @@ function AnimeCard({
         setOpen(
             (current) => !current
         );
+
+        setShowProgressInput(false);
     };
 
+
+    // ============================================================
+    // STATUS UPDATE
+    // ============================================================
 
     const handleUpdate = (
         value
     ) => {
+
         if (!isAuthenticated) {
             setOpen(false);
             showLoginRequired();
             return;
         }
 
-        setOpen(false);
+        // --------------------------------------------------------
+        // WATCHING
+        // --------------------------------------------------------
+
+        if (value === "watching") {
+
+            setProgress(
+                Number(anime?.progress) || 0
+            );
+
+            setShowProgressInput(true);
+
+            return;
+        }
+
+        // --------------------------------------------------------
+        // REMOVE
+        // --------------------------------------------------------
 
         if (value === "remove") {
+
+            setOpen(false);
+            setShowProgressInput(false);
+
             updateLibrary.mutate({
                 anime_id: animeId,
                 remove: true,
@@ -135,9 +178,56 @@ function AnimeCard({
             return;
         }
 
+        // --------------------------------------------------------
+        // OTHER STATUSES
+        // --------------------------------------------------------
+
+        setOpen(false);
+        setShowProgressInput(false);
+
         updateLibrary.mutate({
             anime_id: animeId,
             status: value,
+            title,
+            image,
+        });
+    };
+
+
+    // ============================================================
+    // WATCHING CONFIRMATION
+    // ============================================================
+
+    const handleWatchingSubmit = () => {
+
+        let safeProgress =
+            Number(progress);
+
+        if (!Number.isFinite(safeProgress)) {
+            safeProgress = 0;
+        }
+
+        safeProgress =
+            Math.max(
+                0,
+                Math.floor(safeProgress)
+            );
+
+        if (episodeCount > 0) {
+            safeProgress =
+                Math.min(
+                    safeProgress,
+                    episodeCount
+                );
+        }
+
+        setOpen(false);
+        setShowProgressInput(false);
+
+        updateLibrary.mutate({
+            anime_id: animeId,
+            status: "watching",
+            progress: safeProgress,
             title,
             image,
         });
@@ -292,8 +382,7 @@ function AnimeCard({
                     <button
                         type="button"
                         className={`status-badge ${
-                            status ||
-                            "none"
+                            status || "none"
                         }`}
                         onClick={
                             handleLibraryClick
@@ -329,85 +418,162 @@ function AnimeCard({
                             role="menu"
                         >
 
-                            <button
-                                type="button"
-                                role="menuitem"
-                                onClick={() =>
-                                    handleUpdate(
-                                        "watching"
-                                    )
-                                }
-                                disabled={
-                                    updateLibrary.isPending
-                                }
-                            >
-                                📺 Watching
-                            </button>
+                            {!showProgressInput ? (
+
+                                <>
+
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleUpdate(
+                                                "watching"
+                                            )
+                                        }
+                                        disabled={
+                                            updateLibrary.isPending
+                                        }
+                                    >
+                                        📺 Watching
+                                    </button>
 
 
-                            <button
-                                type="button"
-                                role="menuitem"
-                                onClick={() =>
-                                    handleUpdate(
-                                        "completed"
-                                    )
-                                }
-                                disabled={
-                                    updateLibrary.isPending
-                                }
-                            >
-                                ✅ Completed
-                            </button>
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleUpdate(
+                                                "completed"
+                                            )
+                                        }
+                                        disabled={
+                                            updateLibrary.isPending
+                                        }
+                                    >
+                                        ✅ Completed
+                                    </button>
 
 
-                            <button
-                                type="button"
-                                role="menuitem"
-                                onClick={() =>
-                                    handleUpdate(
-                                        "dropped"
-                                    )
-                                }
-                                disabled={
-                                    updateLibrary.isPending
-                                }
-                            >
-                                ❌ Dropped
-                            </button>
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleUpdate(
+                                                "dropped"
+                                            )
+                                        }
+                                        disabled={
+                                            updateLibrary.isPending
+                                        }
+                                    >
+                                        ❌ Dropped
+                                    </button>
 
 
-                            <button
-                                type="button"
-                                role="menuitem"
-                                onClick={() =>
-                                    handleUpdate(
-                                        "plan_to_watch"
-                                    )
-                                }
-                                disabled={
-                                    updateLibrary.isPending
-                                }
-                            >
-                                📌 Plan to Watch
-                            </button>
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={() =>
+                                            handleUpdate(
+                                                "plan_to_watch"
+                                            )
+                                        }
+                                        disabled={
+                                            updateLibrary.isPending
+                                        }
+                                    >
+                                        📌 Plan to Watch
+                                    </button>
 
 
-                            <button
-                                type="button"
-                                role="menuitem"
-                                className="danger"
-                                onClick={() =>
-                                    handleUpdate(
-                                        "remove"
-                                    )
-                                }
-                                disabled={
-                                    updateLibrary.isPending
-                                }
-                            >
-                                🗑 Remove from library
-                            </button>
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        className="danger"
+                                        onClick={() =>
+                                            handleUpdate(
+                                                "remove"
+                                            )
+                                        }
+                                        disabled={
+                                            updateLibrary.isPending
+                                        }
+                                    >
+                                        🗑 Remove from library
+                                    </button>
+
+                                </>
+
+                            ) : (
+
+                                <div
+                                    className="progress-input-menu"
+                                    onClick={(event) =>
+                                        event.stopPropagation()
+                                    }
+                                >
+
+                                    <label htmlFor={`progress-${animeId}`}>
+                                        Episodes watched
+                                    </label>
+
+                                    <input
+                                        id={`progress-${animeId}`}
+                                        type="number"
+                                        min="0"
+                                        max={
+                                            episodeCount > 0
+                                                ? episodeCount
+                                                : undefined
+                                        }
+                                        value={progress}
+                                        onChange={(event) =>
+                                            setProgress(
+                                                event.target.value
+                                            )
+                                        }
+                                        autoFocus
+                                    />
+
+                                    {episodeCount > 0 && (
+                                        <small>
+                                            out of {episodeCount} episodes
+                                        </small>
+                                    )}
+
+                                    <div className="progress-input-actions">
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowProgressInput(false);
+                                            }}
+                                            disabled={
+                                                updateLibrary.isPending
+                                            }
+                                        >
+                                            Back
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                handleWatchingSubmit
+                                            }
+                                            disabled={
+                                                updateLibrary.isPending
+                                            }
+                                        >
+                                            {updateLibrary.isPending
+                                                ? "Saving..."
+                                                : "Save"}
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            )}
 
                         </div>
 
@@ -423,4 +589,3 @@ function AnimeCard({
 
 
 export default memo(AnimeCard);
-
