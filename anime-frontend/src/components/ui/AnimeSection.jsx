@@ -98,7 +98,6 @@ export default function AnimeSection({
             CARDS_PER_PAGE
         );
 
-
     const hasMultiplePages =
         totalPages > 1;
 
