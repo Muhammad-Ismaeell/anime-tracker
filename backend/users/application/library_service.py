@@ -93,14 +93,14 @@ class LibraryService:
         # EFFECTIVE PROGRESS
         # ==================================================
 
-        # A completed anime must always have progress equal
-        # to its total episode count when that count is known.
+        # Progress can never exceed the number of episodes
+        # currently known by Jikan.
         #
-        # For both finished and currently airing anime,
-        # anime.episodes represents the maximum number of
-        # episodes currently known by Jikan.
+        # For a finished anime, this is its final episode
+        # count.
         #
-        # Therefore progress can never exceed anime.episodes.
+        # For an airing anime, this is the number of episodes
+        # currently known/released.
 
         if anime.episodes is not None:
 
@@ -115,12 +115,50 @@ class LibraryService:
 
 
         # ==================================================
-        # COMPLETED STATUS
+        # AUTOMATIC COMPLETION
         # ==================================================
 
-        # If the user marks an anime as completed and Jikan
-        # knows its episode count, completion means all
-        # currently known episodes have been watched.
+        # If the user reaches the maximum known episode count,
+        # the anime is automatically considered completed.
+        #
+        # This applies to both finished and currently airing
+        # anime because anime.episodes represents the maximum
+        # currently known episode count.
+        #
+        # Example:
+        #
+        # Finished anime:
+        #   28 episodes -> progress 28 -> completed
+        #
+        # Airing anime:
+        #   12 currently known episodes -> progress 12
+        #   -> completed
+        #
+        # This prevents:
+        #
+        #   watching 28/28
+        #
+        # and instead stores:
+        #
+        #   completed 28/28
+
+        if (
+            status == "watching"
+            and anime.episodes is not None
+            and effective_progress >= anime.episodes
+        ):
+
+            status = "completed"
+
+            effective_progress = anime.episodes
+
+
+        # ==================================================
+        # EXPLICIT COMPLETED STATUS
+        # ==================================================
+
+        # When the user explicitly chooses "completed",
+        # automatically set progress to the known episode count.
 
         if (
             status == "completed"
@@ -195,7 +233,6 @@ class LibraryService:
 
             obj.status = status
             obj.progress = effective_progress
-
 
             update_fields = [
                 "status",
@@ -311,8 +348,11 @@ class LibraryService:
         # ACTIVITY
         # ==================================================
 
-        # Progress-only changes do NOT create
-        # another activity.
+        # Progress-only changes do NOT create another activity.
+        #
+        # If progress reaches the maximum episode count and
+        # automatically changes the status from watching to
+        # completed, the activity will correctly be COMPLETED.
 
         action_map = {
             "watching": "WATCHING",

@@ -130,6 +130,58 @@ class LibraryTests(APITestCase):
             64,
         )
 
+    def test_progress_at_episode_count_automatically_completes_anime(self):
+        response = self.client.post(
+            "/api/users/library/update/",
+            {
+                "anime_id": 1,
+                "status": "watching",
+                "progress": 64,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        library = UserAnimeStatus.objects.get(
+            user=self.user,
+            anime=self.anime,
+        )
+
+        self.assertEqual(
+            library.status,
+            "completed",
+        )
+
+        self.assertEqual(
+            library.progress,
+            64,
+        )
+
+        self.assertIsNotNone(
+            library.completed_at
+        )
+
+        self.assertEqual(
+            Activity.objects.filter(
+                user=self.user,
+                anime=self.anime,
+                action="COMPLETED",
+            ).count(),
+            1,
+        )
+
+        self.assertFalse(
+            Activity.objects.filter(
+                user=self.user,
+                anime=self.anime,
+                action="WATCHING",
+            ).exists()
+        )
+
     def test_airing_anime_progress_cannot_exceed_current_episode_count(self):
         airing_anime = Anime.objects.create(
             mal_id=2,
