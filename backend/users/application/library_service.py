@@ -93,11 +93,16 @@ class LibraryService:
         # EFFECTIVE PROGRESS
         # ==================================================
 
-        if status == "completed" and anime.episodes:
+        # A completed anime must always have progress equal
+        # to its total episode count when that count is known.
+        #
+        # For both finished and currently airing anime,
+        # anime.episodes represents the maximum number of
+        # episodes currently known by Jikan.
+        #
+        # Therefore progress can never exceed anime.episodes.
 
-            effective_progress = anime.episodes
-
-        elif anime.episodes:
+        if anime.episodes is not None:
 
             effective_progress = min(
                 requested_progress,
@@ -107,6 +112,22 @@ class LibraryService:
         else:
 
             effective_progress = requested_progress
+
+
+        # ==================================================
+        # COMPLETED STATUS
+        # ==================================================
+
+        # If the user marks an anime as completed and Jikan
+        # knows its episode count, completion means all
+        # currently known episodes have been watched.
+
+        if (
+            status == "completed"
+            and anime.episodes is not None
+        ):
+
+            effective_progress = anime.episodes
 
 
         # ==================================================
