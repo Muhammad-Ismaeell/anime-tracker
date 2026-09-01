@@ -1,3 +1,4 @@
+
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
@@ -75,6 +76,84 @@ class LibraryTests(APITestCase):
                 anime=self.anime,
             ).action,
             "WATCHING",
+        )
+
+    def test_progress_cannot_exceed_anime_episode_count(self):
+        response = self.client.post(
+            "/api/users/library/update/",
+            {
+                "anime_id": 1,
+                "status": "watching",
+                "progress": 100,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        library = UserAnimeStatus.objects.get(
+            user=self.user,
+            anime=self.anime,
+        )
+
+        self.assertEqual(
+            library.progress,
+            64,
+        )
+
+    def test_progress_equal_to_episode_count_is_allowed(self):
+        response = self.client.post(
+            "/api/users/library/update/",
+            {
+                "anime_id": 1,
+                "status": "watching",
+                "progress": 64,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        library = UserAnimeStatus.objects.get(
+            user=self.user,
+            anime=self.anime,
+        )
+
+        self.assertEqual(
+            library.progress,
+            64,
+        )
+
+    def test_negative_progress_becomes_zero(self):
+        response = self.client.post(
+            "/api/users/library/update/",
+            {
+                "anime_id": 1,
+                "status": "watching",
+                "progress": -10,
+            },
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        library = UserAnimeStatus.objects.get(
+            user=self.user,
+            anime=self.anime,
+        )
+
+        self.assertEqual(
+            library.progress,
+            0,
         )
 
     def test_update_progress_without_duplicate_activity(self):
@@ -319,3 +398,4 @@ class LibraryTests(APITestCase):
             response.status_code,
             401,
         )
+
