@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "../../api/client";
 import { queryKeys } from "../../lib/querykeys";
 
+
 export function useDashboard() {
 
     return useQuery({
@@ -10,11 +11,14 @@ export function useDashboard() {
 
         queryFn: async () => {
 
-            const res = await api.get(
+            const response = await api.get(
                 "/users/dashboard/"
             );
 
-            return res.data.data;
-        }
+            return response.data?.data ?? {};
+
+        },
+
     });
+
 }

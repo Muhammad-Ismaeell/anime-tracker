@@ -86,6 +86,13 @@ export function useToggleFavorite() {
                 queryKey: queryKeys.users.activity,
             });
 
+
+            // Dashboard contains recent_activity,
+            // so it must also be invalidated.
+            await queryClient.invalidateQueries({
+                queryKey: queryKeys.users.dashboard,
+            });
+
         },
 
         onError: () => {

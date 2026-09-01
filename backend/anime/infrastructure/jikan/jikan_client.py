@@ -45,7 +45,18 @@ def safe_request(url, params=None, retries=3):
                 timeout=60,
             )
 
+            if result.returncode != 0:
+                logger.warning(
+                    "Jikan curl failed: %s",
+                    result.stderr
+                )
+                return None
+
             if not result.stdout:
+                logger.warning(
+                    "Jikan returned an empty response for %s",
+                    url
+                )
                 return None
 
             data = json.loads(result.stdout)

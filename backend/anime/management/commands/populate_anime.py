@@ -13,17 +13,17 @@ from anime.infrastructure.models import Anime
 
 class Command(BaseCommand):
 
-    help = "Populate anime database from Jikan"
+    help = "Populate anime database from multiple Jikan sources"
 
     def add_arguments(self, parser):
 
         parser.add_argument(
             "--max-pages",
             type=int,
-            default=200,
+            default=5,
             help=(
-                "Maximum number of Jikan pages "
-                "to process. 25 anime per page."
+                "Maximum number of pages to process "
+                "for each source."
             ),
         )
 
@@ -54,19 +54,10 @@ class Command(BaseCommand):
 
         for anime in items:
 
-            # ======================================
-            # NSFW FILTER
-            # ======================================
-
             if is_nsfw(anime):
 
                 blocked_count += 1
-
                 continue
-
-            # ======================================
-            # SAVE
-            # ======================================
 
             try:
 
@@ -99,12 +90,13 @@ class Command(BaseCommand):
         )
 
     # ==============================================
-    # FETCH GENERAL CATALOG
+    # POPULATE ONE SOURCE
     # ==============================================
 
-    def populate_catalog(
+    def populate_source(
         self,
-        client,
+        name,
+        fetcher,
         service,
         max_pages,
         delay,
@@ -115,72 +107,48 @@ class Command(BaseCommand):
         total_blocked = 0
         total_failed = 0
 
-        page = 1
+        self.stdout.write(
+            self.style.HTTP_INFO(
+                f"\n========== {name.upper()} =========="
+            )
+        )
 
-        while page <= max_pages:
+        for page in range(1, max_pages + 1):
 
             self.stdout.write(
-                f"Fetching catalog page {page}..."
+                f"Fetching {name} page {page}..."
             )
 
-            response = client.get_all_anime(
-                page
-            )
+            response = fetcher(page)
 
             if not response:
 
                 self.stdout.write(
                     self.style.WARNING(
-                        f"Page {page} failed."
+                        f"{name} page {page} failed."
                     )
                 )
 
                 break
 
-            # ======================================
-            # RAW JIKAN DATA
-            # ======================================
-
             items = response.get(
                 "items",
-                []
+                [],
             )
 
             has_next = response.get(
                 "has_next",
-                False
+                False,
             )
-
-            total_available = response.get(
-                "total",
-                0
-            )
-
-            # ======================================
-            # API ACTUALLY RETURNED NO DATA
-            # ======================================
 
             if not items:
 
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"Jikan returned no items "
-                        f"for page {page}."
-                    )
+                    f"No items returned for "
+                    f"{name} page {page}."
                 )
 
-                if not has_next:
-                    break
-
-                page += 1
-
-                time.sleep(delay)
-
-                continue
-
-            # ======================================
-            # SAVE SAFE ITEMS
-            # ======================================
+                break
 
             (
                 new_count,
@@ -205,30 +173,13 @@ class Command(BaseCommand):
                 f"{fail_count} failed"
             )
 
-            # ======================================
-            # PROGRESS
-            # ======================================
-
-            if total_available:
-
-                self.stdout.write(
-                    f"Jikan catalog: "
-                    f"{total_available} anime available"
-                )
-
-            # ======================================
-            # PAGINATION
-            # ======================================
-
             if not has_next:
 
                 self.stdout.write(
-                    "Reached the last Jikan page."
+                    f"Reached the last {name} page."
                 )
 
                 break
-
-            page += 1
 
             time.sleep(delay)
 
@@ -250,6 +201,7 @@ class Command(BaseCommand):
     ):
 
         client = JikanClient()
+
         service = AnimeService(
             client
         )
@@ -262,6 +214,42 @@ class Command(BaseCommand):
             "delay"
         ]
 
+        sources = [
+            (
+                "Top Anime",
+                client.get_top,
+            ),
+            (
+                "Seasonal Anime",
+                client.get_seasonal,
+            ),
+            (
+                "Upcoming Anime",
+                client.get_upcoming,
+            ),
+            (
+                "Currently Airing",
+                client.get_airing,
+            ),
+            (
+                "Movies",
+                client.get_movies,
+            ),
+            (
+                "OVA",
+                client.get_ova,
+            ),
+            (
+                "ONA",
+                client.get_ona,
+            ),
+        ]
+
+        total_new = 0
+        total_updated = 0
+        total_blocked = 0
+        total_failed = 0
+
         self.stdout.write(
             self.style.HTTP_INFO(
                 "\n===================================="
@@ -270,7 +258,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.HTTP_INFO(
-                "      JIKAN ANIME POPULATION"
+                "       JIKAN ANIME POPULATION"
             )
         )
 
@@ -281,37 +269,42 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(
-            f"Maximum pages: {max_pages}"
+            f"Sources: {len(sources)}"
         )
 
         self.stdout.write(
-            f"Anime per page: 25"
+            f"Maximum pages per source: "
+            f"{max_pages}"
         )
 
         self.stdout.write(
-            f"Maximum requested: "
-            f"{max_pages * 25} anime"
-        )
-
-        self.stdout.write(
-            f"Request delay: {delay}s\n"
+            f"Delay between requests: "
+            f"{delay}s"
         )
 
         # ==========================================
-        # POPULATE GENERAL CATALOG
+        # POPULATE ALL SOURCES
         # ==========================================
 
-        (
-            total_new,
-            total_updated,
-            total_blocked,
-            total_failed,
-        ) = self.populate_catalog(
-            client=client,
-            service=service,
-            max_pages=max_pages,
-            delay=delay,
-        )
+        for name, fetcher in sources:
+
+            (
+                new_count,
+                update_count,
+                blocked_count,
+                fail_count,
+            ) = self.populate_source(
+                name=name,
+                fetcher=fetcher,
+                service=service,
+                max_pages=max_pages,
+                delay=delay,
+            )
+
+            total_new += new_count
+            total_updated += update_count
+            total_blocked += blocked_count
+            total_failed += fail_count
 
         # ==========================================
         # FINAL RESULT
@@ -358,4 +351,3 @@ class Command(BaseCommand):
                 "===================================="
             )
         )
-
