@@ -2,7 +2,6 @@
 import { useNavigate } from "react-router-dom";
 
 import PageContainer from "../components/ui/PageContainer";
-import EmptyState from "../components/ui/EmptyState";
 import OptimizedImage from "../components/ui/OptimizedImage";
 
 import { useDashboard } from "../hooks/user/useDashboard";
@@ -19,7 +18,135 @@ const actionLabels = {
 };
 
 
+function formatDate(date) {
+    if (!date) {
+        return "";
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "";
+    }
+
+    return parsedDate.toLocaleDateString(
+        undefined,
+        {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        }
+    );
+}
+
+
+function getAnimeProgress(progress, episodes) {
+    const current = Math.max(
+        Number(progress) || 0,
+        0
+    );
+
+    const total = Number(episodes) || 0;
+
+    if (total <= 0) {
+        return 0;
+    }
+
+    return Math.min(
+        Math.round((current / total) * 100),
+        100
+    );
+}
+
+
+function DashboardSkeleton() {
+    return (
+        <PageContainer>
+
+            <div className="dashboard-skeleton">
+
+                <div className="dashboard-skeleton-hero">
+                    <div className="skeleton-line dashboard-skeleton-title" />
+                    <div className="skeleton-line dashboard-skeleton-subtitle" />
+                </div>
+
+
+                <div className="stats-grid premium">
+
+                    {Array.from({ length: 4 }).map(
+                        (_, index) => (
+                            <div
+                                key={index}
+                                className="stat-card glass dashboard-skeleton-stat"
+                            >
+                                <div className="skeleton-circle" />
+                                <div className="skeleton-line dashboard-skeleton-number" />
+                                <div className="skeleton-line dashboard-skeleton-label" />
+                            </div>
+                        )
+                    )}
+
+                </div>
+
+
+                <section className="section">
+
+                    <div className="skeleton-line dashboard-skeleton-section-title" />
+
+                    <div className="dashboard-progress glass dashboard-skeleton-progress">
+
+                        <div className="skeleton-line dashboard-skeleton-progress-number" />
+
+                        <div className="skeleton-line dashboard-skeleton-progress-bar" />
+
+                        <div className="skeleton-line dashboard-skeleton-progress-description" />
+
+                    </div>
+
+                </section>
+
+
+                <section className="section">
+
+                    <div className="skeleton-line dashboard-skeleton-section-title" />
+
+                    <div className="dashboard-watching-list">
+
+                        {Array.from({ length: 3 }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className="dashboard-watching-card glass dashboard-skeleton-watching"
+                                >
+                                    <div className="dashboard-skeleton-cover" />
+
+                                    <div className="watching-info">
+
+                                        <div className="skeleton-line dashboard-skeleton-anime-title" />
+
+                                        <div className="skeleton-line dashboard-skeleton-anime-meta" />
+
+                                        <div className="skeleton-line dashboard-skeleton-anime-progress" />
+
+                                    </div>
+
+                                </div>
+                            )
+                        )}
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </PageContainer>
+    );
+}
+
+
 function Dashboard() {
+
     const navigate = useNavigate();
 
     const {
@@ -27,6 +154,7 @@ function Dashboard() {
         isLoading,
         isError,
         refetch,
+        isFetching,
     } = useDashboard();
 
 
@@ -35,13 +163,7 @@ function Dashboard() {
     // =========================================================
 
     if (isLoading) {
-        return (
-            <PageContainer>
-                <div className="loading">
-                    Loading dashboard...
-                </div>
-            </PageContainer>
-        );
+        return <DashboardSkeleton />;
     }
 
 
@@ -50,19 +172,38 @@ function Dashboard() {
     // =========================================================
 
     if (isError) {
+
         return (
             <PageContainer>
-                <EmptyState
-                    text="Failed to load dashboard."
-                />
 
-                <button
-                    type="button"
-                    className="retry-btn"
-                    onClick={refetch}
-                >
-                    Retry
-                </button>
+                <div className="dashboard-error glass">
+
+                    <div className="dashboard-error-icon">
+                        ⚠️
+                    </div>
+
+                    <h2>
+                        Couldn't load your dashboard
+                    </h2>
+
+                    <p>
+                        Something went wrong while loading
+                        your anime activity.
+                    </p>
+
+                    <button
+                        type="button"
+                        className="retry-btn"
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                    >
+                        {isFetching
+                            ? "Retrying..."
+                            : "Try Again"}
+                    </button>
+
+                </div>
+
             </PageContainer>
         );
     }
@@ -77,19 +218,52 @@ function Dashboard() {
     const progress = stats.progress ?? {};
 
     const currentlyWatching =
-        stats.currently_watching ?? [];
+        Array.isArray(stats.currently_watching)
+            ? stats.currently_watching
+            : [];
 
     const recentActivity =
-        stats.recent_activity ?? [];
+        Array.isArray(stats.recent_activity)
+            ? stats.recent_activity
+            : [];
 
     const recentlyCompleted =
-        stats.recently_completed ?? [];
+        Array.isArray(stats.recently_completed)
+            ? stats.recently_completed
+            : [];
 
 
-    const progressPercentage = Math.min(
-        progress.percentage ?? 0,
-        100
-    );
+    const total =
+        Number(stats.total) || 0;
+
+    const watching =
+        Number(stats.watching) || 0;
+
+    const completed =
+        Number(stats.completed) || 0;
+
+    const progressPercentage =
+        Math.min(
+            Math.max(
+                Number(progress.percentage) || 0,
+                0
+            ),
+            100
+        );
+
+
+    // =========================================================
+    // NAVIGATION
+    // =========================================================
+
+    const openAnime = (animeId) => {
+
+        if (animeId == null) {
+            return;
+        }
+
+        navigate(`/anime/${animeId}`);
+    };
 
 
     // =========================================================
@@ -103,106 +277,115 @@ function Dashboard() {
                 HERO
             ================================================= */}
 
-            <div className="dashboard-hero">
+            <header className="dashboard-hero">
 
-                <h1>
-                    📊 Dashboard
-                </h1>
+                <div>
 
-                <p>
-                    Track your anime progress and recent activity.
-                </p>
+                    <span className="dashboard-eyebrow">
+                        YOUR ANIME ACTIVITY
+                    </span>
 
-            </div>
+                    <h1>
+                        📊 Dashboard
+                    </h1>
+
+                    <p>
+                        Track your watching progress,
+                        activity, and completed anime.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    className="dashboard-library-btn"
+                    onClick={() => navigate("/library")}
+                >
+                    📚 View Library
+                </button>
+
+            </header>
 
 
             {/* =================================================
-                LIBRARY OVERVIEW
+                QUICK STATS
             ================================================= */}
 
-            <section className="section">
+            <section
+                className="stats-grid premium"
+                aria-label="Library statistics"
+            >
 
-                <div className="section-heading">
-                    <h2>
-                        📚 Library Overview
-                    </h2>
-                </div>
+                <button
+                    type="button"
+                    className="stat-card glass dashboard-stat-button"
+                    onClick={() => navigate("/library")}
+                >
+                    <span>
+                        📚
+                    </span>
 
-                <div className="stats-grid premium">
+                    <h3>
+                        {total}
+                    </h3>
 
-                    <div className="stat-card glass">
-                        <span>
-                            📚
-                        </span>
-
-                        <h3>
-                            {stats.total ?? 0}
-                        </h3>
-
-                        <p>
-                            Total
-                        </p>
-                    </div>
-
-
-                    <div className="stat-card glass">
-                        <span>
-                            📺
-                        </span>
-
-                        <h3>
-                            {stats.watching ?? 0}
-                        </h3>
-
-                        <p>
-                            Watching
-                        </p>
-                    </div>
+                    <p>
+                        In Library
+                    </p>
+                </button>
 
 
-                    <div className="stat-card glass">
-                        <span>
-                            ✅
-                        </span>
+                <button
+                    type="button"
+                    className="stat-card glass dashboard-stat-button"
+                    onClick={() => navigate("/library?status=watching")}
+                >
+                    <span>
+                        📺
+                    </span>
 
-                        <h3>
-                            {stats.completed ?? 0}
-                        </h3>
+                    <h3>
+                        {watching}
+                    </h3>
 
-                        <p>
-                            Completed
-                        </p>
-                    </div>
-
-
-                    <div className="stat-card glass">
-                        <span>
-                            🕐
-                        </span>
-
-                        <h3>
-                            {stats.plan_to_watch ?? 0}
-                        </h3>
-
-                        <p>
-                            Plan to Watch
-                        </p>
-                    </div>
+                    <p>
+                        Watching
+                    </p>
+                </button>
 
 
-                    <div className="stat-card glass">
-                        <span>
-                            ❌
-                        </span>
+                <button
+                    type="button"
+                    className="stat-card glass dashboard-stat-button"
+                    onClick={() => navigate("/library?status=completed")}
+                >
+                    <span>
+                        ✅
+                    </span>
 
-                        <h3>
-                            {stats.dropped ?? 0}
-                        </h3>
+                    <h3>
+                        {completed}
+                    </h3>
 
-                        <p>
-                            Dropped
-                        </p>
-                    </div>
+                    <p>
+                        Completed
+                    </p>
+                </button>
+
+
+                <div className="stat-card glass">
+
+                    <span>
+                        📈
+                    </span>
+
+                    <h3>
+                        {progressPercentage}%
+                    </h3>
+
+                    <p>
+                        Overall Progress
+                    </p>
 
                 </div>
 
@@ -217,9 +400,17 @@ function Dashboard() {
 
                 <div className="section-heading">
 
-                    <h2>
-                        📈 Your Progress
-                    </h2>
+                    <div>
+
+                        <span className="section-eyebrow">
+                            WATCHING PROGRESS
+                        </span>
+
+                        <h2>
+                            📈 Your Progress
+                        </h2>
+
+                    </div>
 
                 </div>
 
@@ -231,7 +422,7 @@ function Dashboard() {
                         <div>
 
                             <h3>
-                                {progress.episodes_watched ?? 0}
+                                {progress.episodes_watched || 0}
                             </h3>
 
                             <p>
@@ -241,31 +432,36 @@ function Dashboard() {
                         </div>
 
 
-                        <div className="progress-percentage">
-
+                        <div
+                            className="progress-percentage"
+                            aria-label={`${progressPercentage}% overall progress`}
+                        >
                             {progressPercentage}%
-
                         </div>
 
                     </div>
 
 
-                    <div className="progress-bar">
-
+                    <div
+                        className="progress-bar"
+                        role="progressbar"
+                        aria-valuenow={progressPercentage}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
                         <div
                             className="progress-bar-fill"
                             style={{
                                 width: `${progressPercentage}%`,
                             }}
                         />
-
                     </div>
 
 
                     <p className="progress-description">
 
                         {progress.episodes_available > 0
-                            ? `${progress.episodes_watched ?? 0} of ${progress.episodes_available} available episodes`
+                            ? `${progress.episodes_watched || 0} of ${progress.episodes_available} available episodes`
                             : "Start watching anime to track your progress."
                         }
 
@@ -284,9 +480,27 @@ function Dashboard() {
 
                 <div className="section-heading">
 
-                    <h2>
-                        ▶️ Continue Watching
-                    </h2>
+                    <div>
+
+                        <span className="section-eyebrow">
+                            PICK UP WHERE YOU LEFT OFF
+                        </span>
+
+                        <h2>
+                            ▶️ Continue Watching
+                        </h2>
+
+                    </div>
+
+                    {currentlyWatching.length > 0 && (
+                        <button
+                            type="button"
+                            className="section-action"
+                            onClick={() => navigate("/library")}
+                        >
+                            View Library →
+                        </button>
+                    )}
 
                 </div>
 
@@ -295,13 +509,26 @@ function Dashboard() {
 
                     <div className="dashboard-empty glass">
 
+                        <div className="dashboard-empty-icon">
+                            📺
+                        </div>
+
+                        <h3>
+                            Nothing to continue
+                        </h3>
+
                         <p>
-                            You're not currently watching anything.
+                            You're not currently watching
+                            any anime.
                         </p>
 
-                        <span>
-                            Add an anime to your library and start watching.
-                        </span>
+                        <button
+                            type="button"
+                            className="dashboard-empty-action"
+                            onClick={() => navigate("/search")}
+                        >
+                            🔎 Find Anime
+                        </button>
 
                     </div>
 
@@ -311,52 +538,36 @@ function Dashboard() {
 
                         {currentlyWatching.map((anime) => {
 
-                            const episodeCount =
-                                anime.episodes ?? 0;
-
                             const currentProgress =
-                                anime.progress ?? 0;
+                                Math.max(
+                                    Number(anime.progress) || 0,
+                                    0
+                                );
+
+                            const episodeCount =
+                                Number(anime.episodes) || 0;
 
                             const percentage =
-                                episodeCount > 0
-                                    ? Math.min(
-                                        Math.round(
-                                            (
-                                                currentProgress /
-                                                episodeCount
-                                            ) * 100
-                                        ),
-                                        100
-                                    )
-                                    : 0;
+                                getAnimeProgress(
+                                    currentProgress,
+                                    episodeCount
+                                );
 
 
                             return (
-                                <article
+                                <button
+                                    type="button"
                                     key={anime.id}
                                     className="dashboard-watching-card glass"
                                     onClick={() =>
-                                        navigate(
-                                            `/anime/${anime.id}`
-                                        )
+                                        openAnime(anime.id)
                                     }
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(event) => {
-                                        if (
-                                            event.key === "Enter" ||
-                                            event.key === " "
-                                        ) {
-                                            navigate(
-                                                `/anime/${anime.id}`
-                                            );
-                                        }
-                                    }}
                                 >
 
                                     <OptimizedImage
                                         src={anime.image}
                                         alt={anime.title}
+                                        className="dashboard-watching-image"
                                     />
 
 
@@ -368,30 +579,43 @@ function Dashboard() {
 
 
                                         <p>
-                                            Episode{" "}
-                                            {currentProgress}
 
-                                            {episodeCount
-                                                ? ` / ${episodeCount}`
-                                                : ""
+                                            {episodeCount > 0
+                                                ? `Episode ${currentProgress} / ${episodeCount}`
+                                                : `Episode ${currentProgress}`
                                             }
+
                                         </p>
 
 
-                                        <div className="progress-bar">
+                                        {episodeCount > 0 && (
 
                                             <div
-                                                className="progress-bar-fill"
-                                                style={{
-                                                    width: `${percentage}%`,
-                                                }}
-                                            />
+                                                className="progress-bar"
+                                                role="progressbar"
+                                                aria-valuenow={percentage}
+                                                aria-valuemin="0"
+                                                aria-valuemax="100"
+                                                aria-label={`${anime.title} progress`}
+                                            >
+                                                <div
+                                                    className="progress-bar-fill"
+                                                    style={{
+                                                        width: `${percentage}%`,
+                                                    }}
+                                                />
+                                            </div>
 
-                                        </div>
+                                        )}
+
+
+                                        <span className="watching-continue">
+                                            Continue →
+                                        </span>
 
                                     </div>
 
-                                </article>
+                                </button>
                             );
 
                         })}
@@ -411,9 +635,17 @@ function Dashboard() {
 
                 <div className="section-heading">
 
-                    <h2>
-                        🕒 Recent Activity
-                    </h2>
+                    <div>
+
+                        <span className="section-eyebrow">
+                            WHAT YOU'VE BEEN DOING
+                        </span>
+
+                        <h2>
+                            🕒 Recent Activity
+                        </h2>
+
+                    </div>
 
                 </div>
 
@@ -422,13 +654,18 @@ function Dashboard() {
 
                     <div className="dashboard-empty glass">
 
-                        <p>
-                            No activity yet.
-                        </p>
+                        <div className="dashboard-empty-icon">
+                            ⚡
+                        </div>
 
-                        <span>
-                            Your anime activity will appear here.
-                        </span>
+                        <h3>
+                            No activity yet
+                        </h3>
+
+                        <p>
+                            Your anime activity will appear
+                            here as you use the app.
+                        </p>
 
                     </div>
 
@@ -443,39 +680,13 @@ function Dashboard() {
 
 
                             return (
-                                <article
+                                <button
+                                    type="button"
                                     key={activity.id}
-                                    className="activity-item"
-                                    onClick={() => {
-                                        if (animeId != null) {
-                                            navigate(
-                                                `/anime/${animeId}`
-                                            );
-                                        }
-                                    }}
-                                    role={
-                                        animeId != null
-                                            ? "button"
-                                            : undefined
+                                    className="activity-item dashboard-activity-item"
+                                    onClick={() =>
+                                        openAnime(animeId)
                                     }
-                                    tabIndex={
-                                        animeId != null
-                                            ? 0
-                                            : undefined
-                                    }
-                                    onKeyDown={(event) => {
-                                        if (
-                                            animeId != null &&
-                                            (
-                                                event.key === "Enter" ||
-                                                event.key === " "
-                                            )
-                                        ) {
-                                            navigate(
-                                                `/anime/${animeId}`
-                                            );
-                                        }
-                                    }}
                                 >
 
                                     <OptimizedImage
@@ -502,10 +713,8 @@ function Dashboard() {
 
 
                                         <strong>
-
                                             {activity.anime?.title ||
                                                 "Unknown Anime"}
-
                                         </strong>
 
 
@@ -515,21 +724,19 @@ function Dashboard() {
                                             }
                                             className="activity-date"
                                         >
-                                            {new Date(
+                                            {formatDate(
                                                 activity.created_at
-                                            ).toLocaleDateString(
-                                                undefined,
-                                                {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                    day: "numeric",
-                                                }
                                             )}
                                         </time>
 
                                     </div>
 
-                                </article>
+
+                                    <span className="activity-arrow">
+                                        →
+                                    </span>
+
+                                </button>
                             );
 
                         })}
@@ -549,9 +756,29 @@ function Dashboard() {
 
                 <div className="section-heading">
 
-                    <h2>
-                        🏆 Recently Completed
-                    </h2>
+                    <div>
+
+                        <span className="section-eyebrow">
+                            YOUR LATEST FINISHES
+                        </span>
+
+                        <h2>
+                            🏆 Recently Completed
+                        </h2>
+
+                    </div>
+
+                    {recentlyCompleted.length > 0 && (
+                        <button
+                            type="button"
+                            className="section-action"
+                            onClick={() =>
+                                navigate("/library?status=completed")
+                            }
+                        >
+                            View Completed →
+                        </button>
+                    )}
 
                 </div>
 
@@ -560,13 +787,17 @@ function Dashboard() {
 
                     <div className="dashboard-empty glass">
 
-                        <p>
-                            No completed anime yet.
-                        </p>
+                        <div className="dashboard-empty-icon">
+                            🏆
+                        </div>
 
-                        <span>
-                            Anime you finish will appear here.
-                        </span>
+                        <h3>
+                            No completed anime yet
+                        </h3>
+
+                        <p>
+                            Completed anime will appear here.
+                        </p>
 
                     </div>
 
@@ -576,26 +807,13 @@ function Dashboard() {
 
                         {recentlyCompleted.map((anime) => (
 
-                            <article
+                            <button
+                                type="button"
                                 key={anime.id}
                                 className="completed-card glass"
                                 onClick={() =>
-                                    navigate(
-                                        `/anime/${anime.id}`
-                                    )
+                                    openAnime(anime.id)
                                 }
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(event) => {
-                                    if (
-                                        event.key === "Enter" ||
-                                        event.key === " "
-                                    ) {
-                                        navigate(
-                                            `/anime/${anime.id}`
-                                        );
-                                    }
-                                }}
                             >
 
                                 <OptimizedImage
@@ -616,7 +834,7 @@ function Dashboard() {
 
                                 </div>
 
-                            </article>
+                            </button>
 
                         ))}
 
@@ -632,4 +850,3 @@ function Dashboard() {
 
 
 export default Dashboard;
-
