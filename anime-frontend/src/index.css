@@ -299,6 +299,7 @@ body {
 
 .anime-card {
     position: relative;
+    z-index: 1;
 
     width: 100%;
     min-width: 0;
@@ -313,6 +314,7 @@ body {
         transform 0.2s ease,
         box-shadow 0.2s ease;
 }
+
 
 .anime-card .image {
     display: block;
@@ -595,7 +597,7 @@ body {
 
 .anime-card .status-wrapper {
     position: relative;
-    margin-top: 0.55rem;
+    z-index: 110;
 }
 
 
@@ -707,26 +709,23 @@ body {
     left: 0;
     bottom: calc(100% + 0.5rem);
 
-    z-index: 50;
+    z-index: 1000;
 
     display: flex;
     flex-direction: column;
 
     min-width: 190px;
 
-    padding: 0.4rem;
+    padding: 0.45rem;
 
     border: 1px solid var(--border-color);
-    border-radius: 0.65rem;
+    border-radius: 0.7rem;
 
-    background: color-mix(
-        in srgb,
-        var(--surface) 94%,
-        transparent
-    );
+    background: var(--surface);
 
     box-shadow:
-        0 18px 45px rgba(0, 0, 0, 0.3);
+        0 10px 25px rgba(0, 0, 0, 0.25),
+        0 2px 8px rgba(0, 0, 0, 0.15);
 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -864,8 +863,9 @@ body {
    MENU OPEN
    ========================================================= */
 
+
 .anime-card.menu-open {
-    z-index: 60;
+    z-index: 100;
 }
 
 
@@ -939,14 +939,6 @@ body {
     }
 }
 
-
-/* ============================================================
-   MENU OPEN
-   ============================================================ */
-
-.anime-card.menu-open {
-    z-index: 30;
-}
 
 
 /* ============================================================
@@ -1084,9 +1076,7 @@ body {
     z-index: 5;
 }
 
-.anime-card.menu-open {
-    z-index: 100;
-}
+
 
 
 /* =========================
