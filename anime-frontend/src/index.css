@@ -2955,9 +2955,10 @@ button:disabled {
     grid-template-columns:
         repeat(4, minmax(0, 1fr));
 
-    gap: 18px;
+    gap: 20px;
 
     width: 100%;
+    min-width: 0;
 }
 
 .anime-section-grid .anime-card {
@@ -2965,8 +2966,8 @@ button:disabled {
     min-width: 0;
 }
 
-.anime-section-grid .anime-card .imageWrapper,
-.anime-section-grid .anime-card-poster {
+.anime-section-grid .anime-card-poster,
+.anime-section-grid .anime-card .imageWrapper {
     width: 100%;
     aspect-ratio: 2 / 3;
 }
@@ -6298,39 +6299,6 @@ button:disabled {
 }
 
 
-
-/* ============================================================
-   ANIME GRID
-   ============================================================ */
-
-.home-section .anime-section-grid {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(180px, 1fr)
-    );
-    gap: 1.25rem;
-}
-
-
-
-/* ============================================================
-   CARD SIZING
-   ============================================================ */
-
-
-
-
-/* ============================================================
-   DESKTOP
-   ============================================================ */
-
-
-
-
-/* ============================================================
-   TABLET
-   ============================================================ */
 
 .home-intro {
         padding-top: 1.5rem;
