@@ -20,13 +20,13 @@ const actionLabels = {
 
 
 function Dashboard() {
-
     const navigate = useNavigate();
 
     const {
         data,
         isLoading,
-        error,
+        isError,
+        refetch,
     } = useDashboard();
 
 
@@ -35,17 +35,13 @@ function Dashboard() {
     // =========================================================
 
     if (isLoading) {
-
         return (
             <PageContainer>
-
                 <div className="loading">
                     Loading dashboard...
                 </div>
-
             </PageContainer>
         );
-
     }
 
 
@@ -53,18 +49,22 @@ function Dashboard() {
     // ERROR
     // =========================================================
 
-    if (error) {
-
+    if (isError) {
         return (
             <PageContainer>
-
                 <EmptyState
                     text="Failed to load dashboard."
                 />
 
+                <button
+                    type="button"
+                    className="retry-btn"
+                    onClick={refetch}
+                >
+                    Retry
+                </button>
             </PageContainer>
         );
-
     }
 
 
@@ -72,26 +72,24 @@ function Dashboard() {
     // DATA
     // =========================================================
 
-    const stats = data || {};
+    const stats = data ?? {};
 
-    const progress =
-        stats.progress || {};
+    const progress = stats.progress ?? {};
 
     const currentlyWatching =
-        stats.currently_watching || [];
+        stats.currently_watching ?? [];
 
     const recentActivity =
-        stats.recent_activity || [];
+        stats.recent_activity ?? [];
 
     const recentlyCompleted =
-        stats.recently_completed || [];
+        stats.recently_completed ?? [];
 
 
-    const progressPercentage =
-        Math.min(
-            progress.percentage || 0,
-            100
-        );
+    const progressPercentage = Math.min(
+        progress.percentage ?? 0,
+        100
+    );
 
 
     // =========================================================
@@ -112,86 +110,103 @@ function Dashboard() {
                 </h1>
 
                 <p>
-                    Your personal anime activity and progress
+                    Track your anime progress and recent activity.
                 </p>
 
             </div>
 
 
             {/* =================================================
-                QUICK STATS
+                LIBRARY OVERVIEW
             ================================================= */}
 
-            <div className="stats-grid premium">
+            <section className="section">
 
-                <div className="stat-card glass">
+                <div className="section-heading">
+                    <h2>
+                        📚 Library Overview
+                    </h2>
+                </div>
 
-                    <span>
-                        📚
-                    </span>
+                <div className="stats-grid premium">
 
-                    <h3>
-                        {stats.total || 0}
-                    </h3>
+                    <div className="stat-card glass">
+                        <span>
+                            📚
+                        </span>
 
-                    <p>
-                        In Library
-                    </p>
+                        <h3>
+                            {stats.total ?? 0}
+                        </h3>
+
+                        <p>
+                            Total
+                        </p>
+                    </div>
+
+
+                    <div className="stat-card glass">
+                        <span>
+                            📺
+                        </span>
+
+                        <h3>
+                            {stats.watching ?? 0}
+                        </h3>
+
+                        <p>
+                            Watching
+                        </p>
+                    </div>
+
+
+                    <div className="stat-card glass">
+                        <span>
+                            ✅
+                        </span>
+
+                        <h3>
+                            {stats.completed ?? 0}
+                        </h3>
+
+                        <p>
+                            Completed
+                        </p>
+                    </div>
+
+
+                    <div className="stat-card glass">
+                        <span>
+                            🕐
+                        </span>
+
+                        <h3>
+                            {stats.plan_to_watch ?? 0}
+                        </h3>
+
+                        <p>
+                            Plan to Watch
+                        </p>
+                    </div>
+
+
+                    <div className="stat-card glass">
+                        <span>
+                            ❌
+                        </span>
+
+                        <h3>
+                            {stats.dropped ?? 0}
+                        </h3>
+
+                        <p>
+                            Dropped
+                        </p>
+                    </div>
 
                 </div>
 
-
-                <div className="stat-card glass">
-
-                    <span>
-                        📺
-                    </span>
-
-                    <h3>
-                        {stats.watching || 0}
-                    </h3>
-
-                    <p>
-                        Watching
-                    </p>
-
-                </div>
-
-
-                <div className="stat-card glass">
-
-                    <span>
-                        ✅
-                    </span>
-
-                    <h3>
-                        {stats.completed || 0}
-                    </h3>
-
-                    <p>
-                        Completed
-                    </p>
-
-                </div>
-
-
-                <div className="stat-card glass">
-
-                    <span>
-                        📈
-                    </span>
-
-                    <h3>
-                        {progressPercentage}%
-                    </h3>
-
-                    <p>
-                        Overall Progress
-                    </p>
-
-                </div>
-
-            </div>
+            </section>
 
 
             {/* =================================================
@@ -200,9 +215,14 @@ function Dashboard() {
 
             <section className="section">
 
-                <h2>
-                    📈 Your Progress
-                </h2>
+                <div className="section-heading">
+
+                    <h2>
+                        📈 Your Progress
+                    </h2>
+
+                </div>
+
 
                 <div className="dashboard-progress glass">
 
@@ -211,7 +231,7 @@ function Dashboard() {
                         <div>
 
                             <h3>
-                                {progress.episodes_watched || 0}
+                                {progress.episodes_watched ?? 0}
                             </h3>
 
                             <p>
@@ -245,7 +265,7 @@ function Dashboard() {
                     <p className="progress-description">
 
                         {progress.episodes_available > 0
-                            ? `${progress.episodes_watched || 0} of ${progress.episodes_available} available episodes`
+                            ? `${progress.episodes_watched ?? 0} of ${progress.episodes_available} available episodes`
                             : "Start watching anime to track your progress."
                         }
 
@@ -292,10 +312,10 @@ function Dashboard() {
                         {currentlyWatching.map((anime) => {
 
                             const episodeCount =
-                                anime.episodes || 0;
+                                anime.episodes ?? 0;
 
                             const currentProgress =
-                                anime.progress || 0;
+                                anime.progress ?? 0;
 
                             const percentage =
                                 episodeCount > 0
@@ -312,7 +332,6 @@ function Dashboard() {
 
 
                             return (
-
                                 <article
                                     key={anime.id}
                                     className="dashboard-watching-card glass"
@@ -321,6 +340,18 @@ function Dashboard() {
                                             `/anime/${anime.id}`
                                         )
                                     }
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(event) => {
+                                        if (
+                                            event.key === "Enter" ||
+                                            event.key === " "
+                                        ) {
+                                            navigate(
+                                                `/anime/${anime.id}`
+                                            );
+                                        }
+                                    }}
                                 >
 
                                     <OptimizedImage
@@ -335,15 +366,15 @@ function Dashboard() {
                                             {anime.title}
                                         </h3>
 
-                                        <p>
 
-                                            Episode {currentProgress}
+                                        <p>
+                                            Episode{" "}
+                                            {currentProgress}
 
                                             {episodeCount
                                                 ? ` / ${episodeCount}`
                                                 : ""
                                             }
-
                                         </p>
 
 
@@ -361,7 +392,6 @@ function Dashboard() {
                                     </div>
 
                                 </article>
-
                             );
 
                         })}
@@ -406,74 +436,103 @@ function Dashboard() {
 
                     <div className="activity-list glass">
 
-                        {recentActivity.map((activity) => (
+                        {recentActivity.map((activity) => {
 
-                            <article
-                                key={activity.id}
-                                className="activity-item"
-                                onClick={() =>
-                                    navigate(
-                                        `/anime/${activity.anime.id}`
-                                    )
-                                }
-                            >
+                            const animeId =
+                                activity.anime?.id;
 
-                                <OptimizedImage
-                                    src={
-                                        activity.anime?.image
+
+                            return (
+                                <article
+                                    key={activity.id}
+                                    className="activity-item"
+                                    onClick={() => {
+                                        if (animeId != null) {
+                                            navigate(
+                                                `/anime/${animeId}`
+                                            );
+                                        }
+                                    }}
+                                    role={
+                                        animeId != null
+                                            ? "button"
+                                            : undefined
                                     }
-                                    alt={
-                                        activity.anime?.title ||
-                                        "Anime"
+                                    tabIndex={
+                                        animeId != null
+                                            ? 0
+                                            : undefined
                                     }
-                                    className="activity-cover"
-                                />
+                                    onKeyDown={(event) => {
+                                        if (
+                                            animeId != null &&
+                                            (
+                                                event.key === "Enter" ||
+                                                event.key === " "
+                                            )
+                                        ) {
+                                            navigate(
+                                                `/anime/${animeId}`
+                                            );
+                                        }
+                                    }}
+                                >
+
+                                    <OptimizedImage
+                                        src={
+                                            activity.anime?.image
+                                        }
+                                        alt={
+                                            activity.anime?.title ||
+                                            "Anime"
+                                        }
+                                        className="activity-cover"
+                                    />
 
 
-                                <div className="activity-content">
+                                    <div className="activity-content">
 
-                                    <div className="activity-action">
+                                        <div className="activity-action">
 
-                                        {actionLabels[
-                                            activity.action
-                                        ] ?? activity.action}
+                                            {actionLabels[
+                                                activity.action
+                                            ] ?? activity.action}
+
+                                        </div>
+
+
+                                        <strong>
+
+                                            {activity.anime?.title ||
+                                                "Unknown Anime"}
+
+                                        </strong>
+
+
+                                        <time
+                                            dateTime={
+                                                activity.created_at
+                                            }
+                                            className="activity-date"
+                                        >
+                                            {new Date(
+                                                activity.created_at
+                                            ).toLocaleDateString(
+                                                undefined,
+                                                {
+                                                    year: "numeric",
+                                                    month: "short",
+                                                    day: "numeric",
+                                                }
+                                            )}
+                                        </time>
 
                                     </div>
 
+                                </article>
+                            );
 
-                                    <strong>
-
-                                        {activity.anime?.title ||
-                                            "Unknown Anime"}
-
-                                    </strong>
-
-
-                                    <time
-                                        dateTime={
-                                            activity.created_at
-                                        }
-                                        className="activity-date"
-                                    >
-
-                                        {new Date(
-                                            activity.created_at
-                                        ).toLocaleDateString(
-                                            undefined,
-                                            {
-                                                year: "numeric",
-                                                month: "short",
-                                                day: "numeric",
-                                            }
-                                        )}
-
-                                    </time>
-
-                                </div>
-
-                            </article>
-
-                        ))}
+                        })}
 
                     </div>
 
@@ -486,18 +545,32 @@ function Dashboard() {
                 RECENTLY COMPLETED
             ================================================= */}
 
-            {recentlyCompleted.length > 0 && (
+            <section className="section">
 
-                <section className="section">
+                <div className="section-heading">
 
-                    <div className="section-heading">
+                    <h2>
+                        🏆 Recently Completed
+                    </h2>
 
-                        <h2>
-                            🏆 Recently Completed
-                        </h2>
+                </div>
+
+
+                {recentlyCompleted.length === 0 ? (
+
+                    <div className="dashboard-empty glass">
+
+                        <p>
+                            No completed anime yet.
+                        </p>
+
+                        <span>
+                            Anime you finish will appear here.
+                        </span>
 
                     </div>
 
+                ) : (
 
                     <div className="completed-row">
 
@@ -511,6 +584,18 @@ function Dashboard() {
                                         `/anime/${anime.id}`
                                     )
                                 }
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(event) => {
+                                    if (
+                                        event.key === "Enter" ||
+                                        event.key === " "
+                                    ) {
+                                        navigate(
+                                            `/anime/${anime.id}`
+                                        );
+                                    }
+                                }}
                             >
 
                                 <OptimizedImage
@@ -537,10 +622,9 @@ function Dashboard() {
 
                     </div>
 
-                </section>
+                )}
 
-            )}
-
+            </section>
 
         </PageContainer>
     );
@@ -548,3 +632,4 @@ function Dashboard() {
 
 
 export default Dashboard;
+

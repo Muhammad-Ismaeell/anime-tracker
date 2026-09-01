@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 
 
@@ -60,6 +61,8 @@ class DashboardResponseSerializer(serializers.Serializer):
     # LIBRARY STATS
     # ==========================================
 
+    total = serializers.IntegerField()
+
     watching = serializers.IntegerField()
 
     completed = serializers.IntegerField()
@@ -68,9 +71,6 @@ class DashboardResponseSerializer(serializers.Serializer):
 
     dropped = serializers.IntegerField()
 
-    total = serializers.IntegerField()
-
-    favorites = serializers.IntegerField()
 
     # ==========================================
     # PROGRESS
@@ -78,13 +78,15 @@ class DashboardResponseSerializer(serializers.Serializer):
 
     progress = DashboardProgressSerializer()
 
+
     # ==========================================
-    # CURRENTLY WATCHING
+    # CONTINUE WATCHING
     # ==========================================
 
     currently_watching = DashboardWatchingSerializer(
         many=True
     )
+
 
     # ==========================================
     # RECENT ACTIVITY
@@ -94,6 +96,7 @@ class DashboardResponseSerializer(serializers.Serializer):
         many=True
     )
 
+
     # ==========================================
     # RECENTLY COMPLETED
     # ==========================================
@@ -101,27 +104,3 @@ class DashboardResponseSerializer(serializers.Serializer):
     recently_completed = DashboardAnimeSerializer(
         many=True
     )
-
-    # ==========================================
-    # REVIEW STATS
-    # ==========================================
-
-    review_count = serializers.IntegerField()
-
-    average_rating = serializers.FloatField(
-        allow_null=True
-    )
-
-    # ==========================================
-    # YEARLY STATS
-    # ==========================================
-
-    year = serializers.IntegerField()
-
-    yearly_completed = serializers.IntegerField()
-
-    yearly_added = serializers.IntegerField()
-
-    yearly_favorited = serializers.IntegerField()
-
-    yearly_reviews = serializers.IntegerField()

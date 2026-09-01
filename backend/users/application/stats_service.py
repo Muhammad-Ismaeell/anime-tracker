@@ -1,11 +1,11 @@
-from django.db.models import Avg, Sum
-from django.utils import timezone
+
+from django.db.models import Sum
+
 
 from users.infrastructure.models import (
     UserAnimeStatus,
     FavoriteAnime,
     Activity,
-    Review,
 )
 
 
@@ -60,10 +60,12 @@ class StatsService:
 
 
         # ==================================================
-        # BASIC STATS
+        # LIBRARY STATS
         # ==================================================
 
         stats = {
+            "total": library_qs.count(),
+
             "watching": library_qs.filter(
                 status="watching"
             ).count(),
@@ -79,20 +81,28 @@ class StatsService:
             "dropped": library_qs.filter(
                 status="dropped"
             ).count(),
-
-            "total": library_qs.count(),
-
-            "favorites": FavoriteAnime.objects.filter(
-                user=user
-            ).count(),
         }
 
 
         # ==================================================
-        # PROGRESS
+        # OVERALL PROGRESS
+        # ==================================================
+        #
+        # Progress is based only on anime that the user
+        # has started watching or completed.
+        #
+        # This prevents "Plan to Watch" anime from inflating
+        # the total number of available episodes.
         # ==================================================
 
-        progress_data = library_qs.aggregate(
+        progress_qs = library_qs.filter(
+            status__in=[
+                "watching",
+                "completed",
+            ]
+        )
+
+        progress_data = progress_qs.aggregate(
             episodes_watched=Sum("progress"),
         )
 
@@ -101,14 +111,11 @@ class StatsService:
             or 0
         )
 
-
-        episodes_available = 0
-
-        for item in library_qs:
-
-            if item.anime.episodes:
-                episodes_available += item.anime.episodes
-
+        episodes_available = sum(
+            item.anime.episodes
+            for item in progress_qs
+            if item.anime.episodes
+        )
 
         if episodes_available > 0:
 
@@ -139,7 +146,7 @@ class StatsService:
 
 
         # ==================================================
-        # CURRENTLY WATCHING
+        # CONTINUE WATCHING
         # ==================================================
 
         watching_items = (
@@ -147,7 +154,6 @@ class StatsService:
             .filter(status="watching")
             .order_by("-updated_at")[:6]
         )
-
 
         stats["currently_watching"] = [
 
@@ -178,7 +184,6 @@ class StatsService:
             .order_by("-created_at")[:8]
         )
 
-
         stats["recent_activity"] = [
 
             {
@@ -208,9 +213,11 @@ class StatsService:
         completed_items = (
             library_qs
             .filter(status="completed")
-            .order_by("-completed_at", "-updated_at")[:6]
+            .order_by(
+                "-completed_at",
+                "-updated_at",
+            )[:6]
         )
-
 
         stats["recently_completed"] = [
 
@@ -220,88 +227,11 @@ class StatsService:
                 "title": item.anime.title,
 
                 "image": item.anime.image,
-
             }
 
             for item in completed_items
         ]
 
 
-        # ==================================================
-        # REVIEW STATISTICS
-        # ==================================================
-
-        review_stats = Review.objects.filter(
-            user=user
-        ).aggregate(
-            average_rating=Avg("rating"),
-        )
-
-
-        stats["review_count"] = Review.objects.filter(
-            user=user
-        ).count()
-
-
-        stats["average_rating"] = (
-            round(
-                review_stats["average_rating"],
-                1
-            )
-            if review_stats["average_rating"] is not None
-            else None
-        )
-
-
-        # ==================================================
-        # YEARLY ACTIVITY
-        # ==================================================
-
-        current_year = timezone.now().year
-
-        stats["year"] = current_year
-
-
-        stats["yearly_completed"] = (
-            library_qs
-            .filter(
-                status="completed",
-                completed_at__year=current_year,
-            )
-            .count()
-        )
-
-
-        stats["yearly_added"] = (
-            Activity.objects
-            .filter(
-                user=user,
-                action="ADDED",
-                created_at__year=current_year,
-            )
-            .count()
-        )
-
-
-        stats["yearly_favorited"] = (
-            Activity.objects
-            .filter(
-                user=user,
-                action="FAVORITED",
-                created_at__year=current_year,
-            )
-            .count()
-        )
-
-
-        stats["yearly_reviews"] = (
-            Review.objects
-            .filter(
-                user=user,
-                created_at__year=current_year,
-            )
-            .count()
-        )
-
-
         return stats
+
