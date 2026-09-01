@@ -296,9 +296,11 @@ body {
         filter 0.25s ease;
 }
 
+
 .anime-card {
     position: relative;
 
+    width: 100%;
     min-width: 0;
 
     overflow: visible;
@@ -1797,8 +1799,14 @@ body {
 
 .anime-grid {
     display: grid;
-    grid-template-columns: repeat(6, minmax(220px, 1fr));
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
     gap: 20px;
+
+    width: 100%;
+    min-width: 0;
 }
 
 
@@ -2986,17 +2994,17 @@ button:disabled {
 }
 
 .anime-section {
-    margin-top: 0;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 
+    margin-top: 0;
     padding: 26px 28px;
 
-    border:
-        1px solid rgba(255, 255, 255, 0.07);
-
+    border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 18px;
 
-    background:
-        rgba(255, 255, 255, 0.035);
+    background: rgba(255, 255, 255, 0.035);
 
     color: #cbd5e1;
 
@@ -6596,6 +6604,8 @@ button:disabled {
     gap: 2rem;
 
     align-items: start;
+
+    width: 100%;
 }
 
 
@@ -6605,6 +6615,7 @@ button:disabled {
 
 .home-trending-main {
     min-width: 0;
+    width: 100%;
 
     display: flex;
     flex-direction: column;
