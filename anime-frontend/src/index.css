@@ -2977,13 +2977,16 @@ button:disabled {
 
     .anime-section-grid {
         grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+            repeat(4, minmax(0, 1fr));
+
+        gap: 14px;
     }
 
 }
 
 
-@media (max-width: 650px) {
+
+@media (max-width: 600px) {
 
     .anime-section-grid {
         grid-template-columns:
