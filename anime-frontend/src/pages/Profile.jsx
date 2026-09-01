@@ -13,7 +13,6 @@ import {
     useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
-import { useActivity } from "../hooks/user/useActivity";
 import {
     useUserReviews,
     useReviewAnalytics,
@@ -23,17 +22,6 @@ import {
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 
 import { getMediaUrl } from "../utils/mediaUrl";
-
-
-const actionLabels = {
-    FAVORITED: "❤️ Added to favorites",
-    UNFAVORITED: "💔 Removed from favorites",
-    WATCHING: "👀 Started watching",
-    COMPLETED: "✅ Completed",
-    DROPPED: "❌ Dropped",
-    ADDED: "📚 Added to library",
-    REMOVED: "🗑️ Removed from library",
-};
 
 
 function Profile() {
@@ -84,26 +72,6 @@ function Profile() {
     }, [favorites]);
 
     const toggleFavorite = useToggleFavorite();
-
-
-    // =========================================================
-    // ACTIVITY
-    // =========================================================
-
-    const {
-        data: activityPages,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useActivity();
-
-    const activity = useMemo(
-        () =>
-            activityPages?.pages?.flatMap(
-                (page) => page?.results ?? []
-            ) ?? [],
-        [activityPages]
-    );
 
 
     // =========================================================
@@ -518,88 +486,6 @@ function Profile() {
 
 
             {/* =================================================
-                ACTIVITY
-            ================================================= */}
-
-            <section className="section">
-
-                <div className="section-header">
-                    <h2>⚡ Recent Activity</h2>
-                </div>
-
-                <div className="activity-list">
-
-                    {activity.length ? (
-                        activity.map((act) => (
-                            <article
-                                key={act.id}
-                                className="activity-item"
-                            >
-                                <OptimizedImage
-                                    src={act.anime?.image}
-                                    alt={
-                                        act.anime?.title ||
-                                        "Anime"
-                                    }
-                                    className="activity-cover"
-                                />
-
-                                <div className="activity-content">
-
-                                    <div className="activity-action">
-                                        {actionLabels[act.action] ??
-                                            act.action}
-                                    </div>
-
-                                    <strong>
-                                        {act.anime?.title ||
-                                            "Unknown Anime"}
-                                    </strong>
-
-                                    <time
-                                        dateTime={act.created_at}
-                                        className="activity-date"
-                                    >
-                                        {new Date(
-                                            act.created_at
-                                        ).toLocaleDateString(
-                                            undefined,
-                                            {
-                                                year: "numeric",
-                                                month: "short",
-                                                day: "numeric",
-                                            }
-                                        )}
-                                    </time>
-
-                                </div>
-                            </article>
-                        ))
-                    ) : (
-                        <EmptyState
-                            text="No activity yet"
-                        />
-                    )}
-
-                </div>
-
-                {hasNextPage && (
-                    <button
-                        type="button"
-                        className="load-more-btn"
-                        disabled={isFetchingNextPage}
-                        onClick={fetchNextPage}
-                    >
-                        {isFetchingNextPage
-                            ? "Loading..."
-                            : "Load More Activity"}
-                    </button>
-                )}
-
-            </section>
-
-
-            {/* =================================================
                 MY REVIEWS
             ================================================= */}
 
@@ -879,3 +765,4 @@ function Profile() {
 
 
 export default Profile;
+

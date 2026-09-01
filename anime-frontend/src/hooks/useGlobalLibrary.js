@@ -1,5 +1,7 @@
+
 import { useLibrary } from "./useLibrary";
 import { useMemo } from "react";
+
 
 export function useGlobalLibrary() {
 
@@ -14,6 +16,7 @@ export function useGlobalLibrary() {
         );
 
     }, [data]);
+
 
     const statusMap = useMemo(() => {
 
@@ -38,8 +41,10 @@ export function useGlobalLibrary() {
 
     }, [library]);
 
+
     return {
         library,
         statusMap
     };
 }
+
