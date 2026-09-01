@@ -28,41 +28,29 @@ class DatabaseAnimeService:
 
 
     @classmethod
-    def get_seasonal(cls, page=1):
-
-        now = datetime.now()
-
-        month = now.month
-
-        if month in [12,1,2]:
-            season = "winter"
-
-        elif month in [3,4,5]:
-            season = "spring"
-
-        elif month in [6,7,8]:
-            season = "summer"
-
-        else:
-            season = "fall"
-
-
-        queryset = (
+    def get_seasonal(self, page=1):
+        latest = (
             Anime.objects
-            .filter(
-                season=season,
-                year=now.year,
-            )
-            .order_by(
-                "-score"
-            )
+            .exclude(year__isnull=True)
+            .exclude(season__isnull=True)
+            .order_by("-year", "-id")
+            .values("year", "season")
+            .first()
         )
 
+        if not latest:
+            return {
+                "items": [],
+                "page": page,
+                "has_next": False,
+            }
 
-        return cls.paginate(
-            queryset,
-            page
-        )
+        queryset = Anime.objects.filter(
+            year=latest["year"],
+            season=latest["season"],
+        ).order_by("-score", "-id")
+
+        return self.paginate(queryset, page)
 
 
     @classmethod
