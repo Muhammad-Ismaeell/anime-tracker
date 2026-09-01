@@ -7820,7 +7820,17 @@ button:disabled {
 .home-section + .home-section {
     margin-top: 2.75rem;
 }
+.home-section .anime-section-grid {
+    display: grid;
 
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 20px;
+
+    width: 100%;
+    min-width: 0;
+}
 
 /* ============================================================
    TRENDING LAYOUT
@@ -9187,5 +9197,28 @@ button:disabled {
 
     .advanced-filters {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1200px) {
+    .home-section .anime-section-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 800px) {
+    .home-section .anime-section-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 500px) {
+    .home-section .anime-section-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
     }
 }
