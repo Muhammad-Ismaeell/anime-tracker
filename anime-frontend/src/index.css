@@ -2644,7 +2644,8 @@ body {
         repeat(6, minmax(0, 1fr));
 
     gap: 20px;
-    overflow: visible;
+    overflow-x: visible;
+    overflow-y: visible;
     width: 100%;
     min-width: 0;
 }
