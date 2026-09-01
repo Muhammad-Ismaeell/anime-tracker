@@ -503,7 +503,7 @@ body {
 
 .anime-card .content {
     min-width: 0;
-
+    overflow: visible;
     padding: 0.65rem 0.15rem 0;
 }
 
@@ -597,7 +597,7 @@ body {
 
 .anime-card .status-wrapper {
     position: relative;
-    z-index: 1001;
+    overflow: visible;
 }
 
 
@@ -707,16 +707,19 @@ body {
     position: absolute;
     z-index: 20;
 
-    bottom: calc(100% + 0.5rem);
+    top: calc(100% + 8px);
+    bottom: auto;
     left: 0;
 
     min-width: 175px;
     padding: 0.35rem;
 
-    background: #111827 !important;
-    border: 2px solid white !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
+    background: black;
+
+    border: 1px solid var(--border-color);
     border-radius: 0.55rem;
+
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 
     isolation: isolate;
 }
@@ -8947,8 +8950,8 @@ button:disabled {
     position: relative;
 
     width: 100%;
-
-    overflow: hidden;
+    overflow-x: clip;
+    overflow: visible;
 }
 
 .discover-genres {
