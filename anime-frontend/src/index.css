@@ -589,59 +589,72 @@ body {
    STATUS
    ============================================================ */
 
+/* =========================================================
+   ANIME CARD STATUS CONTROL
+   ========================================================= */
+
 .anime-card .status-wrapper {
     position: relative;
-
-    margin-top: 0.5rem;
+    margin-top: 0.55rem;
 }
 
 
-
-/* ============================================================
+/* =========================================================
    STATUS BUTTON
-   ============================================================ */
+   ========================================================= */
 
 .anime-card .status-badge {
     display: inline-flex;
-
     align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
 
     max-width: 100%;
+    min-height: 30px;
 
-    padding: 0.3rem 0.5rem;
+    padding: 0.35rem 0.65rem;
 
-    border: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
 
-    border-radius: 0.4rem;
-
-    background: var(--surface-hover);
-
+    background: var(--surface);
     color: var(--text-muted);
 
-    font-size: 0.68rem;
-
+    font-size: 0.7rem;
     font-weight: 600;
-
     line-height: 1.2;
 
     cursor: pointer;
 
     transition:
         background-color 0.2s ease,
-        color 0.2s ease;
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
 }
 
 .anime-card .status-badge:hover {
     background: var(--surface-hover);
-
+    border-color: var(--accent-color);
     color: var(--text-primary);
+
+    transform: translateY(-1px);
+}
+
+.anime-card .status-badge:active {
+    transform: translateY(0);
+}
+
+.anime-card .status-badge:disabled {
+    cursor: default;
+    opacity: 0.6;
+    transform: none;
 }
 
 
-/* ============================================================
-   ACTIVE STATUS COLORS
-   ============================================================ */
-
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
 
 .anime-card .status-badge.none {
     color: var(--text-muted);
@@ -649,80 +662,233 @@ body {
 
 .anime-card .status-badge.watching {
     color: var(--status-watching, #60a5fa);
+    border-color: color-mix(
+        in srgb,
+        var(--status-watching, #60a5fa) 30%,
+        transparent
+    );
 }
 
 .anime-card .status-badge.completed {
     color: var(--status-completed, #4ade80);
+    border-color: color-mix(
+        in srgb,
+        var(--status-completed, #4ade80) 30%,
+        transparent
+    );
 }
 
 .anime-card .status-badge.dropped {
     color: var(--status-dropped, #f87171);
+    border-color: color-mix(
+        in srgb,
+        var(--status-dropped, #f87171) 30%,
+        transparent
+    );
 }
 
 .anime-card .status-badge.plan_to_watch {
     color: var(--status-planned, #fbbf24);
+    border-color: color-mix(
+        in srgb,
+        var(--status-planned, #fbbf24) 30%,
+        transparent
+    );
 }
 
 
-/* ============================================================
+/* =========================================================
    STATUS MENU
-   ============================================================ */
+   ========================================================= */
 
 .anime-card .status-menu {
     position: absolute;
 
     left: 0;
+    bottom: calc(100% + 0.5rem);
 
-    bottom: calc(100% + 0.45rem);
-
-    z-index: 20;
+    z-index: 50;
 
     display: flex;
-
     flex-direction: column;
 
-    min-width: 175px;
+    min-width: 190px;
 
-    padding: 0.35rem;
+    padding: 0.4rem;
 
     border: 1px solid var(--border-color);
+    border-radius: 0.65rem;
 
-    border-radius: 0.55rem;
-
-    background: var(--surface);
+    background: color-mix(
+        in srgb,
+        var(--surface) 94%,
+        transparent
+    );
 
     box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.22);
+        0 18px 45px rgba(0, 0, 0, 0.3);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    animation: anime-card-menu-in 0.16s ease-out;
 }
 
 
+/* =========================================================
+   MENU OPTIONS
+   ========================================================= */
+
 .anime-card .status-menu button {
     display: flex;
-
     align-items: center;
 
     width: 100%;
+    min-height: 34px;
 
-    padding: 0.5rem 0.6rem;
+    padding: 0.5rem 0.65rem;
 
     border: 0;
-
-    border-radius: 0.35rem;
+    border-radius: 0.45rem;
 
     background: transparent;
-
     color: var(--text-primary);
 
     font-size: 0.75rem;
+    font-weight: 500;
 
     text-align: left;
 
     cursor: pointer;
 
     transition:
-        background-color 0.15s ease;
+        background-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
 }
 
+.anime-card .status-menu button:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.anime-card .status-menu button:active {
+    transform: scale(0.98);
+}
+
+.anime-card .status-menu button:disabled {
+    cursor: default;
+    opacity: 0.5;
+    transform: none;
+}
+
+
+/* =========================================================
+   CURRENT STATUS
+   ========================================================= */
+
+.anime-card .status-menu button.active {
+    background: var(--surface-hover);
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS OPTION COLORS
+   ========================================================= */
+
+.anime-card .status-menu button.watching {
+    color: var(--status-watching, #60a5fa);
+}
+
+.anime-card .status-menu button.completed {
+    color: var(--status-completed, #4ade80);
+}
+
+.anime-card .status-menu button.dropped {
+    color: var(--status-dropped, #f87171);
+}
+
+.anime-card .status-menu button.plan_to_watch {
+    color: var(--status-planned, #fbbf24);
+}
+
+
+/* =========================================================
+   MENU DIVIDER
+   ========================================================= */
+
+.anime-card .status-menu .status-divider {
+    height: 1px;
+
+    margin: 0.35rem 0;
+
+    background: var(--border-color);
+
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   REMOVE STATUS
+   ========================================================= */
+
+.anime-card .status-menu button.danger {
+    color: #ef4444;
+}
+
+.anime-card .status-menu button.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+}
+
+
+/* =========================================================
+   MENU ANIMATION
+   ========================================================= */
+
+@keyframes anime-card-menu-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   MENU OPEN
+   ========================================================= */
+
+.anime-card.menu-open {
+    z-index: 60;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .anime-card .status-badge {
+        min-height: 32px;
+        padding: 0.4rem 0.65rem;
+    }
+
+    .anime-card .status-menu {
+        min-width: 180px;
+    }
+
+    .anime-card .status-menu button {
+        min-height: 38px;
+        padding: 0.55rem 0.7rem;
+    }
+}
 
 .anime-card .status-menu button:hover {
     background: var(--surface-hover);
