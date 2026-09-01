@@ -22,18 +22,15 @@ stats_service = StatsService()
 @extend_schema(
     summary="User Dashboard",
     description="""
-Return the complete dashboard for the authenticated user.
+Return the dashboard for the authenticated user.
 
 Includes:
 
 - Library status statistics
-- Favorite count
 - Overall episode progress
 - Currently watching anime
 - Recent anime activity
 - Recently completed anime
-- Review statistics
-- Yearly activity statistics
 """,
     responses={
         200: DashboardResponseSerializer
@@ -48,3 +45,4 @@ def dashboard(request):
             request.user
         )
     )
+
