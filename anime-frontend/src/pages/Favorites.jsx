@@ -1,20 +1,21 @@
-
 import { Helmet } from "react-helmet-async";
 
 import PageContainer from "../components/ui/PageContainer";
 import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
+
 import {
     useEffect,
     useRef,
 } from "react";
+
 import {
     useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
 
-import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 
 
 function Favorites() {
@@ -32,8 +33,8 @@ function Favorites() {
 
     const toggleFavorite = useToggleFavorite();
 
-    const { statusMap } = useGlobalLibrary();
-    
+    const favoriteIds = useFavoriteIds();
+
     useEffect(() => {
         const observer =
             new IntersectionObserver(
@@ -52,9 +53,7 @@ function Favorites() {
             );
 
         if (loadMoreRef.current) {
-            observer.observe(
-                loadMoreRef.current
-            );
+            observer.observe(loadMoreRef.current);
         }
 
         return () => {
@@ -66,18 +65,20 @@ function Favorites() {
         isFetchingNextPage,
     ]);
 
+
     /*
-     * Combine all loaded pages into one list.
+     * useFavorites() is an infinite query,
+     * so all favorites are stored inside pages.
      */
     const favorites =
         data?.pages?.flatMap(
-            (page) => page.results || []
+            (page) => page?.results ?? []
         ) ?? [];
 
 
     /*
-     * Total number of favorites reported
-     * by the backend.
+     * The backend count is included
+     * in the first page.
      */
     const totalFavorites =
         data?.pages?.[0]?.count ?? 0;
@@ -91,13 +92,13 @@ function Favorites() {
                 </div>
 
                 <div className="grid">
-                    {Array.from({ length: 12 }).map(
-                        (_, index) => (
-                            <AnimeCardSkeleton
-                                key={index}
-                            />
-                        )
-                    )}
+                    {Array.from({
+                        length: 12,
+                    }).map((_, index) => (
+                        <AnimeCardSkeleton
+                            key={index}
+                        />
+                    ))}
                 </div>
             </PageContainer>
         );
@@ -157,31 +158,53 @@ function Favorites() {
                 ) : (
                     <>
                         <div className="grid">
+
                             {favorites.map((item) => {
 
+                                /*
+                                 * The favorite endpoint returns
+                                 * the anime inside item.anime.
+                                 */
                                 const anime =
-                                    item.anime;
+                                    item?.anime;
+
+                                if (!anime) {
+                                    return null;
+                                }
+
 
                                 const animeId =
                                     anime?.mal_id ??
                                     anime?.id ??
-                                    item.anime_id ??
-                                    item.id;
+                                    item?.anime_id;
 
                                 if (animeId == null) {
                                     return null;
                                 }
 
-                                const id =
+
+                                const normalizedId =
                                     String(animeId);
+
+
+                                /*
+                                 * Prefer the shared favorite ID
+                                 * state so this page stays in sync
+                                 * with Home/Search/etc.
+                                 */
+                                const isFavorited =
+                                    favoriteIds.has(
+                                        normalizedId
+                                    );
 
 
                                 return (
                                     <AnimeCard
-                                        key={id}
+                                        key={normalizedId}
                                         anime={anime}
-                                        statusMap={statusMap}
-                                        isFavorited={true}
+                                        isFavorited={
+                                            isFavorited
+                                        }
                                         isFavoritePending={
                                             toggleFavorite.isPending
                                         }
@@ -191,20 +214,22 @@ function Favorites() {
                                                     animeId,
 
                                                 title:
-                                                    anime?.title ||
-                                                    item.title ||
+                                                    anime?.title ??
+                                                    item?.title ??
                                                     "",
 
                                                 image:
-                                                    anime?.image ||
-                                                    item.image ||
+                                                    anime?.image ??
+                                                    item?.image ??
                                                     "",
                                             })
                                         }
                                     />
                                 );
                             })}
+
                         </div>
+
 
                         <div
                             ref={loadMoreRef}
@@ -212,11 +237,13 @@ function Favorites() {
                             aria-hidden="true"
                         />
 
+
                         {isFetchingNextPage && (
                             <div className="search-loading-more">
                                 Loading more favorites...
                             </div>
                         )}
+
                     </>
                 )}
 
