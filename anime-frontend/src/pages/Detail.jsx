@@ -1,3 +1,4 @@
+
 import {
     useContext,
     useEffect,
@@ -32,12 +33,13 @@ import {
 import { Helmet } from "react-helmet-async";
 
 import OptimizedImage from "../components/ui/OptimizedImage";
+
 import "../detail.css";
+
 
 function Detail() {
 
-    const { id } =
-        useParams();
+    const { id } = useParams();
 
 
     const {
@@ -98,7 +100,6 @@ function Detail() {
                 return undefined;
             }
 
-
             return libraryMap.get(
                 String(id)
             );
@@ -134,6 +135,7 @@ function Detail() {
         setProgressDraft,
     ] = useState(() => storedProgress);
 
+
     // ============================================================
     // SCROLL
     // ============================================================
@@ -156,9 +158,7 @@ function Detail() {
 
         return (
             <PageContainer>
-
                 Invalid anime id
-
             </PageContainer>
         );
     }
@@ -172,9 +172,7 @@ function Detail() {
 
         return (
             <PageContainer>
-
                 <AnimeDetailSkeleton />
-
             </PageContainer>
         );
     }
@@ -266,7 +264,7 @@ function Detail() {
 
 
     // ============================================================
-    // PROGRESS
+    // SAFE STORED PROGRESS
     // ============================================================
 
     const safeStoredProgress =
@@ -281,21 +279,35 @@ function Detail() {
         );
 
 
+    // ============================================================
+    // DISPLAYED PROGRESS
+    // ============================================================
+
+    const numericDraft =
+        Number(
+            progressDraft
+        );
+
+
     const displayedProgress =
         Number.isFinite(
-            Number(progressDraft)
+            numericDraft
         )
             ? Math.max(
                 0,
                 hasKnownEpisodeCount
                     ? Math.min(
-                        Number(progressDraft),
+                        numericDraft,
                         episodeCount
                     )
-                    : Number(progressDraft)
+                    : numericDraft
             )
             : safeStoredProgress;
 
+
+    // ============================================================
+    // PROGRESS PERCENTAGE
+    // ============================================================
 
     const progressPercentage =
         hasKnownEpisodeCount
@@ -308,6 +320,10 @@ function Detail() {
             )
             : null;
 
+
+    // ============================================================
+    // PROGRESS LABEL
+    // ============================================================
 
     const progressLabel =
         hasKnownEpisodeCount
@@ -349,7 +365,7 @@ function Detail() {
 
 
     // ============================================================
-    // LIBRARY STATUS
+    // LIBRARY STATUS HANDLER
     // ============================================================
 
     const handleLibraryStatus =
@@ -367,9 +383,9 @@ function Detail() {
             }
 
 
-            // ----------------------------------------------------
+            // ====================================================
             // REMOVE
-            // ----------------------------------------------------
+            // ====================================================
 
             if (
                 status === "remove"
@@ -394,60 +410,207 @@ function Detail() {
             }
 
 
-            // ----------------------------------------------------
+            // ====================================================
             // WATCHING
-            // ----------------------------------------------------
+            // ====================================================
 
-            if (status === "watching") {
+            if (
+                status === "watching"
+            ) {
+
+                /*
+                 * If the anime was already being watched,
+                 * preserve the existing progress.
+                 *
+                 * If the anime was Completed or Plan to Watch,
+                 * start Watching from episode 0.
+                 */
+
                 const nextProgress =
-                    currentStatus === "completed"
-                        ? 0
-                        : safeStoredProgress;
+                    currentStatus === "watching"
+                        ? safeStoredProgress
+                        : 0;
+
 
                 setProgressDraft(
                     nextProgress
                 );
 
+
                 setLibraryMenuOpen(
                     false
                 );
 
-                if (currentStatus !== "watching") {
+
+                /*
+                 * Only make an API request when the status
+                 * actually changes.
+                 */
+
+                if (
+                    currentStatus !==
+                    "watching"
+                ) {
+
                     updateLibrary.mutate({
-                        anime_id: String(id),
-                        status: "watching",
-                        progress: nextProgress,
-                        title: anime.title,
+
+                        anime_id:
+                            String(id),
+
+                        status:
+                            "watching",
+
+                        progress:
+                            nextProgress,
+
+                        title:
+                            anime.title,
+
                         image,
+
                     });
                 }
+
 
                 return;
             }
 
 
-            // ----------------------------------------------------
-            // OTHER STATUSES
-            // ----------------------------------------------------
+            // ====================================================
+            // PLAN TO WATCH
+            // ====================================================
 
-            setLibraryMenuOpen(
-                false
-            );
+            if (
+                status ===
+                "plan_to_watch"
+            ) {
+
+                setProgressDraft(
+                    0
+                );
 
 
-            updateLibrary.mutate({
+                setLibraryMenuOpen(
+                    false
+                );
 
-                anime_id:
-                    String(id),
 
-                status,
+                updateLibrary.mutate({
 
-                title:
-                    anime.title,
+                    anime_id:
+                        String(id),
 
-                image,
+                    status:
+                        "plan_to_watch",
 
-            });
+                    progress:
+                        0,
+
+                    title:
+                        anime.title,
+
+                    image,
+
+                });
+
+
+                return;
+            }
+
+
+            // ====================================================
+            // COMPLETED
+            // ====================================================
+
+            if (
+                status ===
+                "completed"
+            ) {
+
+                /*
+                 * When episode count is known,
+                 * Completed always means every episode watched.
+                 */
+
+                const completedProgress =
+                    hasKnownEpisodeCount
+                        ? episodeCount
+                        : safeStoredProgress;
+
+
+                setProgressDraft(
+                    completedProgress
+                );
+
+
+                setLibraryMenuOpen(
+                    false
+                );
+
+
+                updateLibrary.mutate({
+
+                    anime_id:
+                        String(id),
+
+                    status:
+                        "completed",
+
+                    progress:
+                        completedProgress,
+
+                    title:
+                        anime.title,
+
+                    image,
+
+                });
+
+
+                return;
+            }
+
+
+            // ====================================================
+            // DROPPED
+            // ====================================================
+
+            if (
+                status ===
+                "dropped"
+            ) {
+
+                /*
+                 * Dropped preserves the point where
+                 * the user stopped watching.
+                 */
+
+                setLibraryMenuOpen(
+                    false
+                );
+
+
+                updateLibrary.mutate({
+
+                    anime_id:
+                        String(id),
+
+                    status:
+                        "dropped",
+
+                    progress:
+                        safeStoredProgress,
+
+                    title:
+                        anime.title,
+
+                    image,
+
+                });
+
+
+                return;
+            }
         };
 
 
@@ -488,6 +651,79 @@ function Detail() {
                     nextProgress
                 );
 
+
+            if (
+                hasKnownEpisodeCount
+            ) {
+
+                nextProgress =
+                    Math.min(
+                        nextProgress,
+                        episodeCount
+                    );
+            }
+
+
+            setProgressDraft(
+                nextProgress
+            );
+        };
+
+
+    // ============================================================
+    // PROGRESS INPUT HANDLER
+    // ============================================================
+
+    const handleProgressInput =
+        (event) => {
+
+            const value =
+                event.target.value;
+
+
+            /*
+             * Allow the user to temporarily clear
+             * the input while typing.
+             */
+
+            if (
+                value === ""
+            ) {
+
+                setProgressDraft(
+                    ""
+                );
+
+                return;
+            }
+
+
+            let nextProgress =
+                Number(value);
+
+
+            if (
+                !Number.isFinite(
+                    nextProgress
+                )
+            ) {
+                return;
+            }
+
+
+            nextProgress =
+                Math.max(
+                    0,
+                    Math.floor(
+                        nextProgress
+                    )
+                );
+
+
+            /*
+             * Never allow the UI to hold
+             * progress above the known episode count.
+             */
 
             if (
                 hasKnownEpisodeCount
@@ -758,7 +994,7 @@ function Detail() {
 
 
                                 {/* ==================================================
-                                    LIBRARY
+                                    LIBRARY CONTROL
                                 ================================================== */}
 
                                 <div className="detail-library-control">
@@ -817,6 +1053,9 @@ function Detail() {
                                             role="menu"
                                         >
 
+
+                                            {/* WATCHING */}
+
                                             <button
                                                 type="button"
                                                 role="menuitem"
@@ -837,6 +1076,8 @@ function Detail() {
 
                                             </button>
 
+
+                                            {/* COMPLETED */}
 
                                             <button
                                                 type="button"
@@ -859,6 +1100,8 @@ function Detail() {
                                             </button>
 
 
+                                            {/* DROPPED */}
+
                                             <button
                                                 type="button"
                                                 role="menuitem"
@@ -880,6 +1123,8 @@ function Detail() {
                                             </button>
 
 
+                                            {/* PLAN TO WATCH */}
+
                                             <button
                                                 type="button"
                                                 role="menuitem"
@@ -900,6 +1145,8 @@ function Detail() {
 
                                             </button>
 
+
+                                            {/* REMOVE */}
 
                                             {currentStatus && (
 
@@ -968,7 +1215,7 @@ function Detail() {
 
 
                             {/* ==================================================
-                                PROGRESS
+                                PROGRESS CARD
                             ================================================== */}
 
                             {isAuthenticated &&
@@ -976,6 +1223,10 @@ function Detail() {
 
                                 <div className="detail-progress-card">
 
+
+                                    {/* ==================================================
+                                        PROGRESS HEADER
+                                    ================================================== */}
 
                                     <div className="detail-progress-header">
 
@@ -987,6 +1238,7 @@ function Detail() {
 
 
                                             <h3>
+
                                                 {currentStatus ===
                                                 "completed"
 
@@ -1013,6 +1265,10 @@ function Detail() {
                                     </div>
 
 
+                                    {/* ==================================================
+                                        PROGRESS INFO
+                                    ================================================== */}
+
                                     <div className="detail-progress-info">
 
                                         <span>
@@ -1033,6 +1289,10 @@ function Detail() {
                                     </div>
 
 
+                                    {/* ==================================================
+                                        PROGRESS BAR
+                                    ================================================== */}
+
                                     {hasKnownEpisodeCount && (
 
                                         <div
@@ -1052,10 +1312,17 @@ function Detail() {
                                     )}
 
 
+                                    {/* ==================================================
+                                        WATCHING CONTROLS
+                                    ================================================== */}
+
                                     {currentStatus ===
                                     "watching" && (
 
                                         <div className="detail-progress-controls">
+
+
+                                            {/* DECREASE */}
 
                                             <button
                                                 type="button"
@@ -1075,6 +1342,8 @@ function Detail() {
                                             </button>
 
 
+                                            {/* INPUT */}
+
                                             <input
                                                 type="number"
                                                 className="detail-progress-input"
@@ -1084,35 +1353,17 @@ function Detail() {
                                                         ? episodeCount
                                                         : undefined
                                                 }
-                                                value={progressDraft}
-                                                onChange={(event) => {
-                                                    const value = event.target.value;
-
-                                                    if (value === "") {
-                                                        setProgressDraft("");
-                                                        return;
-                                                    }
-
-                                                    let next = Number(value);
-
-                                                    if (!Number.isFinite(next)) {
-                                                        return;
-                                                    }
-
-                                                    next = Math.max(0, Math.floor(next));
-
-                                                    if (hasKnownEpisodeCount) {
-                                                        next = Math.min(
-                                                            next,
-                                                            episodeCount
-                                                        );
-                                                    }
-
-                                                    setProgressDraft(next);
-                                                }}
+                                                value={
+                                                    progressDraft
+                                                }
+                                                onChange={
+                                                    handleProgressInput
+                                                }
                                                 aria-label="Episodes watched"
                                             />
 
+
+                                            {/* INCREASE */}
 
                                             <button
                                                 type="button"
@@ -1133,6 +1384,8 @@ function Detail() {
                                             </button>
 
 
+                                            {/* SAVE */}
+
                                             <button
                                                 type="button"
                                                 className="detail-progress-save"
@@ -1145,7 +1398,9 @@ function Detail() {
                                             >
 
                                                 {updateLibrary.isPending
+
                                                     ? "Saving..."
+
                                                     : "Save"}
 
                                             </button>
@@ -1154,6 +1409,10 @@ function Detail() {
 
                                     )}
 
+
+                                    {/* ==================================================
+                                        UNKNOWN EPISODE COUNT
+                                    ================================================== */}
 
                                     {!hasKnownEpisodeCount && (
 
@@ -1188,8 +1447,10 @@ function Detail() {
 
 
                         <p>
+
                             {anime.synopsis ||
                                 "No synopsis available."}
+
                         </p>
 
                     </div>
@@ -1213,3 +1474,4 @@ function Detail() {
 
 
 export default Detail;
+

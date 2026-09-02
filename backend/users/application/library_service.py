@@ -1,4 +1,3 @@
-
 from django.db import transaction
 from django.utils import timezone
 
@@ -31,19 +30,46 @@ class LibraryService:
             .select_related("anime")
         )
 
+        # --------------------------------------------------
+        # Refresh incomplete anime metadata.
+        # --------------------------------------------------
+
         for item in items:
 
-            if item.anime.episodes is None:
+            anime = item.anime
+
+            if anime.episodes is None:
 
                 try:
-                    anime_service.get_or_create(
-                        item.anime.mal_id
+                    anime = anime_service.get_or_create(
+                        anime.mal_id
                     )
 
                 except NotFoundException:
                     # Keep the existing library item even if
                     # Jikan is temporarily unavailable.
                     continue
+
+            # --------------------------------------------------
+            # DATABASE INVARIANT
+            # --------------------------------------------------
+            #
+            # If we now know the total episode count,
+            # library progress must never exceed it.
+            #
+            if (
+                anime.episodes is not None
+                and item.progress > anime.episodes
+            ):
+
+                item.progress = anime.episodes
+
+                item.save(
+                    update_fields=[
+                        "progress",
+                        "updated_at",
+                    ]
+                )
 
         return (
             UserAnimeStatus.objects
@@ -62,16 +88,68 @@ class LibraryService:
         )
 
     # ==================================================
+    # NORMALIZE PROGRESS
+    # ==================================================
+
+    def _normalize_progress(
+        self,
+        anime,
+        progress,
+    ):
+
+        try:
+
+            progress = int(
+                progress
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ):
+
+            progress = 0
+
+        # Progress can never be negative.
+
+        progress = max(
+            progress,
+            0,
+        )
+
+        # If the episode count is known,
+        # progress can never exceed it.
+
+        if anime.episodes is not None:
+
+            progress = min(
+                progress,
+                anime.episodes,
+            )
+
+        return progress
+
+    # ==================================================
     # UPDATE STATUS
     # ==================================================
 
     @transaction.atomic
-    def update_status(self, user, data):
+    def update_status(
+        self,
+        user,
+        data,
+    ):
 
-        anime_id = data.get("anime_id")
-        status = data.get("status")
+        anime_id = data.get(
+            "anime_id"
+        )
+
+        requested_status = data.get(
+            "status"
+        )
 
         if not anime_id:
+
             raise ValidationException(
                 "anime_id required"
             )
@@ -83,7 +161,7 @@ class LibraryService:
             "dropped",
         }
 
-        if status not in valid_statuses:
+        if requested_status not in valid_statuses:
 
             raise ValidationException(
                 "Invalid library status"
@@ -96,77 +174,6 @@ class LibraryService:
         anime = self._get_anime(
             anime_id
         )
-
-        # ==================================================
-        # PROGRESS
-        # ==================================================
-
-        try:
-
-            requested_progress = int(
-                data.get(
-                    "progress",
-                    0,
-                )
-            )
-
-        except (
-            TypeError,
-            ValueError,
-        ):
-
-            requested_progress = 0
-
-        requested_progress = max(
-            requested_progress,
-            0,
-        )
-
-        # ==================================================
-        # CLAMP PROGRESS
-        # ==================================================
-
-        if anime.episodes is not None:
-
-            effective_progress = min(
-                requested_progress,
-                anime.episodes,
-            )
-
-        else:
-
-            effective_progress = requested_progress
-
-        # ==================================================
-        # COMPLETED
-        # ==================================================
-
-        # A completed anime always means that the user
-        # watched all known episodes.
-
-        if status == "completed":
-
-            if anime.episodes is not None:
-
-                effective_progress = (
-                    anime.episodes
-                )
-
-        # ==================================================
-        # AUTOMATIC COMPLETION
-        # ==================================================
-
-        elif (
-            status == "watching"
-            and anime.episodes is not None
-            and effective_progress >= anime.episodes
-        ):
-
-            status = "completed"
-
-            effective_progress = (
-                anime.episodes
-            )
 
         # ==================================================
         # EXISTING LIBRARY ITEM
@@ -183,6 +190,96 @@ class LibraryService:
         )
 
         # ==================================================
+        # CURRENT PROGRESS
+        # ==================================================
+
+        current_progress = (
+            obj.progress
+            if obj is not None
+            else 0
+        )
+
+        current_progress = (
+            current_progress or 0
+        )
+
+        # ==================================================
+        # REQUESTED PROGRESS
+        # ==================================================
+
+        requested_progress = data.get(
+            "progress",
+            current_progress,
+        )
+
+        effective_progress = (
+            self._normalize_progress(
+                anime,
+                requested_progress,
+            )
+        )
+
+        # ==================================================
+        # STATUS RULES
+        # ==================================================
+
+        # --------------------------------------------------
+        # PLAN TO WATCH
+        # --------------------------------------------------
+        #
+        # Plan to Watch means the anime has not been started.
+        #
+        if requested_status == "plan_to_watch":
+
+            effective_progress = 0
+
+        # --------------------------------------------------
+        # COMPLETED
+        # --------------------------------------------------
+        #
+        # Completed means all known episodes have been watched.
+        #
+        elif requested_status == "completed":
+
+            if anime.episodes is not None:
+
+                effective_progress = (
+                    anime.episodes
+                )
+
+        # --------------------------------------------------
+        # WATCHING
+        # --------------------------------------------------
+        #
+        # Watching keeps the requested progress.
+        #
+        # If the user reaches the final known episode,
+        # automatically transition to Completed.
+        #
+        elif requested_status == "watching":
+
+            if (
+                anime.episodes is not None
+                and effective_progress >= anime.episodes
+            ):
+
+                requested_status = "completed"
+
+                effective_progress = (
+                    anime.episodes
+                )
+
+        # --------------------------------------------------
+        # DROPPED
+        # --------------------------------------------------
+        #
+        # Dropped keeps the requested progress.
+        #
+        elif requested_status == "dropped":
+
+            pass
+
+        # ==================================================
         # CREATE
         # ==================================================
 
@@ -191,7 +288,7 @@ class LibraryService:
             obj = UserAnimeStatus.objects.create(
                 user=user,
                 anime=anime,
-                status=status,
+                status=requested_status,
                 progress=effective_progress,
             )
 
@@ -204,11 +301,17 @@ class LibraryService:
 
         else:
 
-            previous_status = obj.status
-            previous_progress = obj.progress
+            previous_status = (
+                obj.status
+            )
+
+            previous_progress = (
+                obj.progress or 0
+            )
 
             status_changed = (
-                previous_status != status
+                previous_status
+                != requested_status
             )
 
             progress_changed = (
@@ -227,7 +330,7 @@ class LibraryService:
 
             new_item = False
 
-            obj.status = status
+            obj.status = requested_status
             obj.progress = effective_progress
 
             update_fields = [
@@ -241,7 +344,7 @@ class LibraryService:
             # ==================================================
 
             if (
-                status == "watching"
+                requested_status == "watching"
                 and not obj.started_at
             ):
 
@@ -257,7 +360,7 @@ class LibraryService:
             # COMPLETED
             # ==================================================
 
-            if status == "completed":
+            if requested_status == "completed":
 
                 if not obj.completed_at:
 
@@ -274,7 +377,7 @@ class LibraryService:
             # ==================================================
 
             elif (
-                status != "completed"
+                requested_status != "completed"
                 and obj.completed_at
             ):
 
@@ -301,7 +404,7 @@ class LibraryService:
             # --------------------------------------------------
 
             if (
-                status == "watching"
+                requested_status == "watching"
                 and not obj.started_at
             ):
 
@@ -317,7 +420,7 @@ class LibraryService:
             # COMPLETED
             # --------------------------------------------------
 
-            if status == "completed":
+            if requested_status == "completed":
 
                 if not obj.completed_at:
 
@@ -355,7 +458,9 @@ class LibraryService:
             activity_service.create(
                 user=user,
                 anime=anime,
-                action=action_map[status],
+                action=action_map[
+                    requested_status
+                ],
             )
 
         return obj
@@ -399,4 +504,3 @@ class LibraryService:
         return {
             "deleted": True,
         }
-
