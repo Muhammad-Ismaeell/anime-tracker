@@ -1,18 +1,35 @@
+
+export const getAnimeId = (anime) => {
+    if (!anime) {
+        return null;
+    }
+
+    return (
+        anime.mal_id ??
+        anime.id ??
+        anime.anime_id ??
+        null
+    );
+};
+
+
 export const normalizeAnime = (anime) => {
     if (!anime) {
         return null;
     }
 
-    return {
-        // Database ID
-        id:
-            anime.id ?? 
-            anime.mal_id,
+    const animeId = getAnimeId(anime);
 
-        // MAL ID for detail requests
-        mal_id:
-            anime.mal_id ??
-            anime.id,
+    if (animeId == null) {
+        return null;
+    }
+
+    return {
+        // MAL ID is the canonical anime ID everywhere
+        id: animeId,
+
+        // Keep mal_id available for compatibility
+        mal_id: animeId,
 
         title:
             anime.title ??
@@ -35,7 +52,7 @@ export const normalizeAnime = (anime) => {
             "",
 
         score:
-            anime.score ?? 
+            anime.score ??
             0,
 
         type:

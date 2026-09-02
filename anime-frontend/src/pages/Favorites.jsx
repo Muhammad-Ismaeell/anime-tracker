@@ -15,7 +15,9 @@ import {
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
 
-import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
+import {
+    useGlobalLibrary,
+} from "../hooks/useGlobalLibrary";
 
 
 function Favorites() {
@@ -31,9 +33,17 @@ function Favorites() {
 
     const loadMoreRef = useRef(null);
 
-    const toggleFavorite = useToggleFavorite();
+    const toggleFavorite =
+        useToggleFavorite();
 
-    const favoriteIds = useFavoriteIds();
+    const {
+        statusMap,
+    } = useGlobalLibrary();
+
+
+    // ============================================================
+    // INFINITE SCROLL
+    // ============================================================
 
     useEffect(() => {
         const observer =
@@ -53,7 +63,9 @@ function Favorites() {
             );
 
         if (loadMoreRef.current) {
-            observer.observe(loadMoreRef.current);
+            observer.observe(
+                loadMoreRef.current
+            );
         }
 
         return () => {
@@ -66,48 +78,77 @@ function Favorites() {
     ]);
 
 
+    // ============================================================
+    // FAVORITES
+    // ============================================================
+
     /*
-     * useFavorites() is an infinite query,
-     * so all favorites are stored inside pages.
+     * useFavorites() is an infinite query.
+     *
+     * Each page contains:
+     *
+     * {
+     *     results: [...]
+     * }
+     *
+     * Flatten all loaded pages into one list.
      */
     const favorites =
         data?.pages?.flatMap(
-            (page) => page?.results ?? []
+            (page) =>
+                page?.results ?? []
         ) ?? [];
 
 
     /*
-     * The backend count is included
-     * in the first page.
+     * The backend count is returned
+     * with the first page.
      */
     const totalFavorites =
         data?.pages?.[0]?.count ?? 0;
 
 
+    // ============================================================
+    // LOADING
+    // ============================================================
+
     if (isLoading) {
         return (
             <PageContainer>
+
                 <div className="section-header">
-                    <h1>❤️ My Favorites</h1>
+                    <h1>
+                        ❤️ My Favorites
+                    </h1>
                 </div>
 
                 <div className="grid">
+
                     {Array.from({
                         length: 12,
-                    }).map((_, index) => (
-                        <AnimeCardSkeleton
-                            key={index}
-                        />
-                    ))}
+                    }).map(
+                        (_, index) => (
+                            <AnimeCardSkeleton
+                                key={index}
+                            />
+                        )
+                    )}
+
                 </div>
+
             </PageContainer>
         );
     }
 
 
+    // ============================================================
+    // ERROR
+    // ============================================================
+
     if (error) {
         return (
             <PageContainer>
+
                 <EmptyState
                     text="Failed to load favorites."
                 />
@@ -115,18 +156,26 @@ function Favorites() {
                 <button
                     type="button"
                     className="retry-btn"
-                    onClick={() => refetch()}
+                    onClick={() =>
+                        refetch()
+                    }
                 >
                     Retry
                 </button>
+
             </PageContainer>
         );
     }
 
 
+    // ============================================================
+    // RENDER
+    // ============================================================
+
     return (
         <>
             <Helmet>
+
                 <title>
                     My Favorites | Anime Tracker
                 </title>
@@ -135,104 +184,127 @@ function Favorites() {
                     name="description"
                     content="View and manage your favorite anime."
                 />
+
             </Helmet>
+
 
             <PageContainer>
 
                 <div className="section-header">
-                    <h1>❤️ My Favorites</h1>
+
+                    <h1>
+                        ❤️ My Favorites
+                    </h1>
 
                     {totalFavorites > 0 && (
                         <span className="section-count">
                             {totalFavorites}
                         </span>
                     )}
+
                 </div>
 
 
                 {favorites.length === 0 ? (
+
                     <EmptyState
                         text="You haven't added any favorite anime yet."
                         icon="❤️"
                     />
+
                 ) : (
+
                     <>
+
                         <div className="grid">
 
-                            {favorites.map((item) => {
+                            {favorites.map(
+                                (item) => {
 
-                                /*
-                                 * The favorite endpoint returns
-                                 * the anime inside item.anime.
-                                 */
-                                const anime =
-                                    item?.anime;
+                                    const anime =
+                                        item?.anime;
 
-                                if (!anime) {
-                                    return null;
-                                }
+                                    if (!anime) {
+                                        return null;
+                                    }
 
 
-                                const animeId =
-                                    anime?.mal_id ??
-                                    anime?.id ??
-                                    item?.anime_id;
+                                    const animeId =
+                                        anime?.mal_id ??
+                                        anime?.id;
 
-                                if (animeId == null) {
-                                    return null;
-                                }
-
-
-                                const normalizedId =
-                                    String(animeId);
+                                    if (
+                                        animeId ==
+                                        null
+                                    ) {
+                                        return null;
+                                    }
 
 
-                                /*
-                                 * Prefer the shared favorite ID
-                                 * state so this page stays in sync
-                                 * with Home/Search/etc.
-                                 */
-                                const isFavorited =
-                                    favoriteIds.has(
-                                        normalizedId
+                                    const normalizedId =
+                                        String(
+                                            animeId
+                                        );
+
+
+                                    return (
+                                        <AnimeCard
+                                            key={
+                                                normalizedId
+                                            }
+
+                                            anime={
+                                                anime
+                                            }
+
+                                            statusMap={
+                                                statusMap
+                                            }
+
+                                            /*
+                                             * Every anime displayed
+                                             * on this page is a favorite.
+                                             */
+                                            isFavorited={
+                                                true
+                                            }
+
+                                            isFavoritePending={
+                                                toggleFavorite.isPending
+                                            }
+
+                                            onToggleFavorite={() =>
+                                                toggleFavorite.mutate(
+                                                    {
+                                                        anime_id:
+                                                            animeId,
+
+                                                        title:
+                                                            anime?.title ??
+                                                            "",
+
+                                                        image:
+                                                            anime?.image ??
+                                                            "",
+                                                    }
+                                                )
+                                            }
+                                        />
                                     );
-
-
-                                return (
-                                    <AnimeCard
-                                        key={normalizedId}
-                                        anime={anime}
-                                        isFavorited={
-                                            isFavorited
-                                        }
-                                        isFavoritePending={
-                                            toggleFavorite.isPending
-                                        }
-                                        onToggleFavorite={() =>
-                                            toggleFavorite.mutate({
-                                                anime_id:
-                                                    animeId,
-
-                                                title:
-                                                    anime?.title ??
-                                                    item?.title ??
-                                                    "",
-
-                                                image:
-                                                    anime?.image ??
-                                                    item?.image ??
-                                                    "",
-                                            })
-                                        }
-                                    />
-                                );
-                            })}
+                                }
+                            )}
 
                         </div>
 
 
+                        {/* ==================================================
+                            INFINITE SCROLL SENTINEL
+                        ================================================== */}
+
                         <div
-                            ref={loadMoreRef}
+                            ref={
+                                loadMoreRef
+                            }
                             className="search-load-more"
                             aria-hidden="true"
                         />

@@ -11,6 +11,8 @@ import {
 
 import AnimeCard from "../AnimeCard";
 
+import { getAnimeId } from "../../utils/normalizeAnime";
+
 
 export default function AnimeSection({
     title,
@@ -21,16 +23,8 @@ export default function AnimeSection({
     toggleFavorite,
 }) {
 
-    // ============================================================
-    // CONSTANTS
-    // ============================================================
-
     const CARDS_PER_PAGE = 4;
 
-
-    // ============================================================
-    // SAFE FAVORITE IDS
-    // ============================================================
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
@@ -42,39 +36,25 @@ export default function AnimeSection({
             );
 
 
-    // ============================================================
-    // VALID ANIME
-    // ============================================================
+    const validAnime = useMemo(() => {
 
-    const validAnime =
-        useMemo(
-            () => {
+        const list =
+            Array.isArray(animeList)
+                ? animeList
+                : [];
 
-                const list =
-                    Array.isArray(animeList)
-                        ? animeList
-                        : [];
+        return list
+            .map((anime) => ({
+                anime,
+                id: getAnimeId(anime),
+            }))
+            .filter(
+                ({ id }) =>
+                    id != null
+            );
 
+    }, [animeList]);
 
-                return list.filter(
-                    (anime) => {
-
-                        const animeId =
-                            anime?.mal_id ??
-                            anime?.id;
-
-                        return animeId != null;
-                    }
-                );
-
-            },
-            [animeList]
-        );
-
-
-    // ============================================================
-    // SLIDER STATE
-    // ============================================================
 
     const [
         currentPage,
@@ -88,15 +68,12 @@ export default function AnimeSection({
     ] = useState(1);
 
 
-    // ============================================================
-    // PAGE INFORMATION
-    // ============================================================
-
     const totalPages =
         Math.ceil(
             validAnime.length /
             CARDS_PER_PAGE
         );
+
 
     const hasMultiplePages =
         totalPages > 1;
@@ -111,10 +88,6 @@ export default function AnimeSection({
         totalPages - 1;
 
 
-    // ============================================================
-    // VISIBLE ANIME
-    // ============================================================
-
     const visibleAnime =
         validAnime.slice(
             currentPage * CARDS_PER_PAGE,
@@ -122,19 +95,13 @@ export default function AnimeSection({
         );
 
 
-    // ============================================================
-    // NAVIGATION
-    // ============================================================
-
     const handlePrevious = () => {
 
         if (isFirstPage) {
             return;
         }
 
-
         setSlideDirection(-1);
-
 
         setCurrentPage(
             (current) =>
@@ -152,9 +119,7 @@ export default function AnimeSection({
             return;
         }
 
-
         setSlideDirection(1);
-
 
         setCurrentPage(
             (current) =>
@@ -166,10 +131,6 @@ export default function AnimeSection({
     };
 
 
-    // ============================================================
-    // SLIDE ANIMATION
-    // ============================================================
-
     const slideVariants = {
 
         enter: (direction) => ({
@@ -177,39 +138,27 @@ export default function AnimeSection({
                 direction > 0
                     ? 45
                     : -45,
-
             opacity: 0,
         }),
-
 
         center: {
             x: 0,
             opacity: 1,
         },
 
-
         exit: (direction) => ({
             x:
                 direction > 0
                     ? -45
                     : 45,
-
             opacity: 0,
         }),
 
     };
 
 
-    // ============================================================
-    // RENDER
-    // ============================================================
-
     return (
         <section className="home-section">
-
-            {/* ==================================================
-                SECTION HEADER
-            ================================================== */}
 
             <div className="section-header">
 
@@ -219,7 +168,6 @@ export default function AnimeSection({
                         {emoji}
                     </span>
 
-
                     <h2>
                         {title}
                     </h2>
@@ -227,17 +175,12 @@ export default function AnimeSection({
                 </div>
 
 
-                {/* ==================================================
-                    SLIDER CONTROLS
-                ================================================== */}
-
                 {hasMultiplePages && (
 
                     <div className="section-slider-controls">
 
                         <button
                             type="button"
-
                             className={
                                 `section-slider-btn ${
                                     isFirstPage
@@ -245,15 +188,12 @@ export default function AnimeSection({
                                         : ""
                                 }`
                             }
-
                             onClick={
                                 handlePrevious
                             }
-
                             disabled={
                                 isFirstPage
                             }
-
                             aria-label={
                                 `Previous ${title.toLowerCase()}`
                             }
@@ -264,7 +204,6 @@ export default function AnimeSection({
 
                         <button
                             type="button"
-
                             className={
                                 `section-slider-btn ${
                                     isLastPage
@@ -272,15 +211,12 @@ export default function AnimeSection({
                                         : ""
                                 }`
                             }
-
                             onClick={
                                 handleNext
                             }
-
                             disabled={
                                 isLastPage
                             }
-
                             aria-label={
                                 `Next ${title.toLowerCase()}`
                             }
@@ -295,41 +231,22 @@ export default function AnimeSection({
             </div>
 
 
-            {/* ==================================================
-                ANIME CARDS
-            ================================================== */}
-
             <div className="anime-section-slider">
 
                 <AnimatePresence
                     initial={false}
                     mode="wait"
-                    custom={
-                        slideDirection
-                    }
+                    custom={slideDirection}
                 >
 
                     <motion.div
-                        key={
-                            currentPage
-                        }
-
+                        key={currentPage}
                         className="anime-section-grid"
-
-                        custom={
-                            slideDirection
-                        }
-
-                        variants={
-                            slideVariants
-                        }
-
+                        custom={slideDirection}
+                        variants={slideVariants}
                         initial="enter"
-
                         animate="center"
-
                         exit="exit"
-
                         transition={{
                             x: {
                                 duration: 0.38,
@@ -349,18 +266,13 @@ export default function AnimeSection({
                     >
 
                         {visibleAnime.map(
-                            (anime) => {
-
-                                const animeId =
-                                    anime.mal_id ??
-                                    anime.id;
-
+                            ({
+                                anime,
+                                id,
+                            }) => {
 
                                 const normalizedAnimeId =
-                                    String(
-                                        animeId
-                                    );
-
+                                    String(id);
 
                                 return (
                                     <AnimeCard
@@ -389,10 +301,8 @@ export default function AnimeSection({
 
                                         onToggleFavorite={() =>
                                             toggleFavorite.mutate({
-
                                                 anime_id:
-                                                    anime.mal_id ??
-                                                    anime.id,
+                                                    id,
 
                                                 title:
                                                     anime.title ??
@@ -401,7 +311,6 @@ export default function AnimeSection({
                                                 image:
                                                     anime.image ??
                                                     "",
-
                                             })
                                         }
                                     />
@@ -418,4 +327,3 @@ export default function AnimeSection({
         </section>
     );
 }
-

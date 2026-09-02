@@ -26,17 +26,20 @@ export function useFavoriteIds() {
 
 
         queryFn: async () => {
+            const ids = await FavoriteAPI.listIds();
 
-            const ids =
-                await FavoriteAPI.listIds();
+            console.log("FAVORITE IDS FROM API:", ids);
 
-            return new Set(
+            const result = new Set(
                 ids
-                    .filter(
-                        (id) => id != null
-                    )
+                    .filter((id) => id != null)
                     .map(String)
             );
+
+            console.log("FAVORITE IDS SET:", result);
+            console.log("HAS 23:", result.has("23"));
+
+            return result;
         },
 
 
