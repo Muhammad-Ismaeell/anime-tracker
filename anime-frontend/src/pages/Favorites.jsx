@@ -1,10 +1,14 @@
+
 import { Helmet } from "react-helmet-async";
 
 import PageContainer from "../components/ui/PageContainer";
 import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
-
+import {
+    useEffect,
+    useRef,
+} from "react";
 import {
     useFavorites,
     useToggleFavorite,
@@ -17,15 +21,66 @@ function Favorites() {
     const {
         data,
         isLoading,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
         error,
         refetch,
     } = useFavorites();
 
+    const loadMoreRef = useRef(null);
+
     const toggleFavorite = useToggleFavorite();
 
     const { statusMap } = useGlobalLibrary();
+    
+    useEffect(() => {
+        const observer =
+            new IntersectionObserver(
+                (entries) => {
+                    if (
+                        entries[0]?.isIntersecting &&
+                        hasNextPage &&
+                        !isFetchingNextPage
+                    ) {
+                        fetchNextPage();
+                    }
+                },
+                {
+                    rootMargin: "300px",
+                }
+            );
 
-    const favorites = data?.results ?? [];
+        if (loadMoreRef.current) {
+            observer.observe(
+                loadMoreRef.current
+            );
+        }
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    ]);
+
+    /*
+     * Combine all loaded pages into one list.
+     */
+    const favorites =
+        data?.pages?.flatMap(
+            (page) => page.results || []
+        ) ?? [];
+
+
+    /*
+     * Total number of favorites reported
+     * by the backend.
+     */
+    const totalFavorites =
+        data?.pages?.[0]?.count ?? 0;
 
 
     if (isLoading) {
@@ -82,9 +137,17 @@ function Favorites() {
             </Helmet>
 
             <PageContainer>
+
                 <div className="section-header">
                     <h1>❤️ My Favorites</h1>
+
+                    {totalFavorites > 0 && (
+                        <span className="section-count">
+                            {totalFavorites}
+                        </span>
+                    )}
                 </div>
+
 
                 {favorites.length === 0 ? (
                     <EmptyState
@@ -92,50 +155,79 @@ function Favorites() {
                         icon="❤️"
                     />
                 ) : (
-                    <div className="grid">
-                        {favorites.map((item) => {
-                            const anime = item.anime;
+                    <>
+                        <div className="grid">
+                            {favorites.map((item) => {
 
-                            const animeId =
-                                anime?.mal_id ??
-                                anime?.id ??
-                                item.anime_id ??
-                                item.id;
+                                const anime =
+                                    item.anime;
 
-                            if (animeId == null) {
-                                return null;
-                            }
+                                const animeId =
+                                    anime?.mal_id ??
+                                    anime?.id ??
+                                    item.anime_id ??
+                                    item.id;
 
-                            const id = String(animeId);
+                                if (animeId == null) {
+                                    return null;
+                                }
 
-                            return (
-                                <AnimeCard
-                                    key={id}
-                                    anime={anime}
-                                    statusMap={statusMap}
-                                    isFavorited={true}
-                                    isFavoritePending={
-                                        toggleFavorite.isPending
+                                const id =
+                                    String(animeId);
+
+
+                                return (
+                                    <AnimeCard
+                                        key={id}
+                                        anime={anime}
+                                        statusMap={statusMap}
+                                        isFavorited={true}
+                                        isFavoritePending={
+                                            toggleFavorite.isPending
+                                        }
+                                        onToggleFavorite={() =>
+                                            toggleFavorite.mutate({
+                                                anime_id:
+                                                    animeId,
+
+                                                title:
+                                                    anime?.title ||
+                                                    item.title ||
+                                                    "",
+
+                                                image:
+                                                    anime?.image ||
+                                                    item.image ||
+                                                    "",
+                                            })
+                                        }
+                                    />
+                                );
+                            })}
+                        </div>
+
+
+                        {hasNextPage && (
+                            <div className="load-more-container">
+                                <button
+                                    type="button"
+                                    className="load-more-btn"
+                                    onClick={() =>
+                                        fetchNextPage()
                                     }
-                                    onToggleFavorite={() =>
-                                        toggleFavorite.mutate({
-                                            anime_id:
-                                                animeId,
-                                            title:
-                                                anime?.title ||
-                                                item.title ||
-                                                "",
-                                            image:
-                                                anime?.image ||
-                                                item.image ||
-                                                "",
-                                        })
+                                    disabled={
+                                        isFetchingNextPage
                                     }
-                                />
-                            );
-                        })}
-                    </div>
+                                >
+                                    {isFetchingNextPage
+                                        ? "Loading..."
+                                        : "Load More"}
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
+
             </PageContainer>
         </>
     );

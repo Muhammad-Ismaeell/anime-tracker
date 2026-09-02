@@ -1,3 +1,4 @@
+
 import { useMemo } from "react";
 import { useFavorites } from "./useFavorites";
 
@@ -5,7 +6,10 @@ export function useFavoriteIds() {
     const { data } = useFavorites();
 
     return useMemo(() => {
-        const favorites = data?.results ?? [];
+        const favorites =
+            data?.pages?.flatMap(
+                (page) => page?.results ?? []
+            ) ?? [];
 
         return new Set(
             favorites
@@ -16,7 +20,9 @@ export function useFavoriteIds() {
                         favorite?.anime_id ??
                         favorite?.mal_id;
 
-                    return id != null ? String(id) : null;
+                    return id != null
+                        ? String(id)
+                        : null;
                 })
                 .filter(Boolean)
         );
