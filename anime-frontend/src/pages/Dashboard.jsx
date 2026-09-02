@@ -250,7 +250,21 @@ function Dashboard() {
             ),
             100
         );
+    
+    const episodesWatched =
+        Math.max(
+            Number(progress.episodes_watched) || 0,
+            0
+        );
 
+    const episodesAvailable =
+        Math.max(
+            Number(progress.episodes_available) || 0,
+            0
+        );
+
+    const hasKnownProgressTotal =
+        episodesAvailable > 0;
 
     // =========================================================
     // NAVIGATION
@@ -380,7 +394,10 @@ function Dashboard() {
                     </span>
 
                     <h3>
-                        {progressPercentage}%
+                        {hasKnownProgressTotal
+                            ? `${progressPercentage}%`
+                            : "—"
+                        }
                     </h3>
 
                     <p>
@@ -434,35 +451,46 @@ function Dashboard() {
 
                         <div
                             className="progress-percentage"
-                            aria-label={`${progressPercentage}% overall progress`}
+                            aria-label={
+                                hasKnownProgressTotal
+                                    ? `${progressPercentage}% overall progress`
+                                    : "Overall progress percentage unavailable"
+                            }
                         >
-                            {progressPercentage}%
+                            {hasKnownProgressTotal
+                                ? `${progressPercentage}%`
+                                : "—"
+                            }
                         </div>
 
                     </div>
 
 
-                    <div
-                        className="progress-bar"
-                        role="progressbar"
-                        aria-valuenow={progressPercentage}
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                    >
+                    {hasKnownProgressTotal && (
                         <div
-                            className="progress-bar-fill"
-                            style={{
-                                width: `${progressPercentage}%`,
-                            }}
-                        />
-                    </div>
+                            className="progress-bar"
+                            role="progressbar"
+                            aria-valuenow={progressPercentage}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        >
+                            <div
+                                className="progress-bar-fill"
+                                style={{
+                                    width: `${progressPercentage}%`,
+                                }}
+                            />
+                        </div>
+                    )}
 
 
                     <p className="progress-description">
 
-                        {progress.episodes_available > 0
-                            ? `${progress.episodes_watched || 0} of ${progress.episodes_available} available episodes`
-                            : "Start watching anime to track your progress."
+                        {hasKnownProgressTotal
+                            ? `${episodesWatched} of ${episodesAvailable} available episodes`
+                            : episodesWatched > 0
+                                ? `${episodesWatched} episodes watched • Total episode count unavailable`
+                                : "Start watching anime to track your progress."
                         }
 
                     </p>
