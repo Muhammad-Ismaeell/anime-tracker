@@ -1,7 +1,4 @@
 
-from django.db.models import Sum
-
-
 from users.infrastructure.models import (
     UserAnimeStatus,
     FavoriteAnime,
@@ -91,8 +88,11 @@ class StatsService:
         # Progress is based only on anime that the user
         # has started watching or completed.
         #
-        # This prevents "Plan to Watch" anime from inflating
-        # the total number of available episodes.
+        # Each anime's progress is capped at its known
+        # episode count before calculating the totals.
+        #
+        # This protects the dashboard even if an older
+        # database record contains an invalid progress value.
         # ==================================================
 
         progress_qs = library_qs.filter(
@@ -102,20 +102,30 @@ class StatsService:
             ]
         )
 
-        progress_data = progress_qs.aggregate(
-            episodes_watched=Sum("progress"),
-        )
+        episodes_watched = 0
+        episodes_available = 0
 
-        episodes_watched = (
-            progress_data["episodes_watched"]
-            or 0
-        )
+        for item in progress_qs:
 
-        episodes_available = sum(
-            item.anime.episodes
-            for item in progress_qs
-            if item.anime.episodes
-        )
+            available = item.anime.episodes or 0
+            progress = item.progress or 0
+
+            if available > 0:
+
+                progress = min(
+                    max(progress, 0),
+                    available,
+                )
+
+                episodes_watched += progress
+                episodes_available += available
+
+            else:
+
+                episodes_watched += max(
+                    progress,
+                    0,
+                )
 
         if episodes_available > 0:
 
@@ -166,7 +176,17 @@ class StatsService:
 
                 "episodes": item.anime.episodes,
 
-                "progress": item.progress,
+                "progress": (
+                    min(
+                        max(item.progress or 0, 0),
+                        item.anime.episodes,
+                    )
+                    if item.anime.episodes
+                    else max(
+                        item.progress or 0,
+                        0,
+                    )
+                ),
             }
 
             for item in watching_items
@@ -234,4 +254,3 @@ class StatsService:
 
 
         return stats
-
