@@ -430,7 +430,7 @@ function Detail() {
                     nextProgress
                 );
 
-
+                setIsProgressEditing(false);
                 setLibraryMenuOpen(
                     false
                 );
@@ -639,7 +639,7 @@ function Detail() {
         }
 
         setProgressDraft(nextProgress);
-        setIsProgressEditing(false);
+        setIsProgressEditing(true);
     };
 
 
