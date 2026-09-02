@@ -1,3 +1,4 @@
+
 from django.db import transaction
 from django.utils import timezone
 
@@ -5,7 +6,6 @@ from anime.application.anime_service import AnimeService
 from anime.infrastructure.jikan.jikan_client import JikanClient
 
 from core.exceptions.custom_exceptions import (
-    NotFoundException,
     ValidationException,
 )
 
@@ -24,53 +24,16 @@ class LibraryService:
 
     def get_user_library(self, user):
 
-        items = (
-            UserAnimeStatus.objects
-            .filter(user=user)
-            .select_related("anime")
-        )
-
         # --------------------------------------------------
-        # Refresh incomplete anime metadata.
+        # Library reads must be fast.
         # --------------------------------------------------
-
-        for item in items:
-
-            anime = item.anime
-
-            if anime.episodes is None:
-
-                try:
-                    anime = anime_service.get_or_create(
-                        anime.mal_id
-                    )
-
-                except NotFoundException:
-                    # Keep the existing library item even if
-                    # Jikan is temporarily unavailable.
-                    continue
-
-            # --------------------------------------------------
-            # DATABASE INVARIANT
-            # --------------------------------------------------
-            #
-            # If we now know the total episode count,
-            # library progress must never exceed it.
-            #
-            if (
-                anime.episodes is not None
-                and item.progress > anime.episodes
-            ):
-
-                item.progress = anime.episodes
-
-                item.save(
-                    update_fields=[
-                        "progress",
-                        "updated_at",
-                    ]
-                )
-
+        #
+        # Do NOT refresh anime metadata from Jikan here.
+        #
+        # The library endpoint should only read the user's
+        # stored library records. Anime metadata is handled
+        # by the anime/detail flow when needed.
+        #
         return (
             UserAnimeStatus.objects
             .filter(user=user)
@@ -308,6 +271,26 @@ class LibraryService:
             previous_progress = (
                 obj.progress or 0
             )
+
+            # --------------------------------------------------
+            # Repair invalid existing progress.
+            # --------------------------------------------------
+            #
+            # This handles old records such as:
+            #
+            # progress = 16
+            # episodes = 14
+            #
+            # once the episode count becomes known.
+            #
+            if (
+                anime.episodes is not None
+                and previous_progress > anime.episodes
+            ):
+
+                previous_progress = (
+                    anime.episodes
+                )
 
             status_changed = (
                 previous_status
