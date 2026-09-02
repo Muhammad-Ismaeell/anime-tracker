@@ -605,16 +605,14 @@ function Dashboard() {
                                             {anime.title}
                                         </h3>
 
-
                                         <p>
-
-                                            {episodeCount > 0
-                                                ? `Episode ${currentProgress} / ${episodeCount}`
-                                                : `Episode ${currentProgress}`
+                                            {currentProgress === 0
+                                                ? "Not started"
+                                                : episodeCount > 0
+                                                    ? `Episode ${currentProgress} / ${episodeCount}`
+                                                    : `Episode ${currentProgress}`
                                             }
-
                                         </p>
-
 
                                         {episodeCount > 0 && (
 
