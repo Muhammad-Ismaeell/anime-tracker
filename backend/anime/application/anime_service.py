@@ -1,4 +1,3 @@
-
 from core.exceptions.custom_exceptions import NotFoundException
 
 from anime.infrastructure.models import Anime, Genre
@@ -172,16 +171,25 @@ class AnimeService:
             mal_id=anime_id
         ).first()
 
-        if anime:
+        # If the anime already exists and has its
+        # episode metadata, use the cached record.
+        if anime and anime.episodes is not None:
             return anime
 
+        # Existing record is incomplete, so refresh it.
         raw = self.client.get_detail(
             anime_id
         )
 
         if not raw:
+
+            if not anime:
+                raise NotFoundException(
+                    "Anime not found"
+                )
+
             raise NotFoundException(
-                "Anime not found"
+                "Anime metadata could not be refreshed"
             )
 
         anime, _ = self.save_anime(
