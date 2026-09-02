@@ -3,9 +3,12 @@ import api from "./client";
 export const FavoriteAPI = {
 
     list: async (page = 1) => {
-        const res = await api.get("/users/favorites/", {
-            params: { page }
-        });
+        const res = await api.get(
+            "/users/favorites/",
+            {
+                params: { page }
+            }
+        );
 
         const data = res.data?.data;
 
@@ -17,8 +20,35 @@ export const FavoriteAPI = {
         };
     },
 
+
+    listIds: async () => {
+        const res = await api.get(
+            "/users/favorites/ids/"
+        );
+
+        const data = res.data?.data;
+
+        /*
+         * The endpoint returns the IDs directly:
+         *
+         * {
+         *     success: true,
+         *     data: [1, 2, 3, ...]
+         * }
+         */
+
+        return Array.isArray(data)
+            ? data
+            : [];
+    },
+
+
     toggle: async (payload) => {
-        const res = await api.post("/users/favorites/toggle/", payload);
+        const res = await api.post(
+            "/users/favorites/toggle/",
+            payload
+        );
+
         return res.data;
     }
 };

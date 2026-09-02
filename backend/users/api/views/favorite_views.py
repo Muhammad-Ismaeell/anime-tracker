@@ -96,3 +96,26 @@ def toggle_favorite(request):
         result,
         "Favorite updated",
     )
+
+
+@extend_schema(
+    summary="List Favorite Anime IDs",
+    description="Return all anime IDs favorited by the authenticated user.",
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def favorite_ids(request):
+
+    ids = list(
+        FavoriteAnime.objects
+        .filter(user=request.user)
+        .values_list(
+            "anime_id",
+            flat=True,
+        )
+    )
+
+    return APIResponse.success(
+        ids,
+        "Favorite IDs retrieved",
+    )

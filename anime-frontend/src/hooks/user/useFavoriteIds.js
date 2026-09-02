@@ -1,30 +1,63 @@
+import { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-import { useMemo } from "react";
-import { useFavorites } from "./useFavorites";
+import { AuthContext } from "../../context/AuthContext";
+import { FavoriteAPI } from "../../api/favorites";
+
 
 export function useFavoriteIds() {
-    const { data } = useFavorites();
 
-    return useMemo(() => {
-        const favorites =
-            data?.pages?.flatMap(
-                (page) => page?.results ?? []
-            ) ?? [];
+    const {
+        user,
+        isAuthenticated,
+        loading,
+    } = useContext(AuthContext);
 
-        return new Set(
-            favorites
-                .map((favorite) => {
-                    const id =
-                        favorite?.anime?.mal_id ??
-                        favorite?.anime?.id ??
-                        favorite?.anime_id ??
-                        favorite?.mal_id;
 
-                    return id != null
-                        ? String(id)
-                        : null;
-                })
-                .filter(Boolean)
-        );
-    }, [data]);
+    const userId = user?.id ?? null;
+
+
+    const query = useQuery({
+
+        queryKey: [
+            "favoriteIds",
+            userId,
+        ],
+
+
+        queryFn: async () => {
+
+            const ids =
+                await FavoriteAPI.listIds();
+
+            return new Set(
+                ids
+                    .filter(
+                        (id) => id != null
+                    )
+                    .map(String)
+            );
+        },
+
+
+        enabled:
+            !loading &&
+            isAuthenticated &&
+            userId !== null,
+
+
+        staleTime:
+            1000 * 60 * 5,
+
+
+        placeholderData:
+            (previousData) =>
+                previousData,
+    });
+
+
+    return (
+        query.data ??
+        new Set()
+    );
 }

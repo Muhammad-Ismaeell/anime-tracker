@@ -6,7 +6,7 @@ from .api.views import (
     update_profile,
     favorite_list,
     toggle_favorite,
-
+    favorite_ids,
     library,
     update_status,
     remove_from_library,
@@ -28,7 +28,10 @@ urlpatterns = [
 
     path("favorites/", favorite_list),
     path("favorites/toggle/", toggle_favorite),
-
+    path(
+        "favorites/ids/",
+        favorite_ids
+    ),
     path("library/", library),
     path("library/update/", update_status),
 
