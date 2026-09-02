@@ -18,9 +18,12 @@ import { useAuthPrompt } from "../context/useAuthPrompt";
 import { AuthContext } from "../context/AuthContext";
 
 import {
-    useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
+
+import {
+    useFavoriteIds,
+} from "../hooks/user/useFavoriteIds";
 
 import {
     useGlobalLibrary,
@@ -64,17 +67,11 @@ function Detail() {
     // FAVORITES
     // ============================================================
 
-    const {
-        data: favoritesPage,
-    } = useFavorites();
-
+    const favoriteIds =
+        useFavoriteIds();
 
     const toggleFavorite =
         useToggleFavorite();
-
-
-    const favorites =
-        favoritesPage?.results ?? [];
 
 
     // ============================================================
@@ -242,26 +239,8 @@ function Detail() {
     // ============================================================
 
     const liked =
-        favorites.some(
-            (favorite) => {
-
-                const favoriteAnimeId =
-                    favorite.anime?.mal_id ??
-                    favorite.anime?.id ??
-                    favorite.anime_id ??
-                    favorite.mal_id;
-
-
-                return (
-                    favoriteAnimeId != null &&
-                    String(
-                        favoriteAnimeId
-                    ) ===
-                    String(
-                        anime.id
-                    )
-                );
-            }
+        favoriteIds.has(
+            String(anime.id)
         );
 
 
