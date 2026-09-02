@@ -1,0 +1,1209 @@
+:root {
+    --detail-bg: #0f1117;
+    --detail-card: rgba(17, 24, 39, 0.92);
+    --detail-card-soft: rgba(31, 41, 55, 0.72);
+
+    --detail-text: #f9fafb;
+    --detail-text-soft: #d1d5db;
+    --detail-text-muted: #9ca3af;
+
+    --detail-border: rgba(255, 255, 255, 0.08);
+    --detail-border-strong: rgba(255, 255, 255, 0.14);
+
+    --detail-accent: #8b5cf6;
+    --detail-accent-light: #a78bfa;
+    --detail-accent-dark: #6d28d9;
+
+    --detail-success: #22c55e;
+    --detail-danger: #ef4444;
+    --detail-warning: #f59e0b;
+
+    --detail-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+    --detail-radius: 22px;
+}
+
+
+/* ============================================================
+   PAGE
+============================================================ */
+
+.detail-premium {
+    width: 100%;
+    min-height: 100%;
+    color: var(--detail-text);
+}
+
+.anime-detail-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+}
+
+
+/* ============================================================
+   BACKDROP
+============================================================ */
+
+.anime-backdrop {
+    position: relative;
+    width: 100%;
+    height: 390px;
+    overflow: hidden;
+    border-radius: 0 0 28px 28px;
+    background: #111827;
+}
+
+.anime-backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(15, 17, 23, 0.08) 0%,
+            rgba(15, 17, 23, 0.18) 35%,
+            rgba(15, 17, 23, 0.72) 70%,
+            var(--detail-bg) 100%
+        );
+
+    pointer-events: none;
+}
+
+.anime-backdrop img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+
+    filter: saturate(0.9);
+    transform: scale(1.02);
+}
+
+
+/* ============================================================
+   MAIN DETAIL CARD
+============================================================ */
+
+.anime-detail-card {
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 38px;
+
+    width: calc(100% - 48px);
+    margin: -125px auto 0;
+
+    padding: 30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(31, 41, 55, 0.94),
+            rgba(17, 24, 39, 0.96)
+        );
+
+    border: 1px solid var(--detail-border);
+    border-radius: var(--detail-radius);
+
+    box-shadow: var(--detail-shadow);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* ============================================================
+   POSTER
+============================================================ */
+
+.anime-poster {
+    width: 250px;
+    height: 350px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background: #111827;
+
+    border: 1px solid var(--detail-border-strong);
+
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.45);
+}
+
+.anime-poster img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.45s ease,
+        filter 0.45s ease;
+}
+
+.anime-poster:hover img {
+    transform: scale(1.035);
+}
+
+
+/* ============================================================
+   MAIN INFORMATION
+============================================================ */
+
+.anime-main-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    padding: 8px 4px;
+}
+
+.anime-detail-eyebrow {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+
+    margin-bottom: 10px;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    letter-spacing: 0.16em;
+
+    color: var(--detail-accent-light);
+}
+
+.anime-main-info h1 {
+    margin: 0;
+
+    max-width: 850px;
+
+    color: var(--detail-text);
+
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.08;
+
+    font-weight: 800;
+
+    letter-spacing: -0.035em;
+}
+
+
+/* ============================================================
+   META STATS
+============================================================ */
+
+.detail-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin-top: 20px;
+}
+
+.detail-stat {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 34px;
+
+    padding: 7px 12px;
+
+    color: var(--detail-text-soft);
+
+    background: rgba(255, 255, 255, 0.055);
+
+    border: 1px solid var(--detail-border);
+
+    border-radius: 999px;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.detail-stat.score {
+    color: #fcd34d;
+
+    background: rgba(245, 158, 11, 0.09);
+
+    border-color: rgba(245, 158, 11, 0.18);
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 24px;
+}
+
+
+/* ============================================================
+   LIBRARY CONTROL
+============================================================ */
+
+.detail-library-control {
+    position: relative;
+}
+
+.detail-library-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 46px;
+
+    padding: 0 16px;
+
+    gap: 10px;
+
+    color: var(--detail-text);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--detail-accent),
+            var(--detail-accent-dark)
+        );
+
+    border: 1px solid rgba(167, 139, 250, 0.35);
+
+    border-radius: 12px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 24px rgba(109, 40, 217, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.detail-library-button:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 12px 30px rgba(109, 40, 217, 0.3);
+
+    filter: brightness(1.06);
+}
+
+.detail-library-button:active {
+    transform: translateY(0);
+}
+
+.detail-library-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.detail-library-button.none {
+    background:
+        linear-gradient(
+            135deg,
+            var(--detail-accent),
+            var(--detail-accent-dark)
+        );
+}
+
+.detail-library-button.watching {
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.detail-library-button.completed {
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #15803d
+        );
+
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.detail-library-button.dropped {
+    background:
+        linear-gradient(
+            135deg,
+            #dc2626,
+            #b91c1c
+        );
+
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.detail-library-button.plan_to_watch {
+    background:
+        linear-gradient(
+            135deg,
+            #d97706,
+            #b45309
+        );
+
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.detail-library-chevron {
+    font-size: 0.75rem;
+
+    opacity: 0.8;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+/* ============================================================
+   LIBRARY DROPDOWN
+============================================================ */
+
+.detail-library-menu {
+    position: absolute;
+
+    z-index: 50;
+
+    top: calc(100% + 8px);
+    left: 0;
+
+    width: 230px;
+
+    padding: 7px;
+
+    background:
+        rgba(17, 24, 39, 0.98);
+
+    border: 1px solid var(--detail-border-strong);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.5);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    animation:
+        detailMenuIn 0.16s ease-out;
+}
+
+@keyframes detailMenuIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.detail-library-menu button {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 42px;
+
+    padding: 9px 11px;
+
+    color: var(--detail-text-soft);
+
+    background: transparent;
+
+    border: 0;
+    border-radius: 9px;
+
+    font-size: 0.86rem;
+    font-weight: 600;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease;
+}
+
+.detail-library-menu button:hover {
+    color: var(--detail-text);
+
+    background:
+        rgba(139, 92, 246, 0.12);
+}
+
+.detail-library-menu button.selected {
+    color: var(--detail-accent-light);
+
+    background:
+        rgba(139, 92, 246, 0.14);
+}
+
+.detail-library-menu button.danger {
+    margin-top: 5px;
+    padding-top: 12px;
+
+    border-top: 1px solid var(--detail-border);
+
+    color: #fca5a5;
+}
+
+.detail-library-menu button.danger:hover {
+    color: #fecaca;
+
+    background:
+        rgba(239, 68, 68, 0.1);
+}
+
+
+/* ============================================================
+   FAVORITE BUTTON
+============================================================ */
+
+.favorite-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 46px;
+
+    padding: 0 17px;
+
+    color: var(--detail-text-soft);
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    border: 1px solid var(--detail-border-strong);
+
+    border-radius: 12px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.favorite-button:hover {
+    color: var(--detail-text);
+
+    background:
+        rgba(255, 255, 255, 0.09);
+
+    border-color:
+        rgba(255, 255, 255, 0.2);
+
+    transform: translateY(-1px);
+}
+
+.favorite-button.active {
+    color: #fca5a5;
+
+    background:
+        rgba(239, 68, 68, 0.1);
+
+    border-color:
+        rgba(239, 68, 68, 0.25);
+}
+
+.favorite-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ============================================================
+   PROGRESS CARD
+============================================================ */
+
+.detail-progress-card {
+    width: 100%;
+
+    margin-top: 22px;
+
+    padding: 19px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.025)
+        );
+
+    border: 1px solid var(--detail-border);
+
+    border-radius: 17px;
+}
+
+
+/* ============================================================
+   PROGRESS HEADER
+============================================================ */
+
+.detail-progress-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.detail-progress-eyebrow {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--detail-accent-light);
+
+    font-size: 0.66rem;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+}
+
+.detail-progress-header h3 {
+    margin: 0;
+
+    color: var(--detail-text);
+
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.detail-progress-header strong {
+    color: var(--detail-accent-light);
+
+    font-size: 1.5rem;
+    line-height: 1;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   PROGRESS INFORMATION
+============================================================ */
+
+.detail-progress-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 14px;
+
+    color: var(--detail-text-muted);
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   PROGRESS BAR
+============================================================ */
+
+.detail-progress-track {
+    width: 100%;
+    height: 8px;
+
+    margin-top: 11px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    border-radius: 999px;
+}
+
+.detail-progress-fill {
+    height: 100%;
+
+    min-width: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--detail-accent-dark),
+            var(--detail-accent-light)
+        );
+
+    border-radius: inherit;
+
+    transition:
+        width 0.35s ease;
+}
+
+
+/* ============================================================
+   PROGRESS CONTROLS
+============================================================ */
+
+.detail-progress-controls {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 16px;
+}
+
+.detail-progress-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    color: var(--detail-text);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    border: 1px solid var(--detail-border-strong);
+
+    border-radius: 10px;
+
+    font-size: 1.35rem;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.detail-progress-step:hover:not(:disabled) {
+    background:
+        rgba(139, 92, 246, 0.13);
+
+    border-color:
+        rgba(167, 139, 250, 0.28);
+
+    transform: translateY(-1px);
+}
+
+.detail-progress-step:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+
+.detail-progress-input {
+    width: 74px;
+    height: 40px;
+
+    padding: 0 9px;
+
+    color: var(--detail-text);
+
+    background:
+        rgba(0, 0, 0, 0.18);
+
+    border: 1px solid var(--detail-border-strong);
+
+    border-radius: 10px;
+
+    font-size: 0.92rem;
+    font-weight: 700;
+
+    text-align: center;
+
+    outline: none;
+
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease;
+}
+
+.detail-progress-input:focus {
+    background:
+        rgba(139, 92, 246, 0.08);
+
+    border-color:
+        rgba(167, 139, 250, 0.55);
+}
+
+
+/* Remove browser number arrows */
+
+.detail-progress-input::-webkit-inner-spin-button,
+.detail-progress-input::-webkit-outer-spin-button {
+    margin: 0;
+
+    -webkit-appearance: none;
+}
+
+.detail-progress-input {
+    -moz-appearance: textfield;
+}
+
+
+/* ============================================================
+   SAVE BUTTON
+============================================================ */
+
+.detail-progress-save {
+    min-height: 40px;
+
+    margin-left: auto;
+
+    padding: 0 15px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--detail-accent),
+            var(--detail-accent-dark)
+        );
+
+    border: 1px solid rgba(167, 139, 250, 0.32);
+
+    border-radius: 10px;
+
+    font-size: 0.82rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.18s ease,
+        filter 0.18s ease,
+        opacity 0.18s ease;
+}
+
+.detail-progress-save:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+.detail-progress-save:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   UNKNOWN EPISODE COUNT NOTE
+============================================================ */
+
+.detail-progress-note {
+    margin: 13px 0 0;
+
+    color: var(--detail-text-muted);
+
+    font-size: 0.75rem;
+    line-height: 1.55;
+}
+
+
+/* ============================================================
+   SYNOPSIS
+============================================================ */
+
+.anime-section {
+    width: calc(100% - 48px);
+
+    margin: 30px auto 0;
+
+    padding: 27px 30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17, 24, 39, 0.96),
+            rgba(17, 24, 39, 0.78)
+        );
+
+    border: 1px solid var(--detail-border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.anime-section h2 {
+    margin: 0 0 13px;
+
+    color: var(--detail-text);
+
+    font-size: 1.35rem;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+}
+
+.anime-section p {
+    max-width: 950px;
+
+    margin: 0;
+
+    color: var(--detail-text-soft);
+
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+
+/* ============================================================
+   REVIEW SECTION SPACING
+============================================================ */
+
+.anime-detail-container > *:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ============================================================
+   RETRY BUTTON
+============================================================ */
+
+.retry-btn {
+    display: block;
+
+    margin: 18px auto 0;
+
+    min-height: 42px;
+
+    padding: 0 18px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--detail-accent),
+            var(--detail-accent-dark)
+        );
+
+    border: 0;
+
+    border-radius: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.18s ease,
+        filter 0.18s ease;
+}
+
+.retry-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+    .anime-backdrop {
+        height: 330px;
+    }
+
+    .anime-detail-card {
+        grid-template-columns: 190px minmax(0, 1fr);
+
+        gap: 26px;
+
+        margin-top: -95px;
+
+        padding: 24px;
+    }
+
+    .anime-poster {
+        width: 190px;
+        height: 285px;
+    }
+
+    .anime-main-info h1 {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+    }
+
+    .detail-actions {
+        align-items: stretch;
+    }
+
+    .detail-library-button,
+    .favorite-button {
+        min-height: 44px;
+    }
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .anime-detail-container {
+        padding-bottom: 55px;
+    }
+
+    .anime-backdrop {
+        height: 250px;
+
+        border-radius: 0 0 20px 20px;
+    }
+
+    .anime-backdrop img {
+        object-position: center;
+    }
+
+    .anime-detail-card {
+        display: flex;
+        flex-direction: column;
+
+        width: calc(100% - 24px);
+
+        margin-top: -75px;
+
+        gap: 22px;
+
+        padding: 18px;
+
+        border-radius: 18px;
+    }
+
+    .anime-poster {
+        width: 155px;
+        height: 225px;
+
+        align-self: center;
+
+        border-radius: 14px;
+    }
+
+    .anime-main-info {
+        padding: 0;
+
+        text-align: center;
+    }
+
+    .anime-detail-eyebrow {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .anime-main-info h1 {
+        font-size: 2rem;
+        line-height: 1.12;
+    }
+
+    .detail-stats {
+        justify-content: center;
+    }
+
+    .detail-stat {
+        font-size: 0.76rem;
+    }
+
+    .detail-actions {
+        flex-direction: column;
+
+        width: 100%;
+
+        margin-top: 20px;
+    }
+
+    .detail-library-control {
+        width: 100%;
+    }
+
+    .detail-library-button {
+        width: 100%;
+    }
+
+    .favorite-button {
+        width: 100%;
+    }
+
+    .detail-library-menu {
+        width: 100%;
+    }
+
+    .detail-progress-card {
+        margin-top: 18px;
+
+        padding: 16px;
+
+        text-align: left;
+    }
+
+    .detail-progress-header strong {
+        font-size: 1.3rem;
+    }
+
+    .detail-progress-controls {
+        flex-wrap: wrap;
+    }
+
+    .detail-progress-step {
+        width: 42px;
+        height: 42px;
+    }
+
+    .detail-progress-input {
+        flex: 1;
+
+        min-width: 65px;
+
+        width: auto;
+    }
+
+    .detail-progress-save {
+        width: 100%;
+
+        margin-left: 0;
+
+        margin-top: 3px;
+    }
+
+    .anime-section {
+        width: calc(100% - 24px);
+
+        margin-top: 20px;
+
+        padding: 21px 18px;
+
+        border-radius: 16px;
+    }
+
+    .anime-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .anime-section p {
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+============================================================ */
+
+@media (max-width: 420px) {
+
+    .anime-backdrop {
+        height: 215px;
+    }
+
+    .anime-detail-card {
+        width: calc(100% - 16px);
+
+        margin-top: -60px;
+
+        padding: 15px;
+    }
+
+    .anime-poster {
+        width: 135px;
+        height: 200px;
+    }
+
+    .anime-main-info h1 {
+        font-size: 1.7rem;
+    }
+
+    .detail-stats {
+        gap: 6px;
+    }
+
+    .detail-stat {
+        min-height: 31px;
+
+        padding: 6px 9px;
+
+        font-size: 0.7rem;
+    }
+
+    .detail-progress-info {
+        font-size: 0.73rem;
+    }
+
+    .detail-progress-controls {
+        gap: 6px;
+    }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .anime-poster img,
+    .detail-library-button,
+    .favorite-button,
+    .detail-progress-step,
+    .detail-progress-save,
+    .detail-progress-fill {
+        transition: none;
+    }
+
+    .detail-library-menu {
+        animation: none;
+    }
+}
