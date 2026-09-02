@@ -4,9 +4,6 @@ from django.utils import timezone
 
 from anime.application.anime_service import AnimeService
 from anime.infrastructure.jikan.jikan_client import JikanClient
-from anime.infrastructure.repositories.anime_repository import (
-    AnimeRepository,
-)
 
 from core.exceptions.custom_exceptions import (
     NotFoundException,
@@ -18,6 +15,7 @@ from users.infrastructure.models import UserAnimeStatus
 
 
 activity_service = ActivityService()
+
 anime_service = AnimeService(
     client=JikanClient()
 )
@@ -33,81 +31,19 @@ class LibraryService:
             .select_related("anime")
         )
 
+    # ==================================================
+    # RESOLVE ANIME
+    # ==================================================
 
-    def _get_or_refresh_anime(self, data):
+    def _get_anime(self, anime_id):
 
-        anime_id = data.get("anime_id")
-
-        anime = AnimeRepository.get_by_mal_id(
+        return anime_service.get_or_create(
             anime_id
         )
 
-        # --------------------------------------------------
-        # Anime already exists
-        # --------------------------------------------------
-
-        if anime:
-
-            # Existing records created before full metadata
-            # synchronization may not have an episode count.
-            #
-            # Refresh them from Jikan so library progress
-            # and dashboard statistics have reliable metadata.
-
-            if anime.episodes is None:
-
-                try:
-
-                    raw = anime_service.client.get_detail(
-                        anime_id
-                    )
-
-                    if raw:
-
-                        anime, _ = anime_service.save_anime(
-                            raw
-                        )
-
-                except Exception:
-                    # Do not prevent the user from updating
-                    # their library if Jikan is temporarily
-                    # unavailable.
-                    pass
-
-            return anime
-
-        # --------------------------------------------------
-        # Anime does not exist
-        # --------------------------------------------------
-
-        try:
-
-            raw = anime_service.client.get_detail(
-                anime_id
-            )
-
-            if raw:
-
-                anime, _ = anime_service.save_anime(
-                    raw
-                )
-
-                return anime
-
-        except Exception:
-            # Fall back to the existing placeholder behavior
-            # if Jikan cannot be reached.
-            pass
-
-        return AnimeRepository.create_placeholder(
-            mal_id=anime_id,
-            title=data.get(
-                "title",
-                "Unknown",
-            ),
-            image=data.get("image"),
-        )
-
+    # ==================================================
+    # UPDATE STATUS
+    # ==================================================
 
     @transaction.atomic
     def update_status(self, user, data):
@@ -128,12 +64,17 @@ class LibraryService:
         }
 
         if status not in valid_statuses:
+
             raise ValidationException(
                 "Invalid library status"
             )
 
-        anime = self._get_or_refresh_anime(
-            data
+        # ==================================================
+        # GET ANIME
+        # ==================================================
+
+        anime = self._get_anime(
+            anime_id
         )
 
         # ==================================================
@@ -143,26 +84,27 @@ class LibraryService:
         try:
 
             requested_progress = int(
-                data.get("progress", 0)
+                data.get(
+                    "progress",
+                    0,
+                )
             )
 
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError,
+        ):
 
             requested_progress = 0
-
 
         requested_progress = max(
             requested_progress,
             0,
         )
 
-
         # ==================================================
-        # EFFECTIVE PROGRESS
+        # CLAMP PROGRESS
         # ==================================================
-
-        # Progress can never exceed the number of episodes
-        # currently known by Jikan.
 
         if anime.episodes is not None:
 
@@ -175,12 +117,26 @@ class LibraryService:
 
             effective_progress = requested_progress
 
+        # ==================================================
+        # COMPLETED
+        # ==================================================
+
+        # A completed anime always means that the user
+        # watched all known episodes.
+
+        if status == "completed":
+
+            if anime.episodes is not None:
+
+                effective_progress = (
+                    anime.episodes
+                )
 
         # ==================================================
         # AUTOMATIC COMPLETION
         # ==================================================
 
-        if (
+        elif (
             status == "watching"
             and anime.episodes is not None
             and effective_progress >= anime.episodes
@@ -188,20 +144,9 @@ class LibraryService:
 
             status = "completed"
 
-            effective_progress = anime.episodes
-
-
-        # ==================================================
-        # EXPLICIT COMPLETED STATUS
-        # ==================================================
-
-        if (
-            status == "completed"
-            and anime.episodes is not None
-        ):
-
-            effective_progress = anime.episodes
-
+            effective_progress = (
+                anime.episodes
+            )
 
         # ==================================================
         # EXISTING LIBRARY ITEM
@@ -210,14 +155,12 @@ class LibraryService:
         obj = (
             UserAnimeStatus.objects
             .select_for_update()
-            .select_related("anime")
             .filter(
                 user=user,
                 anime=anime,
             )
             .first()
         )
-
 
         # ==================================================
         # CREATE
@@ -235,7 +178,6 @@ class LibraryService:
             new_item = True
             status_changed = True
 
-
         # ==================================================
         # UPDATE
         # ==================================================
@@ -250,11 +192,11 @@ class LibraryService:
             )
 
             progress_changed = (
-                previous_progress != effective_progress
+                previous_progress
+                != effective_progress
             )
 
-
-            # Nothing actually changed.
+            # Nothing changed.
 
             if (
                 not status_changed
@@ -262,7 +204,6 @@ class LibraryService:
             ):
 
                 return obj
-
 
             new_item = False
 
@@ -275,10 +216,9 @@ class LibraryService:
                 "updated_at",
             ]
 
-
-            # ----------------------------------------------
+            # ==================================================
             # STARTED
-            # ----------------------------------------------
+            # ==================================================
 
             if (
                 status == "watching"
@@ -293,10 +233,9 @@ class LibraryService:
                     "started_at"
                 )
 
-
-            # ----------------------------------------------
+            # ==================================================
             # COMPLETED
-            # ----------------------------------------------
+            # ==================================================
 
             if status == "completed":
 
@@ -310,10 +249,9 @@ class LibraryService:
                         "completed_at"
                     )
 
-
-            # ----------------------------------------------
+            # ==================================================
             # LEAVING COMPLETED
-            # ----------------------------------------------
+            # ==================================================
 
             elif (
                 status != "completed"
@@ -326,20 +264,21 @@ class LibraryService:
                     "completed_at"
                 )
 
-
             obj.save(
                 update_fields=update_fields
             )
 
-
         # ==================================================
-        # INITIAL DATES FOR NEW RECORDS
+        # DATES FOR NEW ITEMS
         # ==================================================
 
         if new_item:
 
             update_fields = []
 
+            # --------------------------------------------------
+            # WATCHING
+            # --------------------------------------------------
 
             if (
                 status == "watching"
@@ -354,6 +293,9 @@ class LibraryService:
                     "started_at"
                 )
 
+            # --------------------------------------------------
+            # COMPLETED
+            # --------------------------------------------------
 
             if status == "completed":
 
@@ -367,7 +309,6 @@ class LibraryService:
                         "completed_at"
                     )
 
-
             if update_fields:
 
                 update_fields.append(
@@ -378,16 +319,9 @@ class LibraryService:
                     update_fields=update_fields
                 )
 
-
         # ==================================================
         # ACTIVITY
         # ==================================================
-
-        # Progress-only changes do NOT create another activity.
-        #
-        # If progress reaches the maximum episode count and
-        # automatically changes the status from watching to
-        # completed, the activity will correctly be COMPLETED.
 
         action_map = {
             "watching": "WATCHING",
@@ -395,7 +329,6 @@ class LibraryService:
             "dropped": "DROPPED",
             "plan_to_watch": "ADDED",
         }
-
 
         if new_item or status_changed:
 
@@ -405,9 +338,11 @@ class LibraryService:
                 action=action_map[status],
             )
 
-
         return obj
 
+    # ==================================================
+    # REMOVE FROM LIBRARY
+    # ==================================================
 
     @transaction.atomic
     def remove_from_library(
@@ -416,16 +351,9 @@ class LibraryService:
         anime_id,
     ):
 
-        anime = AnimeRepository.get_by_mal_id(
+        anime = anime_service.get_or_create(
             anime_id
         )
-
-        if not anime:
-
-            raise NotFoundException(
-                "anime not found"
-            )
-
 
         deleted_count, _ = (
             UserAnimeStatus.objects
@@ -436,23 +364,17 @@ class LibraryService:
             .delete()
         )
 
-
-        # Only create REMOVED activity when
-        # something was actually removed.
-
         if deleted_count == 0:
 
             return {
                 "deleted": False,
             }
 
-
         activity_service.create(
             user=user,
             anime=anime,
             action="REMOVED",
         )
-
 
         return {
             "deleted": True,
