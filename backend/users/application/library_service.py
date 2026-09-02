@@ -2,8 +2,10 @@
 from django.db import transaction
 from django.utils import timezone
 
+from anime.application.anime_service import AnimeService
+from anime.infrastructure.jikan.jikan_client import JikanClient
 from anime.infrastructure.repositories.anime_repository import (
-    AnimeRepository
+    AnimeRepository,
 )
 
 from core.exceptions.custom_exceptions import (
@@ -16,6 +18,9 @@ from users.infrastructure.models import UserAnimeStatus
 
 
 activity_service = ActivityService()
+anime_service = AnimeService(
+    client=JikanClient()
+)
 
 
 class LibraryService:
@@ -26,6 +31,81 @@ class LibraryService:
             UserAnimeStatus.objects
             .filter(user=user)
             .select_related("anime")
+        )
+
+
+    def _get_or_refresh_anime(self, data):
+
+        anime_id = data.get("anime_id")
+
+        anime = AnimeRepository.get_by_mal_id(
+            anime_id
+        )
+
+        # --------------------------------------------------
+        # Anime already exists
+        # --------------------------------------------------
+
+        if anime:
+
+            # Existing records created before full metadata
+            # synchronization may not have an episode count.
+            #
+            # Refresh them from Jikan so library progress
+            # and dashboard statistics have reliable metadata.
+
+            if anime.episodes is None:
+
+                try:
+
+                    raw = anime_service.client.get_detail(
+                        anime_id
+                    )
+
+                    if raw:
+
+                        anime, _ = anime_service.save_anime(
+                            raw
+                        )
+
+                except Exception:
+                    # Do not prevent the user from updating
+                    # their library if Jikan is temporarily
+                    # unavailable.
+                    pass
+
+            return anime
+
+        # --------------------------------------------------
+        # Anime does not exist
+        # --------------------------------------------------
+
+        try:
+
+            raw = anime_service.client.get_detail(
+                anime_id
+            )
+
+            if raw:
+
+                anime, _ = anime_service.save_anime(
+                    raw
+                )
+
+                return anime
+
+        except Exception:
+            # Fall back to the existing placeholder behavior
+            # if Jikan cannot be reached.
+            pass
+
+        return AnimeRepository.create_placeholder(
+            mal_id=anime_id,
+            title=data.get(
+                "title",
+                "Unknown",
+            ),
+            image=data.get("image"),
         )
 
 
@@ -52,21 +132,9 @@ class LibraryService:
                 "Invalid library status"
             )
 
-        anime = AnimeRepository.get_by_mal_id(
-            anime_id
+        anime = self._get_or_refresh_anime(
+            data
         )
-
-        if not anime:
-
-            anime = AnimeRepository.create_placeholder(
-                mal_id=anime_id,
-                title=data.get(
-                    "title",
-                    "Unknown",
-                ),
-                image=data.get("image"),
-            )
-
 
         # ==================================================
         # PROGRESS
@@ -95,12 +163,6 @@ class LibraryService:
 
         # Progress can never exceed the number of episodes
         # currently known by Jikan.
-        #
-        # For a finished anime, this is its final episode
-        # count.
-        #
-        # For an airing anime, this is the number of episodes
-        # currently known/released.
 
         if anime.episodes is not None:
 
@@ -118,30 +180,6 @@ class LibraryService:
         # AUTOMATIC COMPLETION
         # ==================================================
 
-        # If the user reaches the maximum known episode count,
-        # the anime is automatically considered completed.
-        #
-        # This applies to both finished and currently airing
-        # anime because anime.episodes represents the maximum
-        # currently known episode count.
-        #
-        # Example:
-        #
-        # Finished anime:
-        #   28 episodes -> progress 28 -> completed
-        #
-        # Airing anime:
-        #   12 currently known episodes -> progress 12
-        #   -> completed
-        #
-        # This prevents:
-        #
-        #   watching 28/28
-        #
-        # and instead stores:
-        #
-        #   completed 28/28
-
         if (
             status == "watching"
             and anime.episodes is not None
@@ -156,9 +194,6 @@ class LibraryService:
         # ==================================================
         # EXPLICIT COMPLETED STATUS
         # ==================================================
-
-        # When the user explicitly chooses "completed",
-        # automatically set progress to the known episode count.
 
         if (
             status == "completed"
@@ -422,3 +457,4 @@ class LibraryService:
         return {
             "deleted": True,
         }
+
