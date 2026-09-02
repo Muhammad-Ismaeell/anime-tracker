@@ -32,7 +32,37 @@ class AnimeService:
             raise ValueError(
                 "Anime does not have a MAL ID."
             )
+        
+        # ==========================================
+        # PRESERVE EXISTING METADATA
+        # ==========================================
 
+        existing = Anime.objects.filter(
+            mal_id=mal_id
+        ).first()
+
+        # Jikan can return null for metadata that is
+        # currently unknown. Never replace metadata
+        # we already know with null.
+        episodes = data.get("episodes")
+
+        if episodes is None and existing:
+            episodes = existing.episodes
+
+        year = data.get("year")
+
+        if year is None and existing:
+            year = existing.year
+
+        season = data.get("season")
+
+        if season is None and existing:
+            season = existing.season
+
+        status = data.get("status")
+
+        if not status and existing:
+            status = existing.status
         # ==========================================
         # ANIME
         # ==========================================
@@ -102,24 +132,21 @@ class AnimeService:
                     "type"
                 ),
 
-                "episodes": data.get(
-                    "episodes"
-                ),
+                "episodes": episodes,
 
-                "year": data.get(
-                    "year"
-                ),
+                "year": year,
 
-                "season": data.get(
-                    "season"
-                ),
+                "season": season,
 
-                "status": data.get(
-                    "status"
-                ),
+                "status": status,
 
                 "rating": (
                     data.get("rating")
+                    or (
+                        existing.rating
+                        if existing
+                        else "Unknown"
+                    )
                     or "Unknown"
                 ),
             }
@@ -157,7 +184,8 @@ class AnimeService:
 
             genres.append(genre)
 
-        anime.genres.set(genres)
+        if genres:
+            anime.genres.set(genres)
 
         return anime, created
 

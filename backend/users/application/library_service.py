@@ -25,6 +25,26 @@ class LibraryService:
 
     def get_user_library(self, user):
 
+        items = (
+            UserAnimeStatus.objects
+            .filter(user=user)
+            .select_related("anime")
+        )
+
+        for item in items:
+
+            if item.anime.episodes is None:
+
+                try:
+                    anime_service.get_or_create(
+                        item.anime.mal_id
+                    )
+
+                except NotFoundException:
+                    # Keep the existing library item even if
+                    # Jikan is temporarily unavailable.
+                    continue
+
         return (
             UserAnimeStatus.objects
             .filter(user=user)
