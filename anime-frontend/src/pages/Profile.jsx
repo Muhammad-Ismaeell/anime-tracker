@@ -22,7 +22,7 @@ import {
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 
 import { getMediaUrl } from "../utils/mediaUrl";
-
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 
 const getAnimeId = (anime) => {
     return (
@@ -129,28 +129,15 @@ function Profile() {
     } = useFavorites();
 
     const favorites = useMemo(
-        () => favoritesData?.results ?? [],
-        [favoritesData?.results]
+        () =>
+            favoritesData?.pages?.flatMap(
+                (page) => page?.results ?? []
+            ) ?? [],
+        [favoritesData]
     );
 
-    const favoriteIds = useMemo(() => {
+    const favoriteIds = useFavoriteIds();
 
-        return new Set(
-            favorites
-                .map((favorite) => {
-                    const id = getAnimeId(
-                        favorite?.anime ??
-                        favorite
-                    );
-
-                    return id != null
-                        ? String(id)
-                        : null;
-                })
-                .filter(Boolean)
-        );
-
-    }, [favorites]);
 
     const toggleFavorite =
         useToggleFavorite();

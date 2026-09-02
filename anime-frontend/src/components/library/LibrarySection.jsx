@@ -1,12 +1,11 @@
 
-import { memo, useMemo } from "react";
+import { memo } from "react";
 
 import AnimeCard from "../AnimeCard";
 import EmptyState from "../ui/EmptyState";
-
+import { useFavoriteIds } from "../../hooks/user/useFavoriteIds";
 import { useGlobalLibrary } from "../../hooks/useGlobalLibrary";
 import {
-    useFavorites,
     useToggleFavorite,
 } from "../../hooks/user/useFavorites";
 
@@ -14,24 +13,9 @@ import {
 function LibrarySection({ title, items }) {
     const { statusMap } = useGlobalLibrary();
 
-    const { data: favoritesRes } = useFavorites();
     const toggleFavorite = useToggleFavorite();
 
-    const favoriteIds = useMemo(() => {
-        return new Set(
-            (favoritesRes?.results ?? [])
-                .map((favorite) => {
-                    const id =
-                        favorite.anime?.mal_id ??
-                        favorite.anime?.id ??
-                        favorite.anime_id ??
-                        favorite.mal_id;
-
-                    return id != null ? String(id) : null;
-                })
-                .filter(Boolean)
-        );
-    }, [favoritesRes]);
+    const favoriteIds = useFavoriteIds();
 
 
     if (!items.length) {

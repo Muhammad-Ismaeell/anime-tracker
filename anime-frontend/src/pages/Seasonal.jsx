@@ -2,7 +2,6 @@ import { useEffect } from "react";
 
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import {
-    useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
@@ -11,7 +10,7 @@ import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
 import PageContainer from "../components/ui/PageContainer";
-
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 
 function Seasonal() {
     useEffect(() => {
@@ -28,22 +27,9 @@ function Seasonal() {
     } = useInfiniteAnime("seasonal");
 
     const toggleFavorite = useToggleFavorite();
-    const { data: favoritesRes } = useFavorites();
     const { statusMap } = useGlobalLibrary();
 
-    const favoriteIds = new Set(
-        (favoritesRes?.results ?? [])
-            .map((favorite) => {
-                const id =
-                    favorite.anime?.mal_id ??
-                    favorite.anime?.id ??
-                    favorite.anime_id ??
-                    favorite.mal_id;
-
-                return id != null ? String(id) : null;
-            })
-            .filter(Boolean)
-    );
+    const favoriteIds = useFavoriteIds();
 
     if (isLoading) {
         return (

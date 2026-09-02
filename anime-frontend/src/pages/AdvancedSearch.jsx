@@ -9,6 +9,8 @@ import {
     useSearchParams,
 } from "react-router-dom";
 
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
+
 import {
     Helmet,
 } from "react-helmet-async";
@@ -22,7 +24,6 @@ import {
 } from "../hooks/useDebouncedSearch";
 
 import {
-    useFavorites,
     useToggleFavorite,
 } from "../hooks/user/useFavorites";
 
@@ -219,43 +220,13 @@ export default function AdvancedSearch() {
     // FAVORITES
     // ============================================================
 
-    const {
-        data: favoritesRes,
-    } = useFavorites();
 
 
     const toggleFavorite =
         useToggleFavorite();
 
 
-    const favoriteIds =
-        useMemo(() => {
-
-            return new Set(
-                (
-                    favoritesRes?.results ??
-                    []
-                )
-                    .map(
-                        (favorite) => {
-
-                            const id =
-                                favorite.anime?.mal_id ??
-                                favorite.anime?.id ??
-                                favorite.anime_id ??
-                                favorite.mal_id;
-
-                            return id != null
-                                ? String(id)
-                                : null;
-                        }
-                    )
-                    .filter(Boolean)
-            );
-
-        }, [
-            favoritesRes,
-        ]);
+    const favoriteIds = useFavoriteIds();
 
 
     // ============================================================
