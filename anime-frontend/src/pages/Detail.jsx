@@ -399,8 +399,13 @@ function Detail() {
             // ----------------------------------------------------
 
             if (status === "watching") {
+                const nextProgress =
+                    currentStatus === "completed"
+                        ? 0
+                        : safeStoredProgress;
+
                 setProgressDraft(
-                    safeStoredProgress
+                    nextProgress
                 );
 
                 setLibraryMenuOpen(
@@ -411,7 +416,7 @@ function Detail() {
                     updateLibrary.mutate({
                         anime_id: String(id),
                         status: "watching",
-                        progress: safeStoredProgress,
+                        progress: nextProgress,
                         title: anime.title,
                         image,
                     });
@@ -1079,18 +1084,32 @@ function Detail() {
                                                         ? episodeCount
                                                         : undefined
                                                 }
-                                                value={
-                                                    displayedProgress
-                                                }
-                                                onChange={(
-                                                    event
-                                                ) =>
-                                                    setProgressDraft(
-                                                        event
-                                                            .target
-                                                            .value
-                                                    )
-                                                }
+                                                value={progressDraft}
+                                                onChange={(event) => {
+                                                    const value = event.target.value;
+
+                                                    if (value === "") {
+                                                        setProgressDraft("");
+                                                        return;
+                                                    }
+
+                                                    let next = Number(value);
+
+                                                    if (!Number.isFinite(next)) {
+                                                        return;
+                                                    }
+
+                                                    next = Math.max(0, Math.floor(next));
+
+                                                    if (hasKnownEpisodeCount) {
+                                                        next = Math.min(
+                                                            next,
+                                                            episodeCount
+                                                        );
+                                                    }
+
+                                                    setProgressDraft(next);
+                                                }}
                                                 aria-label="Episodes watched"
                                             />
 
