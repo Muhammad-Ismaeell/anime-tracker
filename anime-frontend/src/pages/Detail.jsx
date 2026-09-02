@@ -133,8 +133,12 @@ function Detail() {
     const [
         progressDraft,
         setProgressDraft,
-    ] = useState(() => storedProgress);
+    ] = useState(null);
 
+    const [
+        isProgressEditing,
+        setIsProgressEditing,
+    ] = useState(false);
 
     // ============================================================
     // SCROLL
@@ -226,13 +230,11 @@ function Detail() {
 
 
     const episodeCount =
-        Number(
-            anime.episodes
-        ) || 0;
+        Number(anime.episodes) ||
+        Number(libraryItem?.anime?.episodes) ||
+        0;
 
-
-    const hasKnownEpisodeCount =
-        episodeCount > 0;
+    const hasKnownEpisodeCount = episodeCount > 0;
 
 
     // ============================================================
@@ -283,24 +285,16 @@ function Detail() {
     // DISPLAYED PROGRESS
     // ============================================================
 
-    const numericDraft =
-        Number(
-            progressDraft
-        );
-
-
     const displayedProgress =
-        Number.isFinite(
-            numericDraft
-        )
+        isProgressEditing
             ? Math.max(
                 0,
                 hasKnownEpisodeCount
                     ? Math.min(
-                        numericDraft,
+                        Number(progressDraft) || 0,
                         episodeCount
                     )
-                    : numericDraft
+                    : Number(progressDraft) || 0
             )
             : safeStoredProgress;
 
@@ -488,7 +482,7 @@ function Detail() {
                 setProgressDraft(
                     0
                 );
-
+                setIsProgressEditing(false);
 
                 setLibraryMenuOpen(
                     false
@@ -541,6 +535,7 @@ function Detail() {
                 setProgressDraft(
                     completedProgress
                 );
+                setIsProgressEditing(false);
 
 
                 setLibraryMenuOpen(
@@ -618,199 +613,119 @@ function Detail() {
     // PROGRESS CHANGE
     // ============================================================
 
-    const changeProgress =
-        (amount) => {
+    const changeProgress = (amount) => {
 
-            let nextProgress =
-                Number(
-                    progressDraft
-                );
+        let nextProgress =
+            isProgressEditing
+                ? Number(progressDraft)
+                : safeStoredProgress;
 
+        if (!Number.isFinite(nextProgress)) {
+            nextProgress = 0;
+        }
 
-            if (
-                !Number.isFinite(
-                    nextProgress
-                )
-            ) {
+        nextProgress =
+            Math.floor(nextProgress) + amount;
 
-                nextProgress =
-                    safeStoredProgress;
-            }
+        nextProgress =
+            Math.max(0, nextProgress);
 
-
+        if (hasKnownEpisodeCount) {
             nextProgress =
-                Math.floor(
-                    nextProgress
-                ) +
-                amount;
-
-
-            nextProgress =
-                Math.max(
-                    0,
-                    nextProgress
+                Math.min(
+                    nextProgress,
+                    episodeCount
                 );
+        }
 
-
-            if (
-                hasKnownEpisodeCount
-            ) {
-
-                nextProgress =
-                    Math.min(
-                        nextProgress,
-                        episodeCount
-                    );
-            }
-
-
-            setProgressDraft(
-                nextProgress
-            );
-        };
+        setProgressDraft(nextProgress);
+        setIsProgressEditing(false);
+    };
 
 
     // ============================================================
     // PROGRESS INPUT HANDLER
     // ============================================================
 
-    const handleProgressInput =
-        (event) => {
+    const handleProgressInput = (event) => {
 
-            const value =
-                event.target.value;
+        const value =
+            event.target.value;
 
+        if (value === "") {
 
-            /*
-             * Allow the user to temporarily clear
-             * the input while typing.
-             */
+            setProgressDraft("");
+            setIsProgressEditing(true);
 
-            if (
-                value === ""
-            ) {
+            return;
+        }
 
-                setProgressDraft(
-                    ""
-                );
+        let nextProgress =
+            Number(value);
 
-                return;
-            }
+        if (!Number.isFinite(nextProgress)) {
+            return;
+        }
 
-
-            let nextProgress =
-                Number(value);
-
-
-            if (
-                !Number.isFinite(
-                    nextProgress
-                )
-            ) {
-                return;
-            }
-
-
-            nextProgress =
-                Math.max(
-                    0,
-                    Math.floor(
-                        nextProgress
-                    )
-                );
-
-
-            /*
-             * Never allow the UI to hold
-             * progress above the known episode count.
-             */
-
-            if (
-                hasKnownEpisodeCount
-            ) {
-
-                nextProgress =
-                    Math.min(
-                        nextProgress,
-                        episodeCount
-                    );
-            }
-
-
-            setProgressDraft(
-                nextProgress
+        nextProgress =
+            Math.max(
+                0,
+                Math.floor(nextProgress)
             );
-        };
+
+        if (hasKnownEpisodeCount) {
+            nextProgress =
+                Math.min(
+                    nextProgress,
+                    episodeCount
+                );
+        }
+
+        setProgressDraft(nextProgress);
+        setIsProgressEditing(true);
+    };
 
 
     // ============================================================
     // SAVE PROGRESS
     // ============================================================
 
-    const handleSaveProgress =
-        () => {
+    const handleSaveProgress = () => {
 
-            let safeProgress =
-                Number(
-                    progressDraft
-                );
+        let safeProgress =
+            isProgressEditing
+                ? Number(progressDraft)
+                : safeStoredProgress;
 
+        if (!Number.isFinite(safeProgress)) {
+            safeProgress = 0;
+        }
 
-            if (
-                !Number.isFinite(
-                    safeProgress
-                )
-            ) {
-
-                safeProgress =
-                    0;
-            }
-
-
-            safeProgress =
-                Math.max(
-                    0,
-                    Math.floor(
-                        safeProgress
-                    )
-                );
-
-
-            if (
-                hasKnownEpisodeCount
-            ) {
-
-                safeProgress =
-                    Math.min(
-                        safeProgress,
-                        episodeCount
-                    );
-            }
-
-
-            setProgressDraft(
-                safeProgress
+        safeProgress =
+            Math.max(
+                0,
+                Math.floor(safeProgress)
             );
 
-
-            updateLibrary.mutate({
-
-                anime_id:
-                    String(id),
-
-                status:
-                    "watching",
-
-                progress:
+        if (hasKnownEpisodeCount) {
+            safeProgress =
+                Math.min(
                     safeProgress,
+                    episodeCount
+                );
+        }
 
-                title:
-                    anime.title,
+        setProgressDraft(safeProgress);
+        setIsProgressEditing(false);
 
-                image,
-
-            });
-        };
+        updateLibrary.mutate({
+            anime_id: String(id),
+            status: "watching",
+            progress: safeProgress,
+            title: anime.title,
+            image,
+        });
+    };
 
 
     // ============================================================
@@ -1354,7 +1269,9 @@ function Detail() {
                                                         : undefined
                                                 }
                                                 value={
-                                                    progressDraft
+                                                    progressDraft === null
+                                                        ? safeStoredProgress
+                                                        : progressDraft
                                                 }
                                                 onChange={
                                                     handleProgressInput
