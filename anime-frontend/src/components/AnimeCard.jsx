@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -8,6 +9,10 @@ import {
 
 import { AuthContext } from "../context/AuthContext";
 import { useAuthPrompt } from "../context/useAuthPrompt";
+
+import {
+    useGlobalLibrary,
+} from "../hooks/useGlobalLibrary";
 
 import { useUpdateLibrary } from "../hooks/useLibrary";
 import OptimizedImage from "./ui/OptimizedImage";
@@ -29,6 +34,11 @@ function AnimeCard({
 
     const updateLibrary =
         useUpdateLibrary();
+
+    const {
+        libraryMap,
+    } = useGlobalLibrary();
+
 
     const [open, setOpen] =
         useState(false);
@@ -53,35 +63,61 @@ function AnimeCard({
         return null;
     }
 
+
     const animeId =
         String(rawAnimeId);
+
 
     const title =
         anime?.title ||
         "Unknown Anime";
 
+
     const image =
         anime?.image ||
         "";
 
+
     const score =
         Number(anime?.score) || 0;
+
 
     const type =
         anime?.type ||
         "";
 
+
     const year =
         anime?.year ||
         "";
 
+
     const episodeCount =
         Number(anime?.episodes) || 0;
+
 
     const status =
         statusMap instanceof Map
             ? statusMap.get(animeId)
             : undefined;
+
+
+    // ============================================================
+    // LIBRARY DATA
+    // ============================================================
+
+    const libraryItem =
+        libraryMap instanceof Map
+            ? libraryMap.get(animeId)
+            : undefined;
+
+
+    const currentProgress =
+        Number(
+            libraryItem?.progress ??
+            anime?.progress ??
+            0
+        ) || 0;
 
 
     // ============================================================
@@ -95,10 +131,12 @@ function AnimeCard({
         event.preventDefault();
         event.stopPropagation();
 
+
         if (!isAuthenticated) {
             showLoginRequired();
             return;
         }
+
 
         onToggleFavorite?.({
             anime_id: animeId,
@@ -119,10 +157,12 @@ function AnimeCard({
         event.preventDefault();
         event.stopPropagation();
 
+
         if (!isAuthenticated) {
             showLoginRequired();
             return;
         }
+
 
         setOpen(
             (current) => !current
@@ -146,6 +186,7 @@ function AnimeCard({
             return;
         }
 
+
         // --------------------------------------------------------
         // WATCHING
         // --------------------------------------------------------
@@ -153,13 +194,14 @@ function AnimeCard({
         if (value === "watching") {
 
             setProgress(
-                Number(anime?.progress) || 0
+                currentProgress
             );
 
             setShowProgressInput(true);
 
             return;
         }
+
 
         // --------------------------------------------------------
         // REMOVE
@@ -170,13 +212,18 @@ function AnimeCard({
             setOpen(false);
             setShowProgressInput(false);
 
+
             updateLibrary.mutate({
-                anime_id: animeId,
-                remove: true,
+                anime_id:
+                    animeId,
+
+                remove:
+                    true,
             });
 
             return;
         }
+
 
         // --------------------------------------------------------
         // OTHER STATUSES
@@ -185,9 +232,15 @@ function AnimeCard({
         setOpen(false);
         setShowProgressInput(false);
 
+
         updateLibrary.mutate({
-            anime_id: animeId,
-            status: value,
+
+            anime_id:
+                animeId,
+
+            status:
+                value,
+
             title,
             image,
         });
@@ -203,17 +256,23 @@ function AnimeCard({
         let safeProgress =
             Number(progress);
 
+
         if (!Number.isFinite(safeProgress)) {
             safeProgress = 0;
         }
 
+
         safeProgress =
             Math.max(
                 0,
-                Math.floor(safeProgress)
+                Math.floor(
+                    safeProgress
+                )
             );
 
+
         if (episodeCount > 0) {
+
             safeProgress =
                 Math.min(
                     safeProgress,
@@ -221,13 +280,22 @@ function AnimeCard({
                 );
         }
 
+
         setOpen(false);
         setShowProgressInput(false);
 
+
         updateLibrary.mutate({
-            anime_id: animeId,
-            status: "watching",
-            progress: safeProgress,
+
+            anime_id:
+                animeId,
+
+            status:
+                "watching",
+
+            progress:
+                safeProgress,
+
             title,
             image,
         });
@@ -513,9 +581,12 @@ function AnimeCard({
                                     }
                                 >
 
-                                    <label htmlFor={`progress-${animeId}`}>
+                                    <label
+                                        htmlFor={`progress-${animeId}`}
+                                    >
                                         Episodes watched
                                     </label>
+
 
                                     <input
                                         id={`progress-${animeId}`}
@@ -535,18 +606,26 @@ function AnimeCard({
                                         autoFocus
                                     />
 
+
                                     {episodeCount > 0 && (
+
                                         <small>
-                                            out of {episodeCount} episodes
+                                            out of{" "}
+                                            {episodeCount}{" "}
+                                            episodes
                                         </small>
+
                                     )}
+
 
                                     <div className="progress-input-actions">
 
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setShowProgressInput(false);
+                                                setShowProgressInput(
+                                                    false
+                                                );
                                             }}
                                             disabled={
                                                 updateLibrary.isPending
@@ -554,6 +633,7 @@ function AnimeCard({
                                         >
                                             Back
                                         </button>
+
 
                                         <button
                                             type="button"

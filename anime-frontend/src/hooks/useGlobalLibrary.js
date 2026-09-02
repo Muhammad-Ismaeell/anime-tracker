@@ -7,29 +7,58 @@ export function useGlobalLibrary() {
 
     const { data } = useLibrary();
 
+
     const library = useMemo(() => {
 
         return (
             data?.pages?.flatMap(
-                page => page.results || []
+                (page) => page.results || []
             ) || []
         );
 
     }, [data]);
 
 
-    const statusMap = useMemo(() => {
+    const libraryMap = useMemo(() => {
 
         const map = new Map();
 
-        library.forEach(item => {
+        library.forEach((item) => {
 
             const id =
                 item.anime_id ??
                 item.anime?.mal_id ??
                 item.anime?.id;
 
-            if (!id) return;
+            if (id == null) {
+                return;
+            }
+
+            map.set(
+                String(id),
+                item
+            );
+        });
+
+        return map;
+
+    }, [library]);
+
+
+    const statusMap = useMemo(() => {
+
+        const map = new Map();
+
+        library.forEach((item) => {
+
+            const id =
+                item.anime_id ??
+                item.anime?.mal_id ??
+                item.anime?.id;
+
+            if (id == null) {
+                return;
+            }
 
             map.set(
                 String(id),
@@ -44,7 +73,7 @@ export function useGlobalLibrary() {
 
     return {
         library,
-        statusMap
+        libraryMap,
+        statusMap,
     };
 }
-
