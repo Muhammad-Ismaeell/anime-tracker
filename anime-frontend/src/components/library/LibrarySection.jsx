@@ -1,3 +1,4 @@
+
 import { memo, useMemo } from "react";
 
 import AnimeCard from "../AnimeCard";
@@ -75,6 +76,12 @@ function LibrarySection({ title, items }) {
                             source.image ??
                             item.image ??
                             "",
+                        episodes:
+                            source.episodes ??
+                            item.episodes ??
+                            null,
+                        progress:
+                            item.progress ?? 0,
                     };
 
                     return (
