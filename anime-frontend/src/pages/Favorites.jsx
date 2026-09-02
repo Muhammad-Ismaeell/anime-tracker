@@ -206,23 +206,15 @@ function Favorites() {
                             })}
                         </div>
 
+                        <div
+                            ref={loadMoreRef}
+                            className="search-load-more"
+                            aria-hidden="true"
+                        />
 
-                        {hasNextPage && (
-                            <div className="load-more-container">
-                                <button
-                                    type="button"
-                                    className="load-more-btn"
-                                    onClick={() =>
-                                        fetchNextPage()
-                                    }
-                                    disabled={
-                                        isFetchingNextPage
-                                    }
-                                >
-                                    {isFetchingNextPage
-                                        ? "Loading..."
-                                        : "Load More"}
-                                </button>
+                        {isFetchingNextPage && (
+                            <div className="search-loading-more">
+                                Loading more favorites...
                             </div>
                         )}
                     </>
