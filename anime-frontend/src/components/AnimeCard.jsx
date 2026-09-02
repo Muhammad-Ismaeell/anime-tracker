@@ -1,6 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+
 import {
     memo,
     useContext,
@@ -14,7 +15,9 @@ import {
     useGlobalLibrary,
 } from "../hooks/useGlobalLibrary";
 
+import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 import { useUpdateLibrary } from "../hooks/useLibrary";
+
 import OptimizedImage from "./ui/OptimizedImage";
 
 
@@ -38,6 +41,9 @@ function AnimeCard({
     const {
         libraryMap,
     } = useGlobalLibrary();
+
+    const favoriteIds =
+        useFavoriteIds();
 
 
     const [open, setOpen] =
@@ -123,6 +129,24 @@ function AnimeCard({
     // ============================================================
     // FAVORITE
     // ============================================================
+
+    /*
+     * AnimeCard is the final component responsible for displaying
+     * the favorite state.
+     *
+     * Therefore it also checks the shared favorite ID cache.
+     *
+     * This prevents individual pages from getting out of sync
+     * with the actual authenticated user's favorites.
+     *
+     * The prop is still respected so Favorites.jsx can explicitly
+     * mark items as favorited while its paginated data is displayed.
+     */
+
+    const favoriteState =
+        isFavorited ||
+        favoriteIds.has(animeId);
+
 
     const handleFavoriteClick = (
         event
@@ -366,7 +390,7 @@ function AnimeCard({
                 <button
                     type="button"
                     className={`favIcon ${
-                        isFavorited
+                        favoriteState
                             ? "active"
                             : ""
                     }`}
@@ -378,7 +402,7 @@ function AnimeCard({
                         )
                     }
                     aria-label={
-                        isFavorited
+                        favoriteState
                             ? `Remove ${title} from favorites`
                             : `Add ${title} to favorites`
                     }
@@ -389,7 +413,7 @@ function AnimeCard({
 
                     {isFavoritePending
                         ? "⏳"
-                        : isFavorited
+                        : favoriteState
                             ? "❤️"
                             : "🤍"}
 

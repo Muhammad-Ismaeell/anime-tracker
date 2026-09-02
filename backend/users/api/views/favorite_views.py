@@ -1,3 +1,4 @@
+
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import (
     api_view,
@@ -110,7 +111,7 @@ def favorite_ids(request):
         FavoriteAnime.objects
         .filter(user=request.user)
         .values_list(
-            "anime_id",
+            "anime__mal_id",
             flat=True,
         )
     )
