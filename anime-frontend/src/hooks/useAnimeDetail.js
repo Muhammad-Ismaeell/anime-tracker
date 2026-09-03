@@ -23,5 +23,9 @@ export function useAnimeDetail(id) {
 
         enabled: !!id,
 
+        // Do not show the previous anime while navigating
+        // from one detail page to another.
+        placeholderData: undefined,
+
     });
 }
