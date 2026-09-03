@@ -2720,9 +2720,12 @@ body {
 }
 
 .review-form textarea {
+    width: 100%;
     min-height: 120px;
-    padding: 12px;
-    border-radius: 12px;
+
+    padding: var(--control-padding-x);
+
+    border-radius: var(--control-radius);
 
     background: #111827;
     color: white;
