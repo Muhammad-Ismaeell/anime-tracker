@@ -45,17 +45,24 @@ function Home() {
         [recentlyAddedQuery.data]
     );
 
-    const featuredAnime = useMemo(() => {
-        const seasonalFeatured = seasonalAnime.find(
-            (anime) => anime?.image
-        );
+    const heroAnime = useMemo(() => {
+        const combined = [
+            ...seasonalAnime,
+            ...trendingAnime,
+            ...recentlyAddedAnime,
+            ...topAnime,
+        ];
+        const seen = new Set();
 
-        if (seasonalFeatured) {
-            return seasonalFeatured;
-        }
-
-        return topAnime.find((anime) => anime?.image);
-    }, [seasonalAnime, topAnime]);
+        return combined
+            .filter((anime) => {
+                const id = anime?.mal_id ?? anime?.id;
+                if (!id || !anime?.image || seen.has(String(id))) return false;
+                seen.add(String(id));
+                return true;
+            })
+            .slice(0, 5);
+    }, [seasonalAnime, trendingAnime, recentlyAddedAnime, topAnime]);
 
     const loading =
         trendingQuery.isPending ||
@@ -89,26 +96,26 @@ function Home() {
                 <title>Anime Tracker</title>
                 <meta
                     name="description"
-                    content="Discover anime, build your library, track your progress, and keep up with what you want to watch."
+                    content="Discover anime, build a personal library, and track what you watch."
                 />
             </Helmet>
 
-            {!loading && featuredAnime && (
+            {!loading && heroAnime.length > 0 && (
                 <section className="home-hero">
                     <div className="home-hero-inner">
                         <div className="home-hero-content">
                             <span className="home-hero-eyebrow">
-                                YOUR ANIME TRACKER
+                                ANIME TRACKER
                             </span>
 
                             <h1 className="home-hero-title">
-                                Keep your anime life organized.
+                                Discover. Track. Organize.
                             </h1>
 
                             <p className="home-hero-description">
-                                Discover new series, keep a personal library,
-                                track what you are watching, and remember what
-                                you want to watch next.
+                                Find your next series, keep your personal
+                                library organized, and track every anime you
+                                plan to watch, are watching, or have finished.
                             </p>
 
                             <div className="home-hero-actions">
@@ -116,53 +123,37 @@ function Home() {
                                     to="/search"
                                     className="home-hero-primary-action"
                                 >
-                                    Browse Anime
+                                    Discover Anime
                                 </Link>
-
                                 <Link
                                     to="/library"
                                     className="home-hero-secondary-action"
                                 >
-                                    My Library
+                                    Open My Library
                                 </Link>
                             </div>
                         </div>
 
-                        <div className="home-hero-feature">
-                            <span className="home-hero-feature-label">
-                                FEATURED IN CATALOG
-                            </span>
-
-                            <Link
-                                to={`/anime/${featuredAnime.mal_id ?? featuredAnime.id}`}
-                                className="home-hero-feature-card"
-                                aria-label={`View ${featuredAnime.title}`}
-                            >
-                                <img
-                                    src={featuredAnime.image}
-                                    alt={featuredAnime.title || "Featured anime"}
-                                    className="home-hero-poster"
-                                    loading="eager"
-                                    decoding="async"
-                                />
-
-                                <div className="home-hero-feature-info">
-                                    <strong>{featuredAnime.title}</strong>
-
-                                    <span>
-                                        {featuredAnime.type || "Anime"}
-                                        {featuredAnime.year
-                                            ? ` • ${featuredAnime.year}`
-                                            : ""}
-                                    </span>
-
-                                    {Number(featuredAnime.score) > 0 && (
-                                        <span>
-                                            ⭐ {Number(featuredAnime.score).toFixed(1)}
-                                        </span>
-                                    )}
-                                </div>
-                            </Link>
+                        <div className="home-hero-posters" aria-label="Anime catalog preview">
+                            {heroAnime.map((anime) => {
+                                const id = anime.mal_id ?? anime.id;
+                                return (
+                                    <Link
+                                        key={id}
+                                        to={`/anime/${id}`}
+                                        className="home-hero-poster-link"
+                                        aria-label={`View ${anime.title}`}
+                                    >
+                                        <img
+                                            src={anime.image}
+                                            alt={anime.title || "Anime poster"}
+                                            className="home-hero-poster"
+                                            loading="eager"
+                                            decoding="async"
+                                        />
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
@@ -181,26 +172,28 @@ function Home() {
                 </div>
             ) : (
                 <div className="home-catalog-sections">
-                    <AnimeSection
-                        title="Trending Now"
-                        animeList={trendingAnime}
-                        viewAllTo="/trending"
-                        {...sectionProps}
-                    />
+                    <div className="home-category-row">
+                        <AnimeSection
+                            title="Trending Now"
+                            animeList={trendingAnime}
+                            viewAllTo="/trending"
+                            {...sectionProps}
+                        />
 
-                    <AnimeSection
-                        title="Current Season"
-                        animeList={seasonalAnime}
-                        viewAllTo="/seasonal"
-                        {...sectionProps}
-                    />
+                        <AnimeSection
+                            title="Current Season"
+                            animeList={seasonalAnime}
+                            viewAllTo="/seasonal"
+                            {...sectionProps}
+                        />
 
-                    <AnimeSection
-                        title="Recently Added"
-                        animeList={recentlyAddedAnime}
-                        viewAllTo="/recently-added"
-                        {...sectionProps}
-                    />
+                        <AnimeSection
+                            title="Recently Added"
+                            animeList={recentlyAddedAnime}
+                            viewAllTo="/recently-added"
+                            {...sectionProps}
+                        />
+                    </div>
 
                     <AnimeSection
                         title="Top Anime"
