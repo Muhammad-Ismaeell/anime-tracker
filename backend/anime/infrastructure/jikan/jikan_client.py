@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 logger = logging.getLogger(__name__)
 
 
-BASE_URL = "https://api.jikan.moe/v4"
+BASE_URL = "https://api.tenrai.org/v1"
 
 
 BLOCKED_RATINGS = {
@@ -66,7 +66,7 @@ def safe_request(url, params=None, retries=3):
 
             if result.returncode != 0:
                 logger.warning(
-                    "Jikan curl failed (attempt %s/%s): "
+                    "Anime API curl failed (attempt %s/%s): "
                     "returncode=%s, http_status=%s, stderr=%s, url=%s",
                     attempt + 1,
                     retries,
@@ -83,7 +83,7 @@ def safe_request(url, params=None, retries=3):
 
             if not stdout:
                 logger.warning(
-                    "Jikan returned an empty response for %s "
+                    "Anime API returned an empty response for %s "
                     "(attempt %s/%s, http_status=%s)",
                     url,
                     attempt + 1,
@@ -100,7 +100,7 @@ def safe_request(url, params=None, retries=3):
 
             if "status" in data and data.get("status") != 200:
                 logger.warning(
-                    "Jikan error (attempt %s/%s, http_status=%s): %s",
+                    "Anime API error (attempt %s/%s, http_status=%s): %s",
                     attempt + 1,
                     retries,
                     http_code,
@@ -133,7 +133,7 @@ def safe_request(url, params=None, retries=3):
 
         except Exception as exc:
             logger.warning(
-                "Jikan request failed (%s/%s): %s",
+                "Anime API request failed (%s/%s): %s",
                 attempt + 1,
                 retries,
                 exc,
@@ -169,9 +169,7 @@ def filter_nsfw(items):
 
 def list_response(data, page):
     """
-    Convert a Jikan list response.
-
-    Pagination is based on Jikan's raw response. Filtering happens later.
+    Convert a Tenrai/Jikan-compatible list response.
     """
     if not data:
         return {
@@ -209,7 +207,7 @@ class JikanClient:
 
     def get_all_anime(self, page=1):
         """
-        Fetch the general MyAnimeList/Jikan anime catalog.
+        Fetch the general MyAnimeList anime catalog through Tenrai.
         """
         return self._get_list(
             "anime",
