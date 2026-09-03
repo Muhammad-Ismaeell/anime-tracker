@@ -36,6 +36,16 @@ class Command(BaseCommand):
             ),
         )
 
+        parser.add_argument(
+            "--request-retries",
+            type=int,
+            default=2,
+            help=(
+                "Additional retries when a Jikan page request "
+                "returns no data."
+            ),
+        )
+
     # ==============================================
     # SAVE ITEMS
     # ==============================================
@@ -89,6 +99,43 @@ class Command(BaseCommand):
         )
 
     # ==============================================
+    # FETCH ONE PAGE WITH RETRIES
+    # ==============================================
+
+    def fetch_page(
+        self,
+        name,
+        fetcher,
+        page,
+        request_retries,
+    ):
+
+        attempts = request_retries + 1
+
+        for attempt in range(1, attempts + 1):
+
+            response = fetcher(page)
+
+            if response and response.get("items"):
+                return response
+
+            if attempt < attempts:
+
+                wait = 2 ** (attempt - 1)
+
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"{name} page {page} returned no data. "
+                        f"Retrying in {wait}s "
+                        f"({attempt}/{request_retries})..."
+                    )
+                )
+
+                time.sleep(wait)
+
+        return None
+
+    # ==============================================
     # POPULATE ONE SOURCE
     # ==============================================
 
@@ -99,6 +146,7 @@ class Command(BaseCommand):
         service,
         max_pages,
         delay,
+        request_retries,
     ):
 
         total_new = 0
@@ -118,13 +166,19 @@ class Command(BaseCommand):
                 f"Fetching {name} page {page}..."
             )
 
-            response = fetcher(page)
+            response = self.fetch_page(
+                name=name,
+                fetcher=fetcher,
+                page=page,
+                request_retries=request_retries,
+            )
 
             if not response:
 
                 self.stdout.write(
                     self.style.WARNING(
-                        f"{name} page {page} failed."
+                        f"Skipping {name} page {page} "
+                        f"after {request_retries + 1} attempts."
                     )
                 )
 
@@ -213,6 +267,10 @@ class Command(BaseCommand):
             "delay"
         ]
 
+        request_retries = options[
+            "request_retries"
+        ]
+
         sources = [
             (
                 "All Anime",
@@ -285,6 +343,11 @@ class Command(BaseCommand):
             f"{delay}s"
         )
 
+        self.stdout.write(
+            f"Retries per failed page: "
+            f"{request_retries}"
+        )
+
         # ==========================================
         # POPULATE ALL SOURCES
         # ==========================================
@@ -302,6 +365,7 @@ class Command(BaseCommand):
                 service=service,
                 max_pages=max_pages,
                 delay=delay,
+                request_retries=request_retries,
             )
 
             total_new += new_count
