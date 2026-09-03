@@ -912,10 +912,6 @@ body {
 }
 
 
-.anime-card .status-menu button.danger {
-    color: #ef4444;
-}
-
 .anime-card .status-menu button:disabled {
     cursor: default;
 
