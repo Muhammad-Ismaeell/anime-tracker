@@ -197,7 +197,7 @@ function Library() {
                     <button
                         className="load-more-btn"
                         disabled={isFetchingNextPage}
-                        onClick={() => fetchNextPage()}
+                        onClick={fetchNextPage}
                     >
 
                         {isFetchingNextPage
