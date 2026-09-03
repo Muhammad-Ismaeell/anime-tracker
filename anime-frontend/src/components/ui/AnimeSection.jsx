@@ -7,6 +7,7 @@ import {
     AnimatePresence,
     motion,
 } from "framer-motion";
+import { Link } from "react-router-dom";
 
 import AnimeCard from "../AnimeCard";
 import { getAnimeId } from "../../utils/normalizeAnime";
@@ -21,10 +22,12 @@ export default function AnimeSection({
     statusMap,
     favoriteIds,
     toggleFavorite,
+    viewAllTo,
+    variant = "grid",
 }) {
 
-    // Match the eight-card desktop grid so cards never wrap onto a second row.
     const CARDS_PER_PAGE = 8;
+    const RANKING_ITEMS = 8;
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
@@ -50,27 +53,24 @@ export default function AnimeSection({
     const [slideDirection, setSlideDirection] = useState(1);
 
     const totalPages = Math.ceil(validAnime.length / CARDS_PER_PAGE);
-    const hasMultiplePages = totalPages > 1;
-    const isFirstPage = currentPage === 0;
-    const isLastPage = currentPage >= totalPages - 1;
 
     const visibleAnime = validAnime.slice(
         currentPage * CARDS_PER_PAGE,
         (currentPage + 1) * CARDS_PER_PAGE
     );
 
-    const handlePrevious = () => {
-        if (isFirstPage) return;
-        setSlideDirection(-1);
-        setCurrentPage((current) => Math.max(current - 1, 0));
-    };
-
     const handleNext = () => {
-        if (isLastPage) return;
+        if (currentPage >= totalPages - 1) return;
         setSlideDirection(1);
         setCurrentPage((current) =>
             Math.min(current + 1, totalPages - 1)
         );
+    };
+
+    const handlePrevious = () => {
+        if (currentPage === 0) return;
+        setSlideDirection(-1);
+        setCurrentPage((current) => Math.max(current - 1, 0));
     };
 
     const slideVariants = {
@@ -85,6 +85,62 @@ export default function AnimeSection({
         }),
     };
 
+    if (variant === "ranking") {
+        return (
+            <section className="home-section home-section-ranking">
+                <div className="section-header">
+                    <div className="section-heading">
+                        <span className="section-emoji" aria-hidden="true">
+                            {emoji}
+                        </span>
+                        <h2>{title}</h2>
+                    </div>
+
+                    {viewAllTo && (
+                        <Link className="section-view-all" to={viewAllTo}>
+                            View All
+                        </Link>
+                    )}
+                </div>
+
+                <div className="anime-ranking-list">
+                    {validAnime.slice(0, RANKING_ITEMS).map(({ anime, id }, index) => (
+                        <Link
+                            key={String(id)}
+                            to={`/anime/${id}`}
+                            className="anime-ranking-item"
+                        >
+                            <span className="anime-ranking-number">
+                                {String(index + 1).padStart(2, "0")}
+                            </span>
+
+                            <img
+                                src={anime.image}
+                                alt=""
+                                className="anime-ranking-image"
+                                loading="lazy"
+                            />
+
+                            <span className="anime-ranking-info">
+                                <strong>{anime.title || "Unknown Anime"}</strong>
+                                <span>
+                                    {anime.type || "Anime"}
+                                    {anime.year ? ` • ${anime.year}` : ""}
+                                </span>
+                            </span>
+
+                            {Number(anime.score) > 0 && (
+                                <span className="anime-ranking-score">
+                                    ⭐ {Number(anime.score).toFixed(1)}
+                                </span>
+                            )}
+                        </Link>
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className="home-section">
             <div className="section-header">
@@ -95,27 +151,10 @@ export default function AnimeSection({
                     <h2>{title}</h2>
                 </div>
 
-                {hasMultiplePages && (
-                    <div className="section-slider-controls">
-                        <button
-                            type="button"
-                            className="section-slider-btn"
-                            onClick={handlePrevious}
-                            disabled={isFirstPage}
-                            aria-label={`Previous ${title.toLowerCase()}`}
-                        >
-                            ←
-                        </button>
-                        <button
-                            type="button"
-                            className="section-slider-btn"
-                            onClick={handleNext}
-                            disabled={isLastPage}
-                            aria-label={`Next ${title.toLowerCase()}`}
-                        >
-                            →
-                        </button>
-                    </div>
+                {viewAllTo && (
+                    <Link className="section-view-all" to={viewAllTo}>
+                        View All
+                    </Link>
                 )}
             </div>
 
@@ -166,6 +205,32 @@ export default function AnimeSection({
                         })}
                     </motion.div>
                 </AnimatePresence>
+
+                {totalPages > 1 && (
+                    <div className="section-page-controls" aria-label={`${title} pages`}>
+                        <button
+                            type="button"
+                            className="section-page-btn"
+                            onClick={handlePrevious}
+                            disabled={currentPage === 0}
+                            aria-label={`Previous ${title.toLowerCase()}`}
+                        >
+                            ←
+                        </button>
+                        <span>
+                            {currentPage + 1} / {totalPages}
+                        </span>
+                        <button
+                            type="button"
+                            className="section-page-btn"
+                            onClick={handleNext}
+                            disabled={currentPage >= totalPages - 1}
+                            aria-label={`Next ${title.toLowerCase()}`}
+                        >
+                            →
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     );
