@@ -1513,12 +1513,20 @@ body {
 
 
 .edit-profile-btn {
-    padding: 12px 20px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
     border: none;
-    border-radius: 12px;
+    border-radius: var(--control-radius);
+
+    font: inherit;
 
     cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 .edit-profile-btn:hover {
