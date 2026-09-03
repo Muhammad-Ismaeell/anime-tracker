@@ -2,15 +2,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import api from "../api/client";
 
 export function useAnimeSearch(query = "", filters = {}) {
-    
-    const hasFilters = Object.values(filters).some(
-            (value) => value !== undefined && value !== ""
-        );
-    const normalizedQuery =
-        query.trim();
+    const normalizedQuery = query.trim();
 
     return useInfiniteQuery({
-
         queryKey: [
             "anime-search",
             normalizedQuery,
@@ -20,7 +14,6 @@ export function useAnimeSearch(query = "", filters = {}) {
         queryFn: async ({
             pageParam = 1,
         }) => {
-
             const { data } =
                 await api.get(
                     "/anime/search/",
@@ -42,23 +35,17 @@ export function useAnimeSearch(query = "", filters = {}) {
             (previousData) =>
                 previousData,
 
-        
-
-        enabled:
-            normalizedQuery.length >= 3 || hasFilters,
+        // An empty query is a valid browse/discover request.
+        // Filters can narrow it down when provided.
+        enabled: true,
 
         getNextPageParam:
             (lastPage) => {
-
-                if (
-                    !lastPage?.has_next
-                ) {
+                if (!lastPage?.has_next) {
                     return undefined;
                 }
 
-                return (
-                    lastPage.page + 1
-                );
+                return lastPage.page + 1;
             },
 
         retry: 2,
