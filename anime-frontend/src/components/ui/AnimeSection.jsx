@@ -23,8 +23,8 @@ export default function AnimeSection({
     toggleFavorite,
 }) {
 
-    // Keep Home sections compact and image-dense on desktop.
-    const CARDS_PER_PAGE = 10;
+    // Match the eight-card desktop grid so cards never wrap onto a second row.
+    const CARDS_PER_PAGE = 8;
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
