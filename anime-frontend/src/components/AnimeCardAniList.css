@@ -10,32 +10,36 @@
     box-shadow: none;
 }
 
-/* Keep an opened card above neighboring cards and their menus. */
-.anime-card.menu-open {
-    z-index: 30;
-}
+.anime-card.menu-open { z-index: 30; }
 
 .anime-card-poster {
     aspect-ratio: 2 / 3;
     border-radius: 4px;
     background: var(--surface);
     box-shadow: none;
+    overflow: hidden;
 }
 
 .anime-card .imageWrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     border-radius: 4px;
 }
 
+/* The poster should not have a permanent dark overlay. */
 .anime-card .imageWrapper::after,
 .anime-card-poster::after {
-    background: linear-gradient(
-        to bottom,
-        transparent 55%,
-        rgba(0, 0, 0, 0.28) 100%
-    );
+    display: none;
 }
 
 .anime-card .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
@@ -57,9 +61,7 @@
 }
 
 .anime-card .favIcon:hover,
-.anime-card .favIcon.active {
-    background: rgba(15, 17, 23, 0.96);
-}
+.anime-card .favIcon.active { background: rgba(15, 17, 23, 0.96); }
 
 .anime-card .anime-card-score {
     right: 7px;
@@ -72,56 +74,15 @@
     line-height: 1.2;
 }
 
-.anime-card .content {
-    padding: 8px 1px 0;
-}
+.anime-card .content { padding: 8px 1px 0; }
+.anime-card .title { font-size: 0.82rem; font-weight: 600; line-height: 1.35; }
+.anime-card .anime-card-meta { gap: 0.3rem; margin-top: 3px; font-size: 0.68rem; line-height: 1.25; }
+.anime-card .status-wrapper { margin-top: 7px; }
+.anime-card .status-badge { min-height: 30px; padding: 0 9px; border-radius: 4px; background: transparent; font-size: 0.66rem; font-weight: 500; }
+.anime-card .status-badge:hover { transform: none; background: var(--surface-hover); }
+.anime-card .status-menu { top: calc(100% + 5px); min-width: 170px; padding: 4px; border-radius: 4px; }
+.anime-card .status-menu button { min-height: 34px; padding: 0 9px; border-radius: 4px; font-size: 0.7rem; }
 
-.anime-card .title {
-    font-size: 0.82rem;
-    font-weight: 600;
-    line-height: 1.35;
-}
-
-.anime-card .anime-card-meta {
-    gap: 0.3rem;
-    margin-top: 3px;
-    font-size: 0.68rem;
-    line-height: 1.25;
-}
-
-.anime-card .status-wrapper {
-    margin-top: 7px;
-}
-
-.anime-card .status-badge {
-    min-height: 30px;
-    padding: 0 9px;
-    border-radius: 4px;
-    background: transparent;
-    font-size: 0.66rem;
-    font-weight: 500;
-}
-
-.anime-card .status-badge:hover {
-    transform: none;
-    background: var(--surface-hover);
-}
-
-.anime-card .status-menu {
-    top: calc(100% + 5px);
-    min-width: 170px;
-    padding: 4px;
-    border-radius: 4px;
-}
-
-.anime-card .status-menu button {
-    min-height: 34px;
-    padding: 0 9px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-}
-
-/* Catalogue grids: show more media at once, closer to AniList density. */
 .results-grid,
 .favorites-grid,
 .grid {
@@ -137,17 +98,7 @@
         gap: 18px 10px;
     }
 
-    .anime-card .title {
-        font-size: 0.78rem;
-    }
-
-    .anime-card .anime-card-meta {
-        font-size: 0.64rem;
-    }
-
-    .anime-card .status-badge {
-        min-height: 28px;
-        padding-inline: 7px;
-        font-size: 0.62rem;
-    }
+    .anime-card .title { font-size: 0.78rem; }
+    .anime-card .anime-card-meta { font-size: 0.64rem; }
+    .anime-card .status-badge { min-height: 28px; padding-inline: 7px; font-size: 0.62rem; }
 }
