@@ -300,18 +300,6 @@ body {
     text-decoration: none;
 }
 
-.anime-card-poster .image {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform 0.35s ease,
-        filter 0.25s ease;
-}
 
 
 .anime-card {
@@ -332,19 +320,6 @@ body {
         box-shadow 0.2s ease;
 }
 
-
-.anime-card .image {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform 0.35s ease,
-        filter 0.25s ease;
-}
 
 .anime-card .imageWrapper {
     position: relative;
@@ -416,8 +391,8 @@ body {
     object-fit: cover;
 
     transition:
-        transform 0.4s ease,
-        filter 0.4s ease;
+        transform 0.35s ease,
+        filter 0.25s ease;
 }
 
 .anime-card:hover .image {
