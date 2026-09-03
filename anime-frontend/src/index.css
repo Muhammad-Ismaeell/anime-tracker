@@ -118,9 +118,6 @@
         margin-top: 50px;
         padding: 24px 18px;
     }
-    .home-hero {
-        min-height: 430px;
-    }
 
     .home-hero-inner {
         min-height: 430px;
@@ -157,16 +154,6 @@
         margin: 2rem auto 0;
     }
 
-    .home-hero-content {
-        max-width: 100%;
-    }
-
-    .home-hero-poster {
-        right: 5%;
-        width: 180px;
-        height: 270px;
-        opacity: 0.45;
-    }
 }
 
 .home-hero-poster-link:hover .home-hero-poster {
