@@ -320,6 +320,7 @@ function EditProfile() {
 
                 <button
                     type="button"
+                    className="retry-btn"
                     onClick={refetch}
                 >
                     Try Again
