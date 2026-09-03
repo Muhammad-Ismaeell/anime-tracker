@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import {
@@ -17,6 +17,8 @@ function Trending() {
         window.scrollTo(0, 0);
     }, []);
 
+    const loadMoreRef = useRef(null);
+
     const {
         data,
         fetchNextPage,
@@ -30,6 +32,27 @@ function Trending() {
     const { statusMap } = useGlobalLibrary();
 
     const favoriteIds = useFavoriteIds();
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (
+                    entries[0]?.isIntersecting &&
+                    hasNextPage &&
+                    !isFetchingNextPage
+                ) {
+                    fetchNextPage();
+                }
+            },
+            { rootMargin: "500px" }
+        );
+
+        if (loadMoreRef.current) {
+            observer.observe(loadMoreRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
         return (
@@ -76,9 +99,7 @@ function Trending() {
                                 anime={item}
                                 statusMap={statusMap}
                                 isFavorited={favoriteIds.has(animeId)}
-                                isFavoritePending={
-                                    toggleFavorite.isPending
-                                }
+                                isFavoritePending={toggleFavorite.isPending}
                                 onToggleFavorite={() =>
                                     toggleFavorite.mutate({
                                         anime_id: item.id,
@@ -93,16 +114,15 @@ function Trending() {
             )}
 
             {hasNextPage && (
-                <button
-                    type="button"
-                    className="load-more-btn"
-                    onClick={fetchNextPage}
-                    disabled={isFetchingNextPage}
-                >
-                    {isFetchingNextPage
-                        ? "Loading..."
-                        : "Load More Anime"}
-                </button>
+                <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
+                    {isFetchingNextPage && (
+                        <div className="grid infinite-scroll-skeleton-grid">
+                            {Array.from({ length: 4 }).map((_, index) => (
+                                <AnimeCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    )}
+                </div>
             )}
         </PageContainer>
     );
