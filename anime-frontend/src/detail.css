@@ -739,10 +739,9 @@
 
 
 .detail-progress-input {
-    width: 74px;
-    height: 40px;
-
-    padding: 0 9px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
+    border-radius: var(--control-radius);
 
     color: var(--detail-text);
 
@@ -761,8 +760,8 @@
     outline: none;
 
     transition:
-        border-color 0.18s ease,
-        background 0.18s ease;
+        border-color var(--transition-fast),
+        background-color var(--transition-fast);
 }
 
 .detail-progress-input:focus {
