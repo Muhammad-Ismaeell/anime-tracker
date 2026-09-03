@@ -15,6 +15,7 @@ from anime.api.docs import (
 )
 from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
+from anime.application.recommendation_service import RecommendationService
 from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.jikan.jikan_client import JikanClient
 
@@ -24,6 +25,8 @@ search_service = AnimeSearchService()
 anime_service = AnimeService(
     JikanClient()
 )
+
+recommendation_service = RecommendationService()
 
 
 def safe_int(value, default=1):
@@ -206,6 +209,23 @@ def anime_search(request):
                 page,
                 filters
             )
+        }
+    )
+
+
+@extend_schema(
+    summary="Anime Recommendations",
+    description="Return SFW anime recommendations for one anime.",
+    responses={
+        200: AnimeListResponseSerializer
+    },
+)
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def anime_recommendations(request, anime_id):
+    return Response(
+        {
+            "items": recommendation_service.get_recommendations(anime_id),
         }
     )
 
