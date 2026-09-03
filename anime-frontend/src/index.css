@@ -2665,9 +2665,10 @@ body {
 
     margin-top: 10px;
 
-    padding: 10px 22px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
+    border-radius: var(--control-radius);
 
-    border-radius: 999px;
 
     border: none;
 
