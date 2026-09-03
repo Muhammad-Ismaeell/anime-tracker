@@ -9,6 +9,7 @@ export function useInfiniteAnime(type) {
         trending: AnimeAPI.trending,
         seasonal: AnimeAPI.seasonal,
         top: AnimeAPI.top,
+        recentlyAdded: AnimeAPI.recentlyAdded,
     };
 
     const fetcher = fetchMap[type];
@@ -18,8 +19,7 @@ export function useInfiniteAnime(type) {
     }
 
     return useInfiniteQuery({
-        queryKey:
-            queryKeys.anime[type],
+        queryKey: queryKeys.anime[type],
 
         queryFn: ({ pageParam = 1 }) =>
             fetcher(pageParam),
@@ -36,28 +36,20 @@ export function useInfiniteAnime(type) {
             const map = new Map();
 
             data.pages.forEach((page) => {
-                (page.items || []).forEach(
-                    (item) => {
-                        const anime =
-                            normalizeAnime(item);
+                (page.items || []).forEach((item) => {
+                    const anime = normalizeAnime(item);
 
-                        if (!anime?.id) {
-                            return;
-                        }
-
-                        map.set(
-                            String(anime.id),
-                            anime
-                        );
+                    if (!anime?.id) {
+                        return;
                     }
-                );
+
+                    map.set(String(anime.id), anime);
+                });
             });
 
             return {
                 ...data,
-                anime: Array.from(
-                    map.values()
-                ),
+                anime: Array.from(map.values()),
             };
         },
     });
