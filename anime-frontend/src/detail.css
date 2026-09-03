@@ -437,17 +437,17 @@
 
     width: 100%;
 
-    min-height: 42px;
+    min-height: var(--control-height);
 
-    padding: 9px 11px;
+    padding: 0 var(--control-padding-x);
+
+    border-radius: var(--control-radius);
 
     color: var(--detail-text-soft);
 
     background: transparent;
 
     border: 0;
-    border-radius: 9px;
-
     font-size: 0.86rem;
     font-weight: 600;
 
@@ -456,8 +456,8 @@
     cursor: pointer;
 
     transition:
-        background 0.18s ease,
-        color 0.18s ease;
+        background-color var(--transition-fast),
+        color var(--transition-fast);
 }
 
 .detail-library-menu button:hover {
