@@ -32,9 +32,7 @@
     letter-spacing: -0.01em;
 }
 
-.section-emoji {
-    display: none;
-}
+.section-emoji { display: none; }
 
 .section-view-all {
     flex-shrink: 0;
@@ -45,19 +43,14 @@
     transition: color var(--transition-fast);
 }
 
-.section-view-all:hover {
-    color: var(--accent);
-}
+.section-view-all:hover { color: var(--accent); }
 
-.anime-section-slider {
-    width: 100%;
-    overflow: visible;
-}
+.anime-section-slider { width: 100%; overflow: visible; }
 
 .anime-section-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px 10px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 22px 14px;
     width: 100%;
     overflow: visible;
 }
@@ -68,34 +61,30 @@
 }
 
 /* ============================================================
-   HOME: TRENDING / SEASONAL / RECENTLY ADDED
-   Three compact catalogue sections side-by-side.
+   HOME: EACH CATEGORY GETS ITS OWN FULL ROW
    ============================================================ */
 
 .home-category-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     margin-bottom: 2.5rem;
 }
 
 .home-category-row .home-section {
+    width: 100%;
     min-width: 0;
-    margin-bottom: 0;
+    margin-bottom: 2.25rem;
 }
 
-.home-category-row .section-header {
-    margin-bottom: 0.7rem;
-}
+.home-category-row .home-section:last-child { margin-bottom: 0; }
+.home-category-row .section-header { margin-bottom: 0.7rem; }
 
 /* ============================================================
    VERTICAL TOP RANKING
    ============================================================ */
 
-.home-section-ranking {
-    margin-bottom: 2.5rem;
-}
+.home-section-ranking { margin-bottom: 2.5rem; }
 
 .anime-ranking-list {
     display: flex;
@@ -117,58 +106,16 @@
     transition: background-color var(--transition-fast);
 }
 
-.anime-ranking-item:hover {
-    background: var(--surface-hover);
-}
-
-.anime-ranking-number {
-    color: var(--text-muted);
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-align: center;
-}
-
-.anime-ranking-image {
-    width: 62px;
-    height: 82px;
-    object-fit: cover;
-    border-radius: 3px;
-    background: var(--surface);
-}
-
-.anime-ranking-info {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    gap: 3px;
-}
-
-.anime-ranking-info strong {
-    overflow: hidden;
-    color: var(--text-primary);
-    font-size: 0.84rem;
-    font-weight: 600;
-    line-height: 1.3;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.anime-ranking-info span {
-    color: var(--text-muted);
-    font-size: 0.68rem;
-    line-height: 1.25;
-}
-
-.anime-ranking-score {
-    flex-shrink: 0;
-    color: var(--text-primary);
-    font-size: 0.72rem;
-    font-weight: 600;
-}
+.anime-ranking-item:hover { background: var(--surface-hover); }
+.anime-ranking-number { color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-align: center; }
+.anime-ranking-image { width: 62px; height: 82px; object-fit: cover; border-radius: 3px; background: var(--surface); }
+.anime-ranking-info { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+.anime-ranking-info strong { overflow: hidden; color: var(--text-primary); font-size: 0.84rem; font-weight: 600; line-height: 1.3; white-space: nowrap; text-overflow: ellipsis; }
+.anime-ranking-info span { color: var(--text-muted); font-size: 0.68rem; line-height: 1.25; }
+.anime-ranking-score { flex-shrink: 0; color: var(--text-primary); font-size: 0.72rem; font-weight: 600; }
 
 /* ============================================================
    HOME TRACKER HERO
-   Multiple complete posters; no single-show streaming banner.
    ============================================================ */
 
 .home-hero {
@@ -193,44 +140,11 @@
     padding: 24px 0;
 }
 
-.home-hero-content {
-    min-width: 0;
-    max-width: 620px;
-}
-
-.home-hero-eyebrow {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--accent);
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-}
-
-.home-hero-title {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: clamp(1.65rem, 2.8vw, 2.3rem);
-    font-weight: 750;
-    line-height: 1.12;
-    letter-spacing: -0.03em;
-}
-
-.home-hero-description {
-    max-width: 560px;
-    margin: 12px 0 0;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.6;
-}
-
-.home-hero-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 17px;
-}
+.home-hero-content { min-width: 0; max-width: 620px; }
+.home-hero-eyebrow { display: block; margin-bottom: 8px; color: var(--accent); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em; }
+.home-hero-title { margin: 0; color: var(--text-primary); font-size: clamp(1.65rem, 2.8vw, 2.3rem); font-weight: 750; line-height: 1.12; letter-spacing: -0.03em; }
+.home-hero-description { max-width: 560px; margin: 12px 0 0; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.6; }
+.home-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
 
 .home-hero-primary-action,
 .home-hero-secondary-action {
@@ -244,39 +158,18 @@
     font-size: 0.73rem;
     font-weight: 650;
     text-decoration: none;
-    transition: background-color var(--transition-fast),
-        border-color var(--transition-fast),
-        color var(--transition-fast),
-        transform var(--transition-fast);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
-.home-hero-primary-action {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: #ffffff;
-}
-
-.home-hero-primary-action:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
-    transform: translateY(-1px);
-}
-
-.home-hero-secondary-action {
-    background: transparent;
-    color: var(--text-primary);
-}
-
-.home-hero-secondary-action:hover {
-    background: var(--surface-hover);
-    border-color: var(--border);
-    transform: translateY(-1px);
-}
+.home-hero-primary-action { border-color: var(--accent); background: var(--accent); color: #ffffff; }
+.home-hero-primary-action:hover { background: var(--accent-hover); border-color: var(--accent-hover); transform: translateY(-1px); }
+.home-hero-secondary-action { background: transparent; color: var(--text-primary); }
+.home-hero-secondary-action:hover { background: var(--surface-hover); border-color: var(--border); transform: translateY(-1px); }
 
 .home-hero-posters {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    align-items: end;
+    align-items: stretch;
     gap: 10px;
     min-width: 0;
 }
@@ -284,12 +177,13 @@
 .home-hero-poster-link {
     display: block;
     min-width: 0;
+    height: 100%;
+    transform: none;
+    filter: none;
     transition: transform var(--transition-fast);
 }
 
-.home-hero-poster-link:hover {
-    transform: translateY(-4px);
-}
+.home-hero-poster-link:hover { transform: translateY(-4px); }
 
 .home-hero-poster {
     display: block;
@@ -301,82 +195,30 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     background: var(--bg);
+    box-shadow: none;
+    filter: none;
 }
 
 @media (max-width: 1050px) {
-    .home-category-row {
-        gap: 18px;
-    }
-
-    .home-hero-inner {
-        grid-template-columns: minmax(0, 0.85fr) minmax(360px, 1.15fr);
-        gap: 24px;
-    }
-
-    .home-hero-posters {
-        gap: 7px;
-    }
+    .home-hero-inner { grid-template-columns: minmax(0, 0.85fr) minmax(360px, 1.15fr); gap: 24px; }
+    .home-hero-posters { gap: 7px; }
 }
 
 @media (max-width: 800px) {
-    .home-category-row {
-        grid-template-columns: 1fr;
-        gap: 26px;
-    }
-
-    .home-category-row .home-section {
-        margin-bottom: 0;
-    }
-
-    .home-hero {
-        min-height: 0;
-    }
-
-    .home-hero-inner {
-        grid-template-columns: 1fr;
-        width: calc(100% - 28px);
-        min-height: 0;
-        gap: 22px;
-        padding: 20px 0;
-    }
-
-    .home-hero-posters {
-        max-width: 560px;
-    }
+    .home-hero { min-height: 0; }
+    .home-hero-inner { grid-template-columns: 1fr; width: calc(100% - 28px); min-height: 0; gap: 22px; padding: 20px 0; }
+    .home-hero-posters { max-width: 560px; }
 }
 
 @media (max-width: 600px) {
-    .home-hero-posters {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 5px;
-    }
-
-    .home-hero-title {
-        font-size: 1.55rem;
-    }
-
-    .home-hero-description {
-        font-size: 0.75rem;
-    }
+    .home-hero-posters { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+    .home-hero-title { font-size: 1.55rem; }
+    .home-hero-description { font-size: 0.75rem; }
 }
 
 @media (max-width: 420px) {
-    .home-hero-posters {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 4px;
-    }
-
-    .anime-ranking-item {
-        grid-template-columns: 26px 46px minmax(0, 1fr);
-        gap: 10px;
-    }
-
-    .anime-ranking-image {
-        width: 46px;
-        height: 61px;
-    }
-
-    .anime-ranking-score {
-        display: none;
-    }
+    .home-hero-posters { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+    .anime-ranking-item { grid-template-columns: 26px 46px minmax(0, 1fr); gap: 10px; }
+    .anime-ranking-image { width: 46px; height: 61px; }
+    .anime-ranking-score { display: none; }
 }
