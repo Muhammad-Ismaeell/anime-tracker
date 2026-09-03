@@ -80,11 +80,11 @@
     overflow: hidden;
 }
 
-/* Keep Home cards at a genuinely compact, fixed catalogue size. */
+/* Compact cards with a small, consistent gap between shows. */
 .anime-section-grid {
     display: grid;
     grid-template-columns: repeat(8, 150px);
-    justify-content: space-between;
+    justify-content: start;
     gap: 12px;
     width: 100%;
 }
@@ -108,20 +108,21 @@
 @media (max-width: 1150px) {
     .anime-section-grid {
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 11px;
+        gap: 10px;
     }
 }
 
 @media (max-width: 900px) {
     .anime-section-grid {
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 10px;
+        gap: 9px;
     }
 }
 
 @media (max-width: 750px) {
     .anime-section-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 9px;
     }
 }
 
@@ -140,7 +141,7 @@
 
     .anime-section-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.8rem;
+        gap: 0.65rem;
     }
 
     .section-slider-btn {
