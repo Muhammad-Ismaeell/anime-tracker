@@ -54,11 +54,11 @@
     overflow: visible;
 }
 
-/* Eight equal columns keep the cards compact without leftover spacing. */
+/* Match the compact catalogue-card width used by Library/Favorites. */
 .anime-section-grid {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 22px 14px;
     width: 100%;
     overflow: visible;
 }
@@ -145,43 +145,10 @@
     font-weight: 600;
 }
 
-@media (max-width: 1150px) {
+@media (max-width: 700px) {
     .anime-section-grid {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 10px;
-    }
-}
-
-@media (max-width: 900px) {
-    .anime-section-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 9px;
-    }
-}
-
-@media (max-width: 750px) {
-    .anime-section-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 9px;
-    }
-}
-
-@media (max-width: 650px) {
-    .home-section {
-        margin-bottom: 1.75rem;
-    }
-
-    .section-header {
-        margin-bottom: 0.75rem;
-    }
-
-    .section-heading h2 {
-        font-size: 1rem;
-    }
-
-    .anime-section-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.65rem;
+        grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+        gap: 18px 10px;
     }
 
     .anime-ranking-item {
@@ -196,10 +163,6 @@
 }
 
 @media (max-width: 420px) {
-    .anime-section-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .anime-ranking-item {
         grid-template-columns: 26px 42px minmax(0, 1fr);
     }
