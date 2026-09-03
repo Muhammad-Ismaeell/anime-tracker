@@ -1,12 +1,5 @@
-import {
-    useMemo,
-    useState,
-} from "react";
+import { useMemo } from "react";
 
-import {
-    AnimatePresence,
-    motion,
-} from "framer-motion";
 import { Link } from "react-router-dom";
 
 import AnimeCard from "../AnimeCard";
@@ -48,42 +41,6 @@ export default function AnimeSection({
             }))
             .filter(({ id }) => id != null);
     }, [animeList]);
-
-    const [currentPage, setCurrentPage] = useState(0);
-    const [slideDirection, setSlideDirection] = useState(1);
-
-    const totalPages = Math.ceil(validAnime.length / CARDS_PER_PAGE);
-
-    const visibleAnime = validAnime.slice(
-        currentPage * CARDS_PER_PAGE,
-        (currentPage + 1) * CARDS_PER_PAGE
-    );
-
-    const handleNext = () => {
-        if (currentPage >= totalPages - 1) return;
-        setSlideDirection(1);
-        setCurrentPage((current) =>
-            Math.min(current + 1, totalPages - 1)
-        );
-    };
-
-    const handlePrevious = () => {
-        if (currentPage === 0) return;
-        setSlideDirection(-1);
-        setCurrentPage((current) => Math.max(current - 1, 0));
-    };
-
-    const slideVariants = {
-        enter: (direction) => ({
-            x: direction > 0 ? 45 : -45,
-            opacity: 0,
-        }),
-        center: { x: 0, opacity: 1 },
-        exit: (direction) => ({
-            x: direction > 0 ? -45 : 45,
-            opacity: 0,
-        }),
-    };
 
     if (variant === "ranking") {
         return (
@@ -141,6 +98,8 @@ export default function AnimeSection({
         );
     }
 
+    const visibleAnime = validAnime.slice(0, CARDS_PER_PAGE);
+
     return (
         <section className="home-section">
             <div className="section-header">
@@ -159,78 +118,28 @@ export default function AnimeSection({
             </div>
 
             <div className="anime-section-slider">
-                <AnimatePresence
-                    initial={false}
-                    mode="wait"
-                    custom={slideDirection}
-                >
-                    <motion.div
-                        key={currentPage}
-                        className="anime-section-grid"
-                        custom={slideDirection}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: {
-                                duration: 0.28,
-                                ease: [0.22, 1, 0.36, 1],
-                            },
-                            opacity: {
-                                duration: 0.2,
-                                ease: "easeOut",
-                            },
-                        }}
-                    >
-                        {visibleAnime.map(({ anime, id }) => {
-                            const normalizedAnimeId = String(id);
+                <div className="anime-section-grid">
+                    {visibleAnime.map(({ anime, id }) => {
+                        const normalizedAnimeId = String(id);
 
-                            return (
-                                <AnimeCard
-                                    key={normalizedAnimeId}
-                                    anime={anime}
-                                    statusMap={statusMap}
-                                    isFavorited={safeFavoriteIds.has(normalizedAnimeId)}
-                                    isFavoritePending={toggleFavorite?.isPending ?? false}
-                                    onToggleFavorite={() =>
-                                        toggleFavorite.mutate({
-                                            anime_id: id,
-                                            title: anime.title ?? "",
-                                            image: anime.image ?? "",
-                                        })
-                                    }
-                                />
-                            );
-                        })}
-                    </motion.div>
-                </AnimatePresence>
-
-                {totalPages > 1 && (
-                    <div className="section-page-controls" aria-label={`${title} pages`}>
-                        <button
-                            type="button"
-                            className="section-page-btn"
-                            onClick={handlePrevious}
-                            disabled={currentPage === 0}
-                            aria-label={`Previous ${title.toLowerCase()}`}
-                        >
-                            ←
-                        </button>
-                        <span>
-                            {currentPage + 1} / {totalPages}
-                        </span>
-                        <button
-                            type="button"
-                            className="section-page-btn"
-                            onClick={handleNext}
-                            disabled={currentPage >= totalPages - 1}
-                            aria-label={`Next ${title.toLowerCase()}`}
-                        >
-                            →
-                        </button>
-                    </div>
-                )}
+                        return (
+                            <AnimeCard
+                                key={normalizedAnimeId}
+                                anime={anime}
+                                statusMap={statusMap}
+                                isFavorited={safeFavoriteIds.has(normalizedAnimeId)}
+                                isFavoritePending={toggleFavorite?.isPending ?? false}
+                                onToggleFavorite={() =>
+                                    toggleFavorite.mutate({
+                                        anime_id: id,
+                                        title: anime.title ?? "",
+                                        image: anime.image ?? "",
+                                    })
+                                }
+                            />
+                        );
+                    })}
+                </div>
             </div>
         </section>
     );
