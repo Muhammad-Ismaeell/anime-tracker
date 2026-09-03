@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import JikanClient, is_nsfw
+from anime.infrastructure.jikan.jikan_client import JikanClient
 
 
 class RecommendationService:
@@ -28,24 +28,22 @@ class RecommendationService:
             if not mal_id:
                 continue
 
-            item = {
+            images = entry.get("images") or {}
+            jpg = images.get("jpg") or {}
+            webp = images.get("webp") or {}
+
+            items.append({
+                "id": mal_id,
                 "mal_id": mal_id,
                 "title": entry.get("title") or "Unknown Anime",
                 "image": (
-                    entry.get("images", {})
-                    .get("jpg", {})
-                    .get("image_url")
-                    or entry.get("images", {})
-                    .get("webp", {})
-                    .get("image_url")
+                    jpg.get("image_url")
+                    or webp.get("image_url")
                     or ""
                 ),
                 "score": 0,
                 "type": "",
                 "year": None,
-            }
-
-            if not is_nsfw(item):
-                items.append(item)
+            })
 
         return items
