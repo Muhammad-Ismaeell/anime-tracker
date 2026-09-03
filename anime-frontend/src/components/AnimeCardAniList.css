@@ -4,9 +4,15 @@
    ============================================================ */
 
 .anime-card {
+    position: relative;
     background: transparent;
     border-radius: 4px;
     box-shadow: none;
+}
+
+/* Keep an opened card above neighboring cards and their menus. */
+.anime-card.menu-open {
+    z-index: 30;
 }
 
 .anime-card-poster {
