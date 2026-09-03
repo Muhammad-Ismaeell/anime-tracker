@@ -18,6 +18,7 @@ const AdvancedSearch = lazy(() => import("../pages/AdvancedSearch"));
 const Trending = lazy(() => import("../pages/Trending"));
 const Seasonal = lazy(() => import("../pages/Seasonal"));
 const Top = lazy(() => import("../pages/Top"));
+const RecentlyAdded = lazy(() => import("../pages/RecentlyAdded"));
 
 
 // AUTH
@@ -59,6 +60,7 @@ export default function App() {
                             <Route path="/trending" element={<Trending />} />
                             <Route path="/seasonal" element={<Seasonal />} />
                             <Route path="/top" element={<Top />} />
+                            <Route path="/recently-added" element={<RecentlyAdded />} />
                         </Route>
 
 
