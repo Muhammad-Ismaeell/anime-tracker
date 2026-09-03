@@ -108,9 +108,11 @@ ReactDOM.createRoot(
                             </GoogleOAuthProvider>
 
 
-                            <ReactQueryDevtools
-                                initialIsOpen={false}
-                            />
+                            {import.meta.env.DEV && (
+                                <ReactQueryDevtools
+                                    initialIsOpen={false}
+                                />
+                            )}
 
 
                         </ThemeProvider>
