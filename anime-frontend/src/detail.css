@@ -792,11 +792,13 @@
 ============================================================ */
 
 .detail-progress-save {
-    min-height: 40px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
+
+    border-radius: var(--control-radius);
 
     margin-left: auto;
 
-    padding: 0 15px;
 
     color: white;
 
@@ -809,7 +811,6 @@
 
     border: 1px solid rgba(167, 139, 250, 0.32);
 
-    border-radius: 10px;
 
     font-size: 0.82rem;
     font-weight: 700;
@@ -817,9 +818,9 @@
     cursor: pointer;
 
     transition:
-        transform 0.18s ease,
-        filter 0.18s ease,
-        opacity 0.18s ease;
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
 }
 
 .detail-progress-save:hover:not(:disabled) {
