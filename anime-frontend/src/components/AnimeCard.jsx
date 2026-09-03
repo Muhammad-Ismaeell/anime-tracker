@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -19,6 +18,7 @@ import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 import { useUpdateLibrary } from "../hooks/useLibrary";
 
 import OptimizedImage from "./ui/OptimizedImage";
+import "./AnimeCardAniList.css";
 
 
 function AnimeCard({
@@ -338,10 +338,10 @@ function AnimeCard({
                     : ""
             }`}
             whileHover={{
-                y: -4,
+                y: -2,
             }}
             transition={{
-                duration: 0.18,
+                duration: 0.15,
                 ease: "easeOut",
             }}
         >
@@ -671,6 +671,7 @@ function AnimeCard({
                                             {updateLibrary.isPending
                                                 ? "Saving..."
                                                 : "Save"}
+
                                         </button>
 
                                     </div>
