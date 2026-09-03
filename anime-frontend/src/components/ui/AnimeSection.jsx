@@ -1,4 +1,3 @@
-
 import {
     useMemo,
     useState,
@@ -13,6 +12,8 @@ import AnimeCard from "../AnimeCard";
 
 import { getAnimeId } from "../../utils/normalizeAnime";
 
+import "./AnimeSection.css";
+
 
 export default function AnimeSection({
     title,
@@ -23,8 +24,9 @@ export default function AnimeSection({
     toggleFavorite,
 }) {
 
-    const CARDS_PER_PAGE = 4;
-
+    // Six cards keeps the home sections dense on desktop while the
+    // responsive CSS reduces the visible columns on smaller screens.
+    const CARDS_PER_PAGE = 6;
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
@@ -35,9 +37,7 @@ export default function AnimeSection({
                     : []
             );
 
-
     const validAnime = useMemo(() => {
-
         const list =
             Array.isArray(animeList)
                 ? animeList
@@ -48,197 +48,99 @@ export default function AnimeSection({
                 anime,
                 id: getAnimeId(anime),
             }))
-            .filter(
-                ({ id }) =>
-                    id != null
-            );
-
+            .filter(({ id }) => id != null);
     }, [animeList]);
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const [slideDirection, setSlideDirection] = useState(1);
 
-    const [
-        currentPage,
-        setCurrentPage,
-    ] = useState(0);
+    const totalPages = Math.ceil(
+        validAnime.length / CARDS_PER_PAGE
+    );
 
+    const hasMultiplePages = totalPages > 1;
+    const isFirstPage = currentPage === 0;
+    const isLastPage = currentPage >= totalPages - 1;
 
-    const [
-        slideDirection,
-        setSlideDirection,
-    ] = useState(1);
-
-
-    const totalPages =
-        Math.ceil(
-            validAnime.length /
-            CARDS_PER_PAGE
-        );
-
-
-    const hasMultiplePages =
-        totalPages > 1;
-
-
-    const isFirstPage =
-        currentPage === 0;
-
-
-    const isLastPage =
-        currentPage >=
-        totalPages - 1;
-
-
-    const visibleAnime =
-        validAnime.slice(
-            currentPage * CARDS_PER_PAGE,
-            (currentPage + 1) * CARDS_PER_PAGE
-        );
-
+    const visibleAnime = validAnime.slice(
+        currentPage * CARDS_PER_PAGE,
+        (currentPage + 1) * CARDS_PER_PAGE
+    );
 
     const handlePrevious = () => {
-
-        if (isFirstPage) {
-            return;
-        }
+        if (isFirstPage) return;
 
         setSlideDirection(-1);
-
-        setCurrentPage(
-            (current) =>
-                Math.max(
-                    current - 1,
-                    0
-                )
+        setCurrentPage((current) =>
+            Math.max(current - 1, 0)
         );
     };
-
 
     const handleNext = () => {
-
-        if (isLastPage) {
-            return;
-        }
+        if (isLastPage) return;
 
         setSlideDirection(1);
-
-        setCurrentPage(
-            (current) =>
-                Math.min(
-                    current + 1,
-                    totalPages - 1
-                )
+        setCurrentPage((current) =>
+            Math.min(current + 1, totalPages - 1)
         );
     };
 
-
     const slideVariants = {
-
         enter: (direction) => ({
-            x:
-                direction > 0
-                    ? 45
-                    : -45,
+            x: direction > 0 ? 45 : -45,
             opacity: 0,
         }),
-
         center: {
             x: 0,
             opacity: 1,
         },
-
         exit: (direction) => ({
-            x:
-                direction > 0
-                    ? -45
-                    : 45,
+            x: direction > 0 ? -45 : 45,
             opacity: 0,
         }),
-
     };
-
 
     return (
         <section className="home-section">
-
             <div className="section-header">
-
                 <div className="section-heading">
-
-                    <span className="section-emoji">
+                    <span className="section-emoji" aria-hidden="true">
                         {emoji}
                     </span>
-
-                    <h2>
-                        {title}
-                    </h2>
-
+                    <h2>{title}</h2>
                 </div>
 
-
                 {hasMultiplePages && (
-
                     <div className="section-slider-controls">
-
                         <button
                             type="button"
-                            className={
-                                `section-slider-btn ${
-                                    isFirstPage
-                                        ? "disabled"
-                                        : ""
-                                }`
-                            }
-                            onClick={
-                                handlePrevious
-                            }
-                            disabled={
-                                isFirstPage
-                            }
-                            aria-label={
-                                `Previous ${title.toLowerCase()}`
-                            }
+                            className="section-slider-btn"
+                            onClick={handlePrevious}
+                            disabled={isFirstPage}
+                            aria-label={`Previous ${title.toLowerCase()}`}
                         >
                             ←
                         </button>
 
-
                         <button
                             type="button"
-                            className={
-                                `section-slider-btn ${
-                                    isLastPage
-                                        ? "disabled"
-                                        : ""
-                                }`
-                            }
-                            onClick={
-                                handleNext
-                            }
-                            disabled={
-                                isLastPage
-                            }
-                            aria-label={
-                                `Next ${title.toLowerCase()}`
-                            }
+                            className="section-slider-btn"
+                            onClick={handleNext}
+                            disabled={isLastPage}
+                            aria-label={`Next ${title.toLowerCase()}`}
                         >
                             →
                         </button>
-
                     </div>
-
                 )}
-
             </div>
 
-
             <div className="anime-section-slider">
-
                 <AnimatePresence
                     initial={false}
                     mode="wait"
                     custom={slideDirection}
                 >
-
                     <motion.div
                         key={currentPage}
                         className="anime-section-grid"
@@ -249,81 +151,38 @@ export default function AnimeSection({
                         exit="exit"
                         transition={{
                             x: {
-                                duration: 0.38,
-                                ease: [
-                                    0.22,
-                                    1,
-                                    0.36,
-                                    1,
-                                ],
+                                duration: 0.28,
+                                ease: [0.22, 1, 0.36, 1],
                             },
-
                             opacity: {
-                                duration: 0.25,
+                                duration: 0.2,
                                 ease: "easeOut",
                             },
                         }}
                     >
+                        {visibleAnime.map(({ anime, id }) => {
+                            const normalizedAnimeId = String(id);
 
-                        {visibleAnime.map(
-                            ({
-                                anime,
-                                id,
-                            }) => {
-
-                                const normalizedAnimeId =
-                                    String(id);
-
-                                return (
-                                    <AnimeCard
-                                        key={
-                                            normalizedAnimeId
-                                        }
-
-                                        anime={
-                                            anime
-                                        }
-
-                                        statusMap={
-                                            statusMap
-                                        }
-
-                                        isFavorited={
-                                            safeFavoriteIds.has(
-                                                normalizedAnimeId
-                                            )
-                                        }
-
-                                        isFavoritePending={
-                                            toggleFavorite?.isPending ??
-                                            false
-                                        }
-
-                                        onToggleFavorite={() =>
-                                            toggleFavorite.mutate({
-                                                anime_id:
-                                                    id,
-
-                                                title:
-                                                    anime.title ??
-                                                    "",
-
-                                                image:
-                                                    anime.image ??
-                                                    "",
-                                            })
-                                        }
-                                    />
-                                );
-                            }
-                        )}
-
+                            return (
+                                <AnimeCard
+                                    key={normalizedAnimeId}
+                                    anime={anime}
+                                    statusMap={statusMap}
+                                    isFavorited={safeFavoriteIds.has(normalizedAnimeId)}
+                                    isFavoritePending={toggleFavorite?.isPending ?? false}
+                                    onToggleFavorite={() =>
+                                        toggleFavorite.mutate({
+                                            anime_id: id,
+                                            title: anime.title ?? "",
+                                            image: anime.image ?? "",
+                                        })
+                                    }
+                                />
+                            );
+                        })}
                     </motion.div>
-
                 </AnimatePresence>
-
             </div>
-
         </section>
     );
 }
