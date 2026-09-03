@@ -19,7 +19,7 @@ export default function AnimeSection({
     variant = "grid",
 }) {
 
-    const CARDS_PER_PAGE = 8;
+    const CARDS_PER_PAGE = 7;
     const RANKING_ITEMS = 8;
 
     const safeFavoriteIds =
