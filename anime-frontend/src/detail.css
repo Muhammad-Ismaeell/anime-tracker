@@ -697,8 +697,8 @@
     align-items: center;
     justify-content: center;
 
-    width: 40px;
-    height: 40px;
+    min-width: var(--control-height);
+    min-height: var(--control-height);
 
     flex-shrink: 0;
 
@@ -709,7 +709,7 @@
 
     border: 1px solid var(--detail-border-strong);
 
-    border-radius: 10px;
+    border-radius: var(--control-radius);
 
     font-size: 1.35rem;
     font-weight: 500;
@@ -717,9 +717,9 @@
     cursor: pointer;
 
     transition:
-        background 0.18s ease,
-        border-color 0.18s ease,
-        transform 0.18s ease;
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .detail-progress-step:hover:not(:disabled) {
