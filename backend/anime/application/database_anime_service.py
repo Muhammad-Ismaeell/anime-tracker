@@ -1,4 +1,4 @@
-from django.db.models import Max
+from django.utils import timezone
 
 from anime.infrastructure.models import Anime
 
@@ -21,43 +21,36 @@ class DatabaseAnimeService:
             "has_next": end < total,
         }
 
+    @staticmethod
+    def get_current_season():
+        """Return the actual anime season for today's calendar date."""
+        today = timezone.localdate()
+
+        if today.month <= 3:
+            season = "winter"
+        elif today.month <= 6:
+            season = "spring"
+        elif today.month <= 9:
+            season = "summer"
+        else:
+            season = "fall"
+
+        return today.year, season
+
     @classmethod
     def get_seasonal(cls, page=1):
 
-        # Find the year/season that was synchronized most recently.
-        latest = (
-            Anime.objects
-            .exclude(
-                year__isnull=True,
-                season__isnull=True,
-            )
-            .values(
-                "year",
-                "season",
-            )
-            .annotate(
-                latest_sync=Max("last_synced")
-            )
-            .order_by("-latest_sync")
-            .first()
-        )
-
-        if not latest:
-            return {
-                "items": [],
-                "page": page,
-                "has_next": False,
-            }
+        year, season = cls.get_current_season()
 
         queryset = (
             Anime.objects
             .filter(
-                year=latest["year"],
-                season=latest["season"],
+                year=year,
+                season=season,
             )
             .order_by(
                 "-score",
-                "-id",
+                "mal_id",
             )
         )
 
@@ -97,6 +90,22 @@ class DatabaseAnimeService:
             .order_by(
                 "popularity",
                 "-score",
+            )
+        )
+
+        return cls.paginate(
+            queryset,
+            page,
+        )
+
+    @classmethod
+    def get_recently_added(cls, page=1):
+
+        queryset = (
+            Anime.objects
+            .order_by(
+                "-created_at",
+                "-id",
             )
         )
 
