@@ -42,13 +42,18 @@ class DatabaseAnimeService:
 
         year, season = cls.get_current_season()
 
+        # Prefer the most popular shows within the actual current season.
+        # This prevents obscure high-scoring titles from dominating the
+        # Home section and makes the ordering closer to an anime catalogue.
         queryset = (
             Anime.objects
             .filter(
                 year=year,
                 season=season,
+                popularity__isnull=False,
             )
             .order_by(
+                "popularity",
                 "-score",
                 "mal_id",
             )
