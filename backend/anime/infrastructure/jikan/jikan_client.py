@@ -37,6 +37,8 @@ def safe_request(url, params=None, retries=3):
                     "-f",
                     "-A",
                     "Mozilla/5.0",
+                    "--write-out",
+                    "\n%{http_code}",
                     url,
                 ],
                 capture_output=True,
@@ -44,12 +46,26 @@ def safe_request(url, params=None, retries=3):
                 timeout=60,
             )
 
+            stdout = result.stdout or ""
+            http_code = "unknown"
+
+            if "\n" in stdout:
+                body, possible_code = stdout.rsplit("\n", 1)
+
+                if possible_code.isdigit():
+                    stdout = body
+                    http_code = possible_code
+
             if result.returncode != 0:
                 logger.warning(
-                    "Jikan curl failed (attempt %s/%s): %s",
+                    "Jikan curl failed (attempt %s/%s): "
+                    "returncode=%s, http_status=%s, stderr=%s, url=%s",
                     attempt + 1,
                     retries,
-                    result.stderr.strip() or "unknown curl error",
+                    result.returncode,
+                    http_code,
+                    result.stderr.strip() or "<empty>",
+                    url,
                 )
 
                 if attempt < retries - 1:
@@ -58,12 +74,14 @@ def safe_request(url, params=None, retries=3):
 
                 return None
 
-            if not result.stdout:
+            if not stdout:
                 logger.warning(
-                    "Jikan returned an empty response for %s (attempt %s/%s)",
+                    "Jikan returned an empty response for %s "
+                    "(attempt %s/%s, http_status=%s)",
                     url,
                     attempt + 1,
                     retries,
+                    http_code,
                 )
 
                 if attempt < retries - 1:
@@ -72,14 +90,15 @@ def safe_request(url, params=None, retries=3):
 
                 return None
 
-            data = json.loads(result.stdout)
+            data = json.loads(stdout)
 
             # Jikan errors are JSON too
             if "status" in data and data.get("status") != 200:
                 logger.warning(
-                    "Jikan error (attempt %s/%s): %s",
+                    "Jikan error (attempt %s/%s, http_status=%s): %s",
                     attempt + 1,
                     retries,
+                    http_code,
                     data,
                 )
 
@@ -94,17 +113,20 @@ def safe_request(url, params=None, retries=3):
         except subprocess.TimeoutExpired:
 
             logger.warning(
-                "Curl timeout (%s/%s)",
+                "Curl timeout (%s/%s): %s",
                 attempt + 1,
                 retries,
+                url,
             )
 
         except json.JSONDecodeError:
 
             logger.warning(
-                "Invalid JSON response (%s/%s)",
+                "Invalid JSON response (%s/%s): http_status=%s, url=%s",
                 attempt + 1,
                 retries,
+                http_code,
+                url,
             )
 
         except Exception as exc:
