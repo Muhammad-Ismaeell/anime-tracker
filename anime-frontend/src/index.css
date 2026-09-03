@@ -3732,14 +3732,11 @@ button:disabled {
     align-items: center;
     justify-content: center;
 
-    min-height: 46px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
-    padding: 0 18px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.10);
-
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: var(--control-radius);
 
     background:
         linear-gradient(
@@ -3750,6 +3747,7 @@ button:disabled {
 
     color: #fff;
 
+    font: inherit;
     font-size: 13px;
     font-weight: 800;
 
@@ -3759,9 +3757,9 @@ button:disabled {
         0 10px 26px rgba(99, 102, 241, 0.20);
 
     transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
 }
 
 .favorite-button:hover {
