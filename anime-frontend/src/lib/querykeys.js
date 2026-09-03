@@ -6,6 +6,7 @@ export const queryKeys = {
         trending: ["anime", "trending"],
         seasonal: ["anime", "seasonal"],
         top: ["anime", "top"],
+        recentlyAdded: ["anime", "recently-added"],
 
         search: (query, filters = {}) => [
             "anime",
