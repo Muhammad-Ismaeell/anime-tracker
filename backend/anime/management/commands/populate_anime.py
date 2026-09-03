@@ -1,4 +1,3 @@
-
 import time
 
 from django.core.management.base import BaseCommand
@@ -20,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--max-pages",
             type=int,
-            default=5,
+            default=10,
             help=(
                 "Maximum number of pages to process "
                 "for each source."
@@ -30,7 +29,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--delay",
             type=float,
-            default=1.5,
+            default=3,
             help=(
                 "Delay between Jikan requests "
                 "in seconds."
@@ -215,6 +214,10 @@ class Command(BaseCommand):
         ]
 
         sources = [
+            (
+                "All Anime",
+                client.get_all_anime,
+            ),
             (
                 "Top Anime",
                 client.get_top,
