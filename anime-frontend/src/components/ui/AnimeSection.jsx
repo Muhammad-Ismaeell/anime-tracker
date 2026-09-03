@@ -118,7 +118,7 @@ export default function AnimeSection({
             </div>
 
             <div className="anime-section-slider">
-                <div className="anime-section-grid">
+                <div className="grid anime-section-grid">
                     {visibleAnime.map(({ anime, id }) => {
                         const normalizedAnimeId = String(id);
 
