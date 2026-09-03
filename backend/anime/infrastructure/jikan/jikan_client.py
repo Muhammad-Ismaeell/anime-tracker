@@ -29,12 +29,21 @@ def safe_request(url, params=None, retries=3):
 
     for attempt in range(retries):
 
+        http_code = "unknown"
+
         try:
             result = subprocess.run(
                 [
                     "curl",
-                    "-s",
+                    "-sS",
                     "-f",
+                    "--http1.1",
+                    "-4",
+                    "-L",
+                    "-H",
+                    "Accept: application/json",
+                    "-H",
+                    "Accept-Encoding: gzip",
                     "-A",
                     "Mozilla/5.0",
                     "--write-out",
@@ -47,7 +56,6 @@ def safe_request(url, params=None, retries=3):
             )
 
             stdout = result.stdout or ""
-            http_code = "unknown"
 
             if "\n" in stdout:
                 body, possible_code = stdout.rsplit("\n", 1)
