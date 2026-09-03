@@ -20,7 +20,14 @@ class Command(BaseCommand):
             "--max-pages",
             type=int,
             default=10,
-            help="Maximum number of pages to process for each source.",
+            help="Maximum number of pages for specialized sources.",
+        )
+
+        parser.add_argument(
+            "--catalog-pages",
+            type=int,
+            default=100,
+            help="Maximum number of pages for the general anime catalog.",
         )
 
         parser.add_argument(
@@ -108,6 +115,7 @@ class Command(BaseCommand):
         max_pages,
         delay,
         request_retries,
+        continue_after_failure=False,
     ):
 
         total_new = 0
@@ -141,6 +149,13 @@ class Command(BaseCommand):
                         f"{request_retries + 1} attempts."
                     )
                 )
+
+                # A transient failure in the large catalog should not
+                # prevent later pages from being populated.
+                if continue_after_failure:
+                    time.sleep(delay)
+                    continue
+
                 break
 
             items = response.get("items", [])
@@ -185,23 +200,24 @@ class Command(BaseCommand):
         service = AnimeService(client)
 
         max_pages = options["max_pages"]
+        catalog_pages = options["catalog_pages"]
         delay = options["delay"]
         source_delay = options["source_delay"]
         request_retries = options["request_retries"]
 
-        # Seasonal is intentionally first because the standalone
-        # populate_seasonal command reliably reaches this endpoint.
-        # Running it before the other sources also gives Jikan a clean
-        # request window before the larger catalog population begins.
+        # The general catalog is the main population source because it
+        # provides much more coverage than category-specific endpoints.
+        # Seasonal remains first so current-season data is available even
+        # when Jikan later becomes unreliable for deeper catalog pages.
         sources = [
-            ("Seasonal Anime", client.get_seasonal),
-            ("Top Anime", client.get_top),
-            ("All Anime", client.get_all_anime),
-            ("Upcoming Anime", client.get_upcoming),
-            ("Currently Airing", client.get_airing),
-            ("Movies", client.get_movies),
-            ("OVA", client.get_ova),
-            ("ONA", client.get_ona),
+            ("Seasonal Anime", client.get_seasonal, max_pages, False),
+            ("Top Anime", client.get_top, max_pages, False),
+            ("All Anime", client.get_all_anime, catalog_pages, True),
+            ("Upcoming Anime", client.get_upcoming, max_pages, False),
+            ("Currently Airing", client.get_airing, max_pages, False),
+            ("Movies", client.get_movies, max_pages, False),
+            ("OVA", client.get_ova, max_pages, False),
+            ("ONA", client.get_ona, max_pages, False),
         ]
 
         total_new = 0
@@ -225,12 +241,13 @@ class Command(BaseCommand):
             )
         )
         self.stdout.write(f"Sources: {len(sources)}")
-        self.stdout.write(f"Maximum pages per source: {max_pages}")
+        self.stdout.write(f"Specialized source pages: {max_pages}")
+        self.stdout.write(f"General catalog pages: {catalog_pages}")
         self.stdout.write(f"Delay between requests: {delay}s")
         self.stdout.write(f"Delay between sources: {source_delay}s")
         self.stdout.write(f"Retries per failed page: {request_retries}")
 
-        for index, (name, fetcher) in enumerate(sources):
+        for index, (name, fetcher, page_limit, continue_after_failure) in enumerate(sources):
 
             (
                 new_count,
@@ -241,9 +258,10 @@ class Command(BaseCommand):
                 name=name,
                 fetcher=fetcher,
                 service=service,
-                max_pages=max_pages,
+                max_pages=page_limit,
                 delay=delay,
                 request_retries=request_retries,
+                continue_after_failure=continue_after_failure,
             )
 
             total_new += new_count
