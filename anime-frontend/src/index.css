@@ -3,20 +3,37 @@
 ========================= */
 
 :root {
-    --text: #d1d5db;
-    --text-light: #9ca3af;
-    --heading: #ffffff;
-
     --bg: #0f1117;
-    --card: #111827;
 
-    --shadow: 0 10px 30px rgba(0,0,0,0.35);
-    --radius: 18px;
+    --surface: #111827;
+    --surface-hover: #1f2937;
+
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+
+    --accent: #8b5cf6;
+    --accent-hover: #7c3aed;
+
+    --border: rgba(255, 255, 255, 0.08);
+
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+
+    --transition-fast: 0.15s ease;
     --transition: 0.25s ease;
 
     font-family: Inter, system-ui, sans-serif;
     color-scheme: dark;
 }
+
 .footer {
     margin-top: 70px;
 
