@@ -762,12 +762,12 @@ body {
     align-items: center;
 
     width: 100%;
-    min-height: 34px;
+    min-height: var(--control-height);
 
-    padding: 0.5rem 0.65rem;
+    padding: 0 var(--control-padding-x);
 
     border: 0;
-    border-radius: 0.45rem;
+    border-radius: var(--control-radius);
 
     background: transparent;
     color: var(--text-primary);
