@@ -235,6 +235,20 @@ class JikanClient:
 
         return anime
 
+    def get_recommendations(self, anime_id):
+        """
+        Fetch anime recommendations from Tenrai.
+        """
+        data = safe_request(
+            f"{BASE_URL}/anime/{anime_id}/recommendations",
+            params={"sfw": "true"},
+        )
+
+        if not data:
+            return []
+
+        return data.get("data", [])
+
     # ==================================================
     # TOP
     # ==================================================
