@@ -320,7 +320,7 @@ function EditProfile() {
 
                 <button
                     type="button"
-                    onClick={() => refetch()}
+                    onClick={refetch}
                 >
                     Try Again
                 </button>

@@ -96,7 +96,7 @@ function Trending() {
                 <button
                     type="button"
                     className="load-more-btn"
-                    onClick={() => fetchNextPage()}
+                    onClick={fetchNextPage}
                     disabled={isFetchingNextPage}
                 >
                     {isFetchingNextPage

@@ -194,7 +194,7 @@ function Dashboard() {
                     <button
                         type="button"
                         className="retry-btn"
-                        onClick={() => refetch()}
+                        onClick={refetch}
                         disabled={isFetching}
                     >
                         {isFetching
