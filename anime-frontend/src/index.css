@@ -531,7 +531,7 @@ body {
 }
 
 .anime-card-title-link:hover .title {
-    color: var(--accent-color);
+    color: var(--accent);
 }
 
 
@@ -608,7 +608,7 @@ body {
 
     padding: 0.35rem 0.65rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.5rem;
 
     background: var(--surface);
@@ -629,7 +629,7 @@ body {
 
 .anime-card .status-badge:hover {
     background: var(--surface-hover);
-    border-color: var(--accent-color);
+    border-color: var(--accent);
     color: var(--text-primary);
 
     transform: translateY(-1px);
@@ -708,7 +708,7 @@ body {
 
     background: black;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.55rem;
 
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
@@ -805,7 +805,7 @@ body {
 
     margin: 0.35rem 0;
 
-    background: var(--border-color);
+    background: var(--border);
 
     opacity: 0.7;
 }
@@ -8097,7 +8097,7 @@ button:disabled {
     margin: 2rem 0 3rem;
     padding: 1.5rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 1rem;
 
     background: var(--surface);
@@ -8171,7 +8171,7 @@ button:disabled {
         0
         1rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.7rem;
 
     outline: none;
@@ -8193,13 +8193,13 @@ button:disabled {
 }
 
 .home-explore-search input:focus {
-    border-color: var(--accent-color);
+    border-color: var(--accent);
 
     box-shadow:
         0 0 0 3px
         color-mix(
             in srgb,
-            var(--accent-color) 12%,
+            var(--accent) 12%,
             transparent
         );
 }
@@ -8267,7 +8267,7 @@ button:disabled {
 }
 
 .home-explore-clear:hover {
-    background: var(--border-color);
+    background: var(--border);
     color: var(--text-primary);
 }
 
@@ -8286,7 +8286,7 @@ button:disabled {
     border: 0;
     border-radius: 0.7rem;
 
-    background: var(--accent-color);
+    background: var(--accent);
     color: white;
 
     font-family: inherit;
@@ -8329,7 +8329,7 @@ button:disabled {
 
     overflow: hidden;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.8rem;
 
     background: var(--surface);
@@ -8480,7 +8480,7 @@ button:disabled {
 
     padding: 0.8rem 1rem;
 
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border);
 
     color: var(--text-muted);
 
@@ -8522,7 +8522,7 @@ button:disabled {
 
     padding: 0.45rem 0.7rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.55rem;
 
     background: var(--background);
@@ -8542,7 +8542,7 @@ button:disabled {
 }
 
 .home-explore-link:hover {
-    border-color: var(--accent-color);
+    border-color: var(--accent);
 
     background: var(--surface-hover);
     color: var(--text-primary);
@@ -10061,7 +10061,7 @@ button:disabled {
     min-height: 42px;
     padding: 0.7rem 1rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.7rem;
 
     background: var(--surface);
@@ -10088,7 +10088,7 @@ button:disabled {
     transform: translateY(-2px);
 
     background: var(--surface-hover);
-    border-color: var(--accent-color);
+    border-color: var(--accent);
 
     color: var(--text-primary);
 
@@ -10103,7 +10103,7 @@ button:disabled {
 .dashboard-library-btn:focus-visible,
 .section-action:focus-visible,
 .dashboard-empty-action:focus-visible {
-    outline: 2px solid var(--accent-color);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
 
@@ -10166,7 +10166,7 @@ button:disabled {
     min-height: 40px;
     padding: 0.65rem 0.9rem;
 
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border);
     border-radius: 0.65rem;
 
     background: var(--surface);
@@ -10191,7 +10191,7 @@ button:disabled {
     transform: translateY(-2px);
 
     background: var(--surface-hover);
-    border-color: var(--accent-color);
+    border-color: var(--accent);
 
     box-shadow:
         0 10px 22px rgba(0, 0, 0, 0.16);
