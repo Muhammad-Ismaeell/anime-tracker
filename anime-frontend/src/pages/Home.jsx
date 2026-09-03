@@ -204,21 +204,21 @@ function Home() {
                     <AnimeSection
                         title="Trending Now"
                         animeList={trendingAnime}
-                        viewAllTo="/anime?order_by=popularity&sort=asc"
+                        viewAllTo="/trending"
                         {...sectionProps}
                     />
 
                     <AnimeSection
                         title="Current Season"
                         animeList={seasonalAnime}
-                        viewAllTo={`/anime?season=${currentSeason}&year=${currentYear}`}
+                        viewAllTo="/seasonal"
                         {...sectionProps}
                     />
 
                     <AnimeSection
                         title="Recently Added"
                         animeList={recentlyAddedAnime}
-                        viewAllTo="/anime"
+                        viewAllTo="/search"
                         {...sectionProps}
                     />
 
@@ -226,7 +226,7 @@ function Home() {
                         title="Top Anime"
                         animeList={topAnime}
                         variant="ranking"
-                        viewAllTo="/anime?order_by=score&sort=desc"
+                        viewAllTo="/top"
                         {...sectionProps}
                     />
                 </div>
