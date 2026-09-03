@@ -12,6 +12,7 @@ from anime.api.docs import (
     AnimeListResponseSerializer,
     AnimeSearchResponseSerializer,
     AnimeDetailResponseSerializer,
+    AnimeRecommendationsResponseSerializer,
 )
 from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
@@ -217,7 +218,7 @@ def anime_search(request):
     summary="Anime Recommendations",
     description="Return SFW anime recommendations for one anime.",
     responses={
-        200: AnimeListResponseSerializer
+        200: AnimeRecommendationsResponseSerializer
     },
 )
 @api_view(["GET"])
