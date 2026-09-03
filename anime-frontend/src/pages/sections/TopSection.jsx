@@ -3,7 +3,7 @@ import AnimeCard from "../../components/AnimeCard";
 import { useFavorites } from "../../hooks/user/useFavorites";
 import Section from "../../components/ui/Section";
 import ErrorState from "../../components/ui/ErrorState";
-import AnimeCardSkeleton from "../../components/ui/AnimeCardSkeleton";
+import AnimeCardSkeleton from "../../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../../components/ui/EmptyState";
 function TopSection() {
 

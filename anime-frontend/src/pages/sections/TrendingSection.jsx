@@ -4,7 +4,7 @@ import { useFavorites } from "../../hooks/user/useFavorites";
 import ErrorState from "../../components/ui/ErrorState";
 import Section from "../../components/ui/Section";
 import EmptyState from "../../components/ui/EmptyState";
-import AnimeCardSkeleton from "../../components/ui/AnimeCardSkeleton";
+import AnimeCardSkeleton from "../../components/skeletons/AnimeCardSkeleton";
 function TrendingSection() {
 
     const { data, isLoading,isError } = useAnimeFeed("trending");
