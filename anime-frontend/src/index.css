@@ -27,6 +27,10 @@
     --radius-md: 12px;
     --radius-lg: 18px;
 
+    --control-height: 40px;
+    --control-padding-x: 14px;
+    --control-radius: 10px;
+
     --transition-fast: 0.15s ease;
     --transition: 0.25s ease;
 
