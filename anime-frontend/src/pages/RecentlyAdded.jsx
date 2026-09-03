@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import "../styles/infinite-scroll.css";
+
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import { useToggleFavorite } from "../hooks/user/useFavorites";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
