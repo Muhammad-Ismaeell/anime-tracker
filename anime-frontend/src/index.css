@@ -4141,10 +4141,11 @@ button:disabled {
 
     margin-top: 4px;
 
-    padding: 14px 18px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
     border: none;
-    border-radius: 13px;
+    border-radius: var(--control-radius);
 
     background: linear-gradient(
         135deg,
@@ -4154,15 +4155,16 @@ button:disabled {
 
     color: #fff;
 
+    font: inherit;
     font-size: 14px;
     font-weight: 700;
 
     cursor: pointer;
 
     transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        opacity 0.2s ease;
+        transform var(--transition),
+        box-shadow var(--transition),
+        opacity var(--transition);
 }
 
 .auth-submit:hover {
