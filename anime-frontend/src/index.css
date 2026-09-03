@@ -640,12 +640,12 @@ body {
     gap: 0.3rem;
 
     max-width: 100%;
-    min-height: 30px;
+    min-height: var(--control-height);
 
-    padding: 0.35rem 0.65rem;
+    padding: 0 var(--control-padding-x);
 
     border: 1px solid var(--border);
-    border-radius: 0.5rem;
+    border-radius: var(--control-radius);
 
     background: var(--surface);
     color: var(--text-muted);
@@ -657,10 +657,10 @@ body {
     cursor: pointer;
 
     transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.15s ease;
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .anime-card .status-badge:hover {
