@@ -1352,18 +1352,38 @@ body {
 ========================= */
 
 .content select {
+    width: 100%;
+    min-height: var(--control-height);
+
     margin-top: 6px;
+    padding: 0 var(--control-padding-x);
 
-    background: #1f2937;
+    border: 1px solid var(--border);
+    border-radius: var(--control-radius);
 
-    border: 1px solid
-        rgba(255, 255, 255, 0.08);
+    background: var(--surface);
+    color: var(--text-primary);
 
-    color: white;
+    font: inherit;
 
-    padding: 8px;
+    cursor: pointer;
 
-    border-radius: 10px;
+    transition:
+        border-color var(--transition-fast),
+        background-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.content select:focus {
+    outline: none;
+    border-color: var(--accent);
+
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.content select:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* =========================
