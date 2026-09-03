@@ -15,6 +15,16 @@ import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import { extractAnimePages } from "../utils/extractAnimePages";
 
+function getCurrentSeason() {
+    const date = new Date();
+    const month = date.getMonth() + 1;
+
+    if (month <= 3) return { year: date.getFullYear(), season: "winter" };
+    if (month <= 6) return { year: date.getFullYear(), season: "spring" };
+    if (month <= 9) return { year: date.getFullYear(), season: "summer" };
+    return { year: date.getFullYear(), season: "fall" };
+}
+
 function Home() {
     const trendingQuery = useInfiniteAnime("trending");
     const seasonalQuery = useInfiniteAnime("seasonal");
@@ -56,6 +66,11 @@ function Home() {
 
         return topAnime.find((anime) => anime?.image);
     }, [seasonalAnime, topAnime]);
+
+    const { year: currentYear, season: currentSeason } = useMemo(
+        getCurrentSeason,
+        []
+    );
 
     const loading =
         trendingQuery.isPending ||
@@ -189,24 +204,29 @@ function Home() {
                     <AnimeSection
                         title="Trending Now"
                         animeList={trendingAnime}
+                        viewAllTo="/anime?order_by=popularity&sort=asc"
                         {...sectionProps}
                     />
 
                     <AnimeSection
                         title="Current Season"
                         animeList={seasonalAnime}
-                        {...sectionProps}
-                    />
-
-                    <AnimeSection
-                        title="Top Anime"
-                        animeList={topAnime}
+                        viewAllTo={`/anime?season=${currentSeason}&year=${currentYear}`}
                         {...sectionProps}
                     />
 
                     <AnimeSection
                         title="Recently Added"
                         animeList={recentlyAddedAnime}
+                        viewAllTo="/anime"
+                        {...sectionProps}
+                    />
+
+                    <AnimeSection
+                        title="Top Anime"
+                        animeList={topAnime}
+                        variant="ranking"
+                        viewAllTo="/anime?order_by=score&sort=desc"
                         {...sectionProps}
                     />
                 </div>
