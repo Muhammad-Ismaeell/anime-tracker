@@ -36,73 +36,113 @@
     display: none;
 }
 
-.section-slider-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
+.section-view-all {
     flex-shrink: 0;
-}
-
-.section-slider-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: transparent;
     color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1;
-    cursor: pointer;
-    transition:
-        background-color var(--transition-fast),
-        border-color var(--transition-fast),
-        color var(--transition-fast);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--transition-fast);
 }
 
-.section-slider-btn:hover:not(:disabled) {
-    background: var(--surface-hover);
-    border-color: rgba(255, 255, 255, 0.14);
-    color: var(--text-primary);
-}
-
-.section-slider-btn:disabled,
-.section-slider-btn.disabled {
-    opacity: 0.3;
-    cursor: default;
+.section-view-all:hover {
+    color: var(--accent);
 }
 
 .anime-section-slider {
     width: 100%;
-    overflow: hidden;
+    overflow: visible;
 }
 
-/* Compact cards with a small, consistent gap between shows. */
+/* Eight equal columns keep the cards compact without leftover spacing. */
 .anime-section-grid {
     display: grid;
-    grid-template-columns: repeat(8, 150px);
-    justify-content: start;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 12px;
     width: 100%;
+    overflow: visible;
 }
 
 .anime-section-grid .anime-card {
-    width: 150px;
-    min-width: 150px;
+    width: 100%;
+    min-width: 0;
 }
 
-@media (max-width: 1300px) {
-    .anime-section-grid {
-        grid-template-columns: repeat(8, minmax(0, 1fr));
-    }
+/* ============================================================
+   VERTICAL TOP RANKING
+   ============================================================ */
 
-    .anime-section-grid .anime-card {
-        width: 100%;
-        min-width: 0;
-    }
+.home-section-ranking {
+    margin-bottom: 2.5rem;
+}
+
+.anime-ranking-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid var(--border);
+}
+
+.anime-ranking-item {
+    display: grid;
+    grid-template-columns: 34px 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 70px;
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--border);
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+}
+
+.anime-ranking-item:hover {
+    background: var(--surface-hover);
+}
+
+.anime-ranking-number {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.anime-ranking-image {
+    width: 48px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 3px;
+    background: var(--surface);
+}
+
+.anime-ranking-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+
+.anime-ranking-info strong {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.anime-ranking-info span {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    line-height: 1.25;
+}
+
+.anime-ranking-score {
+    flex-shrink: 0;
+    color: var(--text-primary);
+    font-size: 0.72rem;
+    font-weight: 600;
 }
 
 @media (max-width: 1150px) {
@@ -144,9 +184,14 @@
         gap: 0.65rem;
     }
 
-    .section-slider-btn {
-        width: 28px;
-        height: 28px;
+    .anime-ranking-item {
+        grid-template-columns: 28px 44px minmax(0, 1fr) auto;
+        gap: 9px;
+    }
+
+    .anime-ranking-image {
+        width: 44px;
+        height: 59px;
     }
 }
 
@@ -154,10 +199,12 @@
     .anime-section-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-}
 
-@media (prefers-reduced-motion: reduce) {
-    .section-slider-btn {
-        transition: none;
+    .anime-ranking-item {
+        grid-template-columns: 26px 42px minmax(0, 1fr);
+    }
+
+    .anime-ranking-score {
+        display: none;
     }
 }
