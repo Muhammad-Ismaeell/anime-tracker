@@ -4,119 +4,53 @@ import {
     useEffect,
     useContext,
 } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import {
-    Link,
-    useNavigate,
-} from "react-router-dom";
-
-import {
-    AuthContext,
-} from "../../context/AuthContext";
-
-import {
-    useNavbarSearch,
-} from "../../hooks/useNavbarSearch";
-
-import {
-    useDebounce,
-} from "../../hooks/useDebounce";
-
+import { AuthContext } from "../../context/AuthContext";
+import { useNavbarSearch } from "../../hooks/useNavbarSearch";
+import { useDebounce } from "../../hooks/useDebounce";
 import { useProfile } from "../../hooks/useProfile";
 import { getMediaUrl } from "../../utils/mediaUrl";
 
 import "./Navbar.css";
-
 
 function NavBar({
     onMenuToggle = () => {},
     sidebarOpen = false,
 }) {
     const navigate = useNavigate();
-
-    const {
-        isAuthenticated,
-        user,
-        loading,
-        logout,
-    } = useContext(AuthContext);
-
-    const {
-        data: profile,
-    } = useProfile();
+    const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
+    const { data: profile } = useProfile();
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-    const debouncedQuery =
-        useDebounce(query, 500);
-
-    const {
-        data: results = [],
-        isLoading,
-    } = useNavbarSearch(
-        debouncedQuery
-    );
+    const debouncedQuery = useDebounce(query, 500);
+    const { data: results = [], isLoading } = useNavbarSearch(debouncedQuery);
 
     const dropdownRef = useRef(null);
     const profileMenuRef = useRef(null);
 
-
-    const profileAvatar =
-        profile?.profile?.avatar ??
-        null;
-
-    const username =
-        user?.username ||
-        "Profile";
-
-    const avatarUrl =
-        profileAvatar
-            ? getMediaUrl(profileAvatar)
-            : null;
-
-    const avatarFallback =
-        username
-            .charAt(0)
-            .toUpperCase() ||
-        "U";
-
+    const profileAvatar = profile?.profile?.avatar ?? null;
+    const username = user?.username || "Profile";
+    const avatarUrl = profileAvatar ? getMediaUrl(profileAvatar) : null;
+    const avatarFallback = username.charAt(0).toUpperCase() || "U";
+    const hasSearchQuery = query.trim().length >= 3;
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(
-                    event.target
-                )
-            ) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setOpen(false);
             }
-
-            if (
-                profileMenuRef.current &&
-                !profileMenuRef.current.contains(
-                    event.target
-                )
-            ) {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
                 setProfileMenuOpen(false);
             }
         };
 
-        document.addEventListener(
-            "mousedown",
-            handleClickOutside
-        );
-
-        return () => {
-            document.removeEventListener(
-                "mousedown",
-                handleClickOutside
-            );
-        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
 
     useEffect(() => {
         const handleEscape = (event) => {
@@ -126,167 +60,83 @@ function NavBar({
             }
         };
 
-        window.addEventListener(
-            "keydown",
-            handleEscape
-        );
-
-        return () => {
-            window.removeEventListener(
-                "keydown",
-                handleEscape
-            );
-        };
+        window.addEventListener("keydown", handleEscape);
+        return () => window.removeEventListener("keydown", handleEscape);
     }, []);
 
-
-    useEffect(() => {
-        if (!profileMenuOpen) {
-            return undefined;
-        }
-
-        const previousOverflow =
-            document.body.style.overflow;
-
-        document.body.style.overflow = "hidden";
-
-        return () => {
-            document.body.style.overflow =
-                previousOverflow;
-        };
-    }, [profileMenuOpen]);
-
-
     const handleSelect = (anime) => {
-        const id =
-            anime?.id ??
-            anime?.mal_id;
-
-        if (id == null) {
-            return;
-        }
+        const id = anime?.id ?? anime?.mal_id;
+        if (id == null) return;
 
         setOpen(false);
         setQuery("");
-
         navigate(`/anime/${id}`);
     };
 
-
     const handleSearchSubmit = () => {
         const value = query.trim();
-
-        if (!value) {
-            return;
-        }
+        if (!value) return;
 
         setOpen(false);
-
-        navigate(
-            `/search?q=${encodeURIComponent(value)}`
-        );
+        navigate(`/search?q=${encodeURIComponent(value)}`);
     };
-
-
-    const handleProfileToggle = () => {
-        setProfileMenuOpen((current) => !current);
-    };
-
 
     const handleLogout = () => {
         setProfileMenuOpen(false);
         logout();
     };
 
-
-    const hasSearchQuery =
-        query.trim().length >= 3;
-
-
     return (
         <header className="navbar">
-            {/* LEFT */}
             <div className="navbar-left">
                 <button
                     type="button"
                     className="navbar-menu-button"
                     onClick={onMenuToggle}
-                    aria-label={
-                        sidebarOpen
-                            ? "Close navigation"
-                            : "Open navigation"
-                    }
+                    aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
                     aria-expanded={sidebarOpen}
                 >
                     {sidebarOpen ? "✕" : "☰"}
                 </button>
 
-                <Link
-                    to="/"
-                    className="navbar-logo"
-                    aria-label="Anime Tracker home"
-                >
-                    <span className="logo-icon">
-                        🎬
-                    </span>
-
-                    <span className="navbar-logo-text">
-                        Anime Tracker
-                    </span>
+                <Link to="/" className="navbar-logo" aria-label="Anime Tracker home">
+                    <span className="logo-mark" aria-hidden="true">A</span>
+                    <span className="navbar-logo-text">Anime Tracker</span>
                 </Link>
+
+                <nav className="navbar-nav" aria-label="Primary navigation">
+                    <Link to="/" className="navbar-nav-link">Home</Link>
+                    <Link to="/search" className="navbar-nav-link">Anime</Link>
+                    {isAuthenticated && (
+                        <Link to="/library" className="navbar-nav-link">Library</Link>
+                    )}
+                    {isAuthenticated && (
+                        <Link to="/favorites" className="navbar-nav-link">Favorites</Link>
+                    )}
+                </nav>
             </div>
 
-
-            {/* CENTER SEARCH */}
-            <div
-                ref={dropdownRef}
-                className="navbar-search-wrapper"
-            >
+            <div ref={dropdownRef} className="navbar-search-wrapper">
                 <div className="navbar-search">
-                    <span
-                        className="navbar-search-icon"
-                        aria-hidden="true"
-                    >
-                        🔎
-                    </span>
-
+                    <span className="navbar-search-icon" aria-hidden="true">⌕</span>
                     <input
                         value={query}
                         onChange={(event) => {
-                            setQuery(
-                                event.target.value
-                            );
+                            setQuery(event.target.value);
                             setOpen(true);
                         }}
                         onFocus={() => {
-                            if (query.trim()) {
-                                setOpen(true);
-                            }
+                            if (query.trim()) setOpen(true);
                         }}
                         onKeyDown={(event) => {
-                            if (
-                                event.key ===
-                                "Enter"
-                            ) {
-                                handleSearchSubmit();
-                            }
-
-                            if (
-                                event.key ===
-                                "Escape"
-                            ) {
-                                setOpen(false);
-                            }
+                            if (event.key === "Enter") handleSearchSubmit();
+                            if (event.key === "Escape") setOpen(false);
                         }}
                         placeholder="Search anime..."
                         className="navbar-search-input"
                         aria-label="Search anime"
-                        aria-expanded={
-                            open &&
-                            hasSearchQuery
-                        }
+                        aria-expanded={open && hasSearchQuery}
                     />
-
                     {query && (
                         <button
                             type="button"
@@ -302,232 +152,100 @@ function NavBar({
                     )}
                 </div>
 
-
                 {open && hasSearchQuery && (
                     <div className="navbar-dropdown">
                         {isLoading ? (
-                            <div className="navbar-message">
-                                Searching anime...
-                            </div>
+                            <div className="navbar-message">Searching anime...</div>
                         ) : results.length === 0 ? (
-                            <div className="navbar-message">
-                                No anime found
-                            </div>
+                            <div className="navbar-message">No anime found</div>
                         ) : (
-                            results
-                                .slice(0, 6)
-                                .map((anime) => (
-                                    <button
-                                        type="button"
-                                        key={
-                                            anime.id ??
-                                            anime.mal_id
-                                        }
-                                        className="navbar-result"
-                                        onClick={() =>
-                                            handleSelect(
-                                                anime
-                                            )
-                                        }
-                                    >
-                                        <img
-                                            src={
-                                                anime.image
-                                            }
-                                            alt=""
-                                            className="navbar-thumb"
-                                        />
-
-                                        <span className="navbar-result-info">
-                                            <span className="navbar-title">
-                                                {
-                                                    anime.title
-                                                }
-                                            </span>
-
-                                            <span className="navbar-meta">
-                                                {
-                                                    anime.type
-                                                }
-                                            </span>
-                                        </span>
-                                    </button>
-                                ))
-                        )}
-
-                        {!isLoading &&
-                            results.length > 0 && (
+                            results.slice(0, 6).map((anime) => (
                                 <button
                                     type="button"
-                                    className="navbar-view-all"
-                                    onClick={
-                                        handleSearchSubmit
-                                    }
+                                    key={anime.id ?? anime.mal_id}
+                                    className="navbar-result"
+                                    onClick={() => handleSelect(anime)}
                                 >
-                                    View all results
-                                    <span>
-                                        →
+                                    <img src={anime.image} alt="" className="navbar-thumb" />
+                                    <span className="navbar-result-info">
+                                        <span className="navbar-title">{anime.title}</span>
+                                        <span className="navbar-meta">{anime.type}</span>
                                     </span>
                                 </button>
-                            )}
+                            ))
+                        )}
+
+                        {!isLoading && results.length > 0 && (
+                            <button
+                                type="button"
+                                className="navbar-view-all"
+                                onClick={handleSearchSubmit}
+                            >
+                                View all results <span aria-hidden="true">→</span>
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
 
-
-            {/* RIGHT */}
             <div className="navbar-right">
                 {!isAuthenticated ? (
                     <>
-                        <Link
-                            to="/login"
-                            className="navbar-login"
-                        >
-                            Sign in
-                        </Link>
-
-                        <Link
-                            to="/register"
-                            className="navbar-register"
-                        >
-                            Get Started
-                        </Link>
+                        <Link to="/login" className="navbar-login">Login</Link>
+                        <Link to="/register" className="navbar-register">Sign Up</Link>
                     </>
                 ) : (
-                    <div
-                        ref={profileMenuRef}
-                        className="profile-menu-wrapper"
-                    >
+                    <div ref={profileMenuRef} className="profile-menu-wrapper">
                         <button
                             type="button"
                             className="navbar-profile-trigger"
-                            onClick={handleProfileToggle}
+                            onClick={() => setProfileMenuOpen((current) => !current)}
                             aria-label="Open profile menu"
-                            aria-expanded={
-                                profileMenuOpen
-                            }
-                            aria-haspopup="dialog"
+                            aria-expanded={profileMenuOpen}
+                            aria-haspopup="menu"
                         >
                             <span className="profile-avatar-mini profile-avatar-mini-image">
-                                {avatarUrl ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt=""
-                                    />
-                                ) : (
-                                    avatarFallback
-                                )}
+                                {avatarUrl ? <img src={avatarUrl} alt="" /> : avatarFallback}
                             </span>
-
                             <span className="navbar-profile-name">
-                                {loading
-                                    ? "Loading..."
-                                    : username}
+                                {loading ? "Loading..." : username}
                             </span>
-
-                            <span
-                                className={`profile-menu-chevron ${
-                                    profileMenuOpen
-                                        ? "open"
-                                        : ""
-                                }`}
-                                aria-hidden="true"
-                            >
-                               ⌄
+                            <span className={`profile-menu-chevron ${profileMenuOpen ? "open" : ""}`} aria-hidden="true">
+                                ⌄
                             </span>
                         </button>
 
-
                         {profileMenuOpen && (
-                            <>
-                                <div
-                                    className="profile-menu-backdrop"
-                                    onClick={() =>
-                                        setProfileMenuOpen(
-                                            false
-                                        )
-                                    }
-                                    aria-hidden="true"
-                                />
-
-                                <aside
-                                    className="profile-menu-drawer"
-                                    role="dialog"
-                                    aria-label="Profile menu"
+                            <div className="profile-menu-dropdown" role="menu">
+                                <div className="profile-menu-user">
+                                    <strong>{username}</strong>
+                                    {user?.email && <span>{user.email}</span>}
+                                </div>
+                                <Link
+                                    to="/profile"
+                                    className="profile-menu-action"
+                                    role="menuitem"
+                                    onClick={() => setProfileMenuOpen(false)}
                                 >
-                                    <div className="profile-menu-header">
-                                        <span className="profile-menu-avatar">
-                                            {avatarUrl ? (
-                                                <img
-                                                    src={avatarUrl}
-                                                    alt=""
-                                                />
-                                            ) : (
-                                                avatarFallback
-                                            )}
-                                        </span>
-
-                                        <div className="profile-menu-user">
-                                            <strong>
-                                                {username}
-                                            </strong>
-
-                                            {user?.email && (
-                                                <span>
-                                                    {user.email}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            className="profile-menu-close"
-                                            onClick={() =>
-                                                setProfileMenuOpen(
-                                                    false
-                                                )
-                                            }
-                                            aria-label="Close profile menu"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-
-                                    <div className="profile-menu-actions">
-                                        <Link
-                                            to="/profile"
-                                            className="profile-menu-action"
-                                            onClick={() =>
-                                                setProfileMenuOpen(
-                                                    false
-                                                )
-                                            }
-                                        >
-                                            <span aria-hidden="true">
-                                                👤
-                                            </span>
-                                            <span>
-                                                View Profile
-                                            </span>
-                                        </Link>
-
-                                        <button
-                                            type="button"
-                                            className="profile-menu-action profile-menu-logout"
-                                            onClick={
-                                                handleLogout
-                                            }
-                                        >
-                                            <span aria-hidden="true">
-                                                🚪
-                                            </span>
-                                            <span>
-                                                Logout
-                                            </span>
-                                        </button>
-                                    </div>
-                                </aside>
-                            </>
+                                    Profile
+                                </Link>
+                                <Link
+                                    to="/edit-profile"
+                                    className="profile-menu-action"
+                                    role="menuitem"
+                                    onClick={() => setProfileMenuOpen(false)}
+                                >
+                                    Settings
+                                </Link>
+                                <button
+                                    type="button"
+                                    className="profile-menu-action profile-menu-logout"
+                                    role="menuitem"
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}
@@ -535,6 +253,5 @@ function NavBar({
         </header>
     );
 }
-
 
 export default NavBar;
