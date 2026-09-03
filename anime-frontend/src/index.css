@@ -1794,10 +1794,11 @@ body {
 
     margin-top: 10px;
 
-    padding: 16px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
     border: none;
-    border-radius: 16px;
+    border-radius: var(--control-radius);
 
     background: linear-gradient(
         135deg,
@@ -1807,12 +1808,16 @@ body {
 
     color: white;
 
+    font: inherit;
     font-size: 15px;
     font-weight: 700;
 
     cursor: pointer;
 
-    transition: all .25s ease;
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        opacity var(--transition);
 }
 
 .save-profile-btn:hover {
