@@ -28,6 +28,15 @@ export const AnimeAPI = {
         return res.data;
     },
 
+    recentlyAdded: async (page = 1) => {
+        const res = await api.get("/anime/recently-added/", {
+            params: { page },
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
     detail: async (id) => {
         const res = await api.get(`/anime/${id}/`, {
             skipAuth: true,
