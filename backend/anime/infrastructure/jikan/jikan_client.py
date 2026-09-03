@@ -23,12 +23,10 @@ BLOCKED_GENRES = {
 
 
 def safe_request(url, params=None, retries=3):
-
     if params:
         url = f"{url}?{urlencode(params)}"
 
     for attempt in range(retries):
-
         http_code = "unknown"
 
         try:
@@ -40,18 +38,21 @@ def safe_request(url, params=None, retries=3):
                     "--http1.1",
                     "-4",
                     "-L",
-                    "-H",
-                    "Accept: application/json",
-                    "-H",
-                    "Accept-Encoding: gzip",
+                    "--compressed",
                     "-A",
-                    "Mozilla/5.0",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+                    "-H",
+                    "Accept: application/json,text/plain,*/*",
+                    "-H",
+                    "Accept-Language: en-US,en;q=0.9",
                     "--write-out",
                     "\n%{http_code}",
                     url,
                 ],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=60,
             )
 
@@ -59,7 +60,6 @@ def safe_request(url, params=None, retries=3):
 
             if "\n" in stdout:
                 body, possible_code = stdout.rsplit("\n", 1)
-
                 if possible_code.isdigit():
                     stdout = body
                     http_code = possible_code
@@ -79,7 +79,6 @@ def safe_request(url, params=None, retries=3):
                 if attempt < retries - 1:
                     time.sleep(2 ** attempt)
                     continue
-
                 return None
 
             if not stdout:
@@ -95,12 +94,10 @@ def safe_request(url, params=None, retries=3):
                 if attempt < retries - 1:
                     time.sleep(2 ** attempt)
                     continue
-
                 return None
 
             data = json.loads(stdout)
 
-            # Jikan errors are JSON too
             if "status" in data and data.get("status") != 200:
                 logger.warning(
                     "Jikan error (attempt %s/%s, http_status=%s): %s",
@@ -113,13 +110,11 @@ def safe_request(url, params=None, retries=3):
                 if attempt < retries - 1:
                     time.sleep(2 ** attempt)
                     continue
-
                 return None
 
             return data
 
         except subprocess.TimeoutExpired:
-
             logger.warning(
                 "Curl timeout (%s/%s): %s",
                 attempt + 1,
@@ -128,7 +123,6 @@ def safe_request(url, params=None, retries=3):
             )
 
         except json.JSONDecodeError:
-
             logger.warning(
                 "Invalid JSON response (%s/%s): http_status=%s, url=%s",
                 attempt + 1,
@@ -138,7 +132,6 @@ def safe_request(url, params=None, retries=3):
             )
 
         except Exception as exc:
-
             logger.warning(
                 "Jikan request failed (%s/%s): %s",
                 attempt + 1,
@@ -156,7 +149,6 @@ def is_nsfw(anime):
     """
     Determine whether an anime should be blocked.
     """
-
     if anime.get("rating") in BLOCKED_RATINGS:
         return True
 
@@ -172,28 +164,16 @@ def filter_nsfw(items):
     """
     Return only anime that are allowed to be stored/displayed.
     """
-
-    return [
-        anime
-        for anime in items
-        if not is_nsfw(anime)
-    ]
+    return [anime for anime in items if not is_nsfw(anime)]
 
 
 def list_response(data, page):
     """
     Convert a Jikan list response.
 
-    IMPORTANT:
-    The returned items are NOT filtered here.
-
-    Pagination must be based on Jikan's raw response.
-    Otherwise an entire page containing blocked anime
-    could incorrectly look like an empty API page.
+    Pagination is based on Jikan's raw response. Filtering happens later.
     """
-
     if not data:
-
         return {
             "items": [],
             "page": page,
@@ -201,45 +181,19 @@ def list_response(data, page):
             "total": 0,
         }
 
-    pagination = data.get(
-        "pagination",
-        {},
-    )
+    pagination = data.get("pagination", {})
 
     return {
-        "items": data.get(
-            "data",
-            [],
-        ),
-        "page": pagination.get(
-            "current_page",
-            page,
-        ),
-        "has_next": pagination.get(
-            "has_next_page",
-            False,
-        ),
-        "total": pagination.get(
-            "items",
-            {},
-        ).get(
-            "total",
-            0,
-        ),
+        "items": data.get("data", []),
+        "page": pagination.get("current_page", page),
+        "has_next": pagination.get("has_next_page", False),
+        "total": pagination.get("items", {}).get("total", 0),
     }
 
 
 class JikanClient:
-
-    def _get_list(
-        self,
-        endpoint,
-        page=1,
-        params=None,
-    ):
-
+    def _get_list(self, endpoint, page=1, params=None):
         params = dict(params or {})
-
         params["page"] = page
 
         data = safe_request(
@@ -247,27 +201,16 @@ class JikanClient:
             params=params,
         )
 
-        return list_response(
-            data,
-            page,
-        )
+        return list_response(data, page)
 
     # ==================================================
     # GENERAL CATALOG
     # ==================================================
 
     def get_all_anime(self, page=1):
-
         """
         Fetch the general MyAnimeList/Jikan anime catalog.
-
-        This is the main population source.
-
-        Sorting by MAL ID gives us a stable catalog-like
-        traversal instead of relying only on top/seasonal
-        categories.
         """
-
         return self._get_list(
             "anime",
             page,
@@ -282,20 +225,14 @@ class JikanClient:
     # ==================================================
 
     def get_detail(self, anime_id):
-
-        data = safe_request(
-            f"{BASE_URL}/anime/{anime_id}/full"
-        )
+        data = safe_request(f"{BASE_URL}/anime/{anime_id}/full")
 
         if not data:
             return None
 
         anime = data.get("data")
 
-        if not anime:
-            return None
-
-        if is_nsfw(anime):
+        if not anime or is_nsfw(anime):
             return None
 
         return anime
@@ -305,14 +242,9 @@ class JikanClient:
     # ==================================================
 
     def get_top(self, page=1):
-
-        return self._get_list(
-            "top/anime",
-            page,
-        )
+        return self._get_list("top/anime", page)
 
     def get_trending(self, page=1):
-
         return self.get_top(page)
 
     # ==================================================
@@ -320,25 +252,16 @@ class JikanClient:
     # ==================================================
 
     def get_seasonal(self, page=1):
-
-        return self._get_list(
-            "seasons/now",
-            page,
-        )
+        return self._get_list("seasons/now", page)
 
     def get_upcoming(self, page=1):
-
-        return self._get_list(
-            "seasons/upcoming",
-            page,
-        )
+        return self._get_list("seasons/upcoming", page)
 
     # ==================================================
     # FILTERED CATALOG ENDPOINTS
     # ==================================================
 
     def get_airing(self, page=1):
-
         return self._get_list(
             "anime",
             page,
@@ -350,7 +273,6 @@ class JikanClient:
         )
 
     def get_movies(self, page=1):
-
         return self._get_list(
             "anime",
             page,
@@ -362,7 +284,6 @@ class JikanClient:
         )
 
     def get_ova(self, page=1):
-
         return self._get_list(
             "anime",
             page,
@@ -374,7 +295,6 @@ class JikanClient:
         )
 
     def get_ona(self, page=1):
-
         return self._get_list(
             "anime",
             page,
@@ -389,22 +309,10 @@ class JikanClient:
     # SEARCH
     # ==================================================
 
-    def search(
-        self,
-        query,
-        page=1,
-        filters=None,
-    ):
-
-        params = {
-            "q": query,
-        }
+    def search(self, query, page=1, filters=None):
+        params = {"q": query}
 
         if filters:
             params.update(filters)
 
-        return self._get_list(
-            "anime",
-            page,
-            params=params,
-        )
+        return self._get_list("anime", page, params=params)
