@@ -89,27 +89,53 @@ function Home() {
                 <title>Anime Tracker</title>
                 <meta
                     name="description"
-                    content="Discover featured, trending, seasonal, top, and recently added anime."
+                    content="Discover anime, build your library, track your progress, and keep up with what you want to watch."
                 />
             </Helmet>
 
             {!loading && featuredAnime && (
                 <section className="home-hero">
-                    <div
-                        className="home-hero-background"
-                        style={{
-                            backgroundImage: `url("${featuredAnime.image}")`,
-                        }}
-                        aria-hidden="true"
-                    />
-
-                    <div className="home-hero-overlay" aria-hidden="true" />
-
                     <div className="home-hero-inner">
-                        <div className="home-hero-poster-container">
+                        <div className="home-hero-content">
+                            <span className="home-hero-eyebrow">
+                                YOUR ANIME TRACKER
+                            </span>
+
+                            <h1 className="home-hero-title">
+                                Keep your anime life organized.
+                            </h1>
+
+                            <p className="home-hero-description">
+                                Discover new series, keep a personal library,
+                                track what you are watching, and remember what
+                                you want to watch next.
+                            </p>
+
+                            <div className="home-hero-actions">
+                                <Link
+                                    to="/search"
+                                    className="home-hero-primary-action"
+                                >
+                                    Browse Anime
+                                </Link>
+
+                                <Link
+                                    to="/library"
+                                    className="home-hero-secondary-action"
+                                >
+                                    My Library
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="home-hero-feature">
+                            <span className="home-hero-feature-label">
+                                FEATURED IN CATALOG
+                            </span>
+
                             <Link
                                 to={`/anime/${featuredAnime.mal_id ?? featuredAnime.id}`}
-                                className="home-hero-poster-link"
+                                className="home-hero-feature-card"
                                 aria-label={`View ${featuredAnime.title}`}
                             >
                                 <img
@@ -119,55 +145,24 @@ function Home() {
                                     loading="eager"
                                     decoding="async"
                                 />
-                            </Link>
-                        </div>
 
-                        <div className="home-hero-content">
-                            <span className="home-hero-eyebrow">✦ FEATURED</span>
+                                <div className="home-hero-feature-info">
+                                    <strong>{featuredAnime.title}</strong>
 
-                            <h1 className="home-hero-title">
-                                {featuredAnime.title}
-                            </h1>
-
-                            <div className="home-hero-meta">
-                                {featuredAnime.score > 0 && (
                                     <span>
-                                        ⭐ {Number(featuredAnime.score).toFixed(1)}
+                                        {featuredAnime.type || "Anime"}
+                                        {featuredAnime.year
+                                            ? ` • ${featuredAnime.year}`
+                                            : ""}
                                     </span>
-                                )}
 
-                                {featuredAnime.type && (
-                                    <span>{featuredAnime.type}</span>
-                                )}
-
-                                {featuredAnime.year && (
-                                    <span>{featuredAnime.year}</span>
-                                )}
-                            </div>
-
-                            {featuredAnime.genres?.length > 0 && (
-                                <div className="home-hero-genres">
-                                    {featuredAnime.genres
-                                        .slice(0, 4)
-                                        .map((genre) => (
-                                            <span key={genre}>{genre}</span>
-                                        ))}
+                                    {Number(featuredAnime.score) > 0 && (
+                                        <span>
+                                            ⭐ {Number(featuredAnime.score).toFixed(1)}
+                                        </span>
+                                    )}
                                 </div>
-                            )}
-
-                            <p className="home-hero-description">
-                                {featuredAnime.synopsis ||
-                                    "Discover this anime and add it to your library."}
-                            </p>
-
-                            <div className="home-hero-actions">
-                                <Link
-                                    to={`/anime/${featuredAnime.mal_id ?? featuredAnime.id}`}
-                                    className="home-hero-primary-action"
-                                >
-                                    View Anime
-                                </Link>
-                            </div>
+                            </Link>
                         </div>
                     </div>
                 </section>
