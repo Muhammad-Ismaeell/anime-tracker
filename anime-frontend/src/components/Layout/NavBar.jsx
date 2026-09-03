@@ -22,6 +22,9 @@ import {
     useDebounce,
 } from "../../hooks/useDebounce";
 
+import { useProfile } from "../../hooks/useProfile";
+import { getMediaUrl } from "../../utils/mediaUrl";
+
 import "./Navbar.css";
 
 
@@ -35,10 +38,16 @@ function NavBar({
         isAuthenticated,
         user,
         loading,
+        logout,
     } = useContext(AuthContext);
+
+    const {
+        data: profile,
+    } = useProfile();
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
     const debouncedQuery =
         useDebounce(query, 500);
@@ -51,6 +60,27 @@ function NavBar({
     );
 
     const dropdownRef = useRef(null);
+    const profileMenuRef = useRef(null);
+
+
+    const profileAvatar =
+        profile?.profile?.avatar ??
+        null;
+
+    const username =
+        user?.username ||
+        "Profile";
+
+    const avatarUrl =
+        profileAvatar
+            ? getMediaUrl(profileAvatar)
+            : null;
+
+    const avatarFallback =
+        username
+            .charAt(0)
+            .toUpperCase() ||
+        "U";
 
 
     useEffect(() => {
@@ -62,6 +92,15 @@ function NavBar({
                 )
             ) {
                 setOpen(false);
+            }
+
+            if (
+                profileMenuRef.current &&
+                !profileMenuRef.current.contains(
+                    event.target
+                )
+            ) {
+                setProfileMenuOpen(false);
             }
         };
 
@@ -83,6 +122,7 @@ function NavBar({
         const handleEscape = (event) => {
             if (event.key === "Escape") {
                 setOpen(false);
+                setProfileMenuOpen(false);
             }
         };
 
@@ -98,6 +138,23 @@ function NavBar({
             );
         };
     }, []);
+
+
+    useEffect(() => {
+        if (!profileMenuOpen) {
+            return undefined;
+        }
+
+        const previousOverflow =
+            document.body.style.overflow;
+
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow =
+                previousOverflow;
+        };
+    }, [profileMenuOpen]);
 
 
     const handleSelect = (anime) => {
@@ -128,6 +185,17 @@ function NavBar({
         navigate(
             `/search?q=${encodeURIComponent(value)}`
         );
+    };
+
+
+    const handleProfileToggle = () => {
+        setProfileMenuOpen((current) => !current);
+    };
+
+
+    const handleLogout = () => {
+        setProfileMenuOpen(false);
+        logout();
     };
 
 
@@ -326,23 +394,142 @@ function NavBar({
                         </Link>
                     </>
                 ) : (
-                    <Link
-                        to="/profile"
-                        className="navbar-profile"
+                    <div
+                        ref={profileMenuRef}
+                        className="profile-menu-wrapper"
                     >
-                        <span className="profile-avatar-mini">
-                            {user?.username
-                                ?.charAt(0)
-                                ?.toUpperCase() ||
-                                "👤"}
-                        </span>
+                        <button
+                            type="button"
+                            className="navbar-profile-trigger"
+                            onClick={handleProfileToggle}
+                            aria-label="Open profile menu"
+                            aria-expanded={
+                                profileMenuOpen
+                            }
+                            aria-haspopup="dialog"
+                        >
+                            <span className="profile-avatar-mini profile-avatar-mini-image">
+                                {avatarUrl ? (
+                                    <img
+                                        src={avatarUrl}
+                                        alt=""
+                                    />
+                                ) : (
+                                    avatarFallback
+                                )}
+                            </span>
 
-                        <span className="navbar-profile-name">
-                            {loading
-                                ? "Loading..."
-                                : user?.username || "Profile"}
-                        </span>
-                    </Link>
+                            <span className="navbar-profile-name">
+                                {loading
+                                    ? "Loading..."
+                                    : username}
+                            </span>
+
+                            <span
+                                className={`profile-menu-chevron ${
+                                    profileMenuOpen
+                                        ? "open"
+                                        : ""
+                                }`}
+                                aria-hidden="true"
+                            >
+                               ⌄
+                            </span>
+                        </button>
+
+
+                        {profileMenuOpen && (
+                            <>
+                                <div
+                                    className="profile-menu-backdrop"
+                                    onClick={() =>
+                                        setProfileMenuOpen(
+                                            false
+                                        )
+                                    }
+                                    aria-hidden="true"
+                                />
+
+                                <aside
+                                    className="profile-menu-drawer"
+                                    role="dialog"
+                                    aria-label="Profile menu"
+                                >
+                                    <div className="profile-menu-header">
+                                        <span className="profile-menu-avatar">
+                                            {avatarUrl ? (
+                                                <img
+                                                    src={avatarUrl}
+                                                    alt=""
+                                                />
+                                            ) : (
+                                                avatarFallback
+                                            )}
+                                        </span>
+
+                                        <div className="profile-menu-user">
+                                            <strong>
+                                                {username}
+                                            </strong>
+
+                                            {user?.email && (
+                                                <span>
+                                                    {user.email}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="profile-menu-close"
+                                            onClick={() =>
+                                                setProfileMenuOpen(
+                                                    false
+                                                )
+                                            }
+                                            aria-label="Close profile menu"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+
+                                    <div className="profile-menu-actions">
+                                        <Link
+                                            to="/profile"
+                                            className="profile-menu-action"
+                                            onClick={() =>
+                                                setProfileMenuOpen(
+                                                    false
+                                                )
+                                            }
+                                        >
+                                            <span aria-hidden="true">
+                                                👤
+                                            </span>
+                                            <span>
+                                                View Profile
+                                            </span>
+                                        </Link>
+
+                                        <button
+                                            type="button"
+                                            className="profile-menu-action profile-menu-logout"
+                                            onClick={
+                                                handleLogout
+                                            }
+                                        >
+                                            <span aria-hidden="true">
+                                                🚪
+                                            </span>
+                                            <span>
+                                                Logout
+                                            </span>
+                                        </button>
+                                    </div>
+                                </aside>
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
         </header>

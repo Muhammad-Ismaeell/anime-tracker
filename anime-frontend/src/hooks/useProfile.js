@@ -1,77 +1,33 @@
+import { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 
+import { AuthContext } from "../context/AuthContext";
 import {
-    useMutation,
-    useQuery,
-    useQueryClient,
-} from "@tanstack/react-query";
-
-import api from "../api/client";
+    fetchProfile,
+} from "../api/profile";
 import { queryKeys } from "../lib/querykeys";
-import toast from "react-hot-toast";
 
 
 export function useProfile() {
+
+    const {
+        isAuthenticated,
+        loading,
+    } = useContext(AuthContext);
+
     return useQuery({
-        queryKey: queryKeys.users.profile,
+        queryKey:
+            queryKeys.users.profile,
 
-        queryFn: async () => {
-            const res = await api.get(
-                "/users/profile/"
-            );
+        queryFn:
+            fetchProfile,
 
-            return res.data.data;
-        },
+        enabled:
+            !loading &&
+            isAuthenticated,
+
+        staleTime:
+            1000 * 60 * 5,
+
     });
 }
-
-
-export function useUpdateProfile() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (formData) => {
-            const response = await api.patch(
-                "/users/profile/update/",
-                formData,
-                {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data",
-                    },
-                }
-            );
-
-            return response;
-        },
-
-        onSuccess: async (response) => {
-            const updatedProfile =
-                response.data.data;
-
-            // Immediately update the cached value.
-            queryClient.setQueryData(
-                queryKeys.users.profile,
-                updatedProfile
-            );
-
-            // Then mark it stale and refetch the
-            // current profile query.
-            await queryClient.invalidateQueries({
-                queryKey: queryKeys.users.profile,
-            });
-
-            toast.success(
-                "Profile updated!"
-            );
-        },
-
-        onError: (error) => {
-            const message =
-                error.response?.data?.detail ||
-                "Failed to update profile.";
-
-            toast.error(message);
-        },
-    });
-}
-

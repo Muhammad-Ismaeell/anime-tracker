@@ -126,6 +126,9 @@ function Profile() {
 
     const {
         data: favoritesData,
+        isLoading: favoritesLoading,
+        isError: favoritesError,
+        refetch: refetchFavorites,
     } = useFavorites();
 
     const favorites = useMemo(
@@ -149,14 +152,22 @@ function Profile() {
 
     const {
         data: analytics,
+        isLoading: analyticsLoading,
+        isError: analyticsError,
     } = useReviewAnalytics();
 
     const {
         data: topRatedList = [],
+        isLoading: topRatedLoading,
+        isError: topRatedError,
+        refetch: refetchTopRated,
     } = useTopRatedAnime();
 
     const {
         data: reviewsData,
+        isLoading: reviewsLoading,
+        isError: reviewsError,
+        refetch: refetchReviews,
     } = useUserReviews();
 
     const updateReview =
@@ -537,7 +548,7 @@ function Profile() {
                     </span>
 
                     <h3>
-                        {favorites.length}
+                        {favoriteIds.size}
                     </h3>
 
                     <p>
@@ -554,7 +565,11 @@ function Profile() {
                     </span>
 
                     <h3>
-                        {reviewCount}
+                        {analyticsLoading
+                            ? "..."
+                            : analyticsError
+                                ? "—"
+                                : reviewCount}
                     </h3>
 
                     <p>
@@ -571,7 +586,11 @@ function Profile() {
                     </span>
 
                     <h3>
-                        {averageRating}
+                        {analyticsLoading
+                            ? "..."
+                            : analyticsError
+                                ? "—"
+                                : averageRating}
                     </h3>
 
                     <p>
@@ -596,27 +615,47 @@ function Profile() {
 
                 <div className="anime-grid">
 
-                    {normalizedFavorites.length > 0 ? (
+                    {favoritesLoading ? (
+
+                        Array.from({ length: 4 }).map(
+                            (_, index) => (
+                                <AnimeCardSkeleton
+                                    key={index}
+                                />
+                            )
+                        )
+
+                    ) : favoritesError ? (
+
+                        <div className="profile-section-error">
+                            <EmptyState
+                                text="Couldn't load your favorites."
+                            />
+
+                            <button
+                                type="button"
+                                className="retry-btn"
+                                onClick={refetchFavorites}
+                            >
+                                Retry
+                            </button>
+                        </div>
+
+                    ) : normalizedFavorites.length > 0 ? (
 
                         normalizedFavorites.map(
                             (anime) => {
-
-                                const id =
-                                    String(
-                                        anime.id
-                                    );
+                                const id = String(
+                                    anime.id
+                                );
 
                                 return (
                                     <AnimeCard
                                         key={id}
                                         anime={anime}
-                                        statusMap={
-                                            statusMap
-                                        }
+                                        statusMap={statusMap}
                                         isFavorited={
-                                            favoriteIds.has(
-                                                id
-                                            )
+                                            favoriteIds.has(id)
                                         }
                                         isFavoritePending={
                                             toggleFavorite.isPending
@@ -657,7 +696,33 @@ function Profile() {
 
                 <div className="anime-grid">
 
-                    {normalizedTopRated.length > 0 ? (
+                    {topRatedLoading ? (
+
+                        Array.from({ length: 4 }).map(
+                            (_, index) => (
+                                <AnimeCardSkeleton
+                                    key={index}
+                                />
+                            )
+                        )
+
+                    ) : topRatedError ? (
+
+                        <div className="profile-section-error">
+                            <EmptyState
+                                text="Couldn't load your top rated anime."
+                            />
+
+                            <button
+                                type="button"
+                                className="retry-btn"
+                                onClick={refetchTopRated}
+                            >
+                                Retry
+                            </button>
+                        </div>
+
+                    ) : normalizedTopRated.length > 0 ? (
 
                         normalizedTopRated.map(
                             (anime) => {
@@ -722,7 +787,29 @@ function Profile() {
 
                 <div className="reviews-list">
 
-                    {myReviews.length > 0 ? (
+                    {reviewsLoading ? (
+
+                        <div className="reviews-loading">
+                            <p>Loading reviews...</p>
+                        </div>
+
+                    ) : reviewsError ? (
+
+                        <div className="profile-section-error">
+                            <EmptyState
+                                text="Couldn't load your reviews."
+                            />
+
+                            <button
+                                type="button"
+                                className="retry-btn"
+                                onClick={refetchReviews}
+                            >
+                                Retry
+                            </button>
+                        </div>
+
+                    ) : myReviews.length > 0 ? (
 
                         myReviews.map(
                             (review) => {

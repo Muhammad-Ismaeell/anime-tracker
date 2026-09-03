@@ -1,7 +1,4 @@
 import { NavLink } from "react-router-dom";
-import { useContext } from "react";
-
-import { AuthContext } from "../../context/AuthContext";
 
 import "./SideBar.css";
 
@@ -27,11 +24,6 @@ const navItems = [
         label: "Dashboard",
         icon: "📊",
     },
-    {
-        to: "/profile",
-        label: "Profile",
-        icon: "👤",
-    },
 ];
 
 
@@ -39,8 +31,6 @@ export default function SideBar({
     isOpen = false,
     onClose = () => {},
 }) {
-    const { token, logout } = useContext(AuthContext);
-
     const handleNavigation = () => {
         onClose();
     };
@@ -61,13 +51,6 @@ export default function SideBar({
                 }`}
             >
                 <div className="sidebar-content">
-
-                    <div className="sidebar-brand">
-                        <span className="sidebar-brand-icon">
-                            🎬
-                        </span>
-                    </div>
-
                     <nav className="sidebar-nav">
                         {navItems.map((item) => (
                             <NavLink
@@ -94,22 +77,6 @@ export default function SideBar({
                         ))}
                     </nav>
                 </div>
-
-                {token && (
-                    <div className="sidebar-footer">
-                        <button
-                            type="button"
-                            className="sidebar-logout"
-                            onClick={() => {
-                                logout();
-                                onClose();
-                            }}
-                        >
-                            <span>🚪</span>
-                            <span>Logout</span>
-                        </button>
-                    </div>
-                )}
             </aside>
         </>
     );
