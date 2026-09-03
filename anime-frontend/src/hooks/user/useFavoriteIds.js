@@ -28,7 +28,6 @@ export function useFavoriteIds() {
         queryFn: async () => {
             const ids = await FavoriteAPI.listIds();
 
-            console.log("FAVORITE IDS FROM API:", ids);
 
             const result = new Set(
                 ids
@@ -36,8 +35,7 @@ export function useFavoriteIds() {
                     .map(String)
             );
 
-            console.log("FAVORITE IDS SET:", result);
-            console.log("HAS 23:", result.has("23"));
+        
 
             return result;
         },

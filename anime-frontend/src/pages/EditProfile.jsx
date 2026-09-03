@@ -1,10 +1,13 @@
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 import {
     useProfile,
     useUpdateProfile,
 } from "../hooks/useProfile";
+
 import { getMediaUrl } from "../utils/mediaUrl";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 
@@ -13,6 +16,7 @@ import "../index.css";
 
 function EditProfileForm({ user, profile }) {
     const updateProfile = useUpdateProfile();
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState(
         user?.username || ""
@@ -27,6 +31,25 @@ function EditProfileForm({ user, profile }) {
     );
 
     const [avatar, setAvatar] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(null);
+
+    useEffect(() => {
+        if (!avatar) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            setAvatarPreview(reader.result);
+        };
+
+        reader.readAsDataURL(avatar);
+
+        return () => {
+            reader.abort();
+        };
+    }, [avatar]);
 
 
     const handleSubmit = () => {
@@ -68,7 +91,7 @@ function EditProfileForm({ user, profile }) {
             formData,
             {
                 onSuccess: () => {
-                    window.location.href = "/profile";
+                    navigate("/profile");
                 },
             }
         );
@@ -82,16 +105,17 @@ function EditProfileForm({ user, profile }) {
                 <div className="edit-profile-header">
 
                     <div className="avatar-preview-wrapper">
-                        {avatar ? (
+
+                        {avatarPreview ? (
                             <img
-                                src={URL.createObjectURL(avatar)}
-                                alt="preview"
+                                src={avatarPreview}
+                                alt="Avatar preview"
                                 className="avatar-preview"
                             />
                         ) : profile?.avatar ? (
                             <img
                                 src={getMediaUrl(profile.avatar)}
-                                alt="avatar"
+                                alt="Current profile avatar"
                                 className="avatar-preview"
                             />
                         ) : (
@@ -99,9 +123,12 @@ function EditProfileForm({ user, profile }) {
                                 👤
                             </div>
                         )}
+
                     </div>
 
+
                     <div className="edit-profile-info">
+
                         <h1 className="edit-profile-title">
                             Edit Profile
                         </h1>
@@ -111,6 +138,7 @@ function EditProfileForm({ user, profile }) {
                         </p>
 
                         <div className="profile-extra">
+
                             <div className="profile-chip">
                                 🎭{" "}
                                 {genre ||
@@ -120,14 +148,18 @@ function EditProfileForm({ user, profile }) {
                             <div className="profile-chip">
                                 ✍️ {bio.length} Characters
                             </div>
+
                         </div>
+
                     </div>
 
                 </div>
 
+
                 <div className="edit-profile-form">
 
                     <div className="form-group">
+
                         <label htmlFor="profile-username">
                             Username
                         </label>
@@ -145,10 +177,12 @@ function EditProfileForm({ user, profile }) {
                             className="profile-input"
                             maxLength={150}
                         />
+
                     </div>
 
 
                     <div className="form-group">
+
                         <label htmlFor="profile-bio">
                             Bio
                         </label>
@@ -165,10 +199,12 @@ function EditProfileForm({ user, profile }) {
                             placeholder="Tell people about yourself..."
                             className="profile-textarea"
                         />
+
                     </div>
 
 
                     <div className="form-group">
+
                         <label htmlFor="profile-genre">
                             Favorite Genre
                         </label>
@@ -185,31 +221,37 @@ function EditProfileForm({ user, profile }) {
                             placeholder="Action, Romance, Fantasy..."
                             className="profile-input"
                         />
+
                     </div>
 
 
                     <div className="form-group">
+
                         <label>
                             Profile Picture
                         </label>
 
                         <label className="upload-box">
+
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(event) =>
-                                    setAvatar(
-                                        event.target.files?.[0] ||
-                                        null
-                                    )
-                                }
+                                onChange={(event) => {
+                                    const file =
+                                        event.target.files?.[0] || null;
+
+                                    setAvatar(file);
+                                    setAvatarPreview(null);
+                                }}
                                 hidden
                             />
 
                             <span>
                                 📸 Upload Avatar
                             </span>
+
                         </label>
+
                     </div>
 
 
@@ -225,6 +267,7 @@ function EditProfileForm({ user, profile }) {
                     </button>
 
                 </div>
+
             </div>
         </div>
     );
@@ -235,7 +278,10 @@ function EditProfile() {
     const {
         data,
         isLoading,
+        isError,
+        refetch,
     } = useProfile();
+
 
     if (isLoading) {
         return (
@@ -258,6 +304,31 @@ function EditProfile() {
             </div>
         );
     }
+
+
+    if (isError) {
+        return (
+            <div className="profile-error">
+
+                <h2>
+                    Failed to load profile
+                </h2>
+
+                <p>
+                    Something went wrong while loading your profile.
+                </p>
+
+                <button
+                    type="button"
+                    onClick={() => refetch()}
+                >
+                    Try Again
+                </button>
+
+            </div>
+        );
+    }
+
 
     return (
         <EditProfileForm
