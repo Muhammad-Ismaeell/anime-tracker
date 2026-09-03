@@ -2869,27 +2869,31 @@ body {
     align-items: center;
     gap: 7px;
 
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
+
+    border-radius: var(--control-radius);
+
     color: var(--text-muted);
     text-decoration: none;
 
+    font: inherit;
     font-size: 0.9rem;
     font-weight: 600;
 
-    transition: var(--transition);
+    transition: color var(--transition-fast);
 }
 
 .view-all-btn:hover {
     color: var(--text-primary);
 }
 
-
 .view-all-btn span {
     font-size: 0.9rem;
 
     transition:
-        transform 0.2s ease;
+        transform var(--transition-fast);
 }
-
 
 .view-all-btn:hover span {
     transform: translateX(3px);
@@ -3814,8 +3818,6 @@ button:disabled {
         font-size: 0.82rem;
     }
 }
-
-
 
 
 
