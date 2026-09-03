@@ -6,6 +6,7 @@ from anime.api.views import (
     seasonal_anime,
     trending_anime,
     recently_added_anime,
+    anime_recommendations,
     anime_detail,
 )
 
@@ -16,5 +17,6 @@ urlpatterns = [
     path("seasonal/", seasonal_anime),
     path("trending/", trending_anime),
     path("recently-added/", recently_added_anime),
+    path("<int:anime_id>/recommendations/", anime_recommendations),
     path("<int:anime_id>/", anime_detail),
 ]
