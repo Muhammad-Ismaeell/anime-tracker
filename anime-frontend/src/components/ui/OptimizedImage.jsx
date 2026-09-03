@@ -5,6 +5,7 @@ export default function OptimizedImage({
     alt = "",
     className = "",
     width = 180,
+    loading="lazy",
     height = 260,
     ...props
 }) {
@@ -34,7 +35,7 @@ export default function OptimizedImage({
             height={height}
             src={src}
             alt={alt}
-            loading="lazy"
+            loading={loading}
             decoding="async"
             onError={() => setError(true)}
             className={className}
