@@ -1597,19 +1597,23 @@ body {
 .profile-input {
     width: 100%;
 
-    padding: 14px 18px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
     background: rgba(255,255,255,0.05);
 
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
+    border-radius: var(--control-radius);
 
     color: white;
     font-size: 15px;
 
     backdrop-filter: blur(12px);
 
-    transition: all .25s ease;
+    transition:
+        border-color var(--transition-fast),
+        background-color var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .profile-input::placeholder {
