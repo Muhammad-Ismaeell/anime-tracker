@@ -1,3 +1,5 @@
+import "./PageContainer.css";
+
 function PageContainer({ children }) {
 
     return (
