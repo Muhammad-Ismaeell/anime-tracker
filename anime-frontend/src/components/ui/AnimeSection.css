@@ -1,5 +1,6 @@
 /* ============================================================
    ANILIST-STYLE ANIME SECTION
+   Dense, image-first catalogue presentation.
    ============================================================ */
 
 .home-section {
@@ -31,8 +32,6 @@
     letter-spacing: -0.01em;
 }
 
-/* Keep the existing prop/API, but let the section use a cleaner
-   AniList-like text heading instead of decorative emoji. */
 .section-emoji {
     display: none;
 }
@@ -81,22 +80,23 @@
     overflow: hidden;
 }
 
+/* Eight compact cards across the desktop Home catalogue. */
 .anime-section-grid {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 1rem;
     width: 100%;
 }
 
 @media (max-width: 1150px) {
     .anime-section-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 900px) {
     .anime-section-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
     }
 }
 
