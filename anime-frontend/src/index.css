@@ -269,6 +269,38 @@ body {
     padding:40px 30px;
 }
 
+.form-control {
+    width: 100%;
+    min-height: var(--control-height);
+
+    padding: 0 var(--control-padding-x);
+
+    border: 1px solid var(--border);
+    border-radius: var(--control-radius);
+
+    background: var(--surface);
+    color: var(--text-primary);
+
+    font: inherit;
+
+    transition:
+        border-color var(--transition-fast),
+        background-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.form-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 /* =========================
    GRID
 ========================= */
