@@ -913,34 +913,24 @@
 ============================================================ */
 
 .retry-btn {
-    display: block;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
-    margin: 18px auto 0;
+    border: none;
+    border-radius: var(--control-radius);
 
-    min-height: 42px;
-
-    padding: 0 18px;
-
+    background: var(--danger);
     color: white;
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--detail-accent),
-            var(--detail-accent-dark)
-        );
-
-    border: 0;
-
-    border-radius: 10px;
-
-    font-weight: 700;
+    font: inherit;
+    font-weight: 600;
 
     cursor: pointer;
 
     transition:
-        transform 0.18s ease,
-        filter 0.18s ease;
+        background-color var(--transition-fast),
+        transform var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 .retry-btn:hover {

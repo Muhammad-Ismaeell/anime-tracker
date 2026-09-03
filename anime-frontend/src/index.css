@@ -1192,21 +1192,24 @@ body {
 
 
 .retry-btn {
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
-    padding:10px 25px;
+    border: none;
+    border-radius: var(--control-radius);
 
-    border-radius:10px;
+    background: var(--danger);
+    color: white;
 
-    border:none;
+    font: inherit;
+    font-weight: 600;
 
-    cursor:pointer;
+    cursor: pointer;
 
-    background:#ff4d6d;
-
-    color:white;
-
-    font-weight:bold;
-
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 
