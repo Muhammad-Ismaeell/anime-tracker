@@ -1,32 +1,11 @@
 export default function AnimeSkeleton() {
     return (
-        <div
-            style={{
-                background: "#1a1a1a",
-                borderRadius: "12px",
-                overflow: "hidden",
-                height: "320px",
-                position: "relative"
-            }}
-        >
-            <div className="shimmer" style={{
-                width: "100%",
-                height: "260px"
-            }} />
+        <div className="anime-skeleton">
+            <div className="anime-skeleton-image shimmer" />
 
-            <div style={{ padding: "10px" }}>
-                <div className="shimmer" style={{
-                    width: "80%",
-                    height: "12px",
-                    marginBottom: "8px",
-                    borderRadius: "4px"
-                }} />
-
-                <div className="shimmer" style={{
-                    width: "40%",
-                    height: "10px",
-                    borderRadius: "4px"
-                }} />
+            <div className="anime-skeleton-content">
+                <div className="anime-skeleton-title shimmer" />
+                <div className="anime-skeleton-meta shimmer" />
             </div>
         </div>
     );

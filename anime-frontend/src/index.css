@@ -3516,6 +3516,41 @@ body {
 }
 
 
+.anime-skeleton {
+    overflow: hidden;
+    height: 320px;
+
+    background: #1a1a1a;
+    border-radius: var(--radius-md);
+
+    position: relative;
+}
+
+.anime-skeleton-image {
+    width: 100%;
+    height: 260px;
+}
+
+.anime-skeleton-content {
+    padding: 10px;
+}
+
+.anime-skeleton-title {
+    width: 80%;
+    height: 12px;
+
+    margin-bottom: 8px;
+
+    border-radius: 4px;
+}
+
+.anime-skeleton-meta {
+    width: 40%;
+    height: 10px;
+
+    border-radius: 4px;
+}
+
 @keyframes dropdownFade {
     from {
         opacity: 0;
