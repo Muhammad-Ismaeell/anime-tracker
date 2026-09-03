@@ -124,9 +124,9 @@
     min-height: 275px;
     margin-bottom: 30px;
     overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    background: transparent;
+    border: none;
+    border-radius: 0;
 }
 
 .home-hero-inner {
@@ -192,9 +192,9 @@
     height: auto;
     object-fit: contain;
     object-position: center;
-    border: 1px solid var(--border);
+    border: none;
     border-radius: 4px;
-    background: var(--bg);
+    background: transparent;
     box-shadow: none;
     filter: none;
 }
