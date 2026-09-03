@@ -2,17 +2,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from anime.infrastructure.jikan.jikan_client import JikanClient
-import json
-
-from django.conf import settings
-from django.db import transaction
-
-from anime.infrastructure.models import Anime
-from anime.infrastructure.jikan.jikan_client import is_nsfw
-from anime.application.search_service import AnimeSearchService
-from anime.application.anime_service import AnimeService
-from anime.application.database_anime_service import DatabaseAnimeService
 from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
@@ -24,6 +13,11 @@ from anime.api.docs import (
     AnimeSearchResponseSerializer,
     AnimeDetailResponseSerializer,
 )
+from anime.application.anime_service import AnimeService
+from anime.application.database_anime_service import DatabaseAnimeService
+from anime.application.search_service import AnimeSearchService
+from anime.infrastructure.jikan.jikan_client import JikanClient
+
 
 search_service = AnimeSearchService()
 
@@ -69,7 +63,7 @@ def top_anime(request):
 
 @extend_schema(
     summary="Trending Anime",
-    description="Return trending anime.",
+    description="Return popular anime ordered by source popularity rank.",
     parameters=[
         OpenApiParameter(
             "page",
@@ -97,7 +91,7 @@ def trending_anime(request):
 
 @extend_schema(
     summary="Seasonal Anime",
-    description="Return seasonal anime.",
+    description="Return anime from the current calendar anime season.",
     parameters=[
         OpenApiParameter(
             "page",
@@ -120,6 +114,34 @@ def seasonal_anime(request):
 
     return Response(
         DatabaseAnimeService.get_seasonal(page)
+    )
+
+
+@extend_schema(
+    summary="Recently Added Anime",
+    description="Return anime ordered by when they were first added to the local catalog.",
+    parameters=[
+        OpenApiParameter(
+            "page",
+            OpenApiTypes.INT,
+            OpenApiParameter.QUERY,
+            description="Page number",
+        ),
+    ],
+    responses={
+        200: AnimeListResponseSerializer
+    },
+)
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def recently_added_anime(request):
+
+    page = safe_int(
+        request.GET.get("page")
+    )
+
+    return Response(
+        DatabaseAnimeService.get_recently_added(page)
     )
 
 
