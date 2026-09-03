@@ -12,10 +12,16 @@ class AnimeDocSerializer(serializers.Serializer):
     year = serializers.IntegerField(allow_null=True)
     season = serializers.CharField(allow_null=True)
 
+
 class AnimeListResponseSerializer(serializers.Serializer):
     items = AnimeDocSerializer(many=True)
     page = serializers.IntegerField()
     has_next = serializers.BooleanField()
+
+
+class AnimeRecommendationsResponseSerializer(serializers.Serializer):
+    items = AnimeDocSerializer(many=True)
+
 
 class AnimeDetailDocSerializer(serializers.Serializer):
 
@@ -43,9 +49,11 @@ class AnimeDetailDocSerializer(serializers.Serializer):
 
     trailer = serializers.DictField()
 
+
 class AnimeDetailResponseSerializer(serializers.Serializer):
 
     item = AnimeDetailDocSerializer()
+
 
 class AnimeSearchDataSerializer(serializers.Serializer):
     items = AnimeDocSerializer(many=True)
