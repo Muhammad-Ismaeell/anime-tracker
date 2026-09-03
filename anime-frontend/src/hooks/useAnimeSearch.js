@@ -2,7 +2,10 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import api from "../api/client";
 
 export function useAnimeSearch(query = "", filters = {}) {
-
+    
+    const hasFilters = Object.values(filters).some(
+            (value) => value !== undefined && value !== ""
+        );
     const normalizedQuery =
         query.trim();
 
@@ -39,9 +42,10 @@ export function useAnimeSearch(query = "", filters = {}) {
             (previousData) =>
                 previousData,
 
+        
+
         enabled:
-            normalizedQuery.length >= 3 ||
-            Object.keys(filters).length > 0,
+            normalizedQuery.length >= 3 || hasFilters,
 
         getNextPageParam:
             (lastPage) => {
