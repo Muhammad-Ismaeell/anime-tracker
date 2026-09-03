@@ -23,8 +23,8 @@ export default function AnimeSection({
     toggleFavorite,
 }) {
 
-    // Keep Home sections compact and information-dense.
-    const CARDS_PER_PAGE = 8;
+    // Keep Home sections compact and image-dense on desktop.
+    const CARDS_PER_PAGE = 10;
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
