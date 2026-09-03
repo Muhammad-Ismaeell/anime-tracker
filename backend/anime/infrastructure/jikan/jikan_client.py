@@ -1,4 +1,3 @@
-
 import json
 import logging
 import subprocess
@@ -47,16 +46,30 @@ def safe_request(url, params=None, retries=3):
 
             if result.returncode != 0:
                 logger.warning(
-                    "Jikan curl failed: %s",
-                    result.stderr
+                    "Jikan curl failed (attempt %s/%s): %s",
+                    attempt + 1,
+                    retries,
+                    result.stderr.strip() or "unknown curl error",
                 )
+
+                if attempt < retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+
                 return None
 
             if not result.stdout:
                 logger.warning(
-                    "Jikan returned an empty response for %s",
-                    url
+                    "Jikan returned an empty response for %s (attempt %s/%s)",
+                    url,
+                    attempt + 1,
+                    retries,
                 )
+
+                if attempt < retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+
                 return None
 
             data = json.loads(result.stdout)
@@ -64,12 +77,17 @@ def safe_request(url, params=None, retries=3):
             # Jikan errors are JSON too
             if "status" in data and data.get("status") != 200:
                 logger.warning(
-                    "Jikan error: %s",
-                    data
+                    "Jikan error (attempt %s/%s): %s",
+                    attempt + 1,
+                    retries,
+                    data,
                 )
 
-                time.sleep(2 ** attempt)
-                continue
+                if attempt < retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+
+                return None
 
             return data
 
@@ -84,17 +102,22 @@ def safe_request(url, params=None, retries=3):
         except json.JSONDecodeError:
 
             logger.warning(
-                "Invalid JSON response"
+                "Invalid JSON response (%s/%s)",
+                attempt + 1,
+                retries,
             )
 
         except Exception as exc:
 
             logger.warning(
-                "Jikan request failed: %s",
+                "Jikan request failed (%s/%s): %s",
+                attempt + 1,
+                retries,
                 exc,
             )
 
-        time.sleep(2 ** attempt)
+        if attempt < retries - 1:
+            time.sleep(2 ** attempt)
 
     return None
 
