@@ -9,7 +9,6 @@ import {
 } from "framer-motion";
 
 import AnimeCard from "../AnimeCard";
-
 import { getAnimeId } from "../../utils/normalizeAnime";
 
 import "./AnimeSection.css";
@@ -24,9 +23,8 @@ export default function AnimeSection({
     toggleFavorite,
 }) {
 
-    // Six cards keeps the home sections dense on desktop while the
-    // responsive CSS reduces the visible columns on smaller screens.
-    const CARDS_PER_PAGE = 6;
+    // Keep Home sections compact and information-dense.
+    const CARDS_PER_PAGE = 8;
 
     const safeFavoriteIds =
         favoriteIds instanceof Set
@@ -38,10 +36,7 @@ export default function AnimeSection({
             );
 
     const validAnime = useMemo(() => {
-        const list =
-            Array.isArray(animeList)
-                ? animeList
-                : [];
+        const list = Array.isArray(animeList) ? animeList : [];
 
         return list
             .map((anime) => ({
@@ -54,10 +49,7 @@ export default function AnimeSection({
     const [currentPage, setCurrentPage] = useState(0);
     const [slideDirection, setSlideDirection] = useState(1);
 
-    const totalPages = Math.ceil(
-        validAnime.length / CARDS_PER_PAGE
-    );
-
+    const totalPages = Math.ceil(validAnime.length / CARDS_PER_PAGE);
     const hasMultiplePages = totalPages > 1;
     const isFirstPage = currentPage === 0;
     const isLastPage = currentPage >= totalPages - 1;
@@ -69,16 +61,12 @@ export default function AnimeSection({
 
     const handlePrevious = () => {
         if (isFirstPage) return;
-
         setSlideDirection(-1);
-        setCurrentPage((current) =>
-            Math.max(current - 1, 0)
-        );
+        setCurrentPage((current) => Math.max(current - 1, 0));
     };
 
     const handleNext = () => {
         if (isLastPage) return;
-
         setSlideDirection(1);
         setCurrentPage((current) =>
             Math.min(current + 1, totalPages - 1)
@@ -90,10 +78,7 @@ export default function AnimeSection({
             x: direction > 0 ? 45 : -45,
             opacity: 0,
         }),
-        center: {
-            x: 0,
-            opacity: 1,
-        },
+        center: { x: 0, opacity: 1 },
         exit: (direction) => ({
             x: direction > 0 ? -45 : 45,
             opacity: 0,
@@ -121,7 +106,6 @@ export default function AnimeSection({
                         >
                             ←
                         </button>
-
                         <button
                             type="button"
                             className="section-slider-btn"
