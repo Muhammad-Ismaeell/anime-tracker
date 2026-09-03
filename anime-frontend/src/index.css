@@ -3828,9 +3828,6 @@ button:disabled {
         font-size: 1.2rem;
     }
 
-    .view-all-btn {
-        font-size: 0.8rem;
-    }
 }
 
 
@@ -6150,10 +6147,6 @@ button:disabled {
         font-size: 21px;
     }
 
-    .view-all-btn {
-        padding: 7px 10px;
-        font-size: 12px;
-    }
 }
 
 /* =========================================================
@@ -6315,12 +6308,6 @@ button:disabled {
     .section-emoji {
         font-size: 21px;
     }
-
-    .view-all-btn {
-        padding: 7px 10px;
-        font-size: 12px;
-    }
-
 
     /* ---------- Profile ---------- */
 
