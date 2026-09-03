@@ -1,0 +1,9 @@
+.infinite-scroll-sentinel {
+    width: 100%;
+    min-height: 1px;
+    margin-top: 24px;
+}
+
+.infinite-scroll-skeleton-grid {
+    margin-top: 24px;
+}
