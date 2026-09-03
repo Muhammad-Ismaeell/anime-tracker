@@ -2897,21 +2897,28 @@ body {
 
 .load-more-btn {
     display: block;
+
     margin: 30px auto 0;
 
-    padding: 12px 24px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
 
     border: none;
-    border-radius: 12px;
+    border-radius: var(--control-radius);
 
     background: #2563eb;
     color: white;
 
+    font: inherit;
     font-size: 14px;
     font-weight: 600;
 
     cursor: pointer;
-    transition: 0.2s ease;
+
+    transition:
+        transform var(--transition-fast),
+        background-color var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 .load-more-btn:hover {
@@ -3005,10 +3012,6 @@ body {
     font-weight: 700;
 }
 
-
-.load-more-btn {
-    margin-top: 16px;
-}
 
 /* layout system */
 .container {
