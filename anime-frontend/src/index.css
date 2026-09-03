@@ -5960,9 +5960,9 @@ button:disabled {
 .auth-prompt-secondary {
     flex: 1;
 
-    min-height: 44px;
-
-    border-radius: 11px;
+    min-height: var(--control-height);
+    padding: 0 var(--control-padding-x);
+    border-radius: var(--control-radius);
 
     font-size: 13px;
     font-weight: 700;
