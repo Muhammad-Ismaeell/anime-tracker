@@ -5,12 +5,11 @@
 
 .auth-page {
     min-height: 100vh;
-    box-sizing: border-box;
-    padding: 48px 20px 40px;
+    padding: 32px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     background: var(--bg);
 }
 
@@ -25,16 +24,19 @@
 
 .auth-brand {
     position: relative;
-    z-index: 1;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 18px;
+    margin: 0 0 18px;
     color: var(--text-primary);
     font-size: 15px;
     font-weight: 700;
     letter-spacing: -0.01em;
-    flex-shrink: 0;
 }
 
 .auth-brand-mark {
@@ -239,7 +241,7 @@
 
 @media (max-width: 520px) {
     .auth-page {
-        padding: 28px 14px 28px;
+        padding: 20px 14px;
     }
 
     .auth-card {
