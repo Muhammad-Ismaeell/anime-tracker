@@ -12,6 +12,7 @@ import "./index.css";
 import "./detail-polish.css";
 import "./review-polish.css";
 import "./auth-polish.css";
+import "./not-found-polish.css";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
     QueryClient,
@@ -28,106 +29,61 @@ const queryClient = new QueryClient({
             // Data stays fresh for 5 minutes
             staleTime: 1000 * 60 * 5,
 
+            // Keep unused data for 10 minutes
+            gcTime: 1000 * 60 * 10,
 
-            // Keep unused data in memory for 30 minutes
-            gcTime: 1000 * 60 * 30,
+            // Don't retry on every failure
+            retry: 1,
 
-
-            // Do not retry bad requests forever
-            retry: (failureCount, error) => {
-
-                if (error?.response?.status === 404) {
-                    return false;
-                }
-
-                if (error?.response?.status === 401) {
-                    return false;
-                }
-
-                return failureCount < 2;
-            },
-
-
-            // Better UX
-            refetchOnWindowFocus: false,
-
-
-            // Refresh only when needed
-            refetchOnReconnect: true,
-
-
-            // Avoid instant loading flashes
+            // Show previous data while fetching
             placeholderData: (previousData) => previousData,
-
         },
-
-
-        mutations: {
-
-            retry: false
-
-        }
-
-    }
-
+    },
 });
 
-ReactDOM.createRoot(
-    document.getElementById("root")
-).render(
 
-    <ErrorBoundary>
+ReactDOM.createRoot(document.getElementById("root")).render(
+
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
 
         <HelmetProvider>
 
-            <BrowserRouter>
+            <QueryClientProvider client={queryClient}>
 
-                <QueryClientProvider client={queryClient}>
+                <BrowserRouter>
 
-                    <AuthProvider>
+                    <ThemeProvider>
 
-                        <ThemeProvider>
+                        <AuthProvider>
 
-                            <Toaster
-                                position="bottom-right"
-                                toastOptions={{
-                                    duration: 2500,
-                                }}
-                            />
+                            <AuthPromptProvider>
 
-
-                            <GoogleOAuthProvider
-                                clientId={
-                                    import.meta.env.VITE_GOOGLE_CLIENT_ID
-                                }
-                            >
-
-                                <AuthPromptProvider>
+                                <ErrorBoundary>
 
                                     <App />
 
-                                </AuthPromptProvider>
+                                </ErrorBoundary>
 
-                            </GoogleOAuthProvider>
+                            </AuthPromptProvider>
 
+                        </AuthProvider>
 
-                            {import.meta.env.DEV && (
-                                <ReactQueryDevtools
-                                    initialIsOpen={false}
-                                />
-                            )}
+                    </ThemeProvider>
 
+                </BrowserRouter>
 
-                        </ThemeProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
 
-                    </AuthProvider>
-
-                </QueryClientProvider>
-
-            </BrowserRouter>
+            </QueryClientProvider>
 
         </HelmetProvider>
 
-    </ErrorBoundary>
+        <Toaster
+            position="top-right"
+            toastOptions={{
+                duration: 3000,
+            }}
+        />
 
+    </GoogleOAuthProvider>
 );
