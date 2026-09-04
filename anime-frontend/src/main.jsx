@@ -9,6 +9,7 @@ import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
+import "./detail-polish.css";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
     QueryClient,
