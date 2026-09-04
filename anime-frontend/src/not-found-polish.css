@@ -4,6 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: 48px 20px;
+    transform: translateX(112px);
 }
 
 .not-found-content {
@@ -56,6 +57,12 @@
 .not-found-home:hover {
     background: var(--accent-hover);
     transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+    .not-found-page {
+        transform: none;
+    }
 }
 
 @media (max-width: 600px) {
