@@ -14,10 +14,7 @@ import { getMediaUrl } from "../../utils/mediaUrl";
 
 import "./Navbar.css";
 
-function NavBar({
-    onMenuToggle = () => {},
-    sidebarOpen = false,
-}) {
+function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const navigate = useNavigate();
     const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
     const { data: profile } = useProfile();
@@ -107,12 +104,6 @@ function NavBar({
                 <nav className="navbar-nav" aria-label="Primary navigation">
                     <Link to="/" className="navbar-nav-link">Home</Link>
                     <Link to="/search" className="navbar-nav-link">Anime</Link>
-                    {isAuthenticated && (
-                        <Link to="/library" className="navbar-nav-link">Library</Link>
-                    )}
-                    {isAuthenticated && (
-                        <Link to="/favorites" className="navbar-nav-link">Favorites</Link>
-                    )}
                 </nav>
             </div>
 
