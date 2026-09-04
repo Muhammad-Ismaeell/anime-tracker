@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 
 import { useAnimeEpisodes } from "../../hooks/useAnimeEpisodes";
+import { useAnimeDetail } from "../../hooks/useAnimeDetail";
 import { useGlobalLibrary } from "../../hooks/useGlobalLibrary";
 
 import "./EpisodesSection.css";
 
 
-function EpisodesSection({ animeId, episodeCount = 0 }) {
+function EpisodesSection({ animeId }) {
     const {
         data,
         isLoading,
@@ -15,6 +16,11 @@ function EpisodesSection({ animeId, episodeCount = 0 }) {
         isFetchingNextPage,
         fetchNextPage,
     } = useAnimeEpisodes(animeId);
+
+    // The episode-list endpoint's pagination metadata does not reliably
+    // expose the total episode count, so use the already-cached anime detail
+    // data as the source of truth for the count.
+    const { data: anime } = useAnimeDetail(animeId);
 
     const { libraryMap } = useGlobalLibrary();
 
@@ -34,7 +40,7 @@ function EpisodesSection({ animeId, episodeCount = 0 }) {
     );
 
     const totalEpisodes =
-        Number(episodeCount) ||
+        Number(anime?.episodes) ||
         Number(data?.pages?.[0]?.total) ||
         episodes.length;
 
