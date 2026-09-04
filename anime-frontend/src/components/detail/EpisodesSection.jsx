@@ -6,7 +6,7 @@ import { useGlobalLibrary } from "../../hooks/useGlobalLibrary";
 import "./EpisodesSection.css";
 
 
-function EpisodesSection({ animeId, episodeCount }) {
+function EpisodesSection({ animeId }) {
     const {
         data,
         isLoading,
@@ -33,7 +33,7 @@ function EpisodesSection({ animeId, episodeCount }) {
         [data]
     );
 
-    if (!episodeCount || episodeCount <= 0) {
+    if (!isLoading && !isError && episodes.length === 0) {
         return null;
     }
 
@@ -43,7 +43,8 @@ function EpisodesSection({ animeId, episodeCount }) {
                 <div>
                     <h2>Episodes</h2>
                     <span className="detail-section-subtitle">
-                        {episodeCount} episodes
+                        {data?.pages?.[0]?.total ?? ""}
+                        {data?.pages?.[0]?.total ? " episodes" : ""}
                     </span>
                 </div>
             </div>
@@ -61,17 +62,12 @@ function EpisodesSection({ animeId, episodeCount }) {
                 <p className="episodes-muted">
                     Episodes could not be loaded right now.
                 </p>
-            ) : episodes.length === 0 ? (
-                <p className="episodes-muted">
-                    No episode information is available.
-                </p>
             ) : (
                 <>
                     <div className="episodes-list">
                         {episodes.map((episode, index) => {
                             const number = index + 1;
                             const watched = number <= watchedProgress;
-
                             const airedDate = episode.aired
                                 ? new Date(episode.aired).toLocaleDateString()
                                 : null;
