@@ -14,6 +14,7 @@ from anime.api.character_views import anime_characters
 from anime.api.staff_views import anime_staff
 from anime.api.statistics_views import anime_statistics
 from anime.api.relation_views import anime_relations
+from anime.api.theme_views import anime_themes
 
 
 urlpatterns = [
@@ -28,5 +29,6 @@ urlpatterns = [
     path("<int:anime_id>/staff/", anime_staff),
     path("<int:anime_id>/statistics/", anime_statistics),
     path("<int:anime_id>/relations/", anime_relations),
+    path("<int:anime_id>/themes/", anime_themes),
     path("<int:anime_id>/", anime_detail),
 ]
