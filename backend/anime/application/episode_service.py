@@ -30,12 +30,26 @@ class EpisodeService:
             }
 
         pagination = data.get("pagination") or {}
+        pagination_items = pagination.get("items") or {}
+
+        if isinstance(pagination_items, dict):
+            total = pagination_items.get("total") or 0
+        else:
+            total = pagination_items or pagination.get("total") or 0
+
         items = []
 
         for episode in data.get("data") or []:
             mal_id = episode.get("mal_id")
             if not mal_id:
                 continue
+
+            duration = episode.get("duration")
+            if duration is not None:
+                try:
+                    duration = round(float(duration) / 60)
+                except (TypeError, ValueError):
+                    pass
 
             items.append({
                 "id": mal_id,
@@ -48,7 +62,7 @@ class EpisodeService:
                 "score": episode.get("score"),
                 "filler": bool(episode.get("filler")),
                 "recap": bool(episode.get("recap")),
-                "duration": episode.get("duration"),
+                "duration": duration,
                 "url": episode.get("url"),
             })
 
@@ -56,5 +70,5 @@ class EpisodeService:
             "items": items,
             "page": pagination.get("current_page", page),
             "has_next": pagination.get("has_next_page", False),
-            "total": pagination.get("items", {}).get("total", 0),
+            "total": total,
         }
