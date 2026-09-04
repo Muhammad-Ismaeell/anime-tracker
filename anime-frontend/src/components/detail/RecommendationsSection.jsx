@@ -6,6 +6,7 @@ import { useAnimeRecommendations } from "../../hooks/useAnimeRecommendations";
 import CharactersSection from "./CharactersSection";
 import EpisodesSection from "./EpisodesSection";
 import StaffSection from "./StaffSection";
+import StatisticsSection from "./StatisticsSection";
 
 import "./RecommendationsSection.css";
 
@@ -25,6 +26,7 @@ function RecommendationsSection({ animeId }) {
             <EpisodesSection animeId={animeId} />
             <CharactersSection animeId={animeId} />
             <StaffSection animeId={animeId} />
+            <StatisticsSection animeId={animeId} />
 
             {isLoading ? (
                 <section className="detail-recommendations anime-section">
