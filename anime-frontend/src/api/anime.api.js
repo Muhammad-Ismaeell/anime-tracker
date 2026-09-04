@@ -62,6 +62,14 @@ export const AnimeAPI = {
         return res.data;
     },
 
+    characters: async (id) => {
+        const res = await api.get(`/anime/${id}/characters/`, {
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
     search: async ({ query, page = 1, filters = {} }) => {
         const res = await api.get("/anime/search/", {
             params: {
