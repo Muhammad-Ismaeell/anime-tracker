@@ -1,0 +1,9 @@
+/* =========================================================
+   FINAL UI POLISH
+   Small consistency fixes identified during the final pass.
+========================================================= */
+
+:root {
+    /* Keep legacy references aligned with the canonical page background. */
+    --background: var(--bg);
+}
