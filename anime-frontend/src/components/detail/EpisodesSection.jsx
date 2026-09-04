@@ -78,7 +78,7 @@ function EpisodesSection({ animeId }) {
                                     key={episode.id ?? `${animeId}-${number}`}
                                 >
                                     <div className="episode-number">
-                                        {watched ? "✓" : number}
+                                        {number}
                                     </div>
 
                                     <div className="episode-main">
@@ -103,11 +103,15 @@ function EpisodesSection({ animeId }) {
                                         </div>
                                     </div>
 
-                                    {episode.score != null && Number(episode.score) > 0 && (
-                                        <span className="episode-score">
-                                            ⭐ {Number(episode.score).toFixed(1)}
-                                        </span>
-                                    )}
+                                    <div className="episode-status">
+                                        {watched && <span aria-label="Watched">✓</span>}
+
+                                        {episode.score != null && Number(episode.score) > 0 && (
+                                            <span className="episode-score">
+                                                ⭐ {Number(episode.score).toFixed(1)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </article>
                             );
                         })}
