@@ -3,12 +3,13 @@ import { useToggleFavorite } from "../../hooks/user/useFavorites";
 import { useFavoriteIds } from "../../hooks/user/useFavoriteIds";
 import { useAnimeRecommendations } from "../../hooks/useAnimeRecommendations";
 
+import CharactersSection from "./CharactersSection";
 import EpisodesSection from "./EpisodesSection";
 
 import "./RecommendationsSection.css";
 
 
-function RecommendationsSection({ animeId, episodeCount }) {
+function RecommendationsSection({ animeId }) {
     const {
         data: recommendations = [],
         isLoading,
@@ -20,10 +21,8 @@ function RecommendationsSection({ animeId, episodeCount }) {
 
     return (
         <>
-            <EpisodesSection
-                animeId={animeId}
-                episodeCount={episodeCount}
-            />
+            <EpisodesSection animeId={animeId} />
+            <CharactersSection animeId={animeId} />
 
             {isLoading ? (
                 <section className="detail-recommendations anime-section">
