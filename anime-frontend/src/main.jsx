@@ -13,6 +13,7 @@ import "./detail-polish.css";
 import "./review-polish.css";
 import "./auth-polish.css";
 import "./not-found-polish.css";
+import "./final-polish.css";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
     QueryClient,
