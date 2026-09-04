@@ -17,6 +17,9 @@
 }
 
 .not-found-content .not-found-code {
+    display: flex;
+    justify-content: center;
+    width: 100%;
     margin: 0 0 10px;
     color: var(--accent);
     font-size: clamp(140px, 20vw, 180px);
