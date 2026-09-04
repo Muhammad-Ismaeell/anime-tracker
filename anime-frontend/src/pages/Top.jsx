@@ -3,15 +3,15 @@ import { useEffect, useRef } from "react";
 import "../styles/infinite-scroll.css";
 
 import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
-import { useToggleFavorite } from "../hooks/user/useFavorites";
+import {
+    useToggleFavorite,
+} from "../hooks/user/useFavorites";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
-
-import { normalizeAnime } from "../utils/normalizeAnime";
 
 import AnimeCard from "../components/AnimeCard";
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
-import PageContainer from "../components/ui/PageContainer";
 import EmptyState from "../components/ui/EmptyState";
+import PageContainer from "../components/ui/PageContainer";
 import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
 
 function Top() {
@@ -20,13 +20,14 @@ function Top() {
     }, []);
 
     const loadMoreRef = useRef(null);
+    const canLoadMoreRef = useRef(true);
 
     const {
         data,
-        isLoading,
-        isError,
         fetchNextPage,
         hasNextPage,
+        isLoading,
+        isError,
         isFetchingNextPage,
     } = useInfiniteAnime("top");
 
@@ -36,22 +37,32 @@ function Top() {
     const favoriteIds = useFavoriteIds();
 
     useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
         const observer = new IntersectionObserver(
-            (entries) => {
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    canLoadMoreRef.current = true;
+                    return;
+                }
+
                 if (
-                    entries[0]?.isIntersecting &&
+                    canLoadMoreRef.current &&
                     hasNextPage &&
                     !isFetchingNextPage
                 ) {
+                    canLoadMoreRef.current = false;
                     fetchNextPage();
                 }
             },
             { rootMargin: "100px" }
         );
 
-        if (loadMoreRef.current) {
-            observer.observe(loadMoreRef.current);
-        }
+        observer.observe(element);
 
         return () => observer.disconnect();
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
@@ -80,14 +91,7 @@ function Top() {
         );
     }
 
-    const animeList =
-        data?.pages?.flatMap(
-            (page) => page?.items || []
-        ) || [];
-
-    const normalizedAnime = animeList
-        .map(normalizeAnime)
-        .filter(Boolean);
+    const anime = data?.anime ?? [];
 
     return (
         <PageContainer>
@@ -95,25 +99,25 @@ function Top() {
                 <h1>⭐ Top Rated Anime</h1>
             </div>
 
-            {normalizedAnime.length === 0 ? (
+            {anime.length === 0 ? (
                 <EmptyState text="No top rated anime found." />
             ) : (
                 <div className="grid">
-                    {normalizedAnime.map((anime) => {
-                        const animeId = String(anime.id);
+                    {anime.map((item) => {
+                        const animeId = String(item.id);
 
                         return (
                             <AnimeCard
                                 key={animeId}
-                                anime={anime}
+                                anime={item}
                                 statusMap={statusMap}
                                 isFavorited={favoriteIds.has(animeId)}
                                 isFavoritePending={toggleFavorite.isPending}
                                 onToggleFavorite={() =>
                                     toggleFavorite.mutate({
-                                        anime_id: anime.id,
-                                        title: anime.title,
-                                        image: anime.image || "",
+                                        anime_id: item.id,
+                                        title: item.title,
+                                        image: item.image || "",
                                     })
                                 }
                             />
