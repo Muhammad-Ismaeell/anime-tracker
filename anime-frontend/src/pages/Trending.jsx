@@ -46,7 +46,7 @@ function Trending() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: "500px" }
+            { rootMargin: "100px" }
         );
 
         if (loadMoreRef.current) {
