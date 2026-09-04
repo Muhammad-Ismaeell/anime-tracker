@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import {
     memo,
     useContext,
+    useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -19,6 +21,67 @@ import { useUpdateLibrary } from "../hooks/useLibrary";
 
 import OptimizedImage from "./ui/OptimizedImage";
 import "./AnimeCardAniList.css";
+
+
+function AnimeCardImage({
+    src,
+    alt,
+    className,
+    imageLoading = "lazy",
+    imageFetchPriority = "auto",
+}) {
+    const containerRef = useRef(null);
+    const [shouldLoad, setShouldLoad] = useState(false);
+
+    useEffect(() => {
+        const element = containerRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
+        if (typeof IntersectionObserver === "undefined") {
+            setShouldLoad(true);
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    return;
+                }
+
+                setShouldLoad(true);
+                observer.disconnect();
+            },
+            {
+                rootMargin: "150px",
+            }
+        );
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={containerRef} className="anime-card-image-loader">
+            {shouldLoad && (
+                <OptimizedImage
+                    src={src}
+                    alt={alt}
+                    className={className}
+                    loading={imageLoading === "lazy" ? "eager" : imageLoading}
+                    fetchPriority={
+                        shouldLoad
+                            ? imageFetchPriority
+                            : "auto"
+                    }
+                />
+            )}
+        </div>
+    );
+}
 
 
 function AnimeCard({
@@ -337,12 +400,12 @@ function AnimeCard({
                     aria-label={`View ${title}`}
                 >
 
-                    <OptimizedImage
+                    <AnimeCardImage
                         src={image}
                         alt={title}
                         className="image"
-                        loading={imageLoading}
-                        fetchPriority={imageFetchPriority}
+                        imageLoading={imageLoading}
+                        imageFetchPriority={imageFetchPriority}
                     />
 
                 </Link>
@@ -399,7 +462,7 @@ function AnimeCard({
 
             {/* ==================================================
                 CONTENT
-            ================================================== */}
+            ================================================== */
 
             <div className="content">
 
@@ -415,7 +478,7 @@ function AnimeCard({
 
                 {/* ==================================================
                     METADATA
-                ================================================== */}
+                ================================================== */
 
                 {(type || year) && (
                     <div className="anime-card-meta">
@@ -435,7 +498,7 @@ function AnimeCard({
 
                 {/* ==================================================
                     LIBRARY STATUS
-                ================================================== */}
+                ================================================== */
 
                 <div className="status-wrapper">
 
