@@ -9,6 +9,7 @@ import StaffSection from "./StaffSection";
 import StatisticsSection from "./StatisticsSection";
 import RelationsSection from "./RelationsSection";
 import ThemesSection from "./ThemesSection";
+import NewsSection from "./NewsSection";
 
 import "./RecommendationsSection.css";
 
@@ -31,6 +32,7 @@ function RecommendationsSection({ animeId }) {
             <StatisticsSection animeId={animeId} />
             <RelationsSection animeId={animeId} />
             <ThemesSection animeId={animeId} />
+            <NewsSection animeId={animeId} />
 
             {isLoading ? (
                 <section className="detail-recommendations anime-section">
