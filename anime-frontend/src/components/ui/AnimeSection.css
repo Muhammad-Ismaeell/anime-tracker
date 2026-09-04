@@ -230,13 +230,32 @@
 }
 
 @media (max-width: 600px) {
-    .home-hero-posters { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+    .home-hero-posters {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+    }
+
+    .home-hero-poster-link {
+        flex: 0 0 78px;
+        width: 78px;
+        height: auto;
+    }
+
     .home-hero-title { font-size: 1.55rem; }
     .home-hero-description { font-size: 0.75rem; }
 }
 
 @media (max-width: 420px) {
-    .home-hero-posters { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+    .home-hero-posters { gap: 6px; }
+    .home-hero-poster-link { flex-basis: 72px; width: 72px; }
     .anime-ranking-item { grid-template-columns: 26px 46px minmax(0, 1fr); gap: 10px; }
     .anime-ranking-image { width: 46px; height: 61px; }
     .anime-ranking-score { display: none; }
