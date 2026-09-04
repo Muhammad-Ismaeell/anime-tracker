@@ -53,6 +53,15 @@ export const AnimeAPI = {
         return res.data;
     },
 
+    episodes: async (id, page = 1) => {
+        const res = await api.get(`/anime/${id}/episodes/`, {
+            params: { page },
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
     search: async ({ query, page = 1, filters = {} }) => {
         const res = await api.get("/anime/search/", {
             params: {
