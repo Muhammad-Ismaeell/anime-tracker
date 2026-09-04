@@ -6,7 +6,7 @@ import { useGlobalLibrary } from "../../hooks/useGlobalLibrary";
 import "./EpisodesSection.css";
 
 
-function EpisodesSection({ animeId }) {
+function EpisodesSection({ animeId, episodeCount = 0 }) {
     const {
         data,
         isLoading,
@@ -33,6 +33,11 @@ function EpisodesSection({ animeId }) {
         [data]
     );
 
+    const totalEpisodes =
+        Number(episodeCount) ||
+        Number(data?.pages?.[0]?.total) ||
+        episodes.length;
+
     if (!isLoading && !isError && episodes.length === 0) {
         return null;
     }
@@ -42,10 +47,11 @@ function EpisodesSection({ animeId }) {
             <div className="detail-section-heading">
                 <div>
                     <h2>Episodes</h2>
-                    <span className="detail-section-subtitle">
-                        {data?.pages?.[0]?.total ?? ""}
-                        {data?.pages?.[0]?.total ? " episodes" : ""}
-                    </span>
+                    {totalEpisodes > 0 && (
+                        <span className="detail-section-subtitle">
+                            {totalEpisodes} episodes
+                        </span>
+                    )}
                 </div>
             </div>
 
