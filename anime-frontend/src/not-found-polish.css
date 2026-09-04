@@ -16,12 +16,12 @@
 }
 
 .not-found-code {
-    margin: 0 0 6px;
+    margin: 0 0 10px;
     color: var(--accent);
-    font-size: clamp(64px, 10vw, 92px);
+    font-size: clamp(96px, 15vw, 144px);
     font-weight: 800;
-    line-height: .95;
-    letter-spacing: -.06em;
+    line-height: .82;
+    letter-spacing: -.07em;
 }
 
 .not-found-content h2 {
@@ -66,5 +66,9 @@
 
     .not-found-content {
         padding: 36px 20px;
+    }
+
+    .not-found-code {
+        font-size: clamp(88px, 24vw, 120px);
     }
 }
