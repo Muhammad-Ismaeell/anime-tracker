@@ -20,6 +20,7 @@ function Seasonal() {
     }, []);
 
     const loadMoreRef = useRef(null);
+    const canLoadMoreRef = useRef(true);
 
     const {
         data,
@@ -36,22 +37,32 @@ function Seasonal() {
     const favoriteIds = useFavoriteIds();
 
     useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
         const observer = new IntersectionObserver(
-            (entries) => {
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    canLoadMoreRef.current = true;
+                    return;
+                }
+
                 if (
-                    entries[0]?.isIntersecting &&
+                    canLoadMoreRef.current &&
                     hasNextPage &&
                     !isFetchingNextPage
                 ) {
+                    canLoadMoreRef.current = false;
                     fetchNextPage();
                 }
             },
             { rootMargin: "100px" }
         );
 
-        if (loadMoreRef.current) {
-            observer.observe(loadMoreRef.current);
-        }
+        observer.observe(element);
 
         return () => observer.disconnect();
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
