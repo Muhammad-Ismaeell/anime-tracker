@@ -2,7 +2,6 @@ import { lazy, Suspense, useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { ThemeContext } from "../context/ThemeContext";
-import ErrorBoundary from "../components/ErrorBoundary";
 import NotFound from "../pages/NotFound";
 import AppLayout from "./AppLayout";
 import PageLoader from "../components/ui/PageLoader";
@@ -39,41 +38,39 @@ export default function App() {
             }}
         >
             <ScrollToTop />
-            <ErrorBoundary>
-                <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                        <Route element={<AppLayout />}>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/anime/:id" element={<Detail />} />
-                            <Route path="/search" element={<AdvancedSearch />} />
-                            <Route path="/trending" element={<Trending />} />
-                            <Route path="/seasonal" element={<Seasonal />} />
-                            <Route path="/top" element={<Top />} />
-                            <Route path="/recently-added" element={<RecentlyAdded />} />
-                        </Route>
+            <Suspense fallback={<PageLoader />}>
+                <Routes>
+                    <Route element={<AppLayout />}>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/anime/:id" element={<Detail />} />
+                        <Route path="/search" element={<AdvancedSearch />} />
+                        <Route path="/trending" element={<Trending />} />
+                        <Route path="/seasonal" element={<Seasonal />} />
+                        <Route path="/top" element={<Top />} />
+                        <Route path="/recently-added" element={<RecentlyAdded />} />
+                    </Route>
 
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/verify-email" element={<VerifyEmail />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
 
-                        <Route
-                            element={
-                                <ProtectedRoute>
-                                    <AppLayout />
-                                </ProtectedRoute>
-                            }
-                        >
-                            <Route path="/library" element={<Library />} />
-                            <Route path="/favorites" element={<Favorites />} />
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/edit-profile" element={<EditProfile />} />
-                        </Route>
+                    <Route
+                        element={
+                            <ProtectedRoute>
+                                <AppLayout />
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route path="/library" element={<Library />} />
+                        <Route path="/favorites" element={<Favorites />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/edit-profile" element={<EditProfile />} />
+                    </Route>
 
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                </Suspense>
-            </ErrorBoundary>
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </Suspense>
         </div>
     );
 }
