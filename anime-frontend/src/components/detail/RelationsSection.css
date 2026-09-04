@@ -1,0 +1,116 @@
+.detail-relations {
+    margin-top: 28px;
+}
+
+.relations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.relation-group {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.relation-label {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.relation-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.relation-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface-elevated, var(--surface));
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    line-height: 1.3;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.relation-link:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover, var(--surface));
+}
+
+.relation-link span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.relation-link small {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-size: 0.58rem;
+    font-weight: 700;
+}
+
+.relations-muted {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.relation-skeleton {
+    min-height: 52px;
+}
+
+.relation-label-skeleton,
+.relation-links-skeleton span {
+    border-radius: 3px;
+    background: var(--surface-elevated, var(--surface));
+    animation: relation-pulse 1.4s ease-in-out infinite;
+}
+
+.relation-label-skeleton {
+    width: 70px;
+    height: 10px;
+}
+
+.relation-links-skeleton {
+    display: flex;
+    gap: 7px;
+}
+
+.relation-links-skeleton span {
+    width: 130px;
+    height: 28px;
+}
+
+@keyframes relation-pulse {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .relation-group {
+        grid-template-columns: 1fr;
+        gap: 7px;
+    }
+}
