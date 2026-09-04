@@ -16,6 +16,7 @@ from anime.api.statistics_views import anime_statistics
 from anime.api.relation_views import anime_relations
 from anime.api.theme_views import anime_themes
 from anime.api.news_views import anime_news
+from anime.api.external_link_views import anime_external_links
 
 
 urlpatterns = [
@@ -32,5 +33,6 @@ urlpatterns = [
     path("<int:anime_id>/relations/", anime_relations),
     path("<int:anime_id>/themes/", anime_themes),
     path("<int:anime_id>/news/", anime_news),
+    path("<int:anime_id>/external-links/", anime_external_links),
     path("<int:anime_id>/", anime_detail),
 ]
