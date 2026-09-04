@@ -1,27 +1,17 @@
-/* =========================================================
-   ANILIST-INSPIRED NAVBAR
-   ========================================================= */
-
+/* Navbar */
 .navbar {
     position: sticky;
     top: 0;
     z-index: 1000;
-
     display: grid;
     grid-template-columns: minmax(0, 1fr) 240px auto;
     align-items: center;
     gap: 24px;
-
     height: 56px;
     padding: 0 24px;
-
     background: #151922;
     border-bottom: 1px solid var(--border);
 }
-
-/* =========================================================
-   LEFT / BRAND / NAVIGATION
-   ========================================================= */
 
 .navbar-left {
     display: flex;
@@ -34,9 +24,7 @@
     display: inline-flex;
     align-items: center;
     gap: 9px;
-
     flex-shrink: 0;
-
     color: var(--text-primary);
     text-decoration: none;
     font-size: 17px;
@@ -49,14 +37,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     width: 28px;
     height: 28px;
-
     border-radius: var(--radius-sm);
     background: var(--accent);
     color: #fff;
-
     font-size: 14px;
     font-weight: 800;
 }
@@ -70,14 +55,11 @@
 
 .navbar-nav-link {
     position: relative;
-
     padding: 18px 0;
-
     color: var(--text-muted);
     text-decoration: none;
     font-size: 13px;
     font-weight: 600;
-
     transition: color var(--transition-fast);
 }
 
@@ -100,24 +82,17 @@
     outline-offset: 2px;
 }
 
-/* =========================================================
-   MOBILE MENU BUTTON
-   ========================================================= */
-
 .navbar-menu-button {
     display: none;
     align-items: center;
     justify-content: center;
-
     width: 40px;
     height: 40px;
     padding: 0;
-
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-primary);
-
     font: inherit;
     font-size: 18px;
     cursor: pointer;
@@ -126,10 +101,6 @@
 .navbar-menu-button:hover {
     background: var(--surface-hover);
 }
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
 
 .navbar-search-wrapper {
     position: relative;
@@ -147,7 +118,6 @@
     position: absolute;
     left: 12px;
     z-index: 1;
-
     color: var(--text-muted);
     font-size: 18px;
     line-height: 1;
@@ -158,20 +128,14 @@
     width: 100%;
     height: 36px;
     padding: 0 38px 0 34px;
-
     border: 1px solid var(--border);
     border-radius: 7px;
-
     background: #0f131b;
     color: var(--text-primary);
-
     font: inherit;
     font-size: 13px;
     outline: none;
-
-    transition:
-        border-color var(--transition-fast),
-        background-color var(--transition-fast);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .navbar-search-input::placeholder {
@@ -190,20 +154,16 @@
 .navbar-search-clear {
     position: absolute;
     right: 8px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 24px;
     height: 24px;
     padding: 0;
-
     border: 0;
     border-radius: 4px;
     background: transparent;
     color: var(--text-muted);
-
     font: inherit;
     font-size: 12px;
     cursor: pointer;
@@ -214,19 +174,13 @@
     color: var(--text-primary);
 }
 
-/* =========================================================
-   SEARCH DROPDOWN
-   ========================================================= */
-
 .navbar-dropdown {
     position: absolute;
     top: calc(100% + 7px);
     left: 0;
     right: 0;
-
     overflow: hidden auto;
     max-height: 420px;
-
     background: #151922;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -246,15 +200,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-
     width: 100%;
     padding: 9px 10px;
-
     border: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     background: transparent;
     color: inherit;
-
     text-align: left;
     cursor: pointer;
 }
@@ -267,7 +218,6 @@
     width: 36px;
     height: 48px;
     flex-shrink: 0;
-
     object-fit: cover;
     border-radius: 4px;
     background: var(--surface-hover);
@@ -305,14 +255,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     width: 100%;
     padding: 11px 12px;
-
     border: 0;
     background: #151922;
     color: var(--accent);
-
     font: inherit;
     font-size: 12px;
     font-weight: 700;
@@ -322,10 +269,6 @@
 .navbar-view-all:hover {
     background: var(--surface-hover);
 }
-
-/* =========================================================
-   RIGHT / AUTH
-   ========================================================= */
 
 .navbar-right {
     display: flex;
@@ -340,10 +283,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     min-height: 34px;
     padding: 0 10px;
-
     border-radius: var(--radius-sm);
     text-decoration: none;
     font-size: 13px;
@@ -368,10 +309,6 @@
     background: var(--accent-hover);
 }
 
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
 .profile-menu-wrapper {
     position: relative;
 }
@@ -380,15 +317,12 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-
     min-height: 36px;
     padding: 3px 7px 3px 4px;
-
     border: 1px solid transparent;
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-primary);
-
     font: inherit;
     font-size: 13px;
     font-weight: 600;
@@ -412,13 +346,10 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-
     flex-shrink: 0;
-
     border-radius: 50%;
     background: var(--accent);
     color: #fff;
-
     font-size: 11px;
     font-weight: 800;
 }
@@ -449,10 +380,8 @@
     position: absolute;
     top: calc(100% + 7px);
     right: 0;
-
     width: 190px;
     padding: 6px;
-
     background: #151922;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -463,39 +392,36 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-
     padding: 8px 9px 9px;
     margin-bottom: 4px;
-
     border-bottom: 1px solid var(--border);
 }
 
-.profile-menu-user strong {
+.profile-menu-user strong,
+.profile-menu-user span {
     overflow: hidden;
-    color: var(--text-primary);
-    font-size: 13px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+.profile-menu-user strong {
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
 .profile-menu-user span {
-    overflow: hidden;
     color: var(--text-muted);
     font-size: 11px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .profile-menu-action {
     display: block;
     width: 100%;
     padding: 9px;
-
     border: 0;
     border-radius: 5px;
     background: transparent;
     color: var(--text-secondary);
-
     font: inherit;
     font-size: 12px;
     text-align: left;
@@ -516,7 +442,6 @@
     color: #f87171;
 }
 
-/* Legacy drawer markup is no longer used by the navbar. */
 .profile-menu-backdrop,
 .profile-menu-drawer,
 .profile-menu-header,
@@ -525,10 +450,6 @@
 .profile-menu-actions {
     display: none;
 }
-
-/* =========================================================
-   TABLET
-   ========================================================= */
 
 @media (max-width: 1100px) {
     .navbar {
@@ -549,10 +470,6 @@
         width: 220px;
     }
 }
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 900px) {
     .navbar {
@@ -594,12 +511,17 @@
 
 @media (max-width: 650px) {
     .navbar {
-        padding: 0 12px;
+        padding: 0 10px;
+    }
+
+    .navbar-left {
+        gap: 8px;
     }
 
     .navbar-search-wrapper {
         flex: 1;
-        max-width: 240px;
+        max-width: 220px;
+        min-width: 0;
     }
 
     .navbar-logo-text {
@@ -615,24 +537,46 @@
         padding: 3px;
     }
 
-    .navbar-login {
-        display: none;
+    .navbar-login,
+    .navbar-register {
+        min-height: 32px;
+        padding: 0 7px;
+        font-size: 11px;
     }
 
-    .navbar-register {
-        min-height: 34px;
-        padding: 0 9px;
-        font-size: 12px;
+    .navbar-right {
+        gap: 4px;
     }
 }
 
 @media (max-width: 420px) {
+    .navbar {
+        gap: 6px;
+    }
+
+    .navbar-menu-button {
+        width: 36px;
+        height: 36px;
+    }
+
+    .navbar-logo {
+        gap: 0;
+    }
+
+    .logo-mark {
+        width: 26px;
+        height: 26px;
+    }
+
     .navbar-search-wrapper {
         max-width: none;
     }
 
+    .navbar-login,
     .navbar-register {
-        display: none;
+        min-height: 30px;
+        padding: 0 6px;
+        font-size: 10px;
     }
 }
 
