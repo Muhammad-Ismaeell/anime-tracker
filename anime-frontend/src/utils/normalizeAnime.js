@@ -1,4 +1,3 @@
-
 export const getAnimeId = (anime) => {
     if (!anime) {
         return null;
@@ -37,6 +36,9 @@ export const normalizeAnime = (anime) => {
             "Unknown Anime",
 
         image:
+            anime.images?.webp?.large_image_url ??
+            anime.images?.jpg?.large_image_url ??
+            anime.image_large ??
             anime.images?.webp?.image_url ??
             anime.images?.jpg?.image_url ??
             anime.image ??
