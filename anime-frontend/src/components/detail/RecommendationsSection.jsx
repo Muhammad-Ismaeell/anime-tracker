@@ -8,7 +8,7 @@ import EpisodesSection from "./EpisodesSection";
 import "./RecommendationsSection.css";
 
 
-function RecommendationsSection({ animeId }) {
+function RecommendationsSection({ animeId, episodeCount }) {
     const {
         data: recommendations = [],
         isLoading,
@@ -20,7 +20,10 @@ function RecommendationsSection({ animeId }) {
 
     return (
         <>
-            <EpisodesSection animeId={animeId} />
+            <EpisodesSection
+                animeId={animeId}
+                episodeCount={episodeCount}
+            />
 
             {isLoading ? (
                 <section className="detail-recommendations anime-section">
