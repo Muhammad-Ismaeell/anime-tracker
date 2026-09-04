@@ -515,11 +515,12 @@
     }
 
     .navbar-left {
+        flex: 0 1 auto;
         gap: 8px;
     }
 
     .navbar-search-wrapper {
-        flex: 1;
+        flex: 1 1 120px;
         max-width: 220px;
         min-width: 0;
     }
@@ -539,12 +540,15 @@
 
     .navbar-login,
     .navbar-register {
+        flex-shrink: 0;
         min-height: 32px;
         padding: 0 7px;
         font-size: 11px;
+        white-space: nowrap;
     }
 
     .navbar-right {
+        flex: 0 0 auto;
         gap: 4px;
     }
 }
@@ -569,7 +573,7 @@
     }
 
     .navbar-search-wrapper {
-        max-width: none;
+        flex-basis: 80px;
     }
 
     .navbar-login,
