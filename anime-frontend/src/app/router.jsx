@@ -1,17 +1,14 @@
-import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense, useContext } from "react";
+import { Route, Routes } from "react-router-dom";
 
 import { ThemeContext } from "../context/ThemeContext";
+import ErrorBoundary from "../components/ErrorBoundary";
 import NotFound from "../pages/NotFound";
 import AppLayout from "./AppLayout";
-
-import ScrollToTop from "../components/ScrollToTop";
-import ErrorBoundary from "../components/ErrorBoundary";
-import ProtectedRoute from "../components/ProtectedRoute";
 import PageLoader from "../components/ui/PageLoader";
+import ProtectedRoute from "../components/ProtectedRoute";
+import ScrollToTop from "../components/ScrollToTop";
 
-
-// PUBLIC
 const Home = lazy(() => import("../pages/Home"));
 const Detail = lazy(() => import("../pages/Detail"));
 const AdvancedSearch = lazy(() => import("../pages/AdvancedSearch"));
@@ -20,13 +17,10 @@ const Seasonal = lazy(() => import("../pages/Seasonal"));
 const Top = lazy(() => import("../pages/Top"));
 const RecentlyAdded = lazy(() => import("../pages/RecentlyAdded"));
 
-
-// AUTH
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
 const VerifyEmail = lazy(() => import("../pages/VerifyEmail"));
 
-// PROTECTED
 const Library = lazy(() => import("../pages/Library"));
 const Favorites = lazy(() => import("../pages/Favorites"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
@@ -44,15 +38,10 @@ export default function App() {
                 minHeight: "100vh",
             }}
         >
-
-            
             <ScrollToTop />
             <ErrorBoundary>
                 <Suspense fallback={<PageLoader />}>
-
                     <Routes>
-
-                        {/* PUBLIC */}
                         <Route element={<AppLayout />}>
                             <Route path="/" element={<Home />} />
                             <Route path="/anime/:id" element={<Detail />} />
@@ -63,16 +52,10 @@ export default function App() {
                             <Route path="/recently-added" element={<RecentlyAdded />} />
                         </Route>
 
-
-                        {/* AUTH */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route
-                            path="/verify-email"
-                            element={<VerifyEmail />}
-                        />
+                        <Route path="/verify-email" element={<VerifyEmail />} />
 
-                        {/* PROTECTED */}
                         <Route
                             element={
                                 <ProtectedRoute>
@@ -85,18 +68,12 @@ export default function App() {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/edit-profile" element={<EditProfile />} />
-
                         </Route>
 
-
                         <Route path="*" element={<NotFound />} />
-
                     </Routes>
-
                 </Suspense>
             </ErrorBoundary>
-            
-
         </div>
     );
 }
