@@ -15,7 +15,7 @@
     background: var(--surface);
 }
 
-.not-found-code {
+.not-found-content .not-found-code {
     margin: 0 0 10px;
     color: var(--accent);
     font-size: clamp(140px, 20vw, 180px);
@@ -30,7 +30,7 @@
     font-size: 22px;
 }
 
-.not-found-content p {
+.not-found-content p:not(.not-found-code) {
     margin: 0 auto 24px;
     max-width: 360px;
     color: var(--text-muted);
@@ -68,7 +68,7 @@
         padding: 36px 20px;
     }
 
-    .not-found-code {
+    .not-found-content .not-found-code {
         font-size: clamp(110px, 28vw, 150px);
     }
 }
