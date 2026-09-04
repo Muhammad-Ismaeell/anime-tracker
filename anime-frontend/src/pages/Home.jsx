@@ -65,18 +65,24 @@ function Home() {
     }, [seasonalAnime, trendingAnime, recentlyAddedAnime, topAnime]);
 
     const loading =
-        trendingQuery.isPending ||
-        seasonalQuery.isPending ||
-        topQuery.isPending ||
+        trendingQuery.isPending &&
+        seasonalQuery.isPending &&
+        topQuery.isPending &&
         recentlyAddedQuery.isPending;
 
-    const error =
-        trendingQuery.error ||
-        seasonalQuery.error ||
-        topQuery.error ||
-        recentlyAddedQuery.error;
+    const hasAnime =
+        trendingAnime.length > 0 ||
+        seasonalAnime.length > 0 ||
+        topAnime.length > 0 ||
+        recentlyAddedAnime.length > 0;
 
-    if (error) {
+    const allFailed =
+        trendingQuery.isError &&
+        seasonalQuery.isError &&
+        topQuery.isError &&
+        recentlyAddedQuery.isError;
+
+    if (allFailed) {
         return (
             <PageContainer>
                 <EmptyState text="Failed to load anime." />
@@ -100,7 +106,7 @@ function Home() {
                 />
             </Helmet>
 
-            {!loading && heroAnime.length > 0 && (
+            {heroAnime.length > 0 && (
                 <section className="home-hero">
                     <div className="home-hero-inner">
                         <div className="home-hero-content">
@@ -170,40 +176,48 @@ function Home() {
                         />
                     ))}
                 </div>
-            ) : (
+            ) : hasAnime ? (
                 <div className="home-catalog-sections">
                     <div className="home-category-row">
-                        <AnimeSection
-                            title="Trending Now"
-                            animeList={trendingAnime}
-                            viewAllTo="/trending"
-                            {...sectionProps}
-                        />
+                        {trendingAnime.length > 0 && (
+                            <AnimeSection
+                                title="Trending Now"
+                                animeList={trendingAnime}
+                                viewAllTo="/trending"
+                                {...sectionProps}
+                            />
+                        )}
 
-                        <AnimeSection
-                            title="Current Season"
-                            animeList={seasonalAnime}
-                            viewAllTo="/seasonal"
-                            {...sectionProps}
-                        />
+                        {seasonalAnime.length > 0 && (
+                            <AnimeSection
+                                title="Current Season"
+                                animeList={seasonalAnime}
+                                viewAllTo="/seasonal"
+                                {...sectionProps}
+                            />
+                        )}
 
-                        <AnimeSection
-                            title="Recently Added"
-                            animeList={recentlyAddedAnime}
-                            viewAllTo="/recently-added"
-                            {...sectionProps}
-                        />
+                        {recentlyAddedAnime.length > 0 && (
+                            <AnimeSection
+                                title="Recently Added"
+                                animeList={recentlyAddedAnime}
+                                viewAllTo="/recently-added"
+                                {...sectionProps}
+                            />
+                        )}
                     </div>
 
-                    <AnimeSection
-                        title="Top Anime"
-                        animeList={topAnime}
-                        variant="ranking"
-                        viewAllTo="/top"
-                        {...sectionProps}
-                    />
+                    {topAnime.length > 0 && (
+                        <AnimeSection
+                            title="Top Anime"
+                            animeList={topAnime}
+                            variant="ranking"
+                            viewAllTo="/top"
+                            {...sectionProps}
+                        />
+                    )}
                 </div>
-            )}
+            ) : null}
         </PageContainer>
     );
 }
