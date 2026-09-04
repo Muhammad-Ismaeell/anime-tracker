@@ -1,0 +1,128 @@
+.detail-staff {
+    margin-top: 28px;
+}
+
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.staff-card {
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.staff-image-wrap {
+    flex: 0 0 58px;
+    width: 58px;
+    height: 76px;
+    background: var(--surface-elevated, var(--surface));
+}
+
+.staff-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.staff-image-placeholder {
+    background: var(--surface-elevated, var(--surface));
+}
+
+.staff-info {
+    min-width: 0;
+    padding: 9px 10px;
+}
+
+.staff-info h3 {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.staff-positions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 5px;
+    margin-top: 5px;
+}
+
+.staff-positions span {
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    line-height: 1.25;
+}
+
+.staff-positions span + span::before {
+    content: "•";
+    margin-right: 5px;
+    color: var(--text-muted, var(--text-secondary));
+}
+
+.staff-muted {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.staff-skeleton {
+    min-height: 76px;
+}
+
+.staff-image-skeleton,
+.staff-line {
+    background: var(--surface-elevated, var(--surface));
+    animation: staff-pulse 1.4s ease-in-out infinite;
+}
+
+.staff-line {
+    width: 70%;
+    height: 8px;
+    border-radius: 3px;
+    margin-top: 7px;
+}
+
+.staff-line-name {
+    width: 88%;
+    height: 10px;
+    margin-top: 0;
+}
+
+@keyframes staff-pulse {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 900px) {
+    .staff-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .staff-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 430px) {
+    .staff-grid {
+        grid-template-columns: 1fr;
+    }
+}
