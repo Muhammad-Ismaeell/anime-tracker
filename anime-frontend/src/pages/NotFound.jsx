@@ -4,19 +4,18 @@ import PageContainer from "../components/ui/PageContainer";
 export default function NotFound() {
     return (
         <PageContainer>
-            <div style={{ textAlign: "center", padding: "80px 0" }}>
-                <h1 style={{ fontSize: "72px" }}>404</h1>
-
-                <h2>Page not found</h2>
-
-                <p>
-                    The page you're looking for doesn't exist.
-                </p>
-
-                <Link className="view-all-btn" to="/">
-                    Go Home
-                </Link>
-            </div>
+            <main className="not-found-page">
+                <div className="not-found-content">
+                    <p className="not-found-code">404</p>
+                    <h2>Page not found</h2>
+                    <p>
+                        The page you're looking for doesn't exist or may have been moved.
+                    </p>
+                    <Link className="not-found-home" to="/">
+                        Go Home
+                    </Link>
+                </div>
+            </main>
         </PageContainer>
     );
 }
