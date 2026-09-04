@@ -23,6 +23,18 @@ export const normalizeAnime = (anime) => {
         return null;
     }
 
+    const normalImage =
+        anime.images?.webp?.image_url ??
+        anime.images?.jpg?.image_url ??
+        anime.image ??
+        "";
+
+    const largeImage =
+        anime.images?.webp?.large_image_url ??
+        anime.images?.jpg?.large_image_url ??
+        anime.image_large ??
+        normalImage;
+
     return {
         // MAL ID is the canonical anime ID everywhere
         id: animeId,
@@ -35,23 +47,10 @@ export const normalizeAnime = (anime) => {
             anime.title_english ??
             "Unknown Anime",
 
-        image:
-            anime.images?.webp?.large_image_url ??
-            anime.images?.jpg?.large_image_url ??
-            anime.image_large ??
-            anime.images?.webp?.image_url ??
-            anime.images?.jpg?.image_url ??
-            anime.image ??
-            "",
-
-        largeImage:
-            anime.images?.webp?.large_image_url ??
-            anime.images?.jpg?.large_image_url ??
-            anime.image_large ??
-            anime.images?.webp?.image_url ??
-            anime.images?.jpg?.image_url ??
-            anime.image ??
-            "",
+        // Use the standard-sized image for catalogue cards.
+        // Keep the large variant separately for views that need it.
+        image: normalImage,
+        largeImage,
 
         score:
             anime.score ??
