@@ -1,19 +1,14 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/Layout/Sidebar";
 import Navbar from "../components/Layout/NavBar";
-import { Outlet } from "react-router-dom";
 
 export default function AppLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const closeSidebar = () => {
-        setSidebarOpen(false);
-    };
-
-    const toggleSidebar = () => {
-        setSidebarOpen((current) => !current);
-    };
+    const closeSidebar = () => setSidebarOpen(false);
+    const toggleSidebar = () => setSidebarOpen((current) => !current);
 
     return (
         <div className="app-layout">
@@ -32,13 +27,8 @@ export default function AppLayout() {
                     <Outlet />
 
                     <footer className="footer">
-                        <p>
-                            Anime Tracker © 2026
-                        </p>
-
-                        <p>
-                            Built with React • Django • Jikan API
-                        </p>
+                        <p>Anime Tracker © 2026</p>
+                        <p>Built with React • Django • Tenrai</p>
                     </footer>
                 </main>
             </div>
