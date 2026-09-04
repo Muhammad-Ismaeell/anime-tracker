@@ -18,7 +18,7 @@
 .not-found-code {
     margin: 0 0 10px;
     color: var(--accent);
-    font-size: clamp(96px, 15vw, 144px);
+    font-size: clamp(140px, 20vw, 180px);
     font-weight: 800;
     line-height: .82;
     letter-spacing: -.07em;
@@ -69,6 +69,6 @@
     }
 
     .not-found-code {
-        font-size: clamp(88px, 24vw, 120px);
+        font-size: clamp(110px, 28vw, 150px);
     }
 }
