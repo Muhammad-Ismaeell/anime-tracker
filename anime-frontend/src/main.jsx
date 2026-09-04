@@ -11,6 +11,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import "./index.css";
 import "./detail-polish.css";
 import "./review-polish.css";
+import "./auth-polish.css";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
 import {
     QueryClient,
