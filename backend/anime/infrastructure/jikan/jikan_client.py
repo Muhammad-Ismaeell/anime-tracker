@@ -163,7 +163,10 @@ class JikanClient:
         return self._get_list("news", page, params)
 
     def get_detail(self, anime_id):
-        data = safe_request(f"{BASE_URL}/anime/{anime_id}/full")
+        data = safe_request(
+            f"{BASE_URL}/anime/{anime_id}/full",
+            params={"sfw-strict": "true"},
+        )
         if not data:
             return None
         anime = data.get("data")
@@ -174,9 +177,16 @@ class JikanClient:
     def get_recommendations(self, anime_id):
         data = safe_request(
             f"{BASE_URL}/anime/{anime_id}/recommendations",
-            params={"sfw": "true"},
+            params={"sfw-strict": "true"},
         )
         return data.get("data", []) if data else []
+
+    def get_character_anime(self, character_id):
+        data = safe_request(
+            f"{BASE_URL}/characters/{character_id}/anime",
+            params={"sfw-strict": "true"},
+        )
+        return data.get("data") if data else None
 
     def get_top(self, page=1):
         return self._get_list("top/anime", page)
