@@ -162,7 +162,7 @@ function News() {
 
             {newsQuery.isLoading ? (
                 <div className="news-list">
-                    {Array.from({ length: 8 }).map((_, index) => <div className="news-skeleton" key={index} />)}
+                    {Array.from({ length: 6 }).map((_, index) => <div className="news-skeleton" key={index} />)}
                 </div>
             ) : newsQuery.isError || news.length === 0 ? (
                 <EmptyState text="No anime news found." icon="📰" />
