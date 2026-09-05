@@ -122,7 +122,7 @@
     position: relative;
     width: 100%;
     min-height: 275px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     overflow: hidden;
     background: transparent;
     border: none;
@@ -131,13 +131,13 @@
 
 .home-hero-inner {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(430px, 1.1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
     align-items: center;
-    gap: 36px;
+    gap: 48px;
     width: min(100% - 44px, 1160px);
     min-height: 275px;
     margin: 0 auto;
-    padding: 24px 0;
+    padding: 20px 0;
 }
 
 .home-hero-content {
@@ -218,44 +218,100 @@
     filter: none !important;
 }
 
+.home-hero-discovery {
+    align-self: end;
+    min-width: 0;
+    padding-bottom: 4px;
+}
+
+.home-hero-discovery-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.home-category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.home-category-tab {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--control-radius);
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 0.7rem;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.home-category-tab:hover {
+    border-color: rgba(139, 92, 246, 0.45);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.home-category-tab.active {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.home-catalog-sections { width: 100%; }
+
+.home-discovery-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 290px);
+    align-items: start;
+    gap: 28px;
+}
+
+.home-discovery-main,
+.home-discovery-ranking { min-width: 0; }
+
+.home-discovery-main .anime-section-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px 12px;
+}
+
+.home-discovery-main .home-section { margin-bottom: 0; }
+
+.home-discovery-main .section-header { margin-bottom: 0.65rem; }
+
+.home-discovery-ranking .home-section { margin-bottom: 0; }
+
 @media (max-width: 1050px) {
-    .home-hero-inner { grid-template-columns: minmax(0, 0.85fr) minmax(360px, 1.15fr); gap: 24px; }
-    .home-hero-posters { gap: 7px; }
+    .home-hero-inner { grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr); gap: 30px; }
+    .home-discovery-grid { grid-template-columns: minmax(0, 1fr) minmax(220px, 260px); gap: 20px; }
+    .home-discovery-main .anime-section-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 800px) {
     .home-hero { min-height: 0; }
-    .home-hero-inner { grid-template-columns: 1fr; width: calc(100% - 28px); min-height: 0; gap: 22px; padding: 20px 0; }
-    .home-hero-posters { max-width: 560px; }
+    .home-hero-inner { grid-template-columns: 1fr; width: calc(100% - 28px); min-height: 0; gap: 18px; padding: 20px 0 14px; }
+    .home-hero-discovery { align-self: start; }
+    .home-discovery-grid { grid-template-columns: 1fr; gap: 26px; }
+    .home-discovery-main .anime-section-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 600px) {
-    .home-hero-posters {
-        display: flex;
-        align-items: stretch;
-        gap: 8px;
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding-bottom: 4px;
-        scrollbar-width: thin;
-    }
-
-    .home-hero-poster-link {
-        flex: 0 0 78px;
-        width: 78px;
-        height: auto;
-    }
-
+    .home-hero-inner { width: 100%; padding-top: 14px; }
     .home-hero-title { font-size: 1.55rem; }
     .home-hero-description { font-size: 0.75rem; }
+    .home-category-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; scrollbar-width: thin; }
+    .home-category-tab { flex: 0 0 auto; }
+    .home-discovery-main .anime-section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 10px; }
 }
 
 @media (max-width: 420px) {
-    .home-hero-posters { gap: 6px; }
-    .home-hero-poster-link { flex-basis: 72px; width: 72px; }
     .anime-ranking-item { grid-template-columns: 26px 46px minmax(0, 1fr); gap: 10px; }
     .anime-ranking-image { width: 46px; height: 61px; }
     .anime-ranking-score { display: none; }
