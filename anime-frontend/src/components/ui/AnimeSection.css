@@ -198,10 +198,18 @@
     letter-spacing: 0.12em;
 }
 
+.home-discovery-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
 .home-category-tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
+    min-width: 0;
 }
 
 .home-category-tab {
@@ -230,17 +238,34 @@
     color: #ffffff;
 }
 
+.home-discovery-view-all {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.home-discovery-view-all:hover { color: var(--accent); }
+
 .home-catalog-sections { width: 100%; }
 
 .home-discovery-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(250px, 290px);
-    align-items: start;
+    display: flex;
+    align-items: flex-start;
     gap: 28px;
 }
 
-.home-discovery-main,
-.home-discovery-ranking { min-width: 0; }
+.home-discovery-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.home-discovery-ranking {
+    flex: 0 0 290px;
+    min-width: 0;
+}
 
 .home-discovery-main .home-section { margin-bottom: 0; }
 
@@ -249,23 +274,21 @@
     gap: 18px 12px;
 }
 
-.home-discovery-main .home-discovery-cards .anime-card:nth-child(6) {
-    display: none;
-}
-
 .home-discovery-ranking .home-section { margin-bottom: 0; }
 
 @media (max-width: 1050px) {
-    .home-discovery-grid { grid-template-columns: minmax(0, 1fr) minmax(220px, 260px); gap: 20px; }
+    .home-discovery-grid { gap: 20px; }
+    .home-discovery-ranking { flex-basis: 260px; }
     .home-discovery-main .home-discovery-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 800px) {
     .home-hero { min-height: 0; }
     .home-hero-inner { width: calc(100% - 28px); min-height: 0; padding: 20px 0 14px; }
-    .home-discovery-grid { grid-template-columns: 1fr; gap: 26px; }
+    .home-discovery-grid { flex-direction: column; gap: 26px; }
+    .home-discovery-main,
+    .home-discovery-ranking { width: 100%; flex-basis: auto; }
     .home-discovery-main .home-discovery-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .home-discovery-main .home-discovery-cards .anime-card:nth-child(6) { display: block; }
 }
 
 @media (max-width: 600px) {
@@ -273,6 +296,7 @@
     .home-hero-title { font-size: 1.55rem; }
     .home-hero-description { font-size: 0.75rem; }
     .home-discovery-controls { margin-bottom: 16px; }
+    .home-discovery-controls-row { align-items: flex-start; }
     .home-category-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; scrollbar-width: thin; }
     .home-category-tab { flex: 0 0 auto; }
     .home-discovery-main .home-discovery-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 10px; }
