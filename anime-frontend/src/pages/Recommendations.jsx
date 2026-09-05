@@ -1,15 +1,12 @@
 import { useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
-import AnimeCard from "../components/AnimeCard";
-import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
 import EmptyState from "../components/ui/EmptyState";
+import OptimizedImage from "../components/ui/OptimizedImage";
 import PageContainer from "../components/ui/PageContainer";
 import { AnimeAPI } from "../api/anime.api";
-import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
-import { useToggleFavorite } from "../hooks/user/useFavorites";
-import { normalizeAnime } from "../utils/normalizeAnime";
 
 import "../styles/recommendations.css";
 
@@ -18,8 +15,6 @@ function Recommendations() {
         window.scrollTo(0, 0);
     }, []);
 
-    const favoriteIds = useFavoriteIds();
-    const toggleFavorite = useToggleFavorite();
     const query = useInfiniteQuery({
         queryKey: ["general-recommendations"],
         queryFn: ({ pageParam }) => AnimeAPI.generalRecommendations(pageParam),
@@ -30,9 +25,7 @@ function Recommendations() {
     });
 
     const recommendations = (query.data?.pages ?? [])
-        .flatMap((page) => page.items ?? [])
-        .map(normalizeAnime)
-        .filter(Boolean);
+        .flatMap((page) => page.items ?? []);
 
     return (
         <PageContainer>
@@ -44,33 +37,74 @@ function Recommendations() {
             <div className="recommendations-header">
                 <span className="recommendations-eyebrow">DISCOVER</span>
                 <h1>Recommendations</h1>
-                <p>Discover anime worth adding to your watchlist.</p>
+                <p>See what the anime community recommends together.</p>
             </div>
 
             {query.isLoading ? (
-                <div className="grid">
-                    {Array.from({ length: 12 }).map((_, index) => <AnimeCardSkeleton key={index} />)}
+                <div className="recommendations-list">
+                    {Array.from({ length: 8 }).map((_, index) => (
+                        <div className="recommendation-skeleton" key={index} />
+                    ))}
                 </div>
             ) : query.isError || recommendations.length === 0 ? (
                 <EmptyState text="No recommendations found right now." icon="✨" />
             ) : (
                 <>
-                    <div className="grid">
-                        {recommendations.map((anime) => {
-                            const id = String(anime.id);
+                    <div className="recommendations-list">
+                        {recommendations.map((recommendation) => {
+                            const [first, second] = recommendation.entries ?? [];
+
+                            if (!first || !second) {
+                                return null;
+                            }
 
                             return (
-                                <AnimeCard
-                                    key={id}
-                                    anime={anime}
-                                    isFavorited={favoriteIds.has(id)}
-                                    isFavoritePending={toggleFavorite.isPending}
-                                    onToggleFavorite={() => toggleFavorite.mutate({
-                                        anime_id: anime.id,
-                                        title: anime.title,
-                                        image: anime.image || "",
-                                    })}
-                                />
+                                <article className="recommendation-card" key={recommendation.id}>
+                                    <div className="recommendation-pair">
+                                        <Link
+                                            to={`/anime/${first.id}`}
+                                            className="recommendation-anime"
+                                        >
+                                            <OptimizedImage
+                                                src={first.image || "/no-image.png"}
+                                                alt={first.title}
+                                                loading="lazy"
+                                            />
+                                            <span>{first.title}</span>
+                                        </Link>
+
+                                        <span className="recommendation-arrow" aria-hidden="true">→</span>
+
+                                        <Link
+                                            to={`/anime/${second.id}`}
+                                            className="recommendation-anime"
+                                        >
+                                            <OptimizedImage
+                                                src={second.image || "/no-image.png"}
+                                                alt={second.title}
+                                                loading="lazy"
+                                            />
+                                            <span>{second.title}</span>
+                                        </Link>
+                                    </div>
+
+                                    {recommendation.content && (
+                                        <p className="recommendation-content">
+                                            “{recommendation.content}”
+                                        </p>
+                                    )}
+
+                                    {(recommendation.user || recommendation.date) && (
+                                        <div className="recommendation-meta">
+                                            {recommendation.user && <span>Recommended by {recommendation.user}</span>}
+                                            {recommendation.date && (
+                                                <time dateTime={recommendation.date}>
+                                                    {new Date(recommendation.date).toLocaleDateString()}
+                                                </time>
+                                            )}
+                                        </div>
+                                    )}
+                                </article>
                             );
                         })}
                     </div>
