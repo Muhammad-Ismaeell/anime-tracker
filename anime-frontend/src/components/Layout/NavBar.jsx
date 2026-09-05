@@ -37,6 +37,7 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const [exploreOpen, setExploreOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [compact, setCompact] = useState(false);
 
     const debouncedQuery = useDebounce(query, 500);
     const { data: results = [], isLoading } = useNavbarSearch(debouncedQuery);
@@ -44,12 +45,31 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const dropdownRef = useRef(null);
     const exploreRef = useRef(null);
     const profileMenuRef = useRef(null);
+    const lastScrollY = useRef(0);
 
     const profileAvatar = profile?.profile?.avatar ?? null;
     const username = user?.username || "Profile";
     const avatarUrl = profileAvatar ? getMediaUrl(profileAvatar) : null;
     const avatarFallback = username.charAt(0).toUpperCase() || "U";
     const hasSearchQuery = query.trim().length >= 3;
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY <= 12) {
+                setCompact(false);
+            } else if (currentScrollY > lastScrollY.current) {
+                setCompact(true);
+            } else {
+                setCompact(false);
+            }
+            lastScrollY.current = currentScrollY;
+        };
+
+        lastScrollY.current = window.scrollY;
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -81,6 +101,11 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
         return () => window.removeEventListener("keydown", handleEscape);
     }, []);
 
+    const handleHomeClick = () => {
+        navigate("/");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     const handleSelect = (anime) => {
         const id = anime?.id ?? anime?.mal_id;
         if (id == null) return;
@@ -109,7 +134,7 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     };
 
     return (
-        <header className="navbar">
+        <header className={`navbar${compact ? " navbar-compact" : ""}`}>
             <div className="navbar-left">
                 <button
                     type="button"
@@ -121,13 +146,11 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
                     {sidebarOpen ? "✕" : "☰"}
                 </button>
 
-                <Link to="/" className="navbar-logo" aria-label="Anime Tracker home">
-                    <span className="logo-mark" aria-hidden="true">A</span>
+                <button type="button" className="navbar-logo" onClick={handleHomeClick} aria-label="Anime Tracker home">
                     <span className="navbar-logo-text">Anime Tracker</span>
-                </Link>
+                </button>
 
                 <nav className="navbar-nav" aria-label="Primary navigation">
-                    <Link to="/" className="navbar-nav-link">Home</Link>
                     <div ref={exploreRef} className="navbar-explore">
                         <button
                             type="button"
