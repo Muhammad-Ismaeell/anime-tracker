@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -16,6 +16,8 @@ import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import { extractAnimePages } from "../utils/extractAnimePages";
 
 function Home() {
+    const [activeCategory, setActiveCategory] = useState("trending");
+
     const trendingQuery = useInfiniteAnime("trending");
     const seasonalQuery = useInfiniteAnime("seasonal");
     const topQuery = useInfiniteAnime("top");
@@ -45,24 +47,14 @@ function Home() {
         [recentlyAddedQuery.data]
     );
 
-    const heroAnime = useMemo(() => {
-        const combined = [
-            ...seasonalAnime,
-            ...trendingAnime,
-            ...recentlyAddedAnime,
-            ...topAnime,
-        ];
-        const seen = new Set();
+    const categories = [
+        { id: "trending", label: "Trending", anime: trendingAnime, to: "/trending" },
+        { id: "seasonal", label: "Seasonal", anime: seasonalAnime, to: "/seasonal" },
+        { id: "recentlyAdded", label: "Recently Added", anime: recentlyAddedAnime, to: "/recently-added" },
+    ];
 
-        return combined
-            .filter((anime) => {
-                const id = anime?.mal_id ?? anime?.id;
-                if (!id || !anime?.image || seen.has(String(id))) return false;
-                seen.add(String(id));
-                return true;
-            })
-            .slice(0, 5);
-    }, [seasonalAnime, trendingAnime, recentlyAddedAnime, topAnime]);
+    const activeCategoryData =
+        categories.find((category) => category.id === activeCategory) ?? categories[0];
 
     const loading =
         trendingQuery.isPending &&
@@ -106,116 +98,77 @@ function Home() {
                 />
             </Helmet>
 
-            {heroAnime.length > 0 && (
-                <section className="home-hero">
-                    <div className="home-hero-inner">
-                        <div className="home-hero-content">
-                            <span className="home-hero-eyebrow">
-                                ANIME TRACKER
-                            </span>
-
-                            <h1 className="home-hero-title">
-                                Discover. Track. Organize.
-                            </h1>
-
-                            <p className="home-hero-description">
-                                Find your next series, keep your personal
-                                library organized, and track every anime you
-                                plan to watch, are watching, or have finished.
-                            </p>
-
-                            <div className="home-hero-actions">
-                                <Link
-                                    to="/search"
-                                    className="home-hero-primary-action"
-                                >
-                                    Discover Anime
-                                </Link>
-                                <Link
-                                    to="/library"
-                                    className="home-hero-secondary-action"
-                                >
-                                    Open My Library
-                                </Link>
-                            </div>
-                        </div>
-
-                        <div className="home-hero-posters" aria-label="Anime catalog preview">
-                            {heroAnime.map((anime) => {
-                                const id = anime.mal_id ?? anime.id;
-                                return (
-                                    <Link
-                                        key={id}
-                                        to={`/anime/${id}`}
-                                        className="home-hero-poster-link"
-                                        aria-label={`View ${anime.title}`}
-                                    >
-                                        <img
-                                            src={anime.image}
-                                            alt={anime.title || "Anime poster"}
-                                            className="home-hero-poster"
-                                            loading="eager"
-                                            decoding="async"
-                                        />
-                                    </Link>
-                                );
-                            })}
+            <section className="home-hero">
+                <div className="home-hero-inner">
+                    <div className="home-hero-content">
+                        <span className="home-hero-eyebrow">ANIME TRACKER</span>
+                        <h1 className="home-hero-title">Discover. Track. Organize.</h1>
+                        <p className="home-hero-description">
+                            Find your next series, build your personal library, and keep track of what you watch.
+                        </p>
+                        <div className="home-hero-actions">
+                            <Link to="/search" className="home-hero-primary-action">
+                                Discover Anime
+                            </Link>
+                            <Link to="/library" className="home-hero-secondary-action">
+                                My Library
+                            </Link>
                         </div>
                     </div>
-                </section>
-            )}
+                </div>
+            </section>
 
             <DiscoverGenres />
 
             {loading ? (
                 <div className="home-loading-grid">
                     {Array.from({ length: 24 }).map((_, index) => (
-                        <div
-                            key={index}
-                            className="home-loading-card shimmer"
-                        />
+                        <div key={index} className="home-loading-card shimmer" />
                     ))}
                 </div>
             ) : hasAnime ? (
                 <div className="home-catalog-sections">
-                    <div className="home-category-row">
-                        {trendingAnime.length > 0 && (
-                            <AnimeSection
-                                title="Trending Now"
-                                animeList={trendingAnime}
-                                viewAllTo="/trending"
-                                {...sectionProps}
-                            />
-                        )}
+                    <div className="home-discovery-grid">
+                        <div className="home-discovery-main">
+                            <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
+                                {categories.map((category) => (
+                                    <button
+                                        key={category.id}
+                                        type="button"
+                                        role="tab"
+                                        aria-selected={activeCategory === category.id}
+                                        className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                                        onClick={() => setActiveCategory(category.id)}
+                                    >
+                                        {category.label}
+                                    </button>
+                                ))}
+                            </div>
 
-                        {seasonalAnime.length > 0 && (
-                            <AnimeSection
-                                title="Current Season"
-                                animeList={seasonalAnime}
-                                viewAllTo="/seasonal"
-                                {...sectionProps}
-                            />
-                        )}
+                            {activeCategoryData.anime.length > 0 ? (
+                                <AnimeSection
+                                    title={activeCategoryData.label}
+                                    animeList={activeCategoryData.anime}
+                                    viewAllTo={activeCategoryData.to}
+                                    {...sectionProps}
+                                />
+                            ) : (
+                                <EmptyState text={`No ${activeCategoryData.label.toLowerCase()} anime available.`} />
+                            )}
+                        </div>
 
-                        {recentlyAddedAnime.length > 0 && (
-                            <AnimeSection
-                                title="Recently Added"
-                                animeList={recentlyAddedAnime}
-                                viewAllTo="/recently-added"
-                                {...sectionProps}
-                            />
+                        {topAnime.length > 0 && (
+                            <div className="home-discovery-ranking">
+                                <AnimeSection
+                                    title="Top Anime"
+                                    animeList={topAnime}
+                                    variant="ranking"
+                                    viewAllTo="/top"
+                                    {...sectionProps}
+                                />
+                            </div>
                         )}
                     </div>
-
-                    {topAnime.length > 0 && (
-                        <AnimeSection
-                            title="Top Anime"
-                            animeList={topAnime}
-                            variant="ranking"
-                            viewAllTo="/top"
-                            {...sectionProps}
-                        />
-                    )}
                 </div>
             ) : null}
         </PageContainer>
