@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -8,9 +8,13 @@ import OptimizedImage from "../components/ui/OptimizedImage";
 import PageContainer from "../components/ui/PageContainer";
 import { AnimeAPI } from "../api/anime.api";
 
+import "../styles/infinite-scroll.css";
 import "../styles/recommendations.css";
 
 function Recommendations() {
+    const loadMoreRef = useRef(null);
+    const canLoadMoreRef = useRef(true);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -26,6 +30,37 @@ function Recommendations() {
 
     const recommendations = (query.data?.pages ?? [])
         .flatMap((page) => page.items ?? []);
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    canLoadMoreRef.current = true;
+                    return;
+                }
+
+                if (
+                    canLoadMoreRef.current &&
+                    query.hasNextPage &&
+                    !query.isFetchingNextPage
+                ) {
+                    canLoadMoreRef.current = false;
+                    query.fetchNextPage();
+                }
+            },
+            { rootMargin: "100px" }
+        );
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [query.fetchNextPage, query.hasNextPage, query.isFetchingNextPage]);
 
     return (
         <PageContainer>
@@ -61,10 +96,7 @@ function Recommendations() {
                             return (
                                 <article className="recommendation-card" key={recommendation.id}>
                                     <div className="recommendation-pair">
-                                        <Link
-                                            to={`/anime/${first.id}`}
-                                            className="recommendation-anime"
-                                        >
+                                        <Link to={`/anime/${first.id}`} className="recommendation-anime">
                                             <OptimizedImage
                                                 src={first.image || "/no-image.png"}
                                                 alt={first.title}
@@ -75,10 +107,7 @@ function Recommendations() {
 
                                         <span className="recommendation-arrow" aria-hidden="true">→</span>
 
-                                        <Link
-                                            to={`/anime/${second.id}`}
-                                            className="recommendation-anime"
-                                        >
+                                        <Link to={`/anime/${second.id}`} className="recommendation-anime">
                                             <OptimizedImage
                                                 src={second.image || "/no-image.png"}
                                                 alt={second.title}
@@ -89,9 +118,7 @@ function Recommendations() {
                                     </div>
 
                                     {recommendation.content && (
-                                        <p className="recommendation-content">
-                                            “{recommendation.content}”
-                                        </p>
+                                        <p className="recommendation-content">“{recommendation.content}”</p>
                                     )}
 
                                     {(recommendation.user || recommendation.date) && (
@@ -110,15 +137,14 @@ function Recommendations() {
                     </div>
 
                     {query.hasNextPage && (
-                        <div className="discovery-load-more">
-                            <button
-                                type="button"
-                                className="discovery-load-more-button"
-                                onClick={() => query.fetchNextPage()}
-                                disabled={query.isFetchingNextPage}
-                            >
-                                {query.isFetchingNextPage ? "Loading..." : "Load More"}
-                            </button>
+                        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
+                            {query.isFetchingNextPage && (
+                                <div className="recommendations-list infinite-scroll-skeleton-grid">
+                                    {Array.from({ length: 4 }).map((_, index) => (
+                                        <div className="recommendation-skeleton" key={index} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </>
