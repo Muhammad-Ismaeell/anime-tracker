@@ -119,24 +119,19 @@ function Home() {
 
             <div className="home-discovery-controls">
                 <span className="home-discovery-controls-label">DISCOVER</span>
-                <div className="home-discovery-controls-row">
-                    <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
-                        {categories.map((category) => (
-                            <button
-                                key={category.id}
-                                type="button"
-                                role="tab"
-                                aria-selected={activeCategory === category.id}
-                                className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
-                                onClick={() => setActiveCategory(category.id)}
-                            >
-                                {category.label}
-                            </button>
-                        ))}
-                    </div>
-                    <Link className="home-discovery-view-all" to={activeCategoryData.to}>
-                        View All
-                    </Link>
+                <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
+                    {categories.map((category) => (
+                        <button
+                            key={category.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeCategory === category.id}
+                            className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                            onClick={() => setActiveCategory(category.id)}
+                        >
+                            {category.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -150,6 +145,13 @@ function Home() {
                 <div className="home-catalog-sections">
                     <div className="home-discovery-grid">
                         <div className="home-discovery-main">
+                            <div className="home-main-section-header">
+                                <span className="home-main-section-label">{activeCategoryData.label}</span>
+                                <Link className="home-discovery-view-all" to={activeCategoryData.to}>
+                                    View All
+                                </Link>
+                            </div>
+
                             {activeCategoryData.anime.length > 0 ? (
                                 <AnimeSection
                                     title={activeCategoryData.label}
@@ -160,6 +162,27 @@ function Home() {
                             ) : (
                                 <EmptyState text={`No ${activeCategoryData.label.toLowerCase()} anime available.`} />
                             )}
+
+                            <div className="home-quick-links">
+                                <div className="home-quick-links-heading">
+                                    <span>EXPLORE</span>
+                                    <p>Find more ways to discover and manage your anime.</p>
+                                </div>
+                                <div className="home-quick-links-grid">
+                                    <Link to="/search" className="home-quick-link">
+                                        <strong>Browse Anime</strong>
+                                        <span>Search the full catalogue</span>
+                                    </Link>
+                                    <Link to="/library" className="home-quick-link">
+                                        <strong>Your Library</strong>
+                                        <span>Keep your watchlist organized</span>
+                                    </Link>
+                                    <Link to="/favorites" className="home-quick-link">
+                                        <strong>Favorites</strong>
+                                        <span>Quick access to saved anime</span>
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
 
                         {topAnime.length > 0 && (
