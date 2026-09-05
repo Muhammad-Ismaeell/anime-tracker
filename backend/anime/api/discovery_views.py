@@ -59,19 +59,9 @@ def general_characters(request):
 @extend_schema(
     summary="Anime News",
     description="Return recent anime news for general discovery.",
-    parameters=[
-        OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY),
-        OpenApiParameter("q", OpenApiTypes.STR, OpenApiParameter.QUERY),
-        OpenApiParameter("tag", OpenApiTypes.STR, OpenApiParameter.QUERY),
-    ],
+    parameters=[OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY)],
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def general_news(request):
-    return Response(
-        news_service.get_general_news(
-            page=safe_int(request.GET.get("page")),
-            query=request.GET.get("q", "").strip(),
-            tag=request.GET.get("tag", "").strip(),
-        )
-    )
+    return Response(news_service.get_general_news(safe_int(request.GET.get("page"))))
