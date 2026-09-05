@@ -14,7 +14,6 @@ import "../styles/recommendations.css";
 function Characters() {
     const [search, setSearch] = useState("");
     const [query, setQuery] = useState("");
-    const [sort, setSort] = useState("desc");
     const loadMoreRef = useRef(null);
     const canLoadMoreRef = useRef(true);
 
@@ -23,11 +22,11 @@ function Characters() {
     }, []);
 
     const charactersQuery = useInfiniteQuery({
-        queryKey: ["general-characters", query, sort],
+        queryKey: ["general-characters", query],
         queryFn: ({ pageParam }) => AnimeAPI.generalCharacters(pageParam, {
             q: query,
             order_by: "favorites",
-            sort,
+            sort: "desc",
         }),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => lastPage.has_next ? lastPage.page + 1 : undefined,
@@ -38,7 +37,7 @@ function Characters() {
 
     useEffect(() => {
         canLoadMoreRef.current = !charactersQuery.isFetchingNextPage;
-    }, [query, sort, charactersQuery.isFetchingNextPage]);
+    }, [query, charactersQuery.isFetchingNextPage]);
 
     useEffect(() => {
         const element = loadMoreRef.current;
@@ -69,12 +68,6 @@ function Characters() {
         setQuery(search.trim());
     };
 
-    const loadMore = () => {
-        if (!charactersQuery.hasNextPage || charactersQuery.isFetchingNextPage) return;
-        canLoadMoreRef.current = false;
-        charactersQuery.fetchNextPage();
-    };
-
     return (
         <PageContainer>
             <Helmet>
@@ -100,19 +93,8 @@ function Characters() {
                     <button type="submit">Search</button>
                 </form>
                 <div className="discovery-sort" role="group" aria-label="Character sorting">
-                    <button
-                        type="button"
-                        className={sort === "desc" ? "active" : ""}
-                        onClick={() => setSort("desc")}
-                    >
+                    <button type="button" className="active">
                         Popular
-                    </button>
-                    <button
-                        type="button"
-                        className={sort === "asc" ? "active" : ""}
-                        onClick={() => setSort("asc")}
-                    >
-                        Least Popular
                     </button>
                 </div>
             </div>
@@ -147,16 +129,12 @@ function Characters() {
 
                     {charactersQuery.hasNextPage && (
                         <div ref={loadMoreRef} className="infinite-scroll-sentinel">
-                            {charactersQuery.isFetchingNextPage ? (
+                            {charactersQuery.isFetchingNextPage && (
                                 <div className="characters-grid infinite-scroll-skeleton-grid">
                                     {Array.from({ length: 6 }).map((_, index) => (
                                         <div className="character-skeleton" key={index} />
                                     ))}
                                 </div>
-                            ) : (
-                                <button type="button" className="infinite-scroll-load-more" onClick={loadMore}>
-                                    Load more characters
-                                </button>
                             )}
                         </div>
                     )}
