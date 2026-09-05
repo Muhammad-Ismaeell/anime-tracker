@@ -170,18 +170,18 @@ function Home() {
                                 <EmptyState text={`No ${activeCategoryData.label.toLowerCase()} anime available.`} />
                             )}
 
-                            {currentlyWatching.length > 0 && (
-                                <section className="home-continue-watching">
-                                    <div className="home-continue-header">
-                                        <div>
-                                            <span className="home-continue-eyebrow">PICK UP WHERE YOU LEFT OFF</span>
-                                            <h2>Continue Watching</h2>
-                                        </div>
-                                        <Link to="/library?status=watching" className="home-continue-view-all">
-                                            View All
-                                        </Link>
+                            <section className="home-continue-watching">
+                                <div className="home-continue-header">
+                                    <div>
+                                        <span className="home-continue-eyebrow">PICK UP WHERE YOU LEFT OFF</span>
+                                        <h2>Continue Watching</h2>
                                     </div>
+                                    <Link to="/library?status=watching" className="home-continue-view-all">
+                                        View All
+                                    </Link>
+                                </div>
 
+                                {currentlyWatching.length > 0 ? (
                                     <div className="home-continue-grid">
                                         {currentlyWatching.map((item) => {
                                             const anime = item.anime;
@@ -222,8 +222,13 @@ function Home() {
                                             );
                                         })}
                                     </div>
-                                </section>
-                            )}
+                                ) : (
+                                    <div className="home-continue-empty">
+                                        <p>Sign in to keep track of what you're watching.</p>
+                                        <Link to="/login">Sign In</Link>
+                                    </div>
+                                )}
+                            </section>
                         </div>
 
                         {topAnime.length > 0 && (
