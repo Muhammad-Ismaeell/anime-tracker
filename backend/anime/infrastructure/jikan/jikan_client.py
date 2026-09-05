@@ -157,13 +157,8 @@ class JikanClient:
             params["letter"] = letter
         return self._get_list("characters", page, params)
 
-    def get_general_news(self, page=1, query="", tag="", limit=12):
-        params = {"limit": limit}
-        if query:
-            params["q"] = query
-        if tag:
-            params["tag"] = tag
-        return self._get_list("news", page, params)
+    def get_general_news(self, page=1):
+        return self._get_list("news", page, {"limit": 12})
 
     def get_detail(self, anime_id):
         data = safe_request(
