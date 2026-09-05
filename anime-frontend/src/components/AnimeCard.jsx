@@ -142,6 +142,29 @@ function AnimeCard({
         });
     };
 
+    const handleProgressChange = (event) => {
+        const rawValue = event.target.value;
+
+        if (rawValue === "") {
+            setProgress("");
+            return;
+        }
+
+        let value = Number(rawValue);
+
+        if (!Number.isFinite(value)) {
+            return;
+        }
+
+        value = Math.max(0, Math.floor(value));
+
+        if (episodeCount > 0) {
+            value = Math.min(value, episodeCount);
+        }
+
+        setProgress(value);
+    };
+
     return (
         <motion.article
             className={`anime-card ${open ? "menu-open" : ""}`}
@@ -286,9 +309,7 @@ function AnimeCard({
                                                 : undefined
                                         }
                                         value={progress}
-                                        onChange={(event) =>
-                                            setProgress(event.target.value)
-                                        }
+                                        onChange={handleProgressChange}
                                         autoFocus
                                     />
 
