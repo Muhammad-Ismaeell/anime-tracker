@@ -7,24 +7,18 @@ class CharacterService:
 
     def get_characters(self, anime_id):
         key = f"anime-characters:{anime_id}"
+        return get_or_set(key, self.CACHE_TIMEOUT, lambda: self._fetch_characters(anime_id))
 
+    def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
+        key = f"characters:page:{page}:q:{query}:order:{order_by}:sort:{sort}:letter:{letter}"
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
-            lambda: self._fetch_characters(anime_id),
+            lambda: self._fetch_general_characters(page, query, order_by, sort, letter),
         )
 
-    def get_general_characters(self, page=1):
-        key = f"characters:page:{page}"
-
-        return get_or_set(
-            key,
-            self.CACHE_TIMEOUT,
-            lambda: self._fetch_general_characters(page),
-        )
-
-    def _fetch_general_characters(self, page):
-        response = JikanClient().get_general_characters(page)
+    def _fetch_general_characters(self, page, query, order_by, sort, letter):
+        response = JikanClient().get_general_characters(page, query, order_by, sort, letter)
         items = []
 
         for character in response.get("items", []):
@@ -39,58 +33,39 @@ class CharacterService:
             items.append({
                 "id": character_id,
                 "name": character.get("name") or "Unknown Character",
-                "image": (
-                    jpg.get("image_url")
-                    or webp.get("image_url")
-                    or ""
-                ),
+                "image": jpg.get("image_url") or webp.get("image_url") or "",
                 "favorites": character.get("favorites") or 0,
             })
 
-        return {
-            **response,
-            "items": items,
-        }
+        return {**response, "items": items}
 
     def _fetch_characters(self, anime_id):
-        data = safe_request(
-            f"{BASE_URL}/anime/{anime_id}/characters"
-        )
-
+        data = safe_request(f"{BASE_URL}/anime/{anime_id}/characters")
         if not data:
             return []
 
         items = []
-
         for entry in data.get("data") or []:
             character = entry.get("character") or {}
             character_id = character.get("mal_id")
-
             if not character_id:
                 continue
 
             images = character.get("images") or {}
             jpg = images.get("jpg") or {}
             webp = images.get("webp") or {}
-
             voice_actors = []
+
             for voice_actor in entry.get("voice_actors") or []:
                 person = voice_actor.get("person") or {}
                 name = person.get("name")
                 if name:
-                    voice_actors.append({
-                        "name": name,
-                        "language": voice_actor.get("language"),
-                    })
+                    voice_actors.append({"name": name, "language": voice_actor.get("language")})
 
             items.append({
                 "id": character_id,
                 "name": character.get("name") or "Unknown Character",
-                "image": (
-                    jpg.get("image_url")
-                    or webp.get("image_url")
-                    or ""
-                ),
+                "image": jpg.get("image_url") or webp.get("image_url") or "",
                 "role": entry.get("role") or "",
                 "favorites": entry.get("favorites") or 0,
                 "voice_actors": voice_actors,
