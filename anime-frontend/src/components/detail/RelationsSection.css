@@ -54,9 +54,17 @@
 }
 
 .relation-link span {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .relation-link span {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
 }
 
 .relation-link small {
