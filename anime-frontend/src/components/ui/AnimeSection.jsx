@@ -17,6 +17,7 @@ export default function AnimeSection({
     toggleFavorite,
     viewAllTo,
     variant = "grid",
+    showHeader = true,
 }) {
 
     const CARDS_PER_PAGE = 7;
@@ -102,23 +103,25 @@ export default function AnimeSection({
 
     return (
         <section className="home-section">
-            <div className="section-header">
-                <div className="section-heading">
-                    <span className="section-emoji" aria-hidden="true">
-                        {emoji}
-                    </span>
-                    <h2>{title}</h2>
-                </div>
+            {showHeader && (
+                <div className="section-header">
+                    <div className="section-heading">
+                        <span className="section-emoji" aria-hidden="true">
+                            {emoji}
+                        </span>
+                        <h2>{title}</h2>
+                    </div>
 
-                {viewAllTo && (
-                    <Link className="section-view-all" to={viewAllTo}>
-                        View All
-                    </Link>
-                )}
-            </div>
+                    {viewAllTo && (
+                        <Link className="section-view-all" to={viewAllTo}>
+                            View All
+                        </Link>
+                    )}
+                </div>
+            )}
 
             <div className="anime-section-slider">
-                <div className="grid">
+                <div className={`grid${showHeader ? "" : " home-discovery-cards"}`}>
                     {visibleAnime.map(({ anime, id }) => {
                         const normalizedAnimeId = String(id);
 
