@@ -10358,3 +10358,29 @@ button:disabled {
     }
 }
 
+
+@media (max-width: 600px) {
+    .edit-profile-page {
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .edit-profile-card {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .edit-profile-header {
+        min-width: 0;
+    }
+
+    .edit-profile-info {
+        min-width: 0;
+    }
+
+    .edit-profile-form {
+        width: 100%;
+        min-width: 0;
+    }
+}
