@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request, JikanClient
+from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_request
 
 
 class NewsService:
@@ -8,57 +8,39 @@ class NewsService:
 
     def get_news(self, anime_id):
         key = f"anime-news:{anime_id}"
+        return get_or_set(key, self.CACHE_TIMEOUT, lambda: self._fetch_news(anime_id))
 
+    def get_general_news(self, page=1, query="", tag=""):
+        key = f"news:page:{page}:q:{query}:tag:{tag}"
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
-            lambda: self._fetch_news(anime_id),
+            lambda: self._fetch_general_news(page, query, tag),
         )
 
-    def get_general_news(self, page=1):
-        key = f"news:page:{page}"
-
-        return get_or_set(
-            key,
-            self.CACHE_TIMEOUT,
-            lambda: self._fetch_general_news(page),
-        )
-
-    def _fetch_general_news(self, page):
-        response = JikanClient().get_general_news(page)
-        items = response.get("items", [])
-
+    def _fetch_general_news(self, page, query, tag):
+        response = JikanClient().get_general_news(page, query, tag)
         return {
             **response,
             "items": [
                 item
-                for item in (
-                    self._normalize_item(news_item)
-                    for news_item in items
-                )
+                for item in (self._normalize_item(news_item) for news_item in response.get("items", []))
                 if item
             ],
         }
 
     def _fetch_news(self, anime_id):
-        data = safe_request(
-            f"{BASE_URL}/anime/{anime_id}/news"
-        )
-
+        data = safe_request(f"{BASE_URL}/anime/{anime_id}/news")
         if not data:
             return []
 
         items = data.get("data")
-
         if not isinstance(items, list):
             return []
 
         return [
             item
-            for item in (
-                self._normalize_item(news_item)
-                for news_item in items[: self.MAX_ITEMS]
-            )
+            for item in (self._normalize_item(news_item) for news_item in items[:self.MAX_ITEMS])
             if item
         ]
 
@@ -69,7 +51,6 @@ class NewsService:
 
         title = str(item.get("title") or "").strip()
         url = str(item.get("url") or "").strip()
-
         if not title or not url:
             return None
 
@@ -78,7 +59,6 @@ class NewsService:
             images.get("jpg", {}).get("image_url")
             or images.get("webp", {}).get("image_url")
         )
-
         anime = item.get("anime") or item.get("entry") or {}
 
         return {
