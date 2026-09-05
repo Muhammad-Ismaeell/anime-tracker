@@ -10364,6 +10364,8 @@ button:disabled {
         width: 100%;
         min-width: 0;
         overflow-x: hidden;
+        padding-left: 6px;
+        padding-right: 6px;
     }
 
     .edit-profile-card {
