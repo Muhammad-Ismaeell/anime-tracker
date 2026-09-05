@@ -126,21 +126,23 @@ def list_response(data, page):
 
 
 class JikanClient:
-    def _get_list(self, endpoint, page=1, params=None):
+    def _get_list(self, endpoint, page=1, params=None, strict_sfw=False):
         params = dict(params or {})
         params["page"] = page
-        params["sfw-strict"] = "true"
+        if strict_sfw:
+            params["sfw-strict"] = "true"
         data = safe_request(f"{BASE_URL}/{endpoint}", params=params)
         return list_response(data, page)
 
     def get_all_anime(self, page=1):
-        return self._get_list("anime", page, {"order_by": "mal_id", "sort": "asc"})
+        return self._get_list("anime", page, {"order_by": "mal_id", "sort": "asc"}, strict_sfw=True)
 
     def get_general_recommendations(self, page=1):
         return self._get_list(
             "recommendations/anime",
             page,
             {"limit": 24},
+            strict_sfw=True,
         )
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
@@ -190,31 +192,31 @@ class JikanClient:
         return data.get("data") if data else None
 
     def get_top(self, page=1):
-        return self._get_list("top/anime", page)
+        return self._get_list("top/anime", page, strict_sfw=True)
 
     def get_trending(self, page=1):
         return self.get_top(page)
 
     def get_seasonal(self, page=1):
-        return self._get_list("seasons/now", page)
+        return self._get_list("seasons/now", page, strict_sfw=True)
 
     def get_upcoming(self, page=1):
-        return self._get_list("seasons/upcoming", page)
+        return self._get_list("seasons/upcoming", page, strict_sfw=True)
 
     def get_airing(self, page=1):
-        return self._get_list("anime", page, {"status": "airing", "order_by": "mal_id", "sort": "asc"})
+        return self._get_list("anime", page, {"status": "airing", "order_by": "mal_id", "sort": "asc"}, strict_sfw=True)
 
     def get_movies(self, page=1):
-        return self._get_list("anime", page, {"type": "movie", "order_by": "mal_id", "sort": "asc"})
+        return self._get_list("anime", page, {"type": "movie", "order_by": "mal_id", "sort": "asc"}, strict_sfw=True)
 
     def get_ova(self, page=1):
-        return self._get_list("anime", page, {"type": "ova", "order_by": "mal_id", "sort": "asc"})
+        return self._get_list("anime", page, {"type": "ova", "order_by": "mal_id", "sort": "asc"}, strict_sfw=True)
 
     def get_ona(self, page=1):
-        return self._get_list("anime", page, {"type": "ona", "order_by": "mal_id", "sort": "asc"})
+        return self._get_list("anime", page, {"type": "ona", "order_by": "mal_id", "sort": "asc"}, strict_sfw=True)
 
     def search(self, query, page=1, filters=None):
         params = {"q": query}
         if filters:
             params.update(filters)
-        return self._get_list("anime", page, params=params)
+        return self._get_list("anime", page, params=params, strict_sfw=True)
