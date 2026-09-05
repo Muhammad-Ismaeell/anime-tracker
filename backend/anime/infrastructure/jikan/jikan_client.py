@@ -146,9 +146,6 @@ def safe_request(url, params=None, retries=3):
 
 
 def is_nsfw(anime):
-    """
-    Determine whether an anime should be blocked.
-    """
     if anime.get("rating") in BLOCKED_RATINGS:
         return True
 
@@ -161,16 +158,10 @@ def is_nsfw(anime):
 
 
 def filter_nsfw(items):
-    """
-    Return only anime that are allowed to be stored/displayed.
-    """
     return [anime for anime in items if not is_nsfw(anime)]
 
 
 def list_response(data, page):
-    """
-    Convert a Tenrai/Jikan-compatible list response.
-    """
     if not data:
         return {
             "items": [],
@@ -201,14 +192,7 @@ class JikanClient:
 
         return list_response(data, page)
 
-    # ==================================================
-    # GENERAL CATALOG
-    # ==================================================
-
     def get_all_anime(self, page=1):
-        """
-        Fetch the general MyAnimeList anime catalog through Tenrai.
-        """
         return self._get_list(
             "anime",
             page,
@@ -218,9 +202,18 @@ class JikanClient:
             },
         )
 
-    # ==================================================
-    # DETAILS
-    # ==================================================
+    def get_general_recommendations(self, page=1):
+        return self._get_list(
+            "recommendations",
+            page,
+            params={"sfw": "true"},
+        )
+
+    def get_general_characters(self, page=1):
+        return self._get_list("characters", page)
+
+    def get_general_news(self, page=1):
+        return self._get_list("news", page)
 
     def get_detail(self, anime_id):
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/full")
@@ -236,9 +229,6 @@ class JikanClient:
         return anime
 
     def get_recommendations(self, anime_id):
-        """
-        Fetch anime recommendations from Tenrai.
-        """
         data = safe_request(
             f"{BASE_URL}/anime/{anime_id}/recommendations",
             params={"sfw": "true"},
@@ -249,29 +239,17 @@ class JikanClient:
 
         return data.get("data", [])
 
-    # ==================================================
-    # TOP
-    # ==================================================
-
     def get_top(self, page=1):
         return self._get_list("top/anime", page)
 
     def get_trending(self, page=1):
         return self.get_top(page)
 
-    # ==================================================
-    # SEASONS
-    # ==================================================
-
     def get_seasonal(self, page=1):
         return self._get_list("seasons/now", page)
 
     def get_upcoming(self, page=1):
         return self._get_list("seasons/upcoming", page)
-
-    # ==================================================
-    # FILTERED CATALOG ENDPOINTS
-    # ==================================================
 
     def get_airing(self, page=1):
         return self._get_list(
@@ -316,10 +294,6 @@ class JikanClient:
                 "sort": "asc",
             },
         )
-
-    # ==================================================
-    # SEARCH
-    # ==================================================
 
     def search(self, query, page=1, filters=None):
         params = {"q": query}
