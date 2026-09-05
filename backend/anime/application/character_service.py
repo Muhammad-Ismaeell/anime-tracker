@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request, JikanClient
+from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_request
 
 
 class CharacterService:
@@ -20,8 +20,37 @@ class CharacterService:
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
-            lambda: JikanClient().get_general_characters(page),
+            lambda: self._fetch_general_characters(page),
         )
+
+    def _fetch_general_characters(self, page):
+        response = JikanClient().get_general_characters(page)
+        items = []
+
+        for character in response.get("items", []):
+            character_id = character.get("mal_id")
+            if not character_id:
+                continue
+
+            images = character.get("images") or {}
+            jpg = images.get("jpg") or {}
+            webp = images.get("webp") or {}
+
+            items.append({
+                "id": character_id,
+                "name": character.get("name") or "Unknown Character",
+                "image": (
+                    jpg.get("image_url")
+                    or webp.get("image_url")
+                    or ""
+                ),
+                "favorites": character.get("favorites") or 0,
+            })
+
+        return {
+            **response,
+            "items": items,
+        }
 
     def _fetch_characters(self, anime_id):
         data = safe_request(
