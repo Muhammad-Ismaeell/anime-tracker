@@ -16,6 +16,8 @@ const Seasonal = lazy(() => import("../pages/Seasonal"));
 const Top = lazy(() => import("../pages/Top"));
 const RecentlyAdded = lazy(() => import("../pages/RecentlyAdded"));
 const Recommendations = lazy(() => import("../pages/Recommendations"));
+const Characters = lazy(() => import("../pages/Characters"));
+const News = lazy(() => import("../pages/News"));
 
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
@@ -68,6 +70,8 @@ export default function App() {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/edit-profile" element={<EditProfile />} />
                         <Route path="/recommendations" element={<Recommendations />} />
+                        <Route path="/characters" element={<Characters />} />
+                        <Route path="/news" element={<News />} />
                     </Route>
 
                     <Route path="*" element={<NotFound />} />
