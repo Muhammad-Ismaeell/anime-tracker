@@ -30,6 +30,7 @@
 }
 
 .home-discovery-view-all {
+    display: inline-flex;
     margin-left: auto;
 }
 
@@ -145,8 +146,42 @@
     background: var(--accent);
 }
 
+.home-continue-empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 78px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--control-radius);
+    background: var(--surface);
+}
+
+.home-continue-empty p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
+.home-continue-empty a {
+    flex-shrink: 0;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.home-continue-empty a:hover {
+    color: var(--accent-hover);
+}
+
 .home-discovery-main .home-discovery-cards .anime-card:nth-child(6) {
     display: none;
+}
+
+.dashboard-watching-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 800px) {
@@ -155,7 +190,11 @@
     }
 
     .home-discovery-main .home-discovery-cards .anime-card:nth-child(6) {
-        display: block;
+        display: block !important;
+    }
+
+    .dashboard-watching-list {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -166,5 +205,11 @@
 
     .home-continue-grid {
         grid-template-columns: 1fr;
+    }
+
+    .home-continue-empty {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
     }
 }
