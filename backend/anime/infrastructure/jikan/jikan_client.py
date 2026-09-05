@@ -129,6 +129,7 @@ class JikanClient:
     def _get_list(self, endpoint, page=1, params=None):
         params = dict(params or {})
         params["page"] = page
+        params["sfw-strict"] = "true"
         data = safe_request(f"{BASE_URL}/{endpoint}", params=params)
         return list_response(data, page)
 
@@ -139,7 +140,7 @@ class JikanClient:
         return self._get_list(
             "recommendations/anime",
             page,
-            {"sfw-strict": "true", "limit": 24},
+            {"limit": 24},
         )
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
