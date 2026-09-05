@@ -31,28 +31,46 @@ class RecommendationService:
         items = []
 
         for recommendation in response.get("items", []):
-            entry = recommendation.get("entry") or recommendation
-            mal_id = entry.get("mal_id")
+            entries = recommendation.get("entry") or []
 
-            if not mal_id:
+            if not isinstance(entries, list) or len(entries) < 2:
                 continue
 
-            images = entry.get("images") or {}
-            jpg = images.get("jpg") or {}
-            webp = images.get("webp") or {}
+            normalized_entries = []
+            for entry in entries[:2]:
+                if not isinstance(entry, dict):
+                    continue
+
+                mal_id = entry.get("mal_id")
+                if not mal_id:
+                    continue
+
+                images = entry.get("images") or {}
+                jpg = images.get("jpg") or {}
+                webp = images.get("webp") or {}
+
+                normalized_entries.append({
+                    "id": mal_id,
+                    "mal_id": mal_id,
+                    "title": entry.get("title") or "Unknown Anime",
+                    "image": (
+                        jpg.get("image_url")
+                        or webp.get("image_url")
+                        or ""
+                    ),
+                })
+
+            if len(normalized_entries) < 2:
+                continue
+
+            user = recommendation.get("user") or {}
 
             items.append({
-                "id": mal_id,
-                "mal_id": mal_id,
-                "title": entry.get("title") or "Unknown Anime",
-                "image": (
-                    jpg.get("image_url")
-                    or webp.get("image_url")
-                    or ""
-                ),
-                "score": entry.get("score") or 0,
-                "type": entry.get("type") or "",
-                "year": entry.get("year"),
+                "id": recommendation.get("mal_id") or f"{normalized_entries[0]['id']}-{normalized_entries[1]['id']}",
+                "entries": normalized_entries,
+                "content": recommendation.get("content") or "",
+                "user": user.get("username") or "",
+                "date": recommendation.get("date"),
             })
 
         return {
