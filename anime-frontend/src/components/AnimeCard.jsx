@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { memo, useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useState } from "react";
 
 import { AuthContext } from "../context/AuthContext";
 import { useAuthPrompt } from "../context/useAuthPrompt";
@@ -10,55 +10,6 @@ import { useUpdateLibrary } from "../hooks/useLibrary";
 
 import OptimizedImage from "./ui/OptimizedImage";
 import "./AnimeCardAniList.css";
-
-function AnimeCardImage({
-    src,
-    alt,
-    className,
-    imageLoading = "lazy",
-    imageFetchPriority = "auto",
-}) {
-    const containerRef = useRef(null);
-    const [shouldLoad, setShouldLoad] = useState(
-        () => typeof IntersectionObserver === "undefined"
-    );
-
-    useEffect(() => {
-        const element = containerRef.current;
-
-        if (!element) {
-            return undefined;
-        }
-
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry?.isIntersecting) {
-                    setShouldLoad(true);
-                    observer.disconnect();
-                }
-            },
-            { rootMargin: "150px" }
-        );
-
-        observer.observe(element);
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <div ref={containerRef} className="anime-card-image-loader">
-            {shouldLoad && (
-                <OptimizedImage
-                    src={src}
-                    alt={alt}
-                    className={className}
-                    loading={imageLoading === "lazy" ? "eager" : imageLoading}
-                    fetchPriority={imageFetchPriority}
-                />
-            )}
-        </div>
-    );
-}
 
 function AnimeCard({
     anime,
@@ -203,12 +154,12 @@ function AnimeCard({
                     className="imageWrapper"
                     aria-label={`View ${title}`}
                 >
-                    <AnimeCardImage
+                    <OptimizedImage
                         src={image}
                         alt={title}
                         className="image"
-                        imageLoading={imageLoading}
-                        imageFetchPriority={imageFetchPriority}
+                        loading={imageLoading}
+                        fetchPriority={imageFetchPriority}
                     />
                 </Link>
 
