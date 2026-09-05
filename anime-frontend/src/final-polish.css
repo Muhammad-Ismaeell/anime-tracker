@@ -21,14 +21,20 @@
 
 .home-main-section-header {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    min-height: 18px;
-    margin-bottom: 8px;
+    justify-content: flex-end;
+    width: 100%;
+    min-height: 24px;
+    margin-bottom: 10px;
+    text-align: right;
+}
+
+.home-discovery-view-all {
+    margin-left: auto;
 }
 
 .home-continue-watching {
-    margin-top: 30px;
+    margin-top: 24px;
 }
 
 .home-continue-header {
@@ -139,9 +145,17 @@
     background: var(--accent);
 }
 
+.home-discovery-main .home-discovery-cards .anime-card:nth-child(6) {
+    display: none;
+}
+
 @media (max-width: 800px) {
     .home-continue-watching {
-        margin-top: 28px;
+        margin-top: 22px;
+    }
+
+    .home-discovery-main .home-discovery-cards .anime-card:nth-child(6) {
+        display: block;
     }
 }
 
