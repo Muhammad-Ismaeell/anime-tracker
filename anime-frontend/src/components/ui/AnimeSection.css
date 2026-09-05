@@ -114,6 +114,24 @@
 .anime-ranking-info span { color: var(--text-muted); font-size: 0.68rem; line-height: 1.25; }
 .anime-ranking-score { flex-shrink: 0; color: var(--text-primary); font-size: 0.72rem; font-weight: 600; }
 
+/* Compact Home ranking so its five-item column ends near Continue Watching. */
+.home-discovery-ranking .anime-ranking-item {
+    grid-template-columns: 28px 46px minmax(0, 1fr) auto;
+    min-height: 72px;
+    gap: 10px;
+    padding: 6px 3px;
+}
+
+.home-discovery-ranking .anime-ranking-image {
+    width: 46px;
+    height: 61px;
+}
+
+.home-discovery-ranking .anime-ranking-number { font-size: 0.72rem; }
+.home-discovery-ranking .anime-ranking-info strong { font-size: 0.76rem; }
+.home-discovery-ranking .anime-ranking-info span { font-size: 0.62rem; }
+.home-discovery-ranking .anime-ranking-score { font-size: 0.68rem; }
+
 /* ============================================================
    HOME TRACKER HERO
    ============================================================ */
