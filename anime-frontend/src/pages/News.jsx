@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 
@@ -22,28 +22,7 @@ function formatDate(value) {
     }).format(date);
 }
 
-function normalizeText(value) {
-    return String(value || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function getSearchScore(article, query) {
-    if (!query) return 0;
-
-    const normalizedQuery = normalizeText(query);
-    const title = normalizeText(article.title);
-
-    if (title === normalizedQuery) return 0;
-    if (title.startsWith(normalizedQuery)) return 1;
-    return 2;
-}
-
 function News() {
-    const [search, setSearch] = useState("");
-    const [query, setQuery] = useState("");
     const [period, setPeriod] = useState("latest");
     const loadMoreRef = useRef(null);
     const canLoadMoreRef = useRef(true);
@@ -53,34 +32,20 @@ function News() {
     }, []);
 
     const newsQuery = useInfiniteQuery({
-        queryKey: ["general-news", query],
-        queryFn: ({ pageParam }) => AnimeAPI.generalNews(pageParam, { q: query }),
+        queryKey: ["general-news"],
+        queryFn: ({ pageParam }) => AnimeAPI.generalNews(pageParam),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => lastPage.has_next ? lastPage.page + 1 : undefined,
         staleTime: 1000 * 60 * 15,
     });
 
     const allNews = (newsQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
-    const news = useMemo(() => {
-        let filtered = allNews;
-
-        if (period === "week") {
-            const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-            filtered = filtered.filter((article) => {
-                const timestamp = article.date ? new Date(article.date).getTime() : 0;
-                return timestamp >= cutoff;
-            });
-        }
-
-        if (!query) return filtered;
-
-        const normalizedQuery = normalizeText(query);
-        filtered = filtered.filter((article) => normalizeText(article.title).includes(normalizedQuery));
-
-        return [...filtered].sort(
-            (first, second) => getSearchScore(first, query) - getSearchScore(second, query)
-        );
-    }, [allNews, period, query]);
+    const news = period === "week"
+        ? allNews.filter((article) => {
+            const timestamp = article.date ? new Date(article.date).getTime() : 0;
+            return timestamp >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+        })
+        : allNews;
 
     useEffect(() => {
         const element = loadMoreRef.current;
@@ -113,11 +78,6 @@ function News() {
         return () => observer.disconnect();
     }, [newsQuery.fetchNextPage, newsQuery.hasNextPage, newsQuery.isFetchingNextPage]);
 
-    const handleSearch = (event) => {
-        event.preventDefault();
-        setQuery(search.trim());
-    };
-
     return (
         <PageContainer>
             <Helmet>
@@ -132,16 +92,6 @@ function News() {
             </div>
 
             <div className="discovery-toolbar">
-                <form className="discovery-search" onSubmit={handleSearch}>
-                    <input
-                        type="search"
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        placeholder="Search anime news..."
-                        aria-label="Search anime news"
-                    />
-                    <button type="submit">Search</button>
-                </form>
                 <div className="discovery-sort" role="group" aria-label="News period">
                     <button
                         type="button"
