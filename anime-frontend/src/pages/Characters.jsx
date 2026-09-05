@@ -8,6 +8,7 @@ import PageContainer from "../components/ui/PageContainer";
 import { AnimeAPI } from "../api/anime.api";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 
+import "../components/detail/CharactersSection.css";
 import "../styles/recommendations.css";
 
 function Characters() {
