@@ -139,12 +139,12 @@ class JikanClient:
         return self._get_list(
             "recommendations/anime",
             page,
-            {"sfw": "true", "limit": 25},
+            {"sfw": "true", "limit": 24},
         )
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
         params = {
-            "limit": 25,
+            "limit": 24,
             "order_by": order_by,
             "sort": sort,
         }
@@ -155,7 +155,7 @@ class JikanClient:
         return self._get_list("characters", page, params)
 
     def get_general_news(self, page=1, query="", tag=""):
-        params = {"limit": 25}
+        params = {"limit": 24}
         if query:
             params["q"] = query
         if tag:
