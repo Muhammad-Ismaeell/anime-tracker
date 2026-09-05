@@ -60,6 +60,10 @@ export const normalizeAnime = (anime) => {
             anime.type ??
             "",
 
+        episodes:
+            anime.episodes ??
+            null,
+
         year:
             anime.year ??
             anime.aired?.prop?.from?.year ??
