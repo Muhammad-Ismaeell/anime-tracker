@@ -4,6 +4,7 @@ from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_
 
 class NewsService:
     CACHE_TIMEOUT = 30 * 60
+    SAFETY_CACHE_TIMEOUT = 6 * 60 * 60
     MAX_ITEMS = 10
 
     def get_news(self, anime_id):
@@ -20,14 +21,25 @@ class NewsService:
 
     def _fetch_general_news(self, page, query, tag):
         response = JikanClient().get_general_news(page, query, tag)
-        return {
-            **response,
-            "items": [
-                item
-                for item in (self._normalize_item(news_item) for news_item in response.get("items", []))
-                if item
-            ],
-        }
+        items = []
+
+        for news_item in response.get("items", []):
+            item = self._normalize_item(news_item)
+            if not item or not item.get("anime_id"):
+                continue
+            if not self._is_safe_anime(item["anime_id"]):
+                continue
+            items.append(item)
+
+        return {**response, "items": items}
+
+    def _is_safe_anime(self, anime_id):
+        key = f"news-anime-safe:{anime_id}"
+        return get_or_set(
+            key,
+            self.SAFETY_CACHE_TIMEOUT,
+            lambda: JikanClient().get_detail(anime_id) is not None,
+        )
 
     def _fetch_news(self, anime_id):
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/news")
@@ -60,6 +72,8 @@ class NewsService:
             or images.get("webp", {}).get("image_url")
         )
         anime = item.get("anime") or item.get("entry") or {}
+        if isinstance(anime, list):
+            anime = anime[0] if anime else {}
 
         return {
             "title": title,
@@ -67,5 +81,6 @@ class NewsService:
             "date": item.get("date"),
             "author": str(item.get("author_username") or "").strip() or None,
             "image": image,
+            "anime_id": anime.get("mal_id"),
             "anime_title": anime.get("title"),
         }
