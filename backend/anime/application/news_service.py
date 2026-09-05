@@ -1,3 +1,5 @@
+import hashlib
+
 from anime.infrastructure.cache import get_or_set
 from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_request
 
@@ -5,33 +7,78 @@ from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_
 class NewsService:
     CACHE_TIMEOUT = 30 * 60
     MAX_ITEMS = 10
+    SEARCH_PAGES = 4
+    SEARCH_LIMIT = 50
 
     def get_news(self, anime_id):
         key = f"anime-news:{anime_id}"
         return get_or_set(key, self.CACHE_TIMEOUT, lambda: self._fetch_news(anime_id))
 
     def get_general_news(self, page=1, query="", tag=""):
-        key = f"news:page:{page}:q:{query}:tag:{tag}"
+        cache_key = self._cache_key(page, query, tag)
         return get_or_set(
-            key,
+            cache_key,
             self.CACHE_TIMEOUT,
             lambda: self._fetch_general_news(page, query, tag),
         )
 
     def _fetch_general_news(self, page, query, tag):
-        response = JikanClient().get_general_news(page, query, tag)
         search_query = query.casefold().strip()
-        items = []
+        response = JikanClient().get_general_news(page, query, tag)
 
-        for news_item in response.get("items", []):
-            item = self._normalize_item(news_item)
-            if not item:
-                continue
-            if search_query and search_query not in item["title"].casefold():
-                continue
-            items.append(item)
+        if not search_query:
+            return self._normalize_response(response)
 
+        items = self._filter_title_matches(response.get("items", []), search_query)
+        if items:
+            return {**response, "items": items}
+
+        return self._search_news_titles(search_query, tag)
+
+    def _search_news_titles(self, search_query, tag):
+        client = JikanClient()
+        matches = []
+
+        for page in range(1, self.SEARCH_PAGES + 1):
+            response = client.get_general_news(
+                page,
+                tag=tag,
+                limit=self.SEARCH_LIMIT,
+            )
+            page_matches = self._filter_title_matches(response.get("items", []), search_query)
+            matches.extend(page_matches)
+
+            if len(matches) >= self.MAX_ITEMS or not response.get("has_next"):
+                break
+
+        return {
+            "items": matches[:self.MAX_ITEMS],
+            "page": 1,
+            "has_next": False,
+            "total": min(len(matches), self.MAX_ITEMS),
+        }
+
+    def _normalize_response(self, response):
+        items = [
+            item
+            for item in (self._normalize_item(news_item) for news_item in response.get("items", []))
+            if item
+        ]
         return {**response, "items": items}
+
+    def _filter_title_matches(self, raw_items, search_query):
+        matches = []
+        for news_item in raw_items:
+            item = self._normalize_item(news_item)
+            if item and search_query in item["title"].casefold():
+                matches.append(item)
+        return matches
+
+    @staticmethod
+    def _cache_key(page, query, tag):
+        value = f"{page}|{query.strip().casefold()}|{tag.strip().casefold()}"
+        digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
+        return f"news:{digest}"
 
     def _fetch_news(self, anime_id):
         data = safe_request(
