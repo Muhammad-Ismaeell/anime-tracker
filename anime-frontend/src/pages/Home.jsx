@@ -23,7 +23,7 @@ function Home() {
     const recentlyAddedQuery = useInfiniteAnime("recentlyAdded");
 
     const toggleFavorite = useToggleFavorite();
-    const { statusMap } = useGlobalLibrary();
+    const { library, statusMap } = useGlobalLibrary();
     const favoriteIds = useFavoriteIds();
 
     const trendingAnime = useMemo(
@@ -44,6 +44,14 @@ function Home() {
     const recentlyAddedAnime = useMemo(
         () => extractAnimePages(recentlyAddedQuery.data),
         [recentlyAddedQuery.data]
+    );
+
+    const currentlyWatching = useMemo(
+        () =>
+            library
+                .filter((item) => item.status === "watching" && item.anime)
+                .slice(0, 3),
+        [library]
     );
 
     const categories = [
@@ -160,6 +168,61 @@ function Home() {
                                 />
                             ) : (
                                 <EmptyState text={`No ${activeCategoryData.label.toLowerCase()} anime available.`} />
+                            )}
+
+                            {currentlyWatching.length > 0 && (
+                                <section className="home-continue-watching">
+                                    <div className="home-continue-header">
+                                        <div>
+                                            <span className="home-continue-eyebrow">PICK UP WHERE YOU LEFT OFF</span>
+                                            <h2>Continue Watching</h2>
+                                        </div>
+                                        <Link to="/library?status=watching" className="home-continue-view-all">
+                                            View All
+                                        </Link>
+                                    </div>
+
+                                    <div className="home-continue-grid">
+                                        {currentlyWatching.map((item) => {
+                                            const anime = item.anime;
+                                            const progress = Math.max(Number(item.progress) || 0, 0);
+                                            const episodes = Number(anime.episodes) || 0;
+                                            const percentage = episodes > 0
+                                                ? Math.min(Math.round((progress / episodes) * 100), 100)
+                                                : 0;
+
+                                            return (
+                                                <Link
+                                                    key={item.id}
+                                                    to={`/anime/${anime.id}`}
+                                                    className="home-continue-card"
+                                                >
+                                                    <img
+                                                        src={anime.image}
+                                                        alt={anime.title}
+                                                        className="home-continue-image"
+                                                        loading="lazy"
+                                                    />
+                                                    <div className="home-continue-info">
+                                                        <strong>{anime.title}</strong>
+                                                        <span>
+                                                            {progress > 0
+                                                                ? episodes > 0
+                                                                    ? `Episode ${progress} / ${episodes}`
+                                                                    : `Episode ${progress}`
+                                                                : "Not started"}
+                                                        </span>
+                                                        {episodes > 0 && (
+                                                            <div className="home-continue-progress" aria-hidden="true">
+                                                                <div style={{ width: `${percentage}%` }} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
                             )}
                         </div>
 
