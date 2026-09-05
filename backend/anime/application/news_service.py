@@ -42,7 +42,10 @@ class NewsService:
         )
 
     def _fetch_news(self, anime_id):
-        data = safe_request(f"{BASE_URL}/anime/{anime_id}/news")
+        data = safe_request(
+            f"{BASE_URL}/anime/{anime_id}/news",
+            params={"sfw-strict": "true"},
+        )
         if not data:
             return []
 
