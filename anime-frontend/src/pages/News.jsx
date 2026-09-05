@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 
@@ -7,6 +7,7 @@ import PageContainer from "../components/ui/PageContainer";
 import { AnimeAPI } from "../api/anime.api";
 
 import "../components/detail/NewsSection.css";
+import "../styles/infinite-scroll.css";
 import "../styles/recommendations.css";
 
 function formatDate(value) {
@@ -21,10 +22,38 @@ function formatDate(value) {
     }).format(date);
 }
 
+function normalizeText(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function getSearchScore(article, query) {
+    if (!query) return 0;
+
+    const normalizedQuery = normalizeText(query);
+    const title = normalizeText(article.title);
+    const animeTitle = normalizeText(article.anime_title);
+
+    if (title === normalizedQuery || animeTitle === normalizedQuery) return 0;
+    if (title.startsWith(normalizedQuery) || animeTitle.startsWith(normalizedQuery)) return 1;
+    if (title.includes(normalizedQuery) || animeTitle.includes(normalizedQuery)) return 2;
+
+    const words = normalizedQuery.split(" ").filter(Boolean);
+    const combined = `${title} ${animeTitle}`;
+    if (words.length > 1 && words.every((word) => combined.includes(word))) return 3;
+
+    return 4;
+}
+
 function News() {
     const [search, setSearch] = useState("");
     const [query, setQuery] = useState("");
     const [period, setPeriod] = useState("latest");
+    const loadMoreRef = useRef(null);
+    const canLoadMoreRef = useRef(true);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -40,14 +69,53 @@ function News() {
 
     const allNews = (newsQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
     const news = useMemo(() => {
-        if (period === "latest") return allNews;
+        let filtered = allNews;
 
-        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        return allNews.filter((article) => {
-            const timestamp = article.date ? new Date(article.date).getTime() : 0;
-            return timestamp >= cutoff;
-        });
-    }, [allNews, period]);
+        if (period === "week") {
+            const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+            filtered = filtered.filter((article) => {
+                const timestamp = article.date ? new Date(article.date).getTime() : 0;
+                return timestamp >= cutoff;
+            });
+        }
+
+        if (!query) return filtered;
+
+        return [...filtered].sort(
+            (first, second) => getSearchScore(first, query) - getSearchScore(second, query)
+        );
+    }, [allNews, period, query]);
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    canLoadMoreRef.current = true;
+                    return;
+                }
+
+                if (
+                    canLoadMoreRef.current &&
+                    newsQuery.hasNextPage &&
+                    !newsQuery.isFetchingNextPage
+                ) {
+                    canLoadMoreRef.current = false;
+                    newsQuery.fetchNextPage();
+                }
+            },
+            { rootMargin: "100px" }
+        );
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [newsQuery.fetchNextPage, newsQuery.hasNextPage, newsQuery.isFetchingNextPage]);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -132,15 +200,14 @@ function News() {
                     </div>
 
                     {newsQuery.hasNextPage && (
-                        <div className="discovery-load-more">
-                            <button
-                                type="button"
-                                className="discovery-load-more-button"
-                                onClick={() => newsQuery.fetchNextPage()}
-                                disabled={newsQuery.isFetchingNextPage}
-                            >
-                                {newsQuery.isFetchingNextPage ? "Loading..." : "Load More"}
-                            </button>
+                        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
+                            {newsQuery.isFetchingNextPage && (
+                                <div className="news-list infinite-scroll-skeleton-grid">
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <div className="news-skeleton" key={index} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </>
