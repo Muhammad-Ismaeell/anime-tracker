@@ -162,7 +162,7 @@ class StatsService:
         watching_items = (
             library_qs
             .filter(status="watching")
-            .order_by("-updated_at")[:6]
+            .order_by("-updated_at")[:8]
         )
 
         stats["currently_watching"] = [
