@@ -64,11 +64,8 @@ export const AnimeAPI = {
         const res = await api.get(`/anime/${id}/news/`, { skipAuth: true });
         return res.data;
     },
-    generalNews: async (page = 1, filters = {}) => {
-        const res = await api.get("/anime/news/", {
-            params: { page, ...filters },
-            skipAuth: true,
-        });
+    generalNews: async (page = 1) => {
+        const res = await api.get("/anime/news/", { params: { page }, skipAuth: true });
         return res.data;
     },
     externalLinks: async (id) => {
