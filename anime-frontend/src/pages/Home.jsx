@@ -8,7 +8,6 @@ import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
 import PageContainer from "../components/ui/PageContainer";
 import AnimeSection from "../components/ui/AnimeSection";
 import EmptyState from "../components/ui/EmptyState";
-import DiscoverGenres from "../components/ui/DiscoverGenres";
 
 import { useToggleFavorite } from "../hooks/user/useFavorites";
 import { useFavoriteIds } from "../hooks/user/useFavoriteIds";
@@ -104,25 +103,41 @@ function Home() {
                         <span className="home-hero-eyebrow">ANIME TRACKER</span>
                         <h1 className="home-hero-title">Discover. Track. Organize.</h1>
                         <p className="home-hero-description">
-                            Find your next series, build your personal library, and keep track of what you watch.
+                            Discover anime, build your personal library, and keep track of what you watch.
                         </p>
                         <div className="home-hero-actions">
                             <Link to="/search" className="home-hero-primary-action">
-                                Discover Anime
+                                Explore Anime
                             </Link>
                             <Link to="/library" className="home-hero-secondary-action">
                                 My Library
                             </Link>
                         </div>
                     </div>
+
+                    <div className="home-hero-discovery">
+                        <span className="home-hero-discovery-label">DISCOVER</span>
+                        <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={activeCategory === category.id}
+                                    className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                                    onClick={() => setActiveCategory(category.id)}
+                                >
+                                    {category.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <DiscoverGenres />
-
             {loading ? (
                 <div className="home-loading-grid">
-                    {Array.from({ length: 24 }).map((_, index) => (
+                    {Array.from({ length: 12 }).map((_, index) => (
                         <div key={index} className="home-loading-card shimmer" />
                     ))}
                 </div>
@@ -130,21 +145,6 @@ function Home() {
                 <div className="home-catalog-sections">
                     <div className="home-discovery-grid">
                         <div className="home-discovery-main">
-                            <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
-                                {categories.map((category) => (
-                                    <button
-                                        key={category.id}
-                                        type="button"
-                                        role="tab"
-                                        aria-selected={activeCategory === category.id}
-                                        className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
-                                        onClick={() => setActiveCategory(category.id)}
-                                    >
-                                        {category.label}
-                                    </button>
-                                ))}
-                            </div>
-
                             {activeCategoryData.anime.length > 0 ? (
                                 <AnimeSection
                                     title={activeCategoryData.label}
