@@ -134,3 +134,20 @@ class Anime(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class CharacterSafety(models.Model):
+
+    mal_id = models.IntegerField(
+        unique=True
+    )
+
+    is_safe = models.BooleanField()
+
+    checked_at = models.DateTimeField(
+        auto_now=True,
+        db_index=True
+    )
+
+    def __str__(self):
+        return f"Character {self.mal_id}: {'safe' if self.is_safe else 'unsafe'}"
