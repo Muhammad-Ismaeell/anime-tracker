@@ -56,13 +56,17 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
-            if (currentScrollY <= 12) {
+            const scrollDelta = currentScrollY - lastScrollY.current;
+            const maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            const atTop = currentScrollY <= 12;
+            const atBottom = maxScrollY - currentScrollY <= 8;
+
+            if (atTop) {
                 setCompact(false);
-            } else if (currentScrollY > lastScrollY.current) {
-                setCompact(true);
-            } else {
-                setCompact(false);
+            } else if (!atBottom && Math.abs(scrollDelta) >= 8) {
+                setCompact(scrollDelta > 0);
             }
+
             lastScrollY.current = currentScrollY;
         };
 
