@@ -158,7 +158,7 @@ class JikanClient:
         return self._get_list("characters", page, params)
 
     def get_general_news(self, page=1, query="", tag=""):
-        params = {"limit": 24}
+        params = {"limit": 12}
         if query:
             params["q"] = query
         if tag:
