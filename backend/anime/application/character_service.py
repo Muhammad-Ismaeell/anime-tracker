@@ -4,6 +4,7 @@ from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_
 
 class CharacterService:
     CACHE_TIMEOUT = 60 * 60
+    SAFETY_CACHE_TIMEOUT = 6 * 60 * 60
 
     def get_characters(self, anime_id):
         key = f"anime-characters:{anime_id}"
@@ -23,7 +24,7 @@ class CharacterService:
 
         for character in response.get("items", []):
             character_id = character.get("mal_id")
-            if not character_id:
+            if not character_id or not self._has_safe_anime(character_id):
                 continue
 
             images = character.get("images") or {}
@@ -38,6 +39,14 @@ class CharacterService:
             })
 
         return {**response, "items": items}
+
+    def _has_safe_anime(self, character_id):
+        key = f"character-safe:{character_id}"
+        return get_or_set(
+            key,
+            self.SAFETY_CACHE_TIMEOUT,
+            lambda: bool(JikanClient().get_character_anime(character_id)),
+        )
 
     def _fetch_characters(self, anime_id):
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/characters")
@@ -67,7 +76,7 @@ class CharacterService:
                 "name": character.get("name") or "Unknown Character",
                 "image": jpg.get("image_url") or webp.get("image_url") or "",
                 "role": entry.get("role") or "",
-                "favorites": entry.get("favorites") or 0,
+                "favorites": character.get("favorites") or 0,
                 "voice_actors": voice_actors,
             })
 
