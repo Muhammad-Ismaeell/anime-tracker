@@ -17,6 +17,10 @@
     cursor: pointer;
 }
 
+.navbar-logo-text-mobile {
+    display: none;
+}
+
 .navbar-compact {
     height: 48px;
 }
@@ -233,16 +237,16 @@
         font-size: 12px;
     }
 
-    .navbar-logo-text {
+    .navbar-logo-text-desktop {
+        display: none;
+    }
+
+    .navbar-logo-text-mobile {
         display: inline;
     }
 
     .navbar-search-wrapper {
-        flex-basis: 160px;
-    }
-
-    .navbar-nav > .navbar-nav-link:first-child {
-        display: none;
+        flex-basis: 190px;
     }
 }
 
@@ -292,7 +296,7 @@
     }
 
     .navbar-search-wrapper {
-        flex-basis: 120px;
+        flex-basis: 145px;
     }
 
     .navbar-right .navbar-login,
@@ -318,6 +322,6 @@
     }
 
     .navbar-search-wrapper {
-        flex-basis: 105px;
+        flex-basis: 130px;
     }
 }
