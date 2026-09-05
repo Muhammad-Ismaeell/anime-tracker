@@ -165,6 +165,12 @@ function AnimeCard({
         setProgress(value);
     };
 
+    const statusLabel = status === "watching"
+        ? `Watching${episodeCount > 0 ? ` · Ep. ${Math.min(currentProgress, episodeCount)}` : currentProgress > 0 ? ` · Ep. ${currentProgress}` : ""}`
+        : status
+            ? status.replaceAll("_", " ")
+            : "＋ Add to list";
+
     return (
         <motion.article
             className={`anime-card ${open ? "menu-open" : ""}`}
@@ -240,9 +246,7 @@ function AnimeCard({
                     >
                         {isAuthenticated && updateLibrary.isPending
                             ? "Updating..."
-                            : status
-                                ? status.replaceAll("_", " ")
-                                : "＋ Add to list"}
+                            : statusLabel}
                     </button>
 
                     {open && isAuthenticated && (
