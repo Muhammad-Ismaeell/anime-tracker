@@ -37,18 +37,16 @@ function Characters() {
     const characters = (charactersQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
 
     useEffect(() => {
-        const element = loadMoreRef.current;
+        canLoadMoreRef.current = true;
+    }, [query, sort]);
 
-        if (!element) {
-            return undefined;
-        }
+    useEffect(() => {
+        const element = loadMoreRef.current;
+        if (!element) return undefined;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (!entry?.isIntersecting) {
-                    canLoadMoreRef.current = true;
-                    return;
-                }
+                if (!entry?.isIntersecting) return;
 
                 if (
                     canLoadMoreRef.current &&
@@ -59,17 +57,22 @@ function Characters() {
                     charactersQuery.fetchNextPage();
                 }
             },
-            { rootMargin: "100px" }
+            { rootMargin: "600px 0px" }
         );
 
         observer.observe(element);
-
         return () => observer.disconnect();
     }, [charactersQuery.fetchNextPage, charactersQuery.hasNextPage, charactersQuery.isFetchingNextPage]);
 
     const handleSearch = (event) => {
         event.preventDefault();
         setQuery(search.trim());
+    };
+
+    const loadMore = () => {
+        if (!charactersQuery.hasNextPage || charactersQuery.isFetchingNextPage) return;
+        canLoadMoreRef.current = false;
+        charactersQuery.fetchNextPage();
     };
 
     return (
@@ -143,13 +146,17 @@ function Characters() {
                     </div>
 
                     {charactersQuery.hasNextPage && (
-                        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
-                            {charactersQuery.isFetchingNextPage && (
+                        <div ref={loadMoreRef} className="infinite-scroll-sentinel">
+                            {charactersQuery.isFetchingNextPage ? (
                                 <div className="characters-grid infinite-scroll-skeleton-grid">
                                     {Array.from({ length: 6 }).map((_, index) => (
                                         <div className="character-skeleton" key={index} />
                                     ))}
                                 </div>
+                            ) : (
+                                <button type="button" className="infinite-scroll-load-more" onClick={loadMore}>
+                                    Load more characters
+                                </button>
                             )}
                         </div>
                     )}
