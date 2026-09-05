@@ -14,12 +14,27 @@ import { getMediaUrl } from "../../utils/mediaUrl";
 
 import "./Navbar.css";
 
+const GENRES = [
+    "Action",
+    "Adventure",
+    "Comedy",
+    "Drama",
+    "Fantasy",
+    "Horror",
+    "Mystery",
+    "Romance",
+    "Sci-Fi",
+    "Sports",
+    "Supernatural",
+];
+
 function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const navigate = useNavigate();
     const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
     const { data: profile } = useProfile();
 
     const [open, setOpen] = useState(false);
+    const [exploreOpen, setExploreOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
@@ -27,6 +42,7 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const { data: results = [], isLoading } = useNavbarSearch(debouncedQuery);
 
     const dropdownRef = useRef(null);
+    const exploreRef = useRef(null);
     const profileMenuRef = useRef(null);
 
     const profileAvatar = profile?.profile?.avatar ?? null;
@@ -39,6 +55,9 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setOpen(false);
+            }
+            if (exploreRef.current && !exploreRef.current.contains(event.target)) {
+                setExploreOpen(false);
             }
             if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
                 setProfileMenuOpen(false);
@@ -53,6 +72,7 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
         const handleEscape = (event) => {
             if (event.key === "Escape") {
                 setOpen(false);
+                setExploreOpen(false);
                 setProfileMenuOpen(false);
             }
         };
@@ -76,6 +96,11 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
 
         setOpen(false);
         navigate(`/search?q=${encodeURIComponent(value)}`);
+    };
+
+    const handleGenreSelect = (genre) => {
+        setExploreOpen(false);
+        navigate(`/search?genres=${encodeURIComponent(genre)}`);
     };
 
     const handleLogout = () => {
@@ -103,7 +128,53 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
 
                 <nav className="navbar-nav" aria-label="Primary navigation">
                     <Link to="/" className="navbar-nav-link">Home</Link>
-                    <Link to="/search" className="navbar-nav-link">Anime</Link>
+                    <div ref={exploreRef} className="navbar-explore">
+                        <button
+                            type="button"
+                            className="navbar-nav-link navbar-explore-trigger"
+                            onClick={() => setExploreOpen((current) => !current)}
+                            aria-expanded={exploreOpen}
+                            aria-haspopup="menu"
+                        >
+                            Explore
+                            <span className={`navbar-explore-chevron ${exploreOpen ? "open" : ""}`} aria-hidden="true">⌄</span>
+                        </button>
+
+                        {exploreOpen && (
+                            <div className="navbar-explore-dropdown" role="menu">
+                                <div className="navbar-explore-links">
+                                    <Link to="/recommendations" className="navbar-explore-item" role="menuitem" onClick={() => setExploreOpen(false)}>
+                                        <span aria-hidden="true">🎯</span>
+                                        <span>Recommendations</span>
+                                    </Link>
+                                    <Link to="/characters" className="navbar-explore-item" role="menuitem" onClick={() => setExploreOpen(false)}>
+                                        <span aria-hidden="true">👤</span>
+                                        <span>Characters</span>
+                                    </Link>
+                                    <Link to="/news" className="navbar-explore-item" role="menuitem" onClick={() => setExploreOpen(false)}>
+                                        <span aria-hidden="true">📰</span>
+                                        <span>Anime News</span>
+                                    </Link>
+                                </div>
+
+                                <div className="navbar-explore-section">
+                                    <span className="navbar-explore-label">GENRES</span>
+                                    <div className="navbar-genre-grid">
+                                        {GENRES.map((genre) => (
+                                            <button
+                                                key={genre}
+                                                type="button"
+                                                className="navbar-genre-item"
+                                                onClick={() => handleGenreSelect(genre)}
+                                            >
+                                                {genre}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </nav>
             </div>
 
