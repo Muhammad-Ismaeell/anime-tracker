@@ -119,19 +119,24 @@ function Home() {
 
             <div className="home-discovery-controls">
                 <span className="home-discovery-controls-label">DISCOVER</span>
-                <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
-                    {categories.map((category) => (
-                        <button
-                            key={category.id}
-                            type="button"
-                            role="tab"
-                            aria-selected={activeCategory === category.id}
-                            className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
-                            onClick={() => setActiveCategory(category.id)}
-                        >
-                            {category.label}
-                        </button>
-                    ))}
+                <div className="home-discovery-controls-row">
+                    <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
+                        {categories.map((category) => (
+                            <button
+                                key={category.id}
+                                type="button"
+                                role="tab"
+                                aria-selected={activeCategory === category.id}
+                                className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                                onClick={() => setActiveCategory(category.id)}
+                            >
+                                {category.label}
+                            </button>
+                        ))}
+                    </div>
+                    <Link className="home-discovery-view-all" to={activeCategoryData.to}>
+                        View All
+                    </Link>
                 </div>
             </div>
 
@@ -148,8 +153,7 @@ function Home() {
                             {activeCategoryData.anime.length > 0 ? (
                                 <AnimeSection
                                     title={activeCategoryData.label}
-                                    animeList={activeCategoryData.anime.slice(0, 6)}
-                                    viewAllTo={activeCategoryData.to}
+                                    animeList={activeCategoryData.anime.slice(0, 5)}
                                     showHeader={false}
                                     {...sectionProps}
                                 />
