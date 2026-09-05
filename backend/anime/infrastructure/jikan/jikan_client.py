@@ -139,7 +139,7 @@ class JikanClient:
         return self._get_list(
             "recommendations/anime",
             page,
-            {"sfw": "true", "limit": 24},
+            {"sfw-strict": "true", "limit": 24},
         )
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
