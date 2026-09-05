@@ -38,7 +38,7 @@ function AnimeCard({
 
     const animeId = String(rawAnimeId);
     const title = anime?.title || "Unknown Anime";
-    const image = anime?.image || "";
+    const image = anime?.largeImage || anime?.image || "";
     const score = Number(anime?.score) || 0;
     const type = anime?.type || "";
     const year = anime?.year || "";
