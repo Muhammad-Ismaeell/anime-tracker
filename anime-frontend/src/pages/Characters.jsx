@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 
@@ -8,12 +8,15 @@ import PageContainer from "../components/ui/PageContainer";
 import { AnimeAPI } from "../api/anime.api";
 
 import "../components/detail/CharactersSection.css";
+import "../styles/infinite-scroll.css";
 import "../styles/recommendations.css";
 
 function Characters() {
     const [search, setSearch] = useState("");
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState("desc");
+    const loadMoreRef = useRef(null);
+    const canLoadMoreRef = useRef(true);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -32,6 +35,37 @@ function Characters() {
     });
 
     const characters = (charactersQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
+
+    useEffect(() => {
+        const element = loadMoreRef.current;
+
+        if (!element) {
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry?.isIntersecting) {
+                    canLoadMoreRef.current = true;
+                    return;
+                }
+
+                if (
+                    canLoadMoreRef.current &&
+                    charactersQuery.hasNextPage &&
+                    !charactersQuery.isFetchingNextPage
+                ) {
+                    canLoadMoreRef.current = false;
+                    charactersQuery.fetchNextPage();
+                }
+            },
+            { rootMargin: "100px" }
+        );
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [charactersQuery.fetchNextPage, charactersQuery.hasNextPage, charactersQuery.isFetchingNextPage]);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -107,16 +141,16 @@ function Characters() {
                             </article>
                         ))}
                     </div>
+
                     {charactersQuery.hasNextPage && (
-                        <div className="discovery-load-more">
-                            <button
-                                type="button"
-                                className="discovery-load-more-button"
-                                onClick={() => charactersQuery.fetchNextPage()}
-                                disabled={charactersQuery.isFetchingNextPage}
-                            >
-                                {charactersQuery.isFetchingNextPage ? "Loading..." : "Load More"}
-                            </button>
+                        <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
+                            {charactersQuery.isFetchingNextPage && (
+                                <div className="characters-grid infinite-scroll-skeleton-grid">
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <div className="character-skeleton" key={index} />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </>
