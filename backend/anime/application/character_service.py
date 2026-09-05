@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
+import time
 
 from django.utils import timezone
 
@@ -11,7 +12,8 @@ from anime.infrastructure.models import CharacterSafety
 class CharacterService:
     CACHE_TIMEOUT = 60 * 60
     SAFETY_CACHE_TIMEOUT = 7 * 24 * 60 * 60
-    SAFETY_WORKERS = 4
+    SAFETY_WORKERS = 1
+    SAFETY_INTERVAL = 0.3
 
     def get_characters(self, anime_id):
         key = f"anime-characters:{anime_id}"
@@ -75,9 +77,11 @@ class CharacterService:
 
         return cached
 
-    @staticmethod
-    def _check_character_safety(character_id):
-        return bool(JikanClient().get_character_anime(character_id))
+    @classmethod
+    def _check_character_safety(cls, character_id):
+        result = bool(JikanClient().get_character_anime(character_id))
+        time.sleep(cls.SAFETY_INTERVAL)
+        return result
 
     @staticmethod
     def _normalize_character(character):
