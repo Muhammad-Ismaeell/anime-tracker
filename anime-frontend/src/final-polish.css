@@ -7,3 +7,17 @@
     /* Keep legacy references aligned with the canonical page background. */
     --background: var(--bg);
 }
+
+/* Keep Advanced Search filters compact on small phones. */
+@media (max-width: 480px) {
+    .advanced-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Preserve a single column on very narrow screens. */
+@media (max-width: 360px) {
+    .advanced-filters {
+        grid-template-columns: 1fr;
+    }
+}
