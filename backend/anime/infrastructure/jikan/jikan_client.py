@@ -1,6 +1,7 @@
 import json
 import logging
 import subprocess
+import threading
 import time
 from urllib.parse import urlencode
 
@@ -9,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 BASE_URL = "https://api.tenrai.org/v1"
+MIN_REQUEST_INTERVAL = 0.3
+_request_lock = threading.Lock()
+_next_request_at = 0.0
 
 
 BLOCKED_RATINGS = {
@@ -22,12 +26,24 @@ BLOCKED_GENRES = {
 }
 
 
+def _wait_for_rate_limit():
+    global _next_request_at
+
+    with _request_lock:
+        now = time.monotonic()
+        wait = _next_request_at - now
+        if wait > 0:
+            time.sleep(wait)
+        _next_request_at = time.monotonic() + MIN_REQUEST_INTERVAL
+
+
 def safe_request(url, params=None, retries=3):
     if params:
         url = f"{url}?{urlencode(params)}"
 
     for attempt in range(retries):
         http_code = "unknown"
+        _wait_for_rate_limit()
 
         try:
             result = subprocess.run(
