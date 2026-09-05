@@ -146,7 +146,6 @@ function Home() {
                     <div className="home-discovery-grid">
                         <div className="home-discovery-main">
                             <div className="home-main-section-header">
-                                <span className="home-main-section-label">{activeCategoryData.label}</span>
                                 <Link className="home-discovery-view-all" to={activeCategoryData.to}>
                                     View All
                                 </Link>
@@ -162,27 +161,6 @@ function Home() {
                             ) : (
                                 <EmptyState text={`No ${activeCategoryData.label.toLowerCase()} anime available.`} />
                             )}
-
-                            <div className="home-quick-links">
-                                <div className="home-quick-links-heading">
-                                    <span>EXPLORE</span>
-                                    <p>Find more ways to discover and manage your anime.</p>
-                                </div>
-                                <div className="home-quick-links-grid">
-                                    <Link to="/search" className="home-quick-link">
-                                        <strong>Browse Anime</strong>
-                                        <span>Search the full catalogue</span>
-                                    </Link>
-                                    <Link to="/library" className="home-quick-link">
-                                        <strong>Your Library</strong>
-                                        <span>Keep your watchlist organized</span>
-                                    </Link>
-                                    <Link to="/favorites" className="home-quick-link">
-                                        <strong>Favorites</strong>
-                                        <span>Quick access to saved anime</span>
-                                    </Link>
-                                </div>
-                            </div>
                         </div>
 
                         {topAnime.length > 0 && (
