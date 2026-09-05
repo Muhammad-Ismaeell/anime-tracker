@@ -37,8 +37,8 @@ function Characters() {
     const characters = (charactersQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
 
     useEffect(() => {
-        canLoadMoreRef.current = true;
-    }, [query, sort]);
+        canLoadMoreRef.current = !charactersQuery.isFetchingNextPage;
+    }, [query, sort, charactersQuery.isFetchingNextPage]);
 
     useEffect(() => {
         const element = loadMoreRef.current;
