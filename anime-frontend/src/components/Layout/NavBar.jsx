@@ -136,8 +136,8 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
                             aria-expanded={exploreOpen}
                             aria-haspopup="menu"
                         >
+                            <span className="navbar-explore-spark" aria-hidden="true">✦</span>
                             Explore
-                            <span className={`navbar-explore-chevron ${exploreOpen ? "open" : ""}`} aria-hidden="true">⌄</span>
                         </button>
 
                         {exploreOpen && (
@@ -271,9 +271,6 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
                             </span>
                             <span className="navbar-profile-name">
                                 {loading ? "Loading..." : username}
-                            </span>
-                            <span className={`profile-menu-chevron ${profileMenuOpen ? "open" : ""}`} aria-hidden="true">
-                                ⌄
                             </span>
                         </button>
 
