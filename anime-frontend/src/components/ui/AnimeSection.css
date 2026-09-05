@@ -99,7 +99,7 @@
     align-items: center;
     gap: 14px;
     min-height: 88px;
-    padding: 10px 4px;
+    padding: 9px 4px;
     border-bottom: 1px solid var(--border);
     color: inherit;
     text-decoration: none;
@@ -108,7 +108,7 @@
 
 .anime-ranking-item:hover { background: var(--surface-hover); }
 .anime-ranking-number { color: var(--text-muted); font-size: 0.82rem; font-weight: 700; text-align: center; }
-.anime-ranking-image { width: 62px; height: 82px; object-fit: cover; border-radius: 3px; background: var(--surface); }
+.anime-ranking-image { width: 62px; height: 80px; object-fit: cover; border-radius: 3px; background: var(--surface); }
 .anime-ranking-info { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
 .anime-ranking-info strong { overflow: hidden; color: var(--text-primary); font-size: 0.84rem; font-weight: 600; line-height: 1.3; white-space: nowrap; text-overflow: ellipsis; }
 .anime-ranking-info span { color: var(--text-muted); font-size: 0.68rem; line-height: 1.25; }
