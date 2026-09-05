@@ -122,7 +122,7 @@
     position: relative;
     width: 100%;
     min-height: 275px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     overflow: hidden;
     background: transparent;
     border: none;
@@ -131,9 +131,8 @@
 
 .home-hero-inner {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
-    gap: 48px;
     width: min(100% - 44px, 1160px);
     min-height: 275px;
     margin: 0 auto;
@@ -185,48 +184,14 @@
 .home-hero-secondary-action { background: transparent; color: var(--text-primary); }
 .home-hero-secondary-action:hover { background: var(--surface-hover); border-color: var(--border); transform: translateY(-1px); }
 
-.home-hero-posters {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    align-items: stretch;
-    gap: 10px;
-    min-width: 0;
-}
-
-.home-hero-poster-link {
-    display: block;
-    min-width: 0;
-    height: 100%;
-    transform: none;
-    filter: none;
-    transition: transform var(--transition-fast);
-}
-
-.home-hero-poster-link:hover { transform: translateY(-4px); }
-
-.home-hero-poster {
-    display: block;
+.home-discovery-controls {
     width: 100%;
-    aspect-ratio: 2 / 3;
-    height: auto;
-    object-fit: contain;
-    object-position: center;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    box-shadow: none !important;
-    filter: none !important;
+    margin: 0 0 18px;
 }
 
-.home-hero-discovery {
-    align-self: end;
-    min-width: 0;
-    padding-bottom: 4px;
-}
-
-.home-hero-discovery-label {
+.home-discovery-controls-label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--text-muted);
     font-size: 0.64rem;
     font-weight: 700;
@@ -289,15 +254,13 @@
 .home-discovery-ranking .home-section { margin-bottom: 0; }
 
 @media (max-width: 1050px) {
-    .home-hero-inner { grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr); gap: 30px; }
     .home-discovery-grid { grid-template-columns: minmax(0, 1fr) minmax(220px, 260px); gap: 20px; }
     .home-discovery-main .anime-section-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 800px) {
     .home-hero { min-height: 0; }
-    .home-hero-inner { grid-template-columns: 1fr; width: calc(100% - 28px); min-height: 0; gap: 18px; padding: 20px 0 14px; }
-    .home-hero-discovery { align-self: start; }
+    .home-hero-inner { width: calc(100% - 28px); min-height: 0; padding: 20px 0 14px; }
     .home-discovery-grid { grid-template-columns: 1fr; gap: 26px; }
     .home-discovery-main .anime-section-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
@@ -306,6 +269,7 @@
     .home-hero-inner { width: 100%; padding-top: 14px; }
     .home-hero-title { font-size: 1.55rem; }
     .home-hero-description { font-size: 0.75rem; }
+    .home-discovery-controls { margin-bottom: 16px; }
     .home-category-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; scrollbar-width: thin; }
     .home-category-tab { flex: 0 0 auto; }
     .home-discovery-main .anime-section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 10px; }
