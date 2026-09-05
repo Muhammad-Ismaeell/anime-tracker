@@ -147,7 +147,7 @@ class JikanClient:
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
         params = {
-            "limit": 24,
+            "limit": 12,
             "order_by": order_by,
             "sort": sort,
         }
