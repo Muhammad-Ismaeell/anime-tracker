@@ -20,12 +20,16 @@ class NewsService:
 
     def _fetch_general_news(self, page, query, tag):
         response = JikanClient().get_general_news(page, query, tag)
+        search_query = query.casefold().strip()
         items = []
 
         for news_item in response.get("items", []):
             item = self._normalize_item(news_item)
-            if item:
-                items.append(item)
+            if not item:
+                continue
+            if search_query and search_query not in item["title"].casefold():
+                continue
+            items.append(item)
 
         return {**response, "items": items}
 
