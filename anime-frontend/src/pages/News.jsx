@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 
 import EmptyState from "../components/ui/EmptyState";
@@ -11,7 +11,6 @@ import "../styles/recommendations.css";
 
 function formatDate(value) {
     if (!value) return "";
-
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "";
 
@@ -23,26 +22,43 @@ function formatDate(value) {
 }
 
 function News() {
+    const [search, setSearch] = useState("");
+    const [query, setQuery] = useState("");
+    const [period, setPeriod] = useState("latest");
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    const { data, isLoading, isError } = useQuery({
-        queryKey: ["general-news"],
-        queryFn: () => AnimeAPI.generalNews(),
+    const newsQuery = useInfiniteQuery({
+        queryKey: ["general-news", query],
+        queryFn: ({ pageParam }) => AnimeAPI.generalNews(pageParam, { q: query }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => lastPage.has_next ? lastPage.page + 1 : undefined,
         staleTime: 1000 * 60 * 15,
     });
 
-    const news = data?.items ?? [];
+    const allNews = (newsQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
+    const news = useMemo(() => {
+        if (period === "latest") return allNews;
+
+        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        return allNews.filter((article) => {
+            const timestamp = article.date ? new Date(article.date).getTime() : 0;
+            return timestamp >= cutoff;
+        });
+    }, [allNews, period]);
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        setQuery(search.trim());
+    };
 
     return (
         <PageContainer>
             <Helmet>
                 <title>Anime News | Anime Tracker</title>
-                <meta
-                    name="description"
-                    content="Read the latest anime news from across the catalogue."
-                />
+                <meta name="description" content="Read the latest anime news from across the catalogue." />
             </Helmet>
 
             <div className="recommendations-header">
@@ -51,46 +67,83 @@ function News() {
                 <p>Keep up with the latest news from the anime world.</p>
             </div>
 
-            {isLoading ? (
-                <div className="news-list">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                        <div className="news-skeleton" key={index} />
-                    ))}
+            <div className="discovery-toolbar">
+                <form className="discovery-search" onSubmit={handleSearch}>
+                    <input
+                        type="search"
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                        placeholder="Search anime news..."
+                        aria-label="Search anime news"
+                    />
+                    <button type="submit">Search</button>
+                </form>
+                <div className="discovery-sort" role="group" aria-label="News period">
+                    <button
+                        type="button"
+                        className={period === "latest" ? "active" : ""}
+                        onClick={() => setPeriod("latest")}
+                    >
+                        Latest
+                    </button>
+                    <button
+                        type="button"
+                        className={period === "week" ? "active" : ""}
+                        onClick={() => setPeriod("week")}
+                    >
+                        This Week
+                    </button>
                 </div>
-            ) : isError || news.length === 0 ? (
-                <EmptyState text="No anime news found right now." icon="📰" />
+            </div>
+
+            {newsQuery.isLoading ? (
+                <div className="news-list">
+                    {Array.from({ length: 8 }).map((_, index) => <div className="news-skeleton" key={index} />)}
+                </div>
+            ) : newsQuery.isError || news.length === 0 ? (
+                <EmptyState text="No anime news found." icon="📰" />
             ) : (
-                <div className="news-list">
-                    {news.map((article, index) => (
-                        <a
-                            className="news-item"
-                            href={article.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            key={`${article.url}-${index}`}
-                        >
-                            {article.image ? (
-                                <img
-                                    className="news-image"
-                                    src={article.image}
-                                    alt=""
-                                    loading="lazy"
-                                />
-                            ) : (
-                                <div className="news-image news-image-placeholder" />
-                            )}
-                            <div className="news-content">
-                                <h3>{article.title}</h3>
-                                <div className="news-meta">
-                                    {article.anime_title && <span>{article.anime_title}</span>}
-                                    {article.anime_title && article.date && <span>•</span>}
-                                    {article.date && <time>{formatDate(article.date)}</time>}
+                <>
+                    <div className="news-list">
+                        {news.map((article, index) => (
+                            <a
+                                className="news-item"
+                                href={article.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                key={`${article.url}-${index}`}
+                            >
+                                {article.image ? (
+                                    <img className="news-image" src={article.image} alt="" loading="lazy" />
+                                ) : (
+                                    <div className="news-image news-image-placeholder" />
+                                )}
+                                <div className="news-content">
+                                    <h3>{article.title}</h3>
+                                    <div className="news-meta">
+                                        {article.anime_title && <span>{article.anime_title}</span>}
+                                        {article.anime_title && article.date && <span>•</span>}
+                                        {article.date && <time>{formatDate(article.date)}</time>}
+                                    </div>
                                 </div>
-                            </div>
-                            <span className="news-arrow" aria-hidden="true">↗</span>
-                        </a>
-                    ))}
-                </div>
+                                <span className="news-arrow" aria-hidden="true">↗</span>
+                            </a>
+                        ))}
+                    </div>
+
+                    {newsQuery.hasNextPage && (
+                        <div className="discovery-load-more">
+                            <button
+                                type="button"
+                                className="discovery-load-more-button"
+                                onClick={() => newsQuery.fetchNextPage()}
+                                disabled={newsQuery.isFetchingNextPage}
+                            >
+                                {newsQuery.isFetchingNextPage ? "Loading..." : "Load More"}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </PageContainer>
     );
