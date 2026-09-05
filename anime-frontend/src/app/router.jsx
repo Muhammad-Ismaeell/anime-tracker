@@ -51,6 +51,9 @@ export default function App() {
                         <Route path="/seasonal" element={<Seasonal />} />
                         <Route path="/top" element={<Top />} />
                         <Route path="/recently-added" element={<RecentlyAdded />} />
+                        <Route path="/recommendations" element={<Recommendations />} />
+                        <Route path="/characters" element={<Characters />} />
+                        <Route path="/news" element={<News />} />
                     </Route>
 
                     <Route path="/login" element={<Login />} />
@@ -69,9 +72,6 @@ export default function App() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/edit-profile" element={<EditProfile />} />
-                        <Route path="/recommendations" element={<Recommendations />} />
-                        <Route path="/characters" element={<Characters />} />
-                        <Route path="/news" element={<News />} />
                     </Route>
 
                     <Route path="*" element={<NotFound />} />
