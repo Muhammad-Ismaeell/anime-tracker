@@ -35,17 +35,10 @@ function getSearchScore(article, query) {
 
     const normalizedQuery = normalizeText(query);
     const title = normalizeText(article.title);
-    const animeTitle = normalizeText(article.anime_title);
 
-    if (title === normalizedQuery || animeTitle === normalizedQuery) return 0;
-    if (title.startsWith(normalizedQuery) || animeTitle.startsWith(normalizedQuery)) return 1;
-    if (title.includes(normalizedQuery) || animeTitle.includes(normalizedQuery)) return 2;
-
-    const words = normalizedQuery.split(" ").filter(Boolean);
-    const combined = `${title} ${animeTitle}`;
-    if (words.length > 1 && words.every((word) => combined.includes(word))) return 3;
-
-    return 4;
+    if (title === normalizedQuery) return 0;
+    if (title.startsWith(normalizedQuery)) return 1;
+    return 2;
 }
 
 function News() {
@@ -80,6 +73,9 @@ function News() {
         }
 
         if (!query) return filtered;
+
+        const normalizedQuery = normalizeText(query);
+        filtered = filtered.filter((article) => normalizeText(article.title).includes(normalizedQuery));
 
         return [...filtered].sort(
             (first, second) => getSearchScore(first, query) - getSearchScore(second, query)
