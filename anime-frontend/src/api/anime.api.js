@@ -53,6 +53,15 @@ export const AnimeAPI = {
         return res.data;
     },
 
+    generalRecommendations: async (page = 1) => {
+        const res = await api.get("/anime/recommendations/", {
+            params: { page },
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
     episodes: async (id, page = 1) => {
         const res = await api.get(`/anime/${id}/episodes/`, {
             params: { page },
@@ -64,6 +73,15 @@ export const AnimeAPI = {
 
     characters: async (id) => {
         const res = await api.get(`/anime/${id}/characters/`, {
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
+    generalCharacters: async (page = 1) => {
+        const res = await api.get("/anime/characters/", {
+            params: { page },
             skipAuth: true,
         });
 
@@ -104,6 +122,15 @@ export const AnimeAPI = {
 
     news: async (id) => {
         const res = await api.get(`/anime/${id}/news/`, {
+            skipAuth: true,
+        });
+
+        return res.data;
+    },
+
+    generalNews: async (page = 1) => {
+        const res = await api.get("/anime/news/", {
+            params: { page },
             skipAuth: true,
         });
 
