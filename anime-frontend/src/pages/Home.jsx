@@ -114,26 +114,26 @@ function Home() {
                             </Link>
                         </div>
                     </div>
-
-                    <div className="home-hero-discovery">
-                        <span className="home-hero-discovery-label">DISCOVER</span>
-                        <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
-                            {categories.map((category) => (
-                                <button
-                                    key={category.id}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={activeCategory === category.id}
-                                    className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
-                                    onClick={() => setActiveCategory(category.id)}
-                                >
-                                    {category.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </section>
+
+            <div className="home-discovery-controls">
+                <span className="home-discovery-controls-label">DISCOVER</span>
+                <div className="home-category-tabs" role="tablist" aria-label="Anime categories">
+                    {categories.map((category) => (
+                        <button
+                            key={category.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeCategory === category.id}
+                            className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                            onClick={() => setActiveCategory(category.id)}
+                        >
+                            {category.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {loading ? (
                 <div className="home-loading-grid">
