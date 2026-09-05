@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request
+from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request, JikanClient
 
 
 class NewsService:
@@ -14,6 +14,31 @@ class NewsService:
             self.CACHE_TIMEOUT,
             lambda: self._fetch_news(anime_id),
         )
+
+    def get_general_news(self, page=1):
+        key = f"news:page:{page}"
+
+        return get_or_set(
+            key,
+            self.CACHE_TIMEOUT,
+            lambda: self._fetch_general_news(page),
+        )
+
+    def _fetch_general_news(self, page):
+        response = JikanClient().get_general_news(page)
+        items = response.get("items", [])
+
+        return {
+            **response,
+            "items": [
+                item
+                for item in (
+                    self._normalize_item(news_item)
+                    for news_item in items
+                )
+                if item
+            ],
+        }
 
     def _fetch_news(self, anime_id):
         data = safe_request(
@@ -54,10 +79,13 @@ class NewsService:
             or images.get("webp", {}).get("image_url")
         )
 
+        anime = item.get("anime") or item.get("entry") or {}
+
         return {
             "title": title,
             "url": url,
             "date": item.get("date"),
             "author": str(item.get("author_username") or "").strip() or None,
             "image": image,
+            "anime_title": anime.get("title"),
         }
