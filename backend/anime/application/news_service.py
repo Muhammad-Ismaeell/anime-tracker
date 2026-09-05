@@ -4,7 +4,6 @@ from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_
 
 class NewsService:
     CACHE_TIMEOUT = 30 * 60
-    SAFETY_CACHE_TIMEOUT = 6 * 60 * 60
     MAX_ITEMS = 10
 
     def get_news(self, anime_id):
@@ -25,21 +24,10 @@ class NewsService:
 
         for news_item in response.get("items", []):
             item = self._normalize_item(news_item)
-            if not item or not item.get("anime_id"):
-                continue
-            if not self._is_safe_anime(item["anime_id"]):
-                continue
-            items.append(item)
+            if item:
+                items.append(item)
 
         return {**response, "items": items}
-
-    def _is_safe_anime(self, anime_id):
-        key = f"news-anime-safe:{anime_id}"
-        return get_or_set(
-            key,
-            self.SAFETY_CACHE_TIMEOUT,
-            lambda: JikanClient().get_detail(anime_id) is not None,
-        )
 
     def _fetch_news(self, anime_id):
         data = safe_request(
