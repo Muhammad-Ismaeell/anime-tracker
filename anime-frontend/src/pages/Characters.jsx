@@ -92,11 +92,6 @@ function Characters() {
                     />
                     <button type="submit">Search</button>
                 </form>
-                <div className="discovery-sort" role="group" aria-label="Character sorting">
-                    <button type="button" className="active">
-                        Popular
-                    </button>
-                </div>
             </div>
 
             {charactersQuery.isLoading ? (
