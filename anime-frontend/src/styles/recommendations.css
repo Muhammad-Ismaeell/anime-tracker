@@ -25,6 +25,105 @@
     line-height: 1.6;
 }
 
+.discovery-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.discovery-search {
+    display: flex;
+    flex: 1;
+    max-width: 560px;
+    min-width: 0;
+}
+
+.discovery-search input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-right: 0;
+    border-radius: 8px 0 0 8px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+}
+
+.discovery-search input:focus {
+    border-color: var(--accent);
+}
+
+.discovery-search button,
+.discovery-sort button,
+.discovery-load-more-button {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.discovery-search button {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 0 8px 8px 0;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.discovery-sort {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.discovery-sort button {
+    padding: 9px 13px;
+    font-size: 12px;
+}
+
+.discovery-sort button:first-child {
+    border-radius: 7px 0 0 7px;
+}
+
+.discovery-sort button:last-child {
+    border-left: 0;
+    border-radius: 0 7px 7px 0;
+}
+
+.discovery-sort button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.discovery-load-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.discovery-load-more-button {
+    min-width: 130px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.discovery-load-more-button:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.discovery-load-more-button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
 @media (max-width: 600px) {
     .recommendations-header {
         margin-bottom: 22px;
@@ -32,5 +131,18 @@
 
     .recommendations-header h1 {
         font-size: 30px;
+    }
+
+    .discovery-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .discovery-search {
+        max-width: none;
+    }
+
+    .discovery-sort button {
+        flex: 1;
     }
 }
