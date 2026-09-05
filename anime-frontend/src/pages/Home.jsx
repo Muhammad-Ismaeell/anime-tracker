@@ -148,8 +148,9 @@ function Home() {
                             {activeCategoryData.anime.length > 0 ? (
                                 <AnimeSection
                                     title={activeCategoryData.label}
-                                    animeList={activeCategoryData.anime}
+                                    animeList={activeCategoryData.anime.slice(0, 6)}
                                     viewAllTo={activeCategoryData.to}
+                                    showHeader={false}
                                     {...sectionProps}
                                 />
                             ) : (
