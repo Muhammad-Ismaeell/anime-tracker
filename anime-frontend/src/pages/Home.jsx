@@ -95,6 +95,10 @@ function Home() {
         toggleFavorite,
     };
 
+    const visibleAnime = activeCategory === "trending"
+        ? activeCategoryData.anime.slice(0, 5)
+        : activeCategoryData.anime.slice(0, 6);
+
     return (
         <PageContainer>
             <Helmet>
@@ -162,7 +166,7 @@ function Home() {
                             {activeCategoryData.anime.length > 0 ? (
                                 <AnimeSection
                                     title={activeCategoryData.label}
-                                    animeList={activeCategoryData.anime.slice(0, 6)}
+                                    animeList={visibleAnime}
                                     showHeader={false}
                                     {...sectionProps}
                                 />
