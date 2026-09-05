@@ -235,7 +235,7 @@ function Home() {
                             <div className="home-discovery-ranking">
                                 <AnimeSection
                                     title="Top Anime"
-                                    animeList={topAnime}
+                                    animeList={topAnime.slice(0, 5)}
                                     variant="ranking"
                                     viewAllTo="/top"
                                     {...sectionProps}
