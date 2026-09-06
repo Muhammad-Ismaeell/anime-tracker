@@ -151,3 +151,171 @@ class CharacterSafety(models.Model):
 
     def __str__(self):
         return f"Character {self.mal_id}: {'safe' if self.is_safe else 'unsafe'}"
+
+
+class AnimeRelation(models.Model):
+
+    anime = models.ForeignKey(
+        Anime,
+        on_delete=models.CASCADE,
+        related_name="relations"
+    )
+
+    relation_type = models.CharField(
+        max_length=100
+    )
+
+    related_mal_id = models.IntegerField()
+
+    related_title = models.CharField(
+        max_length=255
+    )
+
+    related_type = models.CharField(
+        max_length=50,
+        default="anime"
+    )
+
+    related_url = models.URLField(
+        blank=True,
+        default=""
+    )
+
+    last_synced = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["anime", "relation_type", "related_mal_id"],
+                name="unique_anime_relation"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["anime", "relation_type"]),
+        ]
+
+
+class AnimeTheme(models.Model):
+
+    THEME_TYPES = (
+        ("opening", "Opening"),
+        ("ending", "Ending"),
+    )
+
+    anime = models.ForeignKey(
+        Anime,
+        on_delete=models.CASCADE,
+        related_name="themes"
+    )
+
+    theme_type = models.CharField(
+        max_length=20,
+        choices=THEME_TYPES
+    )
+
+    title = models.CharField(
+        max_length=255
+    )
+
+    position = models.PositiveIntegerField()
+
+    last_synced = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["theme_type", "position"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["anime", "theme_type", "position"],
+                name="unique_anime_theme_position"
+            )
+        ]
+
+
+class AnimeExternalLink(models.Model):
+
+    anime = models.ForeignKey(
+        Anime,
+        on_delete=models.CASCADE,
+        related_name="external_links"
+    )
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    url = models.URLField()
+
+    category = models.CharField(
+        max_length=30
+    )
+
+    last_synced = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["anime", "url"],
+                name="unique_anime_external_link"
+            )
+        ]
+
+
+class StaffPerson(models.Model):
+
+    mal_id = models.IntegerField(
+        unique=True
+    )
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    image = models.URLField(
+        blank=True,
+        default=""
+    )
+
+    favorites = models.IntegerField(
+        default=0
+    )
+
+    last_synced = models.DateTimeField(
+        auto_now=True
+    )
+
+
+class AnimeStaff(models.Model):
+
+    anime = models.ForeignKey(
+        Anime,
+        on_delete=models.CASCADE,
+        related_name="staff_members"
+    )
+
+    person = models.ForeignKey(
+        StaffPerson,
+        on_delete=models.CASCADE,
+        related_name="anime_roles"
+    )
+
+    positions = models.JSONField(
+        default=list
+    )
+
+    last_synced = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["anime", "person"],
+                name="unique_anime_staff_person"
+            )
+        ]
