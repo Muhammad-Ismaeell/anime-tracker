@@ -8,5 +8,6 @@ export function useAnimeStatistics(animeId) {
         queryKey: ["anime-statistics", animeId],
         queryFn: () => AnimeAPI.statistics(animeId),
         enabled: Boolean(animeId),
+        staleTime: 1000 * 60 * 60,
     });
 }
