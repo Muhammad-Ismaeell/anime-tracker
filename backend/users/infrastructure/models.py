@@ -3,8 +3,6 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from anime.infrastructure.models import Anime
-from datetime import timedelta
-
 from django.utils import timezone
 
 
