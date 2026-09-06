@@ -230,6 +230,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-shrink: 0;
     }
 
     .navbar-nav-link {
@@ -247,11 +248,17 @@
 
     .navbar-search-wrapper {
         flex-basis: 190px;
+        min-width: 0;
     }
 
-    /* Keep Explore in the top bar and anchor its menu to Explore itself. */
+    /* Explore is part of the mobile top bar, so reserve real space for it. */
     .navbar-explore {
         position: relative;
+        flex-shrink: 0;
+    }
+
+    .navbar-explore-trigger {
+        white-space: nowrap;
     }
 
     .navbar-explore-dropdown {
@@ -259,9 +266,9 @@
         right: auto;
         width: 360px;
         max-width: calc(100vw - 16px);
+        z-index: 1100;
     }
 
-    /* Keep menu labels fully readable. */
     .navbar-explore-item > span:last-child {
         overflow: visible;
         text-overflow: clip;
@@ -304,6 +311,7 @@
 
     .navbar-left {
         gap: 7px;
+        flex-shrink: 0;
     }
 
     .navbar-nav {
@@ -316,6 +324,7 @@
 
     .navbar-search-wrapper {
         flex-basis: 145px;
+        flex-shrink: 1;
     }
 
     .navbar-right .navbar-login,
@@ -341,6 +350,7 @@
     }
 
     .navbar-search-wrapper {
-        flex-basis: 130px;
+        flex-basis: 110px;
+        min-width: 0;
     }
 }
