@@ -249,14 +249,23 @@
         flex-basis: 190px;
     }
 
+    /* Keep Explore in the top bar and anchor its menu to Explore itself. */
     .navbar-explore {
-        position: static;
+        position: relative;
     }
 
     .navbar-explore-dropdown {
-        left: 8px;
-        right: 8px;
-        width: auto;
+        left: 0;
+        right: auto;
+        width: 360px;
+        max-width: calc(100vw - 16px);
+    }
+
+    /* Keep menu labels fully readable. */
+    .navbar-explore-item > span:last-child {
+        overflow: visible;
+        text-overflow: clip;
+        white-space: nowrap;
     }
 }
 
