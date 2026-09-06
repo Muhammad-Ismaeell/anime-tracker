@@ -248,6 +248,16 @@
     .navbar-search-wrapper {
         flex-basis: 190px;
     }
+
+    .navbar-explore {
+        position: static;
+    }
+
+    .navbar-explore-dropdown {
+        left: 8px;
+        right: 8px;
+        width: auto;
+    }
 }
 
 @media (max-width: 800px) {
