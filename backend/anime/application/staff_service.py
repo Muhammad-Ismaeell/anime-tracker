@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
+from anime.infrastructure.db_write_lock import db_write_lock
 from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeStaff, StaffPerson
 
@@ -67,27 +68,28 @@ class StaffService:
                 "favorites": entry.get("favorites") or 0,
             })
 
-        AnimeStaff.objects.filter(anime=anime).delete()
-        staff_rows = []
-        for item in items:
-            staff_person, _ = StaffPerson.objects.update_or_create(
-                mal_id=item["id"],
-                defaults={
-                    "name": item["name"],
-                    "image": item["image"],
-                    "favorites": item["favorites"],
-                },
-            )
-            staff_rows.append(
-                AnimeStaff(
-                    anime=anime,
-                    person=staff_person,
-                    positions=item["positions"],
+        with db_write_lock:
+            AnimeStaff.objects.filter(anime=anime).delete()
+            staff_rows = []
+            for item in items:
+                staff_person, _ = StaffPerson.objects.update_or_create(
+                    mal_id=item["id"],
+                    defaults={
+                        "name": item["name"],
+                        "image": item["image"],
+                        "favorites": item["favorites"],
+                    },
                 )
-            )
+                staff_rows.append(
+                    AnimeStaff(
+                        anime=anime,
+                        person=staff_person,
+                        positions=item["positions"],
+                    )
+                )
 
-        if staff_rows:
-            AnimeStaff.objects.bulk_create(staff_rows)
+            if staff_rows:
+                AnimeStaff.objects.bulk_create(staff_rows)
 
         return items
 
