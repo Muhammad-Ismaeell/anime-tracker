@@ -332,6 +332,16 @@
         padding: 0 7px;
         font-size: 11px;
     }
+
+    /* Keep the profile compact on mobile so it never crowds the search field. */
+    .navbar-profile-name {
+        display: none;
+    }
+
+    .navbar-profile-trigger {
+        gap: 0;
+        padding: 3px;
+    }
 }
 
 @media (max-width: 480px) {
