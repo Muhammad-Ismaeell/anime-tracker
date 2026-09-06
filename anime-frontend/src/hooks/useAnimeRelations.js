@@ -8,5 +8,6 @@ export function useAnimeRelations(animeId) {
         queryKey: ["anime-relations", animeId],
         queryFn: () => AnimeAPI.relations(animeId),
         enabled: Boolean(animeId),
+        staleTime: 1000 * 60 * 60,
     });
 }
