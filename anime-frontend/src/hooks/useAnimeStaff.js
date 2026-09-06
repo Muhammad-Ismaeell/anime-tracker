@@ -8,5 +8,6 @@ export function useAnimeStaff(animeId) {
         queryKey: ["anime-staff", animeId],
         queryFn: () => AnimeAPI.staff(animeId),
         enabled: Boolean(animeId),
+        staleTime: 1000 * 60 * 60,
     });
 }
