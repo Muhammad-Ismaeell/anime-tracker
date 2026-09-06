@@ -225,6 +225,17 @@
     display: none;
 }
 
+/* Keep all Explore labels readable on desktop too. */
+.navbar-explore-dropdown {
+    width: 420px;
+}
+
+.navbar-explore-item > span:last-child {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
 @media (max-width: 900px) {
     .navbar-nav {
         display: flex;
