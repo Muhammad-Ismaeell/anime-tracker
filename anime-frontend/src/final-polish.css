@@ -251,7 +251,6 @@
         min-width: 0;
     }
 
-    /* Explore is part of the mobile top bar, so reserve real space for it. */
     .navbar-explore {
         position: relative;
         flex-shrink: 0;
@@ -273,6 +272,11 @@
         overflow: visible !important;
         text-overflow: clip !important;
         white-space: nowrap !important;
+    }
+
+    /* Give the quick links enough room to display full labels on mobile. */
+    .navbar-explore-links {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -333,7 +337,6 @@
         font-size: 11px;
     }
 
-    /* Keep the profile compact on mobile so it never crowds the search field. */
     .navbar-profile-name {
         display: none;
     }
