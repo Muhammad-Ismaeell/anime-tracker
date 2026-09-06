@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
+from anime.infrastructure.db_write_lock import db_write_lock
 from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeExternalLink
 
@@ -57,7 +58,6 @@ class ExternalLinkService:
         for item in anime_data.get("streaming", []) or []:
             self._append_link(links, seen_urls, item, "Streaming")
 
-        AnimeExternalLink.objects.filter(anime=anime).delete()
         rows = [
             AnimeExternalLink(
                 anime=anime,
@@ -67,8 +67,11 @@ class ExternalLinkService:
             )
             for item in links
         ]
-        if rows:
-            AnimeExternalLink.objects.bulk_create(rows)
+
+        with db_write_lock:
+            AnimeExternalLink.objects.filter(anime=anime).delete()
+            if rows:
+                AnimeExternalLink.objects.bulk_create(rows)
 
         return links
 
