@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
+from anime.infrastructure.db_write_lock import db_write_lock
 from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeTheme
 
@@ -61,9 +62,10 @@ class ThemeService:
                 for position, title in enumerate(items, start=1)
             )
 
-        AnimeTheme.objects.filter(anime=anime).delete()
-        if rows:
-            AnimeTheme.objects.bulk_create(rows)
+        with db_write_lock:
+            AnimeTheme.objects.filter(anime=anime).delete()
+            if rows:
+                AnimeTheme.objects.bulk_create(rows)
 
         return self._serialize(rows)
 
