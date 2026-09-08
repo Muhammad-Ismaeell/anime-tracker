@@ -1,12 +1,16 @@
 # Python
 backend/venv/
 backend/__pycache__/
+backend/**/__pycache__/
 backend/**/*.pyc
+*.pyc
 backend/db.sqlite3
 backend/.pytest_cache/
 backend/htmlcov/
 backend/.coverage
 backend/media/
+backend/avatars/
+backend/staticfiles/
 backend/jikan.json
 
 # Environment
