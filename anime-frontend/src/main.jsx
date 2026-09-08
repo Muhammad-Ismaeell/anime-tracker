@@ -46,7 +46,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         </AuthProvider>
                     </ThemeProvider>
                 </BrowserRouter>
-                <ReactQueryDevtools initialIsOpen={false} />
+                {import.meta.env.DEV && (
+                    <ReactQueryDevtools initialIsOpen={false} />
+                )}
             </QueryClientProvider>
         </HelmetProvider>
         <Toaster
