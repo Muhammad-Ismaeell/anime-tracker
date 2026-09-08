@@ -2,25 +2,41 @@
 
 [![CI](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml/badge.svg)](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml)
 
-A full-stack anime discovery and tracking platform built with **Django REST Framework** and **React**. The application combines a searchable anime catalogue with personal library tracking, favourites, reviews, authentication, activity, statistics and detailed supplementary anime data.
+A full-stack anime discovery and tracking platform built with **Django REST Framework** and **React**. It combines a searchable anime catalogue with personal library tracking, favourites, reviews, authentication, activity, statistics and detailed supplementary anime data.
+
+**Status: Complete — portfolio-ready**
 
 ## Live Demo
 
 **Web app:** https://anime-tracker-zeta-green.vercel.app
 
-## Why this project is portfolio-worthy
+## What I Built
 
-This project demonstrates more than CRUD. It includes:
+Anime Tracker was built as a real-world portfolio application rather than a simple CRUD demo. The project focuses on separating responsibilities, handling external API dependencies reliably, protecting authenticated requests and providing a responsive user experience.
 
-- A layered Django backend with API, application-service and infrastructure boundaries
+Key engineering areas demonstrated:
+
+- Layered Django backend with API, application-service and infrastructure boundaries
 - Database-first persistence for core and selected supplementary anime data
-- External API integration isolated behind a dedicated client
+- External anime API integration isolated behind a dedicated client
 - Shared upstream request throttling and caching
 - JWT refresh-token rotation, blacklisting and centralized Axios token refresh
 - Relational constraints and indexes for data integrity and common query paths
 - Responsive React UI with lazy-loaded routes and TanStack Query server-state management
 - Automated backend tests plus frontend lint/build checks in GitHub Actions
 - Docker and PostgreSQL-ready deployment configuration
+
+## Screenshots
+
+Screenshots are intentionally kept out of the repository documentation until the final project images are added.
+
+Recommended screenshots:
+
+- Home / discovery page
+- Advanced search or search results
+- Anime detail page
+- User dashboard or library
+- Mobile responsive view
 
 ## Features
 
@@ -129,26 +145,26 @@ See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 anime-tracker/
 ├── anime-frontend/
 │   └── src/
-│       ├── api/          # HTTP/API client functions
-│       ├── app/          # application shell and routing
-│       ├── auth/         # token/session helpers
-│       ├── components/   # reusable UI components
-│       ├── context/      # global providers
-│       ├── hooks/        # reusable/server-state hooks
-│       ├── lib/          # shared client utilities
-│       ├── pages/        # route-level screens
-│       └── utils/        # shared data/media utilities
+│       ├── api/           # HTTP/API client functions
+│       ├── app/           # application shell and routing
+│       ├── auth/          # token/session helpers
+│       ├── components/    # reusable UI components
+│       ├── context/       # global providers
+│       ├── hooks/         # reusable/server-state hooks
+│       ├── lib/           # shared client utilities
+│       ├── pages/         # route-level screens
+│       └── utils/         # shared data/media utilities
 │
 ├── backend/
-│   ├── accounts/         # custom User model
+│   ├── accounts/          # custom User model
 │   ├── anime/
-│   │   ├── api/          # API endpoints and OpenAPI serializers
-│   │   ├── application/  # application services/business logic
-│   │   ├── infrastructure/# ORM, cache and external API integration
-│   │   └── presentation/ # response normalization
-│   ├── users/            # profile/library/favourite/review features
-│   ├── core/             # auth, exceptions and shared backend code
-│   ├── config/           # Django configuration
+│   │   ├── api/           # API endpoints and OpenAPI serializers
+│   │   ├── application/   # application services/business logic
+│   │   ├── infrastructure/ # ORM, cache and external API integration
+│   │   └── presentation/  # response normalization
+│   ├── users/             # profile/library/favourite/review features
+│   ├── core/              # auth, exceptions and shared backend code
+│   ├── config/            # Django configuration
 │   ├── Dockerfile
 │   └── manage.py
 │
@@ -240,7 +256,7 @@ Main API groups:
 
 See [docs/api.md](docs/api.md) for a concise endpoint reference.
 
-## Testing
+## Testing & CI
 
 Backend tests:
 
@@ -259,7 +275,7 @@ npm run build
 
 GitHub Actions runs Django tests plus frontend lint/build checks on pushes and pull requests.
 
-## Data and Caching Strategy
+## Data & Caching Strategy
 
 The application uses a database-first approach for data that benefits from persistence. Core anime records and selected supplementary records are stored locally and refreshed according to feature-specific freshness windows.
 
@@ -267,11 +283,11 @@ The backend cache reduces repeated work and external API calls. TanStack Query p
 
 The external API client applies a shared request interval and lock to avoid uncontrolled bursts. This is particularly useful during concurrent development requests against the upstream provider.
 
-## Security and Reliability
+## Security & Reliability
 
 - Environment variables are used for secrets and deployment-specific configuration.
 - `.env`, SQLite databases, uploaded media and generated static files are excluded from version control.
-- Production security settings enable HTTPS redirects, secure cookies and HSTS when `DEBUG=False`.
+- Production security settings enable HTTPS redirects, secure session/CSRF cookies and HSTS when `DEBUG=False`.
 - CORS is explicitly configured.
 - JWT refresh tokens are rotated and blacklisted after use.
 - Local accounts require email verification before login.
