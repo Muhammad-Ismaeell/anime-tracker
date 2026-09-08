@@ -24,6 +24,7 @@ function formatDate(value) {
 
 function News() {
     const [period, setPeriod] = useState("latest");
+    const [now] = useState(() => Date.now());
     const loadMoreRef = useRef(null);
     const canLoadMoreRef = useRef(true);
 
@@ -39,11 +40,20 @@ function News() {
         staleTime: 1000 * 60 * 15,
     });
 
-    const allNews = (newsQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+    } = newsQuery;
+
+    const allNews = (data?.pages ?? []).flatMap((page) => page.items ?? []);
     const news = period === "week"
         ? allNews.filter((article) => {
             const timestamp = article.date ? new Date(article.date).getTime() : 0;
-            return timestamp >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+            return timestamp >= now - 7 * 24 * 60 * 60 * 1000;
         })
         : allNews;
 
@@ -63,11 +73,11 @@ function News() {
 
                 if (
                     canLoadMoreRef.current &&
-                    newsQuery.hasNextPage &&
-                    !newsQuery.isFetchingNextPage
+                    hasNextPage &&
+                    !isFetchingNextPage
                 ) {
                     canLoadMoreRef.current = false;
-                    newsQuery.fetchNextPage();
+                    fetchNextPage();
                 }
             },
             { rootMargin: "100px" }
@@ -76,7 +86,7 @@ function News() {
         observer.observe(element);
 
         return () => observer.disconnect();
-    }, [newsQuery.fetchNextPage, newsQuery.hasNextPage, newsQuery.isFetchingNextPage]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     return (
         <PageContainer>
@@ -110,11 +120,11 @@ function News() {
                 </div>
             </div>
 
-            {newsQuery.isLoading ? (
+            {isLoading ? (
                 <div className="news-list">
                     {Array.from({ length: 6 }).map((_, index) => <div className="news-skeleton" key={index} />)}
                 </div>
-            ) : newsQuery.isError || news.length === 0 ? (
+            ) : isError || news.length === 0 ? (
                 <EmptyState text="No anime news found." icon="📰" />
             ) : (
                 <>
@@ -145,9 +155,9 @@ function News() {
                         ))}
                     </div>
 
-                    {newsQuery.hasNextPage && (
+                    {hasNextPage && (
                         <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
-                            {newsQuery.isFetchingNextPage && (
+                            {isFetchingNextPage && (
                                 <div className="news-list infinite-scroll-skeleton-grid">
                                     {Array.from({ length: 6 }).map((_, index) => (
                                         <div className="news-skeleton" key={index} />
