@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
-import { useInfiniteAnime } from "../hooks/useInfintiteAnime";
+import { useInfiniteAnime } from "../hooks/useInfiniteAnime";
 
 import PageContainer from "../components/ui/PageContainer";
 import AnimeSection from "../components/ui/AnimeSection";
