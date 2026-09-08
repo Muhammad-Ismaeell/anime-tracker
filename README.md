@@ -1,10 +1,26 @@
 # Anime Tracker
 
+[![CI](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml/badge.svg)](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml)
+
 A full-stack anime discovery and tracking platform built with **Django REST Framework** and **React**. The application combines a searchable anime catalogue with personal library tracking, favourites, reviews, authentication, activity, statistics and detailed supplementary anime data.
 
 ## Live Demo
 
 **Web app:** https://anime-tracker-zeta-green.vercel.app
+
+## Why this project is portfolio-worthy
+
+This project demonstrates more than CRUD. It includes:
+
+- A layered Django backend with API, application-service and infrastructure boundaries
+- Database-first persistence for core and selected supplementary anime data
+- External API integration isolated behind a dedicated client
+- Shared upstream request throttling and caching
+- JWT refresh-token rotation, blacklisting and centralized Axios token refresh
+- Relational constraints and indexes for data integrity and common query paths
+- Responsive React UI with lazy-loaded routes and TanStack Query server-state management
+- Automated backend tests plus frontend lint/build checks in GitHub Actions
+- Docker and PostgreSQL-ready deployment configuration
 
 ## Features
 
@@ -241,7 +257,7 @@ npm run lint
 npm run build
 ```
 
-GitHub Actions runs the Django test suite on pushes and pull requests.
+GitHub Actions runs Django tests plus frontend lint/build checks on pushes and pull requests.
 
 ## Data and Caching Strategy
 
