@@ -33,11 +33,20 @@ function Characters() {
         staleTime: 1000 * 60 * 60,
     });
 
-    const characters = (charactersQuery.data?.pages ?? []).flatMap((page) => page.items ?? []);
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+    } = charactersQuery;
+
+    const characters = (data?.pages ?? []).flatMap((page) => page.items ?? []);
 
     useEffect(() => {
-        canLoadMoreRef.current = !charactersQuery.isFetchingNextPage;
-    }, [query, charactersQuery.isFetchingNextPage]);
+        canLoadMoreRef.current = !isFetchingNextPage;
+    }, [isFetchingNextPage]);
 
     useEffect(() => {
         const element = loadMoreRef.current;
@@ -49,11 +58,11 @@ function Characters() {
 
                 if (
                     canLoadMoreRef.current &&
-                    charactersQuery.hasNextPage &&
-                    !charactersQuery.isFetchingNextPage
+                    hasNextPage &&
+                    !isFetchingNextPage
                 ) {
                     canLoadMoreRef.current = false;
-                    charactersQuery.fetchNextPage();
+                    fetchNextPage();
                 }
             },
             { rootMargin: "600px 0px" }
@@ -61,7 +70,7 @@ function Characters() {
 
         observer.observe(element);
         return () => observer.disconnect();
-    }, [charactersQuery.fetchNextPage, charactersQuery.hasNextPage, charactersQuery.isFetchingNextPage]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -94,11 +103,11 @@ function Characters() {
                 </form>
             </div>
 
-            {charactersQuery.isLoading ? (
+            {isLoading ? (
                 <div className="characters-grid">
                     {Array.from({ length: 12 }).map((_, index) => <div className="character-skeleton" key={index} />)}
                 </div>
-            ) : charactersQuery.isError || characters.length === 0 ? (
+            ) : isError || characters.length === 0 ? (
                 <EmptyState text="No characters found." icon="👥" />
             ) : (
                 <>
@@ -122,9 +131,9 @@ function Characters() {
                         ))}
                     </div>
 
-                    {charactersQuery.hasNextPage && (
+                    {hasNextPage && (
                         <div ref={loadMoreRef} className="infinite-scroll-sentinel">
-                            {charactersQuery.isFetchingNextPage && (
+                            {isFetchingNextPage && (
                                 <div className="characters-grid infinite-scroll-skeleton-grid">
                                     {Array.from({ length: 6 }).map((_, index) => (
                                         <div className="character-skeleton" key={index} />

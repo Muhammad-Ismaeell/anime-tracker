@@ -28,7 +28,16 @@ function Recommendations() {
         staleTime: 1000 * 60 * 30,
     });
 
-    const recommendations = (query.data?.pages ?? [])
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        isError,
+    } = query;
+
+    const recommendations = (data?.pages ?? [])
         .flatMap((page) => page.items ?? []);
 
     useEffect(() => {
@@ -47,11 +56,11 @@ function Recommendations() {
 
                 if (
                     canLoadMoreRef.current &&
-                    query.hasNextPage &&
-                    !query.isFetchingNextPage
+                    hasNextPage &&
+                    !isFetchingNextPage
                 ) {
                     canLoadMoreRef.current = false;
-                    query.fetchNextPage();
+                    fetchNextPage();
                 }
             },
             { rootMargin: "100px" }
@@ -60,7 +69,7 @@ function Recommendations() {
         observer.observe(element);
 
         return () => observer.disconnect();
-    }, [query.fetchNextPage, query.hasNextPage, query.isFetchingNextPage]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     return (
         <PageContainer>
@@ -75,13 +84,13 @@ function Recommendations() {
                 <p>See what the anime community recommends together.</p>
             </div>
 
-            {query.isLoading ? (
+            {isLoading ? (
                 <div className="recommendations-list">
                     {Array.from({ length: 8 }).map((_, index) => (
                         <div className="recommendation-skeleton" key={index} />
                     ))}
                 </div>
-            ) : query.isError || recommendations.length === 0 ? (
+            ) : isError || recommendations.length === 0 ? (
                 <EmptyState text="No recommendations found right now." icon="✨" />
             ) : (
                 <>
@@ -136,9 +145,9 @@ function Recommendations() {
                         })}
                     </div>
 
-                    {query.hasNextPage && (
+                    {hasNextPage && (
                         <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
-                            {query.isFetchingNextPage && (
+                            {isFetchingNextPage && (
                                 <div className="recommendations-list infinite-scroll-skeleton-grid">
                                     {Array.from({ length: 4 }).map((_, index) => (
                                         <div className="recommendation-skeleton" key={index} />

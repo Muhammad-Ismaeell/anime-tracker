@@ -1,11 +1,12 @@
-name: Django Tests
+name: Backend CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  test:
+  backend:
+    name: Backend tests
     runs-on: ubuntu-latest
 
     defaults:
@@ -31,10 +32,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run migrations
-        run: |
-          python manage.py migrate --noinput
+      - name: Django system checks
+        run: python manage.py check
+
+      - name: Apply migrations
+        run: python manage.py migrate --noinput
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
 
       - name: Run tests
-        run: |
-          pytest -q
+        run: pytest -q
