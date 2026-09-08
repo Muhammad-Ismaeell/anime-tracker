@@ -1,0 +1,203 @@
+Project AnimeTracker {
+  database_type: "PostgreSQL"
+  Note: "Application/domain schema. Django internal auth permission, session, admin and migration tables are intentionally omitted."
+}
+
+Table accounts_user {
+  id bigint [pk]
+  password varchar(128)
+  last_login datetime
+  is_superuser boolean
+  username varchar(150) [unique]
+  first_name varchar(150)
+  last_name varchar(150)
+  email varchar(254) [unique]
+  is_staff boolean
+  is_active boolean
+  date_joined datetime
+  google_sub varchar(255) [unique, null]
+  auth_provider varchar(20)
+  created_at datetime
+  updated_at datetime
+}
+
+Table anime_genre {
+  id bigint [pk]
+  mal_id int [unique]
+  name varchar(100)
+}
+
+Table anime_anime {
+  id bigint [pk]
+  mal_id int [unique]
+  title varchar(255) [index]
+  title_english varchar(255)
+  search_title varchar(255) [index]
+  image varchar(200)
+  image_large varchar(200)
+  synopsis text
+  score float [index]
+  popularity int
+  type varchar(50) [index]
+  episodes int
+  year int [index]
+  season varchar(20) [index]
+  status varchar(50) [index]
+  rating varchar(40)
+  created_at datetime [index]
+  last_synced datetime
+}
+
+Table anime_anime_genres {
+  id bigint [pk]
+  anime_id bigint [ref: > anime_anime.id]
+  genre_id bigint [ref: > anime_genre.id]
+
+  indexes {
+    (anime_id, genre_id) [unique]
+  }
+}
+
+Table anime_charactersafety {
+  id bigint [pk]
+  mal_id int [unique]
+  is_safe boolean
+  checked_at datetime [index]
+}
+
+Table anime_animerelation {
+  id bigint [pk]
+  anime_id bigint [ref: > anime_anime.id]
+  relation_type varchar(100)
+  related_mal_id int
+  related_title varchar(255)
+  related_type varchar(50)
+  related_url varchar(200)
+  last_synced datetime
+
+  indexes {
+    (anime_id, relation_type, related_mal_id) [unique]
+    (anime_id, relation_type)
+  }
+}
+
+Table anime_animetheme {
+  id bigint [pk]
+  anime_id bigint [ref: > anime_anime.id]
+  theme_type varchar(20)
+  title varchar(255)
+  position int
+  last_synced datetime
+
+  indexes {
+    (anime_id, theme_type, position) [unique]
+  }
+}
+
+Table anime_animeexternallink {
+  id bigint [pk]
+  anime_id bigint [ref: > anime_anime.id]
+  name varchar(255)
+  url varchar(200)
+  category varchar(30)
+  last_synced datetime
+
+  indexes {
+    (anime_id, url) [unique]
+  }
+}
+
+Table anime_staffperson {
+  id bigint [pk]
+  mal_id int [unique]
+  name varchar(255)
+  image varchar(200)
+  favorites int
+  last_synced datetime
+}
+
+Table anime_animestaff {
+  id bigint [pk]
+  anime_id bigint [ref: > anime_anime.id]
+  person_id bigint [ref: > anime_staffperson.id]
+  positions json
+  last_synced datetime
+
+  indexes {
+    (anime_id, person_id) [unique]
+  }
+}
+
+Table users_profile {
+  id bigint [pk]
+  user_id bigint [ref: - accounts_user.id]
+  avatar varchar(100)
+  bio text
+  favorite_genre varchar(100)
+  created datetime
+}
+
+Table users_useranimestatus {
+  id bigint [pk]
+  user_id bigint [ref: > accounts_user.id]
+  anime_id bigint [ref: > anime_anime.id]
+  status varchar(30)
+  progress int
+  started_at date
+  completed_at date
+  updated_at datetime
+
+  indexes {
+    (user_id, anime_id) [unique]
+    (user_id, status)
+  }
+}
+
+Table users_favoriteanime {
+  id bigint [pk]
+  user_id bigint [ref: > accounts_user.id]
+  anime_id bigint [ref: > anime_anime.id]
+  created_at datetime
+
+  indexes {
+    (user_id, anime_id) [unique]
+    (user_id, created_at)
+  }
+}
+
+Table users_review {
+  id bigint [pk]
+  user_id bigint [ref: > accounts_user.id]
+  anime_id bigint [ref: > anime_anime.id]
+  rating int
+  text text
+  created_at datetime
+  updated_at datetime
+
+  indexes {
+    (user_id, anime_id) [unique]
+    (anime_id, created_at)
+    (user_id, created_at)
+  }
+}
+
+Table users_activity {
+  id bigint [pk]
+  user_id bigint [ref: > accounts_user.id]
+  anime_id bigint [ref: > anime_anime.id]
+  action varchar(20)
+  created_at datetime
+
+  indexes {
+    (user_id, created_at)
+  }
+}
+
+Table users_emailverification {
+  id bigint [pk]
+  user_id bigint [ref: - accounts_user.id]
+  token_hash varchar(128) [unique]
+  expires_at datetime
+  verified_at datetime
+  created_at datetime
+}
