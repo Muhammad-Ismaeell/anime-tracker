@@ -6,7 +6,7 @@ Project AnimeTracker {
 Table accounts_user {
   id bigint [pk]
   password varchar(128)
-  last_login datetime
+  last_login datetime [null]
   is_superuser boolean
   username varchar(150) [unique]
   first_name varchar(150)
@@ -33,15 +33,15 @@ Table anime_anime {
   title varchar(255) [index]
   title_english varchar(255)
   search_title varchar(255) [index]
-  image varchar(200)
-  image_large varchar(200)
-  synopsis text
-  score float [index]
-  popularity int
-  type varchar(50) [index]
-  episodes int
-  year int [index]
-  season varchar(20) [index]
+  image varchar(200) [null]
+  image_large varchar(200) [null]
+  synopsis text [null]
+  score float [null, index]
+  popularity int [null]
+  type varchar(50) [null, index]
+  episodes int [null]
+  year int [null, index]
+  season varchar(20) [null, index]
   status varchar(50) [index]
   rating varchar(40)
   created_at datetime [index]
@@ -71,8 +71,8 @@ Table anime_animerelation {
   relation_type varchar(100)
   related_mal_id int
   related_title varchar(255)
-  related_type varchar(50)
-  related_url varchar(200)
+  related_type varchar(50) [default: "anime"]
+  related_url varchar(200) [default: ""]
   last_synced datetime
 
   indexes {
@@ -111,8 +111,8 @@ Table anime_staffperson {
   id bigint [pk]
   mal_id int [unique]
   name varchar(255)
-  image varchar(200)
-  favorites int
+  image varchar(200) [default: ""]
+  favorites int [default: 0]
   last_synced datetime
 }
 
@@ -131,7 +131,7 @@ Table anime_animestaff {
 Table users_profile {
   id bigint [pk]
   user_id bigint [ref: - accounts_user.id]
-  avatar varchar(100)
+  avatar varchar(100) [null]
   bio text
   favorite_genre varchar(100)
   created datetime
@@ -143,8 +143,8 @@ Table users_useranimestatus {
   anime_id bigint [ref: > anime_anime.id]
   status varchar(30)
   progress int
-  started_at date
-  completed_at date
+  started_at date [null]
+  completed_at date [null]
   updated_at datetime
 
   indexes {
@@ -198,6 +198,6 @@ Table users_emailverification {
   user_id bigint [ref: - accounts_user.id]
   token_hash varchar(128) [unique]
   expires_at datetime
-  verified_at datetime
+  verified_at datetime [null]
   created_at datetime
 }
