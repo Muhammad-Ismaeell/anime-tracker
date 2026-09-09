@@ -13,6 +13,7 @@ import { useProfile } from "../../hooks/useProfile";
 import { getMediaUrl } from "../../utils/mediaUrl";
 
 import "./Navbar.css";
+import "../../mobile-responsive.css";
 
 const GENRES = [
     "Action",
