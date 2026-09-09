@@ -5,7 +5,6 @@
    ============================================================ */
 
 @media (max-width: 650px) {
-    /* ---------- Global mobile spacing ---------- */
     html,
     body,
     #root {
@@ -19,17 +18,19 @@
         padding: 20px 12px;
     }
 
-    /* ---------- Navbar: two-row phone layout ---------- */
+    /* ---------- Navbar ---------- */
     .navbar {
         display: grid;
-        grid-template-columns: 40px minmax(0, 1fr) auto;
-        grid-template-rows: 56px 48px;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        grid-template-rows: 54px 48px;
         gap: 0 8px;
         width: 100%;
         height: auto;
-        min-height: 104px;
-        padding: 0 10px 8px;
+        min-height: 102px;
+        padding: 0 10px 9px;
         align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
     }
 
     .navbar-left {
@@ -40,9 +41,17 @@
         display: inline-flex;
         grid-column: 1;
         grid-row: 1;
+        align-items: center;
+        justify-content: center;
         width: 40px;
         height: 40px;
+        padding: 0;
         flex-shrink: 0;
+        border-radius: 10px;
+    }
+
+    .navbar-menu-button:active {
+        transform: scale(0.95);
     }
 
     .navbar-logo {
@@ -50,11 +59,20 @@
         grid-row: 1;
         min-width: 0;
         justify-self: start;
+        display: flex;
+        align-items: center;
+        max-width: 100%;
         font-size: 16px;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .navbar-logo-text-desktop {
         display: inline;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .navbar-logo-text-mobile {
@@ -70,46 +88,25 @@
         grid-row: 1;
         min-width: 0;
         justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 5px;
         flex-shrink: 0;
     }
 
-    .navbar-search-wrapper {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        width: 100%;
-        min-width: 0;
-        margin: 0;
-        justify-self: stretch;
-    }
-
-    .navbar-search-input {
-        height: 44px;
-        font-size: 14px;
-        border-radius: 9px;
-    }
-
-    .navbar-search-icon {
-        left: 13px;
-    }
-
-    .navbar-search-clear {
-        right: 7px;
-        width: 30px;
-        height: 30px;
-    }
-
-    .navbar-dropdown {
-        top: calc(100% + 6px);
-        max-height: min(420px, 65vh);
-        z-index: 1100;
-    }
-
-    /* Keep authentication usable without forcing another navbar row. */
     .navbar-login,
     .navbar-register {
         min-height: 36px;
         padding: 0 9px;
         font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .navbar-login:active,
+    .navbar-register:active,
+    .navbar-profile-trigger:active {
+        transform: scale(0.97);
     }
 
     .navbar-profile-trigger {
@@ -132,6 +129,56 @@
         height: 30px;
     }
 
+    /* Search gets its own full-width row and a stronger app-like treatment. */
+    .navbar-search-wrapper {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        justify-self: stretch;
+        position: relative;
+    }
+
+    .navbar-search-input {
+        width: 100%;
+        height: 44px;
+        padding-left: 42px;
+        padding-right: 38px;
+        font-size: 14px;
+        border-radius: 12px;
+    }
+
+    .navbar-search-input:focus {
+        outline: none;
+    }
+
+    .navbar-search-icon {
+        left: 14px;
+    }
+
+    .navbar-search-clear {
+        right: 7px;
+        width: 30px;
+        height: 30px;
+    }
+
+    .navbar-dropdown {
+        top: calc(100% + 7px);
+        width: 100%;
+        max-width: 100%;
+        max-height: min(420px, 65vh);
+        z-index: 1100;
+        border-radius: 12px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .navbar-dropdown-item {
+        min-height: 58px;
+        padding: 8px 10px;
+    }
+
     /* ---------- Home sections ---------- */
     .home-section {
         margin-bottom: 2rem;
@@ -152,7 +199,6 @@
         font-size: 0.7rem;
     }
 
-    /* Two cards per row is much easier to scan and tap on a phone. */
     .anime-section-grid,
     .home-discovery-main .home-discovery-cards,
     .results-grid,
@@ -317,7 +363,6 @@
         min-height: 44px;
     }
 
-    /* Prevent long metadata/descriptions from creating horizontal overflow. */
     .anime-detail-card,
     .anime-detail-card * {
         max-width: 100%;
@@ -327,26 +372,54 @@
 @media (max-width: 420px) {
     .navbar {
         grid-template-columns: 38px minmax(0, 1fr) auto;
+        grid-template-rows: 52px 46px;
+        min-height: 98px;
         gap: 0 6px;
-        padding-left: 8px;
-        padding-right: 8px;
+        padding: 0 8px 8px;
     }
 
     .navbar-menu-button {
         width: 38px;
         height: 38px;
+        border-radius: 9px;
     }
 
     .navbar-logo {
         font-size: 15px;
     }
 
-    .navbar-login {
-        padding-inline: 7px;
+    .navbar-right {
+        gap: 4px;
     }
 
+    .navbar-login,
     .navbar-register {
-        padding-inline: 8px;
+        min-height: 34px;
+        padding-inline: 7px;
+        font-size: 11px;
+    }
+
+    .navbar-profile-trigger {
+        width: 38px;
+        height: 38px;
+        min-height: 38px;
+    }
+
+    .profile-avatar-mini,
+    .profile-avatar-mini-image img {
+        width: 29px;
+        height: 29px;
+    }
+
+    .navbar-search-input {
+        height: 42px;
+        padding-left: 40px;
+        font-size: 13px;
+        border-radius: 11px;
+    }
+
+    .navbar-search-icon {
+        left: 13px;
     }
 
     .page-container {
@@ -363,12 +436,20 @@
 }
 
 @media (max-width: 360px) {
+    .navbar-logo {
+        font-size: 14px;
+    }
+
     .navbar-login {
         display: none;
     }
 
     .navbar-register {
-        padding-inline: 9px;
+        padding-inline: 8px;
+    }
+
+    .navbar-search-input {
+        font-size: 12.5px;
     }
 
     .anime-card .title {
