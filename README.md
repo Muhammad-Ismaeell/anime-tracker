@@ -372,7 +372,7 @@ See [docs/development.md](docs/development.md) for environment setup, Docker usa
 
 ## Current Scope
 
-This is a portfolio-scale application. The current design deliberately avoids infrastructure complexity that is not needed at this scale. If the project grows, natural next steps include PostgreSQL as the primary deployed database, Redis for distributed caching, background jobs for refresh work, stronger observability and additional integration tests.
+This is a portfolio-scale application. The current design deliberately avoids infrastructure complexity that is not needed at this scale. If the project grows, natural next steps include PostgreSQL as the primary deployed database, Redis for distributed caching, background jobs, observability and additional integration tests.
 
 ## Attribution
 
