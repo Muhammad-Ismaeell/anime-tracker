@@ -2,6 +2,7 @@ from django.db.models import Q
 
 from anime.infrastructure.models import Anime
 from anime.api.serializers import AnimeSerializer
+
 PAGE_SIZE = 24
 
 ALLOWED_ORDERING = {
@@ -9,6 +10,12 @@ ALLOWED_ORDERING = {
     "year",
     "popularity",
     "title",
+}
+
+STATUS_MAP = {
+    "airing": "Currently Airing",
+    "complete": "Finished Airing",
+    "upcoming": "Not yet aired",
 }
 
 
@@ -24,7 +31,6 @@ class AnimeSearchService:
         # --------------------
 
         if query:
-
             query = query.lower()
 
             queryset = queryset.filter(
@@ -56,16 +62,15 @@ class AnimeSearchService:
             queryset = queryset.filter(score__gte=value)
 
         if value := filters.get("status"):
+            status = STATUS_MAP.get(value.lower(), value)
             queryset = queryset.filter(
-                status__iexact=value
+                status__iexact=status
             )
-
 
         if value := filters.get("rating"):
             queryset = queryset.filter(
                 rating__iexact=value
             )
-
 
         if value := filters.get("genres"):
             queryset = queryset.filter(
@@ -95,12 +100,10 @@ class AnimeSearchService:
         start = (page - 1) * PAGE_SIZE
         end = start + PAGE_SIZE
 
-
         items = AnimeSerializer(
             queryset[start:end],
             many=True
         ).data
-
 
         return {
             "items": items,
