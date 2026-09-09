@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, safe_request
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 
 
 class StatisticsService:
