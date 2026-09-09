@@ -48,8 +48,6 @@ For a faster seasonal-only refresh:
 python manage.py populate_seasonal
 ```
 
-`load_jikan_json` is retained only as a legacy import utility for existing Jikan JSON exports. It is not the application's live API integration.
-
 ## Frontend
 
 ```bash
