@@ -108,7 +108,7 @@ JWT access tokens are attached by the Axios request interceptor. When an authent
 
 ## External API integration
 
-The external provider is accessed through `JikanClient` in the infrastructure layer. The class name remains for compatibility with the existing project structure; the configured provider is Tenrai.
+The external provider is accessed through `TenraiClient` in the infrastructure layer. The client targets the Tenrai API while retaining external identifiers such as `mal_id` where they are part of the provider's data contract.
 
 The client applies a shared request interval and lock around external requests. Application services decide when external data is needed, while the database/cache layer prevents unnecessary calls where persisted data is fresh enough.
 
