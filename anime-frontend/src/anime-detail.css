@@ -1,0 +1,293 @@
+/* ============================================================
+   DETAIL PAGE VISUAL POLISH
+   Keeps the existing structure and behavior while moving the
+   page toward a compact, AniList-inspired information density.
+============================================================ */
+
+.detail-premium {
+    --detail-radius: 12px;
+    --detail-shadow: 0 14px 38px rgba(0, 0, 0, 0.26);
+}
+
+.anime-detail-container {
+    max-width: 1180px;
+    padding-bottom: 56px;
+}
+
+.anime-backdrop {
+    height: 340px;
+    border-radius: 0 0 16px 16px;
+}
+
+.anime-backdrop img {
+    filter: saturate(0.88);
+    transform: scale(1.01);
+}
+
+.anime-detail-card {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 28px;
+    width: calc(100% - 32px);
+    margin: -92px auto 0;
+    padding: 24px;
+    background: rgba(17, 24, 39, 0.97);
+    border-radius: 12px;
+    box-shadow: var(--detail-shadow);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.anime-poster {
+    width: 220px;
+    height: 310px;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+.anime-main-info {
+    padding: 4px 0;
+}
+
+.anime-detail-eyebrow {
+    margin-bottom: 8px;
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+}
+
+.anime-main-info h1 {
+    max-width: 760px;
+    font-size: clamp(1.9rem, 3.2vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+}
+
+.detail-stats {
+    gap: 7px;
+    margin-top: 16px;
+}
+
+.detail-stat {
+    min-height: 30px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+}
+
+.detail-actions {
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.detail-library-button,
+.favorite-button,
+.detail-progress-step,
+.detail-progress-input,
+.detail-progress-save {
+    border-radius: 7px;
+}
+
+.detail-library-button {
+    gap: 8px;
+    box-shadow: none;
+}
+
+.detail-library-button:hover {
+    box-shadow: none;
+    filter: brightness(1.05);
+}
+
+.detail-library-button.none {
+    background: var(--detail-accent);
+}
+
+.detail-library-button.watching {
+    background: #2563eb;
+}
+
+.detail-library-button.completed {
+    background: #16a34a;
+}
+
+.detail-library-button.dropped {
+    background: #dc2626;
+}
+
+.detail-library-button.plan_to_watch {
+    background: #d97706;
+}
+
+.detail-library-menu {
+    width: 214px;
+    padding: 5px;
+    border-radius: 9px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.38);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.detail-progress-card {
+    margin-top: 18px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    border-radius: 10px;
+}
+
+.detail-progress-track {
+    height: 7px;
+    margin-top: 9px;
+}
+
+.detail-progress-fill {
+    background: var(--detail-accent);
+}
+
+.anime-section {
+    width: calc(100% - 32px);
+    margin-top: 22px;
+    padding: 22px 24px;
+    background: #111827;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.anime-section h2 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.anime-section p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.detail-library-button:focus-visible,
+.detail-library-menu button:focus-visible,
+.favorite-button:focus-visible,
+.detail-progress-step:focus-visible,
+.detail-progress-input:focus-visible,
+.detail-progress-save:focus-visible {
+    outline: 2px solid var(--detail-accent-light);
+    outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+    .anime-detail-container {
+        padding-bottom: 44px;
+    }
+
+    .anime-backdrop {
+        height: 280px;
+    }
+
+    .anime-detail-card {
+        grid-template-columns: 180px minmax(0, 1fr);
+        gap: 22px;
+        margin-top: -68px;
+        padding: 20px;
+    }
+
+    .anime-poster {
+        width: 180px;
+        height: 255px;
+    }
+
+    .anime-main-info h1 {
+        font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+    }
+
+    .anime-section {
+        margin-top: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .anime-detail-container {
+        padding-bottom: 32px;
+    }
+
+    .anime-backdrop {
+        height: 210px;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .anime-detail-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(100% - 20px);
+        margin-top: -48px;
+        padding: 16px;
+        gap: 18px;
+        text-align: center;
+    }
+
+    .anime-poster {
+        width: 150px;
+        height: 212px;
+    }
+
+    .anime-main-info {
+        width: 100%;
+        align-items: center;
+        padding: 0;
+    }
+
+    .anime-main-info h1 {
+        width: 100%;
+        font-size: 1.65rem;
+        line-height: 1.15;
+    }
+
+    .detail-stats {
+        justify-content: center;
+        margin-top: 13px;
+    }
+
+    .detail-actions {
+        width: 100%;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    .detail-library-control {
+        width: 100%;
+    }
+
+    .detail-library-button,
+    .favorite-button {
+        min-height: 38px;
+    }
+
+    .detail-library-button {
+        width: 100%;
+    }
+
+    .detail-library-menu {
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(214px, calc(100vw - 44px));
+    }
+
+    .detail-progress-card {
+        text-align: left;
+    }
+
+    .detail-progress-controls {
+        flex-wrap: wrap;
+    }
+
+    .detail-progress-save {
+        margin-left: 0;
+        flex: 1;
+    }
+
+    .anime-section {
+        width: calc(100% - 20px);
+        padding: 18px 16px;
+        border-radius: 10px;
+    }
+
+    .anime-section h2 {
+        font-size: 1.1rem;
+    }
+}
