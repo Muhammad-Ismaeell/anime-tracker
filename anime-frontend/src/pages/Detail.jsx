@@ -70,6 +70,7 @@ function Detail() {
     const favoriteIds =
         useFavoriteIds();
 
+
     const toggleFavorite =
         useToggleFavorite();
 
@@ -82,8 +83,10 @@ function Detail() {
         libraryMap,
     } = useGlobalLibrary();
 
+
     const updateLibrary =
         useUpdateLibrary();
+
 
     const libraryItem =
         useMemo(() => {
@@ -104,8 +107,10 @@ function Detail() {
             id,
         ]);
 
+
     const currentStatus =
         libraryItem?.status ?? null;
+
 
     const storedProgress =
         Number(
@@ -122,15 +127,18 @@ function Detail() {
         setLibraryMenuOpen,
     ] = useState(false);
 
+
     const [
         progressDraft,
         setProgressDraft,
     ] = useState(null);
 
+
     const [
         isProgressEditing,
         setIsProgressEditing,
     ] = useState(false);
+
 
     // ============================================================
     // SCROLL
@@ -206,8 +214,8 @@ function Detail() {
     // ANIME DATA
     // ============================================================
 
-    // Prefer the normalized large image so the detail poster uses
-    // the same high-resolution source as AnimeCard.
+    // Prefer the normalized large image so the detail page uses
+    // the same high-resolution source as the anime cards.
     const image =
         anime.largeImage ??
         anime.images?.webp?.large_image_url ??
@@ -316,16 +324,22 @@ function Detail() {
             return;
         }
 
+
         if (!anime?.id) {
             return;
         }
 
+
         toggleFavorite.mutate({
+
             anime_id:
                 anime.id,
+
             title:
                 anime.title,
+
             image,
+
         });
     };
 
@@ -348,6 +362,7 @@ function Detail() {
                 return;
             }
 
+
             // ====================================================
             // REMOVE
             // ====================================================
@@ -360,15 +375,20 @@ function Detail() {
                     false
                 );
 
+
                 updateLibrary.mutate({
+
                     anime_id:
                         String(id),
+
                     remove:
                         true,
+
                 });
 
                 return;
             }
+
 
             // ====================================================
             // WATCHING
@@ -378,10 +398,19 @@ function Detail() {
                 status === "watching"
             ) {
 
+                /*
+                 * If the anime was already being watched,
+                 * preserve the existing progress.
+                 *
+                 * If the anime was Completed or Plan to Watch,
+                 * start Watching from episode 0.
+                 */
+
                 const nextProgress =
                     currentStatus === "watching"
                         ? safeStoredProgress
                         : 0;
+
 
                 setProgressDraft(
                     nextProgress
@@ -392,26 +421,40 @@ function Detail() {
                     false
                 );
 
+
+                /*
+                 * Only make an API request when the status
+                 * actually changes.
+                 */
+
                 if (
                     currentStatus !==
                     "watching"
                 ) {
 
                     updateLibrary.mutate({
+
                         anime_id:
                             String(id),
+
                         status:
                             "watching",
+
                         progress:
                             nextProgress,
+
                         title:
                             anime.title,
+
                         image,
+
                     });
                 }
 
+
                 return;
             }
+
 
             // ====================================================
             // PLAN TO WATCH
@@ -431,20 +474,29 @@ function Detail() {
                     false
                 );
 
+
                 updateLibrary.mutate({
+
                     anime_id:
                         String(id),
+
                     status:
                         "plan_to_watch",
+
                     progress:
                         0,
+
                     title:
                         anime.title,
+
                     image,
+
                 });
+
 
                 return;
             }
+
 
             // ====================================================
             // COMPLETED
@@ -455,34 +507,50 @@ function Detail() {
                 "completed"
             ) {
 
+                /*
+                 * When episode count is known,
+                 * Completed always means every episode watched.
+                 */
+
                 const completedProgress =
                     hasKnownEpisodeCount
                         ? episodeCount
                         : safeStoredProgress;
+
 
                 setProgressDraft(
                     completedProgress
                 );
                 setIsProgressEditing(false);
 
+
                 setLibraryMenuOpen(
                     false
                 );
 
+
                 updateLibrary.mutate({
+
                     anime_id:
                         String(id),
+
                     status:
                         "completed",
+
                     progress:
                         completedProgress,
+
                     title:
                         anime.title,
+
                     image,
+
                 });
+
 
                 return;
             }
+
 
             // ====================================================
             // DROPPED
@@ -493,21 +561,34 @@ function Detail() {
                 "dropped"
             ) {
 
+                /*
+                 * Dropped preserves the point where
+                 * the user stopped watching.
+                 */
+
                 setLibraryMenuOpen(
                     false
                 );
 
+
                 updateLibrary.mutate({
+
                     anime_id:
                         String(id),
+
                     status:
                         "dropped",
+
                     progress:
                         safeStoredProgress,
+
                     title:
                         anime.title,
+
                     image,
+
                 });
+
 
                 return;
             }
@@ -638,15 +719,21 @@ function Detail() {
     // ============================================================
 
     const statusLabelMap = {
+
         watching:
             "📺 Watching",
+
         completed:
             "✅ Completed",
+
         dropped:
             "❌ Dropped",
+
         plan_to_watch:
             "📌 Plan to Watch",
+
     };
+
 
     const statusLabel =
         currentStatus
@@ -659,16 +746,21 @@ function Detail() {
             )
             : "＋ Add to Library";
 
+
     // ============================================================
     // RENDER
     // ============================================================
 
     return (
         <PageContainer>
+
             <Helmet>
+
                 <title>
                     {anime.title} | Anime Tracker
                 </title>
+
+
                 <meta
                     name="description"
                     content={
@@ -676,92 +768,138 @@ function Detail() {
                         `Read about ${anime.title}.`
                     }
                 />
+
             </Helmet>
 
+
             <div className="detail-premium">
+
                 <div className="anime-detail-container">
+
 
                     {/* ==================================================
                         BACKDROP
                     ================================================== */}
+
                     <div className="anime-backdrop">
+
                         <OptimizedImage
                             src={image}
                             alt={anime.title}
                             loading="eager"
                         />
+
                     </div>
+
 
                     {/* ==================================================
                         MAIN DETAIL CARD
                     ================================================== */}
+
                     <div className="anime-detail-card">
+
 
                         {/* ==================================================
                             POSTER
                         ================================================== */}
+
                         <div className="anime-poster">
+
                             <OptimizedImage
                                 src={image}
                                 alt={title}
                                 loading="eager"
                             />
+
                         </div>
+
 
                         {/* ==================================================
                             MAIN INFO
                         ================================================== */}
+
                         <div className="anime-main-info">
+
                             <span className="anime-detail-eyebrow">
                                 ANIME DETAILS
                             </span>
+
 
                             <h1>
                                 {title}
                             </h1>
 
+
                             {/* ==================================================
                                 STATS
                             ================================================== */}
+
                             <div className="detail-stats">
+
                                 {anime.score != null && (
+
                                     <span className="detail-stat score">
+
                                         ⭐{" "}
                                         {anime.score}
+
                                     </span>
+
                                 )}
+
 
                                 {anime.type && (
+
                                     <span className="detail-stat">
+
                                         📺{" "}
                                         {anime.type}
+
                                     </span>
+
                                 )}
 
+
                                 {anime.episodes != null && (
+
                                     <span className="detail-stat">
+
                                         🎬{" "}
                                         {anime.episodes}{" "}
                                         Episodes
+
                                     </span>
+
                                 )}
 
+
                                 {anime.year && (
+
                                     <span className="detail-stat">
+
                                         📅{" "}
                                         {anime.year}
+
                                     </span>
+
                                 )}
+
                             </div>
+
 
                             {/* ==================================================
                                 ACTIONS
                             ================================================== */}
+
                             <div className="detail-actions">
+
+
                                 {/* ==================================================
                                     LIBRARY CONTROL
                                 ================================================== */}
+
                                 <div className="detail-library-control">
+
                                     <button
                                         type="button"
                                         className={`detail-library-button ${
@@ -769,223 +907,474 @@ function Detail() {
                                             "none"
                                         }`}
                                         onClick={() => {
-                                            if (!isAuthenticated) {
+
+                                            if (
+                                                !isAuthenticated
+                                            ) {
+
                                                 showLoginRequired();
+
                                                 return;
                                             }
 
+
                                             setLibraryMenuOpen(
-                                                (open) => !open
+                                                (current) =>
+                                                    !current
                                             );
+
                                         }}
+                                        disabled={
+                                            isAuthenticated &&
+                                            updateLibrary.isPending
+                                        }
                                     >
-                                        {statusLabel}
+
+                                        {isAuthenticated &&
+                                        updateLibrary.isPending
+                                            ? "Updating..."
+                                            : statusLabel}
+
+
+                                        <span
+                                            className="detail-library-chevron"
+                                            aria-hidden="true"
+                                        >
+                                            ▾
+                                        </span>
+
                                     </button>
 
-                                    {libraryMenuOpen && (
-                                        <div className="detail-library-menu">
+
+                                    {libraryMenuOpen &&
+                                    isAuthenticated && (
+
+                                        <div
+                                            className="detail-library-menu"
+                                            role="menu"
+                                        >
+
+
+                                            {/* WATCHING */}
+
                                             <button
                                                 type="button"
+                                                role="menuitem"
+                                                className={
+                                                    currentStatus ===
+                                                    "watching"
+                                                        ? "selected"
+                                                        : ""
+                                                }
                                                 onClick={() =>
-                                                    handleLibraryStatus("watching")
+                                                    handleLibraryStatus(
+                                                        "watching"
+                                                    )
                                                 }
                                             >
+
                                                 📺 Watching
+
                                             </button>
+
+
+                                            {/* COMPLETED */}
 
                                             <button
                                                 type="button"
+                                                role="menuitem"
+                                                className={
+                                                    currentStatus ===
+                                                    "completed"
+                                                        ? "selected"
+                                                        : ""
+                                                }
                                                 onClick={() =>
-                                                    handleLibraryStatus("completed")
+                                                    handleLibraryStatus(
+                                                        "completed"
+                                                    )
                                                 }
                                             >
+
                                                 ✅ Completed
+
                                             </button>
+
+
+                                            {/* DROPPED */}
 
                                             <button
                                                 type="button"
+                                                role="menuitem"
+                                                className={
+                                                    currentStatus ===
+                                                    "dropped"
+                                                        ? "selected"
+                                                        : ""
+                                                }
                                                 onClick={() =>
-                                                    handleLibraryStatus("plan_to_watch")
+                                                    handleLibraryStatus(
+                                                        "dropped"
+                                                    )
                                                 }
                                             >
-                                                📌 Plan to Watch
-                                            </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleLibraryStatus("dropped")
-                                                }
-                                            >
                                                 ❌ Dropped
+
                                             </button>
+
+
+                                            {/* PLAN TO WATCH */}
+
+                                            <button
+                                                type="button"
+                                                role="menuitem"
+                                                className={
+                                                    currentStatus ===
+                                                    "plan_to_watch"
+                                                        ? "selected"
+                                                        : ""
+                                                }
+                                                onClick={() =>
+                                                    handleLibraryStatus(
+                                                        "plan_to_watch"
+                                                    )
+                                                }
+                                            >
+
+                                                📌 Plan to Watch
+
+                                            </button>
+
+
+                                            {/* REMOVE */}
 
                                             {currentStatus && (
+
                                                 <button
                                                     type="button"
-                                                    className="remove"
+                                                    role="menuitem"
+                                                    className="danger"
                                                     onClick={() =>
-                                                        handleLibraryStatus("remove")
+                                                        handleLibraryStatus(
+                                                            "remove"
+                                                        )
                                                     }
                                                 >
+
                                                     🗑 Remove from Library
+
                                                 </button>
+
                                             )}
+
                                         </div>
+
                                     )}
+
                                 </div>
+
+
+                                {/* ==================================================
+                                    FAVORITE
+                                ================================================== */}
 
                                 <button
                                     type="button"
-                                    className={`detail-favorite-button ${
-                                        liked ? "liked" : ""
+                                    className={`favorite-button ${
+                                        liked
+                                            ? "active"
+                                            : ""
                                     }`}
-                                    onClick={handleFavorite}
+                                    onClick={
+                                        handleFavorite
+                                    }
+                                    disabled={
+                                        isAuthenticated &&
+                                        toggleFavorite.isPending
+                                    }
                                     aria-label={
                                         liked
-                                            ? "Remove from favorites"
-                                            : "Add to favorites"
+                                            ? `Remove ${title} from favorites`
+                                            : `Add ${title} to favorites`
                                     }
                                 >
-                                    {liked ? "♥" : "♡"}
+
+                                    {toggleFavorite.isPending
+
+                                        ? "Saving..."
+
+                                        : liked
+
+                                            ? "❤️ Remove Favorite"
+
+                                            : "♡ Add to Favorites"}
+
                                 </button>
+
                             </div>
 
+
                             {/* ==================================================
-                                PROGRESS
+                                PROGRESS CARD
                             ================================================== */}
-                            {currentStatus === "watching" && (
-                                <div className="detail-progress">
+
+                            {isAuthenticated &&
+                            currentStatus && (
+
+                                <div className="detail-progress-card">
+
+
+                                    {/* ==================================================
+                                        PROGRESS HEADER
+                                    ================================================== */}
+
                                     <div className="detail-progress-header">
-                                        <span>Progress</span>
-                                        <span>{progressLabel}</span>
+
+                                        <div>
+
+                                            <span className="detail-progress-eyebrow">
+                                                YOUR PROGRESS
+                                            </span>
+
+
+                                            <h3>
+
+                                                {currentStatus ===
+                                                "completed"
+
+                                                    ? "Completed"
+
+                                                    : "Episodes watched"}
+
+                                            </h3>
+
+                                        </div>
+
+
+                                        {progressPercentage !==
+                                            null && (
+
+                                            <strong>
+                                                {
+                                                    progressPercentage
+                                                }%
+                                            </strong>
+
+                                        )}
+
                                     </div>
 
-                                    {progressPercentage !== null && (
-                                        <div className="detail-progress-bar">
+
+                                    {/* ==================================================
+                                        PROGRESS INFO
+                                    ================================================== */}
+
+                                    <div className="detail-progress-info">
+
+                                        <span>
+                                            {progressLabel}
+                                        </span>
+
+
+                                        {currentStatus ===
+                                            "completed" &&
+                                        hasKnownEpisodeCount && (
+
+                                            <span>
+                                                Full series
+                                            </span>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {/* ==================================================
+                                        PROGRESS BAR
+                                    ================================================== */}
+
+                                    {hasKnownEpisodeCount && (
+
+                                        <div
+                                            className="detail-progress-track"
+                                            aria-label={`Progress: ${progressPercentage}%`}
+                                        >
+
                                             <div
                                                 className="detail-progress-fill"
                                                 style={{
                                                     width: `${progressPercentage}%`,
                                                 }}
                                             />
+
                                         </div>
+
                                     )}
 
-                                    <div className="detail-progress-controls">
-                                        <button
-                                            type="button"
-                                            onClick={() => changeProgress(-1)}
-                                            disabled={displayedProgress <= 0}
-                                        >
-                                            −
-                                        </button>
 
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max={
-                                                hasKnownEpisodeCount
-                                                    ? episodeCount
-                                                    : undefined
-                                            }
-                                            value={
-                                                isProgressEditing
-                                                    ? progressDraft
-                                                    : safeStoredProgress
-                                            }
-                                            onChange={handleProgressInput}
-                                            aria-label="Episodes watched"
-                                        />
+                                    {/* ==================================================
+                                        WATCHING CONTROLS
+                                    ================================================== */}
 
-                                        <button
-                                            type="button"
-                                            onClick={() => changeProgress(1)}
-                                            disabled={
-                                                hasKnownEpisodeCount &&
-                                                displayedProgress >= episodeCount
-                                            }
-                                        >
-                                            +
-                                        </button>
+                                    {currentStatus ===
+                                    "watching" && (
 
-                                        <button
-                                            type="button"
-                                            className="save-progress"
-                                            onClick={handleSaveProgress}
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
+                                        <div className="detail-progress-controls">
+
+
+                                            {/* DECREASE */}
+
+                                            <button
+                                                type="button"
+                                                className="detail-progress-step"
+                                                onClick={() =>
+                                                    changeProgress(
+                                                        -1
+                                                    )
+                                                }
+                                                disabled={
+                                                    displayedProgress <=
+                                                    0
+                                                }
+                                                aria-label="Decrease episode progress"
+                                            >
+                                                −
+                                            </button>
+
+
+                                            {/* INPUT */}
+
+                                            <input
+                                                type="number"
+                                                className="detail-progress-input"
+                                                min="0"
+                                                max={
+                                                    hasKnownEpisodeCount
+                                                        ? episodeCount
+                                                        : undefined
+                                                }
+                                                value={
+                                                    progressDraft === null
+                                                        ? safeStoredProgress
+                                                        : progressDraft
+                                                }
+                                                onChange={
+                                                    handleProgressInput
+                                                }
+                                                aria-label="Episodes watched"
+                                            />
+
+
+                                            {/* INCREASE */}
+
+                                            <button
+                                                type="button"
+                                                className="detail-progress-step"
+                                                onClick={() =>
+                                                    changeProgress(
+                                                        1
+                                                    )
+                                                }
+                                                disabled={
+                                                    hasKnownEpisodeCount &&
+                                                    displayedProgress >=
+                                                    episodeCount
+                                                }
+                                                aria-label="Increase episode progress"
+                                            >
+                                                +
+                                            </button>
+
+
+                                            {/* SAVE */}
+
+                                            <button
+                                                type="button"
+                                                className="detail-progress-save"
+                                                onClick={
+                                                    handleSaveProgress
+                                                }
+                                                disabled={
+                                                    updateLibrary.isPending
+                                                }
+                                            >
+
+                                                {updateLibrary.isPending
+
+                                                    ? "Saving..."
+
+                                                    : "Save"}
+
+                                            </button>
+
+                                        </div>
+
+                                    )}
+
+
+                                    {/* ==================================================
+                                        UNKNOWN EPISODE COUNT
+                                    ================================================== */}
+
+                                    {!hasKnownEpisodeCount && (
+
+                                        <p className="detail-progress-note">
+
+                                            Episode count is currently
+                                            unavailable, so percentage
+                                            progress cannot be calculated.
+
+                                        </p>
+
+                                    )}
+
                                 </div>
+
                             )}
 
-                            {anime.synopsis && (
-                                <p className="anime-synopsis">
-                                    {anime.synopsis}
-                                </p>
-                            )}
                         </div>
+
                     </div>
+
 
                     {/* ==================================================
-                        ADDITIONAL DETAILS
+                        SYNOPSIS
                     ================================================== */}
-                    <div className="anime-detail-sections">
-                        {anime.genres?.length > 0 && (
-                            <section className="detail-section">
-                                <h2>Genres</h2>
-                                <div className="genre-list">
-                                    {anime.genres.map((genre) => (
-                                        <span
-                                            key={genre.mal_id ?? genre.name}
-                                            className="genre-tag"
-                                        >
-                                            {genre.name}
-                                        </span>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
 
-                        {anime.studios?.length > 0 && (
-                            <section className="detail-section">
-                                <h2>Studios</h2>
-                                <div className="genre-list">
-                                    {anime.studios.map((studio) => (
-                                        <span
-                                            key={studio.mal_id ?? studio.name}
-                                            className="genre-tag"
-                                        >
-                                            {studio.name}
-                                        </span>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
+                    <div className="anime-section">
 
-                        {anime.themes?.length > 0 && (
-                            <section className="detail-section">
-                                <h2>Themes</h2>
-                                <div className="genre-list">
-                                    {anime.themes.map((theme) => (
-                                        <span
-                                            key={theme.mal_id ?? theme.name}
-                                            className="genre-tag"
-                                        >
-                                            {theme.name}
-                                        </span>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
+                        <h2>
+                            Synopsis
+                        </h2>
+
+
+                        <p>
+
+                            {anime.synopsis ||
+                                "No synopsis available."}
+
+                        </p>
+
                     </div>
 
-                    <ReviewSection animeId={anime.id} />
+
+                    {/* ==================================================
+                        REVIEWS
+                    ================================================== */}
+
+                    <ReviewSection
+                        animeId={id}
+                    />
+
                 </div>
+
             </div>
+
         </PageContainer>
     );
 }
 
+
 export default Detail;
+
