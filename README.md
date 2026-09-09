@@ -58,12 +58,6 @@ Each anime has a dedicated detail page containing its key information, synopsis,
   <img src="docs/screenshots/anime-detail.png" alt="Anime Tracker anime detail page" width="90%">
 </p>
 
-If the page contains important content further down, such as reviews or related anime:
-
-<p align="center">
-  <img src="docs/screenshots/anime-detail-reviews.png" alt="Anime Tracker anime detail reviews section" width="90%">
-</p>
-
 ---
 
 ### Personal Library
