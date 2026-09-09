@@ -32,6 +32,24 @@ Run tests:
 pytest -q
 ```
 
+### Anime data population
+
+The canonical catalogue population command is:
+
+```bash
+python manage.py populate_anime
+```
+
+It imports multiple Tenrai sources, including seasonal, top, upcoming, airing, movies, OVA and ONA data, plus a broad general catalogue. It also applies the application's SFW filter and reports created, updated, blocked and failed records.
+
+For a faster seasonal-only refresh:
+
+```bash
+python manage.py populate_seasonal
+```
+
+`load_jikan_json` is retained only as a legacy import utility for existing Jikan JSON exports. It is not the application's live API integration.
+
 ## Frontend
 
 ```bash
