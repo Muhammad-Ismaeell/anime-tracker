@@ -1,5 +1,5 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_request
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, TenraiClient, safe_request
 
 
 class NewsService:
@@ -19,7 +19,7 @@ class NewsService:
         )
 
     def _fetch_general_news(self, page):
-        response = JikanClient().get_general_news(page)
+        response = TenraiClient().get_general_news(page)
         items = [
             item
             for item in (self._normalize_item(news_item) for news_item in response.get("items", []))
