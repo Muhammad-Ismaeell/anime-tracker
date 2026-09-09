@@ -3,16 +3,13 @@ import time
 from django.core.management.base import BaseCommand
 
 from anime.application.anime_service import AnimeService
-from anime.infrastructure.jikan.jikan_client import (
-    JikanClient,
-    is_nsfw,
-)
+from anime.infrastructure.tenrai.tenrai_client import TenraiClient, is_nsfw
 from anime.infrastructure.models import Anime
 
 
 class Command(BaseCommand):
 
-    help = "Populate anime database from multiple Jikan sources"
+    help = "Populate anime database from multiple Tenrai sources"
 
     def add_arguments(self, parser):
 
@@ -34,21 +31,21 @@ class Command(BaseCommand):
             "--delay",
             type=float,
             default=3,
-            help="Delay between Jikan requests in seconds.",
+            help="Delay between Tenrai requests in seconds.",
         )
 
         parser.add_argument(
             "--source-delay",
             type=float,
             default=10,
-            help="Cooldown between different Jikan sources in seconds.",
+            help="Cooldown between different Tenrai sources in seconds.",
         )
 
         parser.add_argument(
             "--request-retries",
             type=int,
             default=2,
-            help="Additional retries when a Jikan page request returns no data.",
+            help="Additional retries when a Tenrai page request returns no data.",
         )
 
     def save_items(self, items, service):
@@ -150,8 +147,6 @@ class Command(BaseCommand):
                     )
                 )
 
-                # A transient failure in the large catalog should not
-                # prevent later pages from being populated.
                 if continue_after_failure:
                     time.sleep(delay)
                     continue
@@ -196,7 +191,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        client = JikanClient()
+        client = TenraiClient()
         service = AnimeService(client)
 
         max_pages = options["max_pages"]
@@ -205,10 +200,6 @@ class Command(BaseCommand):
         source_delay = options["source_delay"]
         request_retries = options["request_retries"]
 
-        # The general catalog is the main population source because it
-        # provides much more coverage than category-specific endpoints.
-        # Seasonal remains first so current-season data is available even
-        # when Jikan later becomes unreliable for deeper catalog pages.
         sources = [
             ("Seasonal Anime", client.get_seasonal, max_pages, False),
             ("Top Anime", client.get_top, max_pages, False),
@@ -232,7 +223,7 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             self.style.HTTP_INFO(
-                "       JIKAN ANIME POPULATION"
+                "       TENRAI ANIME POPULATION"
             )
         )
         self.stdout.write(
