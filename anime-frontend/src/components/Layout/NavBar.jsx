@@ -153,7 +153,7 @@ function NavBar({ onMenuToggle = () => {}, sidebarOpen = false }) {
 
                 <button type="button" className="navbar-logo" onClick={handleHomeClick} aria-label="Anime Tracker home">
                     <span className="navbar-logo-text navbar-logo-text-desktop">Anime Tracker</span>
-                    <span className="navbar-logo-text navbar-logo-text-mobile">Anime</span>
+                    <span className="navbar-logo-text navbar-logo-text-mobile">Anime Tracker</span>
                 </button>
 
                 <nav className="navbar-nav" aria-label="Primary navigation">
