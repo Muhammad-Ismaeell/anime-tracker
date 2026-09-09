@@ -28,15 +28,71 @@ Key engineering areas demonstrated:
 
 ## Screenshots
 
-Screenshots are intentionally kept out of the repository documentation until the final project images are added.
+### Home & Discovery
 
-Recommended screenshots:
+<p align="center">
+  <img src="docs/screenshots/home-top.png" alt="Anime Tracker home page" width="90%">
+</p>
 
-- Home / discovery page
-- Advanced search or search results
-- Anime detail page
-- User dashboard or library
-- Mobile responsive view
+<p align="center">
+  <img src="docs/screenshots/home-lower.png" alt="Anime Tracker home page - additional content" width="90%">
+</p>
+
+---
+
+### Search & Discovery
+
+Users can search for anime and browse matching results with relevant information and artwork.
+
+<p align="center">
+  <img src="docs/screenshots/search.png" alt="Anime Tracker search page" width="90%">
+</p>
+
+---
+
+### Anime Details
+
+Each anime has a dedicated detail page containing its key information, synopsis, genres, ratings, and other relevant data.
+
+<p align="center">
+  <img src="docs/screenshots/anime-detail.png" alt="Anime Tracker anime detail page" width="90%">
+</p>
+
+If the page contains important content further down, such as reviews or related anime:
+
+<p align="center">
+  <img src="docs/screenshots/anime-detail-reviews.png" alt="Anime Tracker anime detail reviews section" width="90%">
+</p>
+
+---
+
+### Personal Library
+
+Users can manage their anime library and keep track of their favorites and viewing status.
+
+<p align="center">
+  <img src="docs/screenshots/library.png" alt="Anime Tracker personal library" width="90%">
+</p>
+
+---
+
+### Profile & Activity
+
+The profile provides an overview of the user's activity and interactions within the application.
+
+<p align="center">
+  <img src="docs/screenshots/profile.png" alt="Anime Tracker profile and activity page" width="90%">
+</p>
+
+---
+
+### Responsive Design
+
+The interface is designed to adapt to different screen sizes and provide a usable experience on mobile devices.
+
+<p align="center">
+  <img src="docs/screenshots/mobile.png" alt="Anime Tracker mobile responsive layout" width="45%">
+</p>
 
 ## Features
 
