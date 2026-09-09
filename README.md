@@ -24,7 +24,7 @@ Key engineering areas demonstrated:
 - Relational constraints and indexes for data integrity and common query paths
 - Responsive React UI with lazy-loaded routes and TanStack Query server-state management
 - Automated backend tests plus frontend lint/build checks in GitHub Actions
-- Docker support and PostgreSQL production deployment
+- PostgreSQL production deployment
 
 ## Screenshots
 
@@ -119,7 +119,6 @@ The interface is designed to adapt to different screen sizes and provide a usabl
 - Lazy-loaded React routes and centralized server-state management
 - OpenAPI/Swagger API documentation
 - Automated backend tests with GitHub Actions
-- Docker support
 
 ## Architecture
 
@@ -180,7 +179,6 @@ See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 - Cloudinary for production media storage
 - WhiteNoise
 - Gunicorn
-- Docker
 - Pytest / pytest-django
 
 ### External services
@@ -214,9 +212,8 @@ anime-tracker/
 │   │   └── presentation/  # response normalization
 │   ├── users/             # profile/library/favourite/review features
 │   ├── core/              # auth, exceptions and shared backend code
-│   ├── config/            # Django configuration
-│   ├── Dockerfile
-│   └── manage.py
+   ├── config/             # Django configuration
+   └── manage.py
 │
 └── docs/
     ├── architecture.md
@@ -368,7 +365,7 @@ See [docs/technical-decisions.md](docs/technical-decisions.md) for the reasoning
 
 ## Development Guide
 
-See [docs/development.md](docs/development.md) for environment setup, Docker usage, testing, migrations and pre-PR checks.
+See [docs/development.md](docs/development.md) for environment setup, testing, migrations and pre-PR checks.
 
 ## Current Scope
 
