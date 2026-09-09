@@ -1,7 +1,7 @@
 from core.exceptions.custom_exceptions import NotFoundException
 
 from anime.infrastructure.models import Anime, Genre
-from anime.infrastructure.jikan.jikan_client import is_nsfw
+from anime.infrastructure.tenrai.tenrai_client import is_nsfw
 from anime.presentation.normalizer import normalize_anime_detail
 
 
@@ -41,7 +41,7 @@ class AnimeService:
             mal_id=mal_id
         ).first()
 
-        # Jikan can return null for metadata that is
+        # Tenrai can return null for metadata that is
         # currently unknown. Never replace metadata
         # we already know with null.
         episodes = data.get("episodes")

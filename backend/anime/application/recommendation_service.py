@@ -1,12 +1,12 @@
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import JikanClient
+from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
 
 class RecommendationService:
     CACHE_TIMEOUT = 60 * 60
 
     def __init__(self, client=None):
-        self.client = client or JikanClient()
+        self.client = client or TenraiClient()
 
     def get_recommendations(self, anime_id):
         key = f"anime-recommendations:{anime_id}"

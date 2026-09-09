@@ -14,11 +14,11 @@ import {
     QueryClientProvider,
 } from "@tanstack/react-query";
 import "./index.css";
-import "./detail-polish.css";
+import "./anime-detail.css";
 import "./review-polish.css";
 import "./auth-polish.css";
 import "./not-found-polish.css";
-import "./final-polish.css";
+import "./layout.css";
 
 const queryClient = new QueryClient({
     defaultOptions: {

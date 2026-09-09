@@ -141,7 +141,7 @@ def list_response(data, page):
     }
 
 
-class JikanClient:
+class TenraiClient:
     def _get_list(self, endpoint, page=1, params=None, strict_sfw=False):
         params = dict(params or {})
         params["page"] = page

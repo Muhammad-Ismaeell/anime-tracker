@@ -24,9 +24,9 @@ This keeps HTTP concerns separate from application logic and makes the same logi
 
 ## External API client isolation
 
-External HTTP communication is isolated behind the `JikanClient` integration class. The name is retained for compatibility with the existing project structure, while the configured provider is Tenrai.
+External HTTP communication is isolated behind the `TenraiClient` integration class. Services depend on the client instead of directly constructing HTTP requests. This is a simple form of dependency injection and makes the external integration easier to replace or mock in tests.
 
-Services depend on the client instead of directly constructing HTTP requests. This is a simple form of dependency injection and makes the external integration easier to replace or mock in tests.
+The client currently targets the Tenrai API while consuming the provider's MAL-oriented anime data model, so external identifiers such as `mal_id` remain part of the application's data contract.
 
 ## Rate limiting
 

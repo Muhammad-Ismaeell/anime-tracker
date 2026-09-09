@@ -1,16 +1,16 @@
 from django.core.management.base import BaseCommand
 
-from anime.infrastructure.jikan.jikan_client import JikanClient
 from anime.application.anime_service import AnimeService
+from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
 
 class Command(BaseCommand):
 
-    help = "Populate current seasonal anime"
+    help = "Populate current seasonal anime from Tenrai"
 
     def handle(self, *args, **options):
 
-        client = JikanClient()
+        client = TenraiClient()
         service = AnimeService(client)
 
         total_saved = 0

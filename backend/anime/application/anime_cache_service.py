@@ -1,5 +1,5 @@
 from anime.infrastructure.models import Anime
-from anime.infrastructure.jikan.jikan_client import JikanClient
+from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
 
 class AnimeCacheService:
@@ -29,7 +29,7 @@ class AnimeCacheService:
             }
 
 
-        data = JikanClient().get_detail(
+        data = TenraiClient().get_detail(
             anime_id
         )
 

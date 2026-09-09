@@ -5,12 +5,12 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from anime.application.anime_service import AnimeService
-from anime.infrastructure.jikan.jikan_client import is_nsfw
+from anime.infrastructure.tenrai.tenrai_client import is_nsfw
 from anime.infrastructure.models import Anime
 
 
 class Command(BaseCommand):
-    help = "Load anime from a Jikan JSON export."
+    help = "Load anime from a legacy Jikan JSON export."
 
     def add_arguments(self, parser):
         parser.add_argument(

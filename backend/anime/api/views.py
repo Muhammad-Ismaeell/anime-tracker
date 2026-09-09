@@ -18,13 +18,13 @@ from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
 from anime.application.recommendation_service import RecommendationService
 from anime.application.search_service import AnimeSearchService
-from anime.infrastructure.jikan.jikan_client import JikanClient
+from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
 
 search_service = AnimeSearchService()
 
 anime_service = AnimeService(
-    JikanClient()
+    TenraiClient()
 )
 
 recommendation_service = RecommendationService()

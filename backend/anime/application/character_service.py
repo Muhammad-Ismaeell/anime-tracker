@@ -6,7 +6,7 @@ import time
 from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.jikan.jikan_client import BASE_URL, JikanClient, safe_request
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, TenraiClient, safe_request
 from anime.infrastructure.models import CharacterSafety
 
 
@@ -31,7 +31,7 @@ class CharacterService:
         )
 
     def _fetch_general_characters(self, page, query, order_by, sort, letter):
-        response = JikanClient().get_general_characters(page, query, order_by, sort, letter)
+        response = TenraiClient().get_general_characters(page, query, order_by, sort, letter)
         characters = [
             character
             for character in response.get("items", [])
@@ -88,7 +88,7 @@ class CharacterService:
                 time.sleep(cls.SAFETY_INTERVAL - elapsed)
             cls._last_safety_request = time.monotonic()
 
-        return bool(JikanClient().get_character_anime(character_id))
+        return bool(TenraiClient().get_character_anime(character_id))
 
     @staticmethod
     def _normalize_character(character):
