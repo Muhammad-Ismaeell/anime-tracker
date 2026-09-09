@@ -24,7 +24,7 @@ Key engineering areas demonstrated:
 - Relational constraints and indexes for data integrity and common query paths
 - Responsive React UI with lazy-loaded routes and TanStack Query server-state management
 - Automated backend tests plus frontend lint/build checks in GitHub Actions
-- Docker and PostgreSQL-ready deployment configuration
+- Docker support and PostgreSQL production deployment
 
 ## Screenshots
 
@@ -143,8 +143,8 @@ Django + Django REST Framework
    │               ├── Django cache
    │               └── Tenrai API client
    │
-   └── PostgreSQL-ready configuration
-           └── SQLite used for local development
+   └── PostgreSQL (production)
+           └── SQLite (local development)
 ```
 
 The backend separates API/presentation concerns from application services and infrastructure integrations. External anime data is persisted locally when appropriate, while freshness windows and caching reduce unnecessary upstream requests.
@@ -175,8 +175,8 @@ See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 - Simple JWT
 - drf-spectacular / OpenAPI
 - Django ORM
+- PostgreSQL for production
 - SQLite for local development
-- PostgreSQL-ready configuration via `dj-database-url` and `psycopg2-binary`
 - Cloudinary for production media storage
 - WhiteNoise
 - Gunicorn
@@ -372,7 +372,7 @@ See [docs/development.md](docs/development.md) for environment setup, Docker usa
 
 ## Current Scope
 
-This is a portfolio-scale application. The current design deliberately avoids infrastructure complexity that is not needed at this scale. If the project grows, natural next steps include PostgreSQL as the primary deployed database, Redis for distributed caching, background jobs, observability and additional integration tests.
+This is a portfolio-scale application. The current design deliberately avoids infrastructure complexity that is not needed at this scale. If the project grows, natural next steps include Redis for distributed caching, background jobs, observability and additional integration tests.
 
 ## Attribution
 
