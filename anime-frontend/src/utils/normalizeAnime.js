@@ -47,8 +47,7 @@ export const normalizeAnime = (anime) => {
             anime.title_english ??
             "Unknown Anime",
 
-        // Use the standard-sized image for catalogue cards.
-        // Keep the large variant separately for views that need it.
+        // Keep both image variants so each view can choose the appropriate size.
         image: normalImage,
         largeImage,
 
