@@ -85,8 +85,9 @@
         display: none;
     }
 
+    /* Explore belongs in the hamburger/sidebar on phones. */
     .navbar-nav {
-        display: none;
+        display: none !important;
     }
 
     .navbar-right {
@@ -161,6 +162,7 @@
         padding: 0 42px;
         font-size: 14px;
         border-radius: 12px;
+        line-height: 44px;
     }
 
     .mobile-search-input:focus {
@@ -168,9 +170,15 @@
     }
 
     .mobile-search .navbar-search-icon {
-        top: 50%;
+        top: 0;
+        bottom: 0;
         left: 14px;
-        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: auto;
+        transform: none;
+        line-height: 1;
     }
 
     .mobile-search .navbar-search-clear {
@@ -471,6 +479,7 @@
         padding-left: 40px;
         font-size: 13px;
         border-radius: 11px;
+        line-height: 42px;
     }
 
     .mobile-search .navbar-search-icon {
