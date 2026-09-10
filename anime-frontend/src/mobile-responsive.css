@@ -22,24 +22,21 @@
     .navbar {
         display: grid;
         grid-template-columns: 42px minmax(0, 1fr) auto;
-        grid-template-rows: 54px 48px;
+        grid-template-rows: 54px;
         gap: 0 8px;
         width: 100%;
         height: auto;
-        min-height: 102px;
-        padding: 0 10px 9px;
+        min-height: 54px;
+        padding: 0 10px;
         align-items: center;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
     }
 
-    /* Desktop and mobile now share the same scroll state. Keep the
-       mobile two-row layout intact when the desktop scroll handler
-       marks the navbar compact, rather than jumping to 48px. */
     .navbar.navbar-compact {
         height: auto;
-        min-height: 102px;
-        padding-bottom: 9px;
+        min-height: 54px;
+        padding-bottom: 0;
     }
 
     .navbar-left {
@@ -138,56 +135,64 @@
         height: 30px;
     }
 
-    /* Search gets its own full-width row and a stronger app-like treatment. */
+    /* Desktop search stays in the navbar; mobile search is rendered
+       directly below the compact navbar by AppLayout. */
     .navbar-search-wrapper {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        width: 100%;
-        min-width: 0;
-        margin: 0;
-        justify-self: stretch;
-        position: relative;
+        display: none;
     }
 
-    .navbar-search-input {
+    /* ---------- Mobile search ---------- */
+    .mobile-search {
+        display: block;
+        position: relative;
+        width: 100%;
+        padding: 10px 12px 4px;
+        z-index: 1000;
+    }
+
+    .mobile-search-box {
+        position: relative;
+        width: 100%;
+    }
+
+    .mobile-search-input {
         width: 100%;
         height: 44px;
-        padding-left: 42px;
-        padding-right: 38px;
+        padding: 0 42px;
         font-size: 14px;
         border-radius: 12px;
     }
 
-    .navbar.navbar-compact .navbar-search-input {
-        height: 44px;
-    }
-
-    .navbar-search-input:focus {
+    .mobile-search-input:focus {
         outline: none;
     }
 
-    .navbar-search-icon {
+    .mobile-search .navbar-search-icon {
         left: 14px;
     }
 
-    .navbar-search-clear {
+    .mobile-search .navbar-search-clear {
         right: 7px;
         width: 30px;
         height: 30px;
     }
 
-    .navbar-dropdown {
-        top: calc(100% + 7px);
-        width: 100%;
-        max-width: 100%;
+    .mobile-search-dropdown {
+        position: absolute;
+        top: calc(100% - 1px);
+        left: 12px;
+        right: 12px;
+        width: auto;
         max-height: min(420px, 65vh);
         z-index: 1100;
         border-radius: 12px;
         overflow-x: hidden;
         overflow-y: auto;
+        background: var(--surface, #151515);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
     }
 
-    .navbar-dropdown-item {
+    .mobile-search-dropdown .navbar-result {
         min-height: 58px;
         padding: 8px 10px;
     }
@@ -400,20 +405,24 @@
     .home-category-tab-mobile-only {
         display: none;
     }
+
+    .mobile-search {
+        display: none;
+    }
 }
 
 @media (max-width: 420px) {
     .navbar {
         grid-template-columns: 38px minmax(0, 1fr) auto;
-        grid-template-rows: 52px 46px;
-        min-height: 98px;
+        grid-template-rows: 52px;
+        min-height: 52px;
         gap: 0 6px;
-        padding: 0 8px 8px;
+        padding: 0 8px;
     }
 
     .navbar.navbar-compact {
-        min-height: 98px;
-        padding-bottom: 8px;
+        min-height: 52px;
+        padding-bottom: 0;
     }
 
     .navbar-menu-button {
@@ -449,18 +458,18 @@
         height: 29px;
     }
 
-    .navbar-search-input {
+    .mobile-search {
+        padding: 9px 10px 3px;
+    }
+
+    .mobile-search-input {
         height: 42px;
         padding-left: 40px;
         font-size: 13px;
         border-radius: 11px;
     }
 
-    .navbar.navbar-compact .navbar-search-input {
-        height: 42px;
-    }
-
-    .navbar-search-icon {
+    .mobile-search .navbar-search-icon {
         left: 13px;
     }
 
@@ -490,7 +499,7 @@
         padding-inline: 8px;
     }
 
-    .navbar-search-input {
+    .mobile-search-input {
         font-size: 12.5px;
     }
 
