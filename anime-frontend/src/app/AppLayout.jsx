@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/Layout/Sidebar";
 import Navbar from "../components/Layout/NavBar";
+import MobileSearch from "../components/Layout/MobileSearch";
 
 export default function AppLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function AppLayout() {
                 onMenuToggle={toggleSidebar}
                 sidebarOpen={sidebarOpen}
             />
+            <MobileSearch />
 
             <div className="app-layout-body">
                 <Sidebar
