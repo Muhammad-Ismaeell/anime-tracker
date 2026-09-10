@@ -1,9 +1,10 @@
 import json
 import logging
-import subprocess
 import threading
 import time
 from urllib.parse import urlencode
+
+import requests
 
 
 logger = logging.getLogger(__name__)
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.tenrai.org/v1"
 MIN_REQUEST_INTERVAL = 0.3
+REQUEST_TIMEOUT = 30
 _request_lock = threading.Lock()
 _next_request_at = 0.0
 
@@ -38,78 +40,55 @@ def _wait_for_rate_limit():
 
 
 def safe_request(url, params=None, retries=3):
-    if params:
-        url = f"{url}?{urlencode(params)}"
-
     for attempt in range(retries):
-        http_code = "unknown"
         _wait_for_rate_limit()
 
         try:
-            result = subprocess.run(
-                [
-                    "curl", "-sS", "-f", "--http1.1", "-4", "-L", "--compressed",
-                    "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                    "-H", "Accept: application/json,text/plain,*/*",
-                    "-H", "Accept-Language: en-US,en;q=0.9",
-                    "--write-out", "\n%{http_code}", url,
-                ],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=60,
+            response = requests.get(
+                url,
+                params=params,
+                headers={
+                    "Accept": "application/json,text/plain,*/*",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "User-Agent": "AnimeTracker/1.0",
+                },
+                timeout=REQUEST_TIMEOUT,
             )
+            response.raise_for_status()
 
-            stdout = result.stdout or ""
+            if not response.content:
+                raise requests.RequestException("Empty response body")
 
-            if "\n" in stdout:
-                body, possible_code = stdout.rsplit("\n", 1)
-                if possible_code.isdigit():
-                    stdout = body
-                    http_code = possible_code
-
-            if result.returncode != 0:
-                logger.warning(
-                    "Anime API curl failed (attempt %s/%s): returncode=%s, http_status=%s, stderr=%s, url=%s",
-                    attempt + 1,
-                    retries,
-                    result.returncode,
-                    http_code,
-                    result.stderr.strip() or "<empty>",
-                    url,
-                )
-                if attempt < retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return None
-
-            if not stdout:
-                if attempt < retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return None
-
-            data = json.loads(stdout)
+            data = response.json()
 
             if "status" in data and data.get("status") != 200:
                 logger.warning("Anime API error: %s", data)
                 if attempt < retries - 1:
-                    time.sleep(2 ** attempt)
+                    time.sleep(2**attempt)
                     continue
                 return None
 
             return data
 
-        except subprocess.TimeoutExpired:
-            logger.warning("Curl timeout (%s/%s): %s", attempt + 1, retries, url)
-        except json.JSONDecodeError:
-            logger.warning("Invalid JSON response (%s/%s): %s", attempt + 1, retries, url)
-        except Exception as exc:
-            logger.warning("Anime API request failed (%s/%s): %s", attempt + 1, retries, exc)
+        except requests.RequestException as exc:
+            logger.warning(
+                "Anime API request failed (attempt %s/%s): %s, url=%s",
+                attempt + 1,
+                retries,
+                exc,
+                url,
+            )
+        except (ValueError, json.JSONDecodeError) as exc:
+            logger.warning(
+                "Invalid JSON response (attempt %s/%s): %s, url=%s",
+                attempt + 1,
+                retries,
+                exc,
+                url,
+            )
 
         if attempt < retries - 1:
-            time.sleep(2 ** attempt)
+            time.sleep(2**attempt)
 
     return None
 
