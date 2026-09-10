@@ -12,6 +12,14 @@ const navSections = [
         ],
     },
     {
+        title: "EXPLORE",
+        items: [
+            { to: "/recommendations", label: "Recommendations", icon: "🎯" },
+            { to: "/characters", label: "Characters", icon: "👤" },
+            { to: "/news", label: "Anime News", icon: "📰" },
+        ],
+    },
+    {
         title: "MY ANIME",
         items: [
             { to: "/library", label: "Library", icon: "📚" },
