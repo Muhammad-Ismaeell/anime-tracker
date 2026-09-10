@@ -308,6 +308,16 @@
         min-height: 38px;
     }
 
+    /* On phones, Top Anime belongs to the same discovery tabs as the
+       other catalogue feeds. The desktop ranking remains unchanged. */
+    .home-category-tab-mobile-only {
+        display: inline-flex;
+    }
+
+    .home-discovery-ranking {
+        display: none;
+    }
+
     /* ---------- Ranking ---------- */
     .anime-ranking-item {
         grid-template-columns: 28px 48px minmax(0, 1fr);
@@ -366,6 +376,12 @@
     .anime-detail-card,
     .anime-detail-card * {
         max-width: 100%;
+    }
+}
+
+@media (min-width: 651px) {
+    .home-category-tab-mobile-only {
+        display: none;
     }
 }
 
