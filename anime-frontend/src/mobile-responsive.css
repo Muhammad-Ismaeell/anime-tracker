@@ -33,6 +33,15 @@
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
     }
 
+    /* Desktop and mobile now share the same scroll state. Keep the
+       mobile two-row layout intact when the desktop scroll handler
+       marks the navbar compact, rather than jumping to 48px. */
+    .navbar.navbar-compact {
+        height: auto;
+        min-height: 102px;
+        padding-bottom: 9px;
+    }
+
     .navbar-left {
         display: contents;
     }
@@ -147,6 +156,10 @@
         padding-right: 38px;
         font-size: 14px;
         border-radius: 12px;
+    }
+
+    .navbar.navbar-compact .navbar-search-input {
+        height: 44px;
     }
 
     .navbar-search-input:focus {
@@ -398,6 +411,11 @@
         padding: 0 8px 8px;
     }
 
+    .navbar.navbar-compact {
+        min-height: 98px;
+        padding-bottom: 8px;
+    }
+
     .navbar-menu-button {
         width: 38px;
         height: 38px;
@@ -436,6 +454,10 @@
         padding-left: 40px;
         font-size: 13px;
         border-radius: 11px;
+    }
+
+    .navbar.navbar-compact .navbar-search-input {
+        height: 42px;
     }
 
     .navbar-search-icon {
