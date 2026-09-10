@@ -2,7 +2,7 @@
    MOBILE RESPONSIVE PASS
    Keeps the existing desktop design while giving phones a
    deliberate, touch-friendly layout.
-   ============================================================
+   ============================================================ */
 
 @media (max-width: 650px) {
     html,
