@@ -306,6 +306,10 @@
     .home-category-tab {
         flex: 0 0 auto;
         min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
 
     /* On phones, Top Anime belongs to the same discovery tabs as the
