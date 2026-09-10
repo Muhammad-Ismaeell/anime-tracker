@@ -123,7 +123,7 @@ The two layers are complementary. Frontend caching avoids repeated browser reque
 
 ## Database strategy
 
-SQLite is used for local development because it is simple and requires no separate database server. The project is PostgreSQL-ready through `dj-database-url` and `psycopg2-binary`; the production configuration reads `DATABASE_URL` when `DEBUG=False`.
+SQLite is used for local development because it is simple and requires no separate database server. PostgreSQL is used for production through `dj-database-url` and `psycopg2-binary`; the production configuration reads `DATABASE_URL` when `DEBUG=False`.
 
 A local SQLite write lock is used around selected supplementary-data writes to prevent concurrent write contention during development. This is a single-process development safeguard, not a distributed locking mechanism.
 
@@ -140,4 +140,4 @@ See [database.dbml](database.dbml) for the application/domain ERD.
 
 ## Production evolution
 
-The current design is appropriate for a portfolio-scale deployment. If traffic grows, the natural next steps are PostgreSQL as the primary database, Redis for distributed caching/coordination, background jobs for refresh work, and stronger observability around external API latency and failures.
+The current design is appropriate for a portfolio-scale deployment. If traffic grows, natural next steps are Redis for distributed caching/coordination, background jobs for refresh work, and stronger observability around external API latency and failures.
