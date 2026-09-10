@@ -168,13 +168,17 @@
     }
 
     .mobile-search .navbar-search-icon {
+        top: 50%;
         left: 14px;
+        transform: translateY(-50%);
     }
 
     .mobile-search .navbar-search-clear {
         right: 7px;
         width: 30px;
         height: 30px;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     .mobile-search-dropdown {
@@ -471,6 +475,10 @@
 
     .mobile-search .navbar-search-icon {
         left: 13px;
+    }
+
+    .mobile-search .navbar-search-clear {
+        right: 7px;
     }
 
     .page-container {
