@@ -58,6 +58,7 @@ function Home() {
         { id: "trending", label: "Trending", anime: trendingAnime, to: "/trending" },
         { id: "seasonal", label: "Seasonal", anime: seasonalAnime, to: "/seasonal" },
         { id: "recentlyAdded", label: "Recently Added", anime: recentlyAddedAnime, to: "/recently-added" },
+        { id: "top", label: "Top Anime", anime: topAnime, to: "/top", mobileOnly: true },
     ];
 
     const activeCategoryData =
@@ -134,7 +135,7 @@ function Home() {
                             type="button"
                             role="tab"
                             aria-selected={activeCategory === category.id}
-                            className={`home-category-tab ${activeCategory === category.id ? "active" : ""}`}
+                            className={`home-category-tab ${category.mobileOnly ? "home-category-tab-mobile-only" : ""} ${activeCategory === category.id ? "active" : ""}`}
                             onClick={() => setActiveCategory(category.id)}
                         >
                             {category.label}
