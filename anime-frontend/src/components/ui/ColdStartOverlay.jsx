@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Gamepad2, MousePointer2, Zap } from "lucide-react";
 
@@ -21,10 +22,13 @@ const OBSTACLE_HEIGHT = 42;
 
 const STAR_SIZE = 22;
 
-const HOME_REFRESH_KEY = "anime-tracker:cold-start-home-refresh";
+const HOME_REFRESH_KEY =
+    "anime-tracker:cold-start-home-refresh";
 
 const randomId = () =>
-    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    `${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2)}`;
 
 const createObstacle = (x = GAME_WIDTH + 80) => ({
     id: randomId(),
@@ -46,8 +50,12 @@ const getInitialGame = () => ({
         velocityY: 0,
         grounded: true,
     },
-    obstacles: [createObstacle(GAME_WIDTH + 80)],
-    stars: [createStar(GAME_WIDTH + 330)],
+    obstacles: [
+        createObstacle(GAME_WIDTH + 80),
+    ],
+    stars: [
+        createStar(GAME_WIDTH + 330),
+    ],
     score: 0,
     speed: INITIAL_SPEED,
     elapsed: 0,
@@ -65,8 +73,9 @@ const rectanglesOverlap = (a, b) =>
 const hasPendingHomeRefresh = () => {
     try {
         return (
-            sessionStorage.getItem(HOME_REFRESH_KEY) ===
-            "true"
+            sessionStorage.getItem(
+                HOME_REFRESH_KEY
+            ) === "true"
         );
     } catch {
         return false;
@@ -75,7 +84,9 @@ const hasPendingHomeRefresh = () => {
 
 const markHomeRefreshComplete = () => {
     try {
-        sessionStorage.removeItem(HOME_REFRESH_KEY);
+        sessionStorage.removeItem(
+            HOME_REFRESH_KEY
+        );
     } catch {
         // Ignore storage errors.
     }
@@ -83,7 +94,10 @@ const markHomeRefreshComplete = () => {
 
 const markHomeRefreshPending = () => {
     try {
-        sessionStorage.setItem(HOME_REFRESH_KEY, "true");
+        sessionStorage.setItem(
+            HOME_REFRESH_KEY,
+            "true"
+        );
     } catch {
         // Ignore storage errors.
     }
@@ -96,7 +110,12 @@ export default function ColdStartOverlay() {
     const [slowRequestCount, setSlowRequestCount] =
         useState(0);
 
+    /*
+     * Refs are used only for internal mutable values.
+     * They are never read directly during render.
+     */
     const slowRequests = useRef(0);
+    const coldStartShown = useRef(false);
     const startedAt = useRef(null);
 
     const animationFrameRef = useRef(null);
@@ -121,43 +140,53 @@ export default function ColdStartOverlay() {
     }, []);
 
     /*
-     * Finish the cold-start experience.
+     * Called only after the final slow request finishes.
      *
-     * When the final slow request finishes on Home:
-     *
-     *   1. Hide the overlay.
-     *   2. Mark the refresh as intentional.
-     *   3. Fully reload Home.
-     *
-     * sessionStorage prevents an infinite reload loop.
+     * If the overlay was never shown, this does absolutely
+     * nothing. This means a normal/fast server response
+     * never causes a refresh.
      */
     const finishColdStart = useCallback(() => {
+        const wasColdStartShown =
+            coldStartShown.current;
+
         slowRequests.current = 0;
         setSlowRequestCount(0);
+
+        if (!wasColdStartShown) {
+            return;
+        }
+
+        coldStartShown.current = false;
         setVisible(false);
 
         const isHome =
             window.location.pathname === "/" ||
             window.location.pathname === "";
 
+        /*
+         * Only refresh Home.
+         */
         if (!isHome) {
             return;
         }
 
         /*
-         * This page was already reloaded because of the
-         * previous cold start. Do not reload again.
+         * If this page was already reloaded because of
+         * the cold-start experience, don't reload again.
          */
         if (hasPendingHomeRefresh()) {
             markHomeRefreshComplete();
             return;
         }
 
+        /*
+         * Mark the reload before performing it.
+         */
         markHomeRefreshPending();
 
         /*
-         * Allow React to process the state update before
-         * performing the full browser refresh.
+         * Let React process the overlay state update first.
          */
         window.requestAnimationFrame(() => {
             window.location.reload();
@@ -165,37 +194,40 @@ export default function ColdStartOverlay() {
     }, []);
 
     /*
-     * Listen for cold-start events emitted by client.js.
+     * Listen for events emitted by client.js.
      */
     useEffect(() => {
         const handleColdStart = (event) => {
-            const { type, count } = event.detail || {};
+            const { type, count } =
+                event.detail || {};
 
             if (type === "start") {
                 const previousCount =
                     slowRequests.current;
 
                 /*
-                 * Keep our own count rather than trusting the
-                 * event count completely. This makes the overlay
-                 * robust when multiple requests start together.
+                 * Maintain our own request count.
                  */
                 const nextCount = Math.max(
                     Number(count) || 0,
                     previousCount + 1
                 );
 
-                slowRequests.current = nextCount;
+                slowRequests.current =
+                    nextCount;
+
                 setSlowRequestCount(nextCount);
 
                 /*
-                 * Only reset the game when transitioning from
-                 * zero slow requests to one or more.
+                 * Only the first slow request starts
+                 * the cold-start experience.
                  *
-                 * Additional simultaneous requests won't
-                 * restart the runner.
+                 * Additional simultaneous slow requests
+                 * do not reset the runner.
                  */
                 if (previousCount === 0) {
+                    coldStartShown.current = true;
+
                     resetGame();
                     setVisible(true);
                 }
@@ -209,15 +241,18 @@ export default function ColdStartOverlay() {
 
                 const nextCount = Math.max(
                     0,
-                    Number(count) || previousCount - 1
+                    Number(count) ||
+                        previousCount - 1
                 );
 
-                slowRequests.current = nextCount;
+                slowRequests.current =
+                    nextCount;
+
                 setSlowRequestCount(nextCount);
 
                 /*
-                 * Only finish when every slow request has
-                 * completed.
+                 * Only finish when every slow request
+                 * has completed.
                  */
                 if (
                     previousCount > 0 &&
@@ -239,11 +274,13 @@ export default function ColdStartOverlay() {
                 handleColdStart
             );
         };
-    }, [finishColdStart, resetGame]);
+    }, [
+        finishColdStart,
+        resetGame,
+    ]);
 
     /*
-     * Cleanup animation and timer loops when the component
-     * unmounts.
+     * Cleanup animation and timer loops.
      */
     useEffect(() => {
         return () => {
@@ -251,10 +288,16 @@ export default function ColdStartOverlay() {
                 cancelAnimationFrame(
                     animationFrameRef.current
                 );
+
+                animationFrameRef.current = null;
             }
 
             if (timerRef.current) {
-                window.clearInterval(timerRef.current);
+                window.clearInterval(
+                    timerRef.current
+                );
+
+                timerRef.current = null;
             }
         };
     }, []);
@@ -292,7 +335,7 @@ export default function ColdStartOverlay() {
     }, [visible, requestJump]);
 
     /*
-     * Elapsed time display.
+     * Elapsed time.
      */
     useEffect(() => {
         if (!visible) {
@@ -311,13 +354,15 @@ export default function ColdStartOverlay() {
             startedAt.current = Date.now();
         }
 
-        timerRef.current = window.setInterval(() => {
-            if (startedAt.current) {
-                setElapsed(
-                    Date.now() - startedAt.current
-                );
-            }
-        }, 250);
+        timerRef.current =
+            window.setInterval(() => {
+                if (startedAt.current) {
+                    setElapsed(
+                        Date.now() -
+                            startedAt.current
+                    );
+                }
+            }, 250);
 
         return () => {
             if (timerRef.current) {
@@ -351,16 +396,22 @@ export default function ColdStartOverlay() {
         const tick = (now) => {
             const delta = Math.min(
                 32,
-                Math.max(8, now - lastTime)
+                Math.max(
+                    8,
+                    now - lastTime
+                )
             );
 
             lastTime = now;
 
-            const frameScale = delta / 16.67;
+            const frameScale =
+                delta / 16.67;
 
             setGame((previous) => {
                 if (previous.gameOver) {
-                    gameRef.current = previous;
+                    gameRef.current =
+                        previous;
+
                     return previous;
                 }
 
@@ -375,16 +426,18 @@ export default function ColdStartOverlay() {
                         })
                     );
 
-                let stars = previous.stars.map(
-                    (star) => ({
-                        ...star,
-                    })
-                );
+                let stars =
+                    previous.stars.map(
+                        (star) => ({
+                            ...star,
+                        })
+                    );
 
                 const speed = Math.min(
                     MAX_SPEED,
                     previous.speed +
-                        0.0025 * frameScale
+                        0.0025 *
+                            frameScale
                 );
 
                 /*
@@ -394,23 +447,29 @@ export default function ColdStartOverlay() {
                     jumpRequestedRef.current &&
                     player.grounded
                 ) {
-                    player.velocityY = JUMP_FORCE;
+                    player.velocityY =
+                        JUMP_FORCE;
+
                     player.grounded = false;
                 }
 
-                jumpRequestedRef.current = false;
+                jumpRequestedRef.current =
+                    false;
 
                 /*
                  * Gravity.
                  */
                 player.velocityY +=
-                    GRAVITY * frameScale;
+                    GRAVITY *
+                    frameScale;
 
                 player.y +=
-                    player.velocityY * frameScale;
+                    player.velocityY *
+                    frameScale;
 
                 const floorY =
-                    GROUND_Y - PLAYER_HEIGHT;
+                    GROUND_Y -
+                    PLAYER_HEIGHT;
 
                 if (player.y >= floorY) {
                     player.y = floorY;
@@ -426,12 +485,14 @@ export default function ColdStartOverlay() {
                         ...obstacle,
                         x:
                             obstacle.x -
-                            speed * frameScale,
+                            speed *
+                                frameScale,
                     }))
                     .filter(
                         (obstacle) =>
                             obstacle.x >
-                            -obstacle.width - 50
+                            -obstacle.width -
+                                50
                     );
 
                 /*
@@ -457,9 +518,12 @@ export default function ColdStartOverlay() {
                  */
                 let nextObstacleSpawn =
                     previous.nextObstacleSpawn -
-                    speed * frameScale;
+                    speed *
+                        frameScale;
 
-                if (nextObstacleSpawn <= 0) {
+                if (
+                    nextObstacleSpawn <= 0
+                ) {
                     obstacles.push(
                         createObstacle(
                             GAME_WIDTH + 40
@@ -468,7 +532,8 @@ export default function ColdStartOverlay() {
 
                     nextObstacleSpawn =
                         900 +
-                        Math.random() * 700;
+                        Math.random() *
+                            700;
                 }
 
                 /*
@@ -476,9 +541,12 @@ export default function ColdStartOverlay() {
                  */
                 let nextStarSpawn =
                     previous.nextStarSpawn -
-                    speed * frameScale;
+                    speed *
+                        frameScale;
 
-                if (nextStarSpawn <= 0) {
+                if (
+                    nextStarSpawn <= 0
+                ) {
                     stars.push(
                         createStar(
                             GAME_WIDTH + 80
@@ -487,7 +555,8 @@ export default function ColdStartOverlay() {
 
                     nextStarSpawn =
                         700 +
-                        Math.random() * 900;
+                        Math.random() *
+                            900;
                 }
 
                 /*
@@ -496,8 +565,10 @@ export default function ColdStartOverlay() {
                 const playerBox = {
                     x: player.x + 7,
                     y: player.y + 5,
-                    width: PLAYER_WIDTH - 14,
-                    height: PLAYER_HEIGHT - 7,
+                    width:
+                        PLAYER_WIDTH - 14,
+                    height:
+                        PLAYER_HEIGHT - 7,
                 };
 
                 /*
@@ -536,7 +607,8 @@ export default function ColdStartOverlay() {
                         nextStarSpawn,
                     };
 
-                    gameRef.current = nextGame;
+                    gameRef.current =
+                        nextGame;
 
                     return nextGame;
                 }
@@ -561,7 +633,8 @@ export default function ColdStartOverlay() {
                             starBox
                         )
                     ) {
-                        collectedStars += 1;
+                        collectedStars +=
+                            1;
                     } else {
                         remainingStars.push(
                             star
@@ -574,12 +647,15 @@ export default function ColdStartOverlay() {
                  * approximately +1 every second.
                  */
                 const nextElapsed =
-                    previous.elapsed + delta;
+                    previous.elapsed +
+                    delta;
 
                 const score =
                     Math.floor(
-                        nextElapsed / 1000
-                    ) + collectedStars;
+                        nextElapsed /
+                            1000
+                    ) +
+                    collectedStars;
 
                 const nextGame = {
                     player,
@@ -587,19 +663,23 @@ export default function ColdStartOverlay() {
                     stars: remainingStars,
                     score,
                     speed,
-                    elapsed: nextElapsed,
+                    elapsed:
+                        nextElapsed,
                     gameOver: false,
                     nextObstacleSpawn,
                     nextStarSpawn,
                 };
 
-                gameRef.current = nextGame;
+                gameRef.current =
+                    nextGame;
 
                 return nextGame;
             });
 
             animationFrameRef.current =
-                requestAnimationFrame(tick);
+                requestAnimationFrame(
+                    tick
+                );
         };
 
         animationFrameRef.current =
@@ -620,6 +700,10 @@ export default function ColdStartOverlay() {
         resetGame();
     };
 
+    /*
+     * When the server is already awake,
+     * render absolutely nothing.
+     */
     if (!visible) {
         return null;
     }
@@ -667,10 +751,10 @@ export default function ColdStartOverlay() {
                     </strong>
 
                     <span>
-                        Waiting for the API response.
-                        This screen disappears
-                        automatically when the
-                        server is ready.
+                        Waiting for the API
+                        response. This screen
+                        disappears automatically
+                        when the server is ready.
                     </span>
                 </div>
 
@@ -721,17 +805,20 @@ export default function ColdStartOverlay() {
 
                     <div className="cold-start__moon" />
 
-                    {game.stars.map((star) => (
-                        <div
-                            key={star.id}
-                            className="cold-start__star"
-                            style={{
-                                transform: `translate(${star.x}px, ${star.y}px)`,
-                            }}
-                        >
-                            ✦
-                        </div>
-                    ))}
+                    {game.stars.map(
+                        (star) => (
+                            <div
+                                key={star.id}
+                                className="cold-start__star"
+                                style={{
+                                    transform:
+                                        `translate(${star.x}px, ${star.y}px)`,
+                                }}
+                            >
+                                ✦
+                            </div>
+                        )
+                    )}
 
                     {game.obstacles.map(
                         (obstacle) => (
@@ -739,10 +826,11 @@ export default function ColdStartOverlay() {
                                 key={obstacle.id}
                                 className="cold-start__obstacle"
                                 style={{
-                                    transform: `translate(${obstacle.x}px, ${
-                                        GROUND_Y -
-                                        obstacle.height
-                                    }px)`,
+                                    transform:
+                                        `translate(${obstacle.x}px, ${
+                                            GROUND_Y -
+                                            obstacle.height
+                                        }px)`,
                                     width:
                                         obstacle.width,
                                     height:
@@ -762,7 +850,8 @@ export default function ColdStartOverlay() {
                                 : "is-jumping"
                         }`}
                         style={{
-                            transform: `translate(${game.player.x}px, ${game.player.y}px)`,
+                            transform:
+                                `translate(${game.player.x}px, ${game.player.y}px)`,
                         }}
                     >
                         <div className="cold-start__player-head">
@@ -791,8 +880,9 @@ export default function ColdStartOverlay() {
                                 </strong>
 
                                 <span>
-                                    The server is still
-                                    waking up.
+                                    The server is
+                                    still waking
+                                    up.
                                 </span>
 
                                 <button
@@ -827,7 +917,8 @@ export default function ColdStartOverlay() {
                         <MousePointer2 size={18} />
 
                         <span>
-                            Click or tap the runner
+                            Click or tap the
+                            runner
                         </span>
                     </div>
 
@@ -841,8 +932,9 @@ export default function ColdStartOverlay() {
                 </div>
 
                 <p className="cold-start__footer">
-                    Free hosting can take a little
-                    longer to wake up after inactivity.
+                    Free hosting can take a
+                    little longer to wake up
+                    after inactivity.
                 </p>
             </section>
         </div>

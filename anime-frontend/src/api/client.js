@@ -21,7 +21,7 @@ const refreshClient = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-const COLD_START_DELAY = 500;
+const COLD_START_DELAY = 2200;
 let slowRequestCount = 0;
 
 const emitColdStart = (type) => {
