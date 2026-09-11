@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
+from anime.presentation.serializers import AnimeListSerializer
 from users.infrastructure.models import FavoriteAnime
-from anime.api.serializers import AnimeListSerializer
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-
     anime = AnimeListSerializer(read_only=True)
 
     class Meta:
