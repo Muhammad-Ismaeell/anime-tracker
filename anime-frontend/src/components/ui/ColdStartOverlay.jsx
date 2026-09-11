@@ -326,7 +326,8 @@ export default function ColdStartOverlay() {
                 }
 
                 const nextElapsed = previous.elapsed + delta;
-                const score = Math.floor(nextElapsed / 1000) + collectedStars;
+                const previousStarScore = previous.score - Math.floor(previous.elapsed / 1000);
+                const score = Math.floor(nextElapsed / 1000) + previousStarScore + collectedStars;
 
                 const nextGame = {
                     player,
@@ -445,7 +446,7 @@ export default function ColdStartOverlay() {
                         <div className="cold-start__runner-leg cold-start__runner-leg--right" />
                     </div>
 
-                    <div className="cold-start__ground" />
+                    <div className="cold-start__ground" style={{ height: `${GAME_HEIGHT - GROUND_Y}px` }} />
 
                     {game.gameOver && (
                         <div className="cold-start__game-over">
