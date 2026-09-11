@@ -88,7 +88,7 @@ export default function ColdStartOverlay() {
     const [visible, setVisible] = useState(false);
     const [game, setGame] = useState(getInitialGame);
     const [elapsed, setElapsed] = useState(0);
-    const [setSlowRequestCount] = useState(0);
+    const [, setSlowRequestCount] = useState(0);
 
     const slowRequests = useRef(0);
     const coldStartShown = useRef(false);
