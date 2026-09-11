@@ -1,0 +1,158 @@
+.sidebar {
+    width: 224px;
+    height: calc(100vh - 60px);
+
+    position: sticky;
+    top: 60px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 18px 12px;
+
+    background: #0f1117;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+
+    overflow-y: auto;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.sidebar-section-title {
+    padding: 0 10px 3px;
+
+    color: #71717a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    line-height: 1.4;
+}
+
+.sidebar-section-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-link {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 40px;
+    padding: 9px 10px;
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    color: #a1a1aa;
+    background: transparent;
+
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+
+    transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.sidebar-link:hover {
+    color: #e4e4e7;
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.sidebar-link.active {
+    color: #f4f4f5;
+    background: rgba(124, 58, 237, 0.14);
+    border-color: rgba(124, 58, 237, 0.22);
+}
+
+.sidebar-link.active::before {
+    content: "";
+
+    position: absolute;
+    left: -1px;
+    top: 8px;
+    bottom: 8px;
+
+    width: 2px;
+    border-radius: 999px;
+    background: #8b5cf6;
+}
+
+.sidebar-link-icon {
+    width: 20px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
+/* =========================
+   MOBILE SIDEBAR
+========================= */
+
+@media (max-width: 900px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        width: 250px;
+        height: 100vh;
+
+        z-index: 2000;
+        transform: translateX(-100%);
+
+        padding: 18px 12px;
+
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+        box-shadow: 18px 0 45px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-overlay {
+        display: block;
+
+        position: fixed;
+        inset: 0;
+
+        z-index: 1999;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(2px);
+    }
+
+    .sidebar-link {
+        min-height: 42px;
+    }
+}
