@@ -1,35 +1,8 @@
-from rest_framework import serializers
-from anime.infrastructure.models import Anime
-class AnimeSerializer(serializers.ModelSerializer):
+"""Compatibility exports for anime presentation serializers.
 
-    id = serializers.IntegerField(source="mal_id")
+The canonical serializer definitions live in anime.presentation.serializers.
+"""
 
-    class Meta:
-        model = Anime
-        fields = [
-            "id",
-            "title",
-            "image",
-            "score",
-            "synopsis",
-            "episodes",
-            "type",
-            "year",
-            "season",
-        ]
+from anime.presentation.serializers import AnimeListSerializer, AnimeSerializer
 
-class AnimeListSerializer(serializers.ModelSerializer):
-
-    id = serializers.IntegerField(source="mal_id")
-
-    class Meta:
-        model = Anime
-        fields = [
-            "id",
-            "title",
-            "image",
-            "score",
-            "episodes",
-            "type",
-            "year",
-        ]
+__all__ = ["AnimeSerializer", "AnimeListSerializer"]
