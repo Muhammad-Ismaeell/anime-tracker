@@ -1,40 +1,30 @@
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-
-
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiParameter,
-    OpenApiTypes,
-)
-
 from anime.api.docs import (
+    AnimeDetailResponseSerializer,
     AnimeListResponseSerializer,
     AnimeSearchResponseSerializer,
-    AnimeDetailResponseSerializer,
-    AnimeRecommendationsResponseSerializer,
 )
 from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
-from anime.application.recommendation_service import RecommendationService
 from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
 
 search_service = AnimeSearchService()
-
-anime_service = AnimeService(
-    TenraiClient()
-)
-
-recommendation_service = RecommendationService()
+anime_service = AnimeService(TenraiClient())
 
 
 def safe_int(value, default=1):
     try:
-        return int(value)
+        return max(1, int(value))
     except (TypeError, ValueError):
         return default
 
@@ -50,20 +40,13 @@ def safe_int(value, default=1):
             description="Page number",
         ),
     ],
-    responses={
-        200: AnimeListResponseSerializer
-    },
+    responses={200: AnimeListResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-
-    page = safe_int(
-        request.GET.get("page")
-    )
-
     return Response(
-        DatabaseAnimeService.get_top(page)
+        DatabaseAnimeService.get_top(safe_int(request.GET.get("page")))
     )
 
 
@@ -78,19 +61,13 @@ def top_anime(request):
             description="Page number",
         ),
     ],
-    responses={
-        200: AnimeListResponseSerializer
-    },
+    responses={200: AnimeListResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def trending_anime(request):
-    page = safe_int(
-        request.GET.get("page")
-    )
-
     return Response(
-        DatabaseAnimeService.get_trending(page)
+        DatabaseAnimeService.get_trending(safe_int(request.GET.get("page")))
     )
 
 
@@ -105,19 +82,13 @@ def trending_anime(request):
             description="Page number",
         ),
     ],
-    responses={
-        200: AnimeListResponseSerializer
-    },
+    responses={200: AnimeListResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def seasonal_anime(request):
-    page = safe_int(
-        request.GET.get("page")
-    )
-
     return Response(
-        DatabaseAnimeService.get_seasonal(page)
+        DatabaseAnimeService.get_seasonal(safe_int(request.GET.get("page")))
     )
 
 
@@ -132,32 +103,22 @@ def seasonal_anime(request):
             description="Page number",
         ),
     ],
-    responses={
-        200: AnimeListResponseSerializer
-    },
+    responses={200: AnimeListResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def recently_added_anime(request):
-
-    page = safe_int(
-        request.GET.get("page")
-    )
-
     return Response(
-        DatabaseAnimeService.get_recently_added(page)
+        DatabaseAnimeService.get_recently_added(
+            safe_int(request.GET.get("page"))
+        )
     )
 
 
 @extend_schema(
     summary="Search Anime",
     parameters=[
-        OpenApiParameter(
-            name="q",
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.QUERY,
-            description="Anime title (e.g. Naruto, One Piece)",
-        ),
+        OpenApiParameter("q", OpenApiTypes.STR, OpenApiParameter.QUERY),
         OpenApiParameter("page", OpenApiTypes.INT),
         OpenApiParameter("type", OpenApiTypes.STR),
         OpenApiParameter("season", OpenApiTypes.STR),
@@ -169,22 +130,13 @@ def recently_added_anime(request):
         OpenApiParameter("sort", OpenApiTypes.STR),
         OpenApiParameter("min_score", OpenApiTypes.FLOAT),
     ],
-    responses={
-        200: AnimeSearchResponseSerializer
-    },
+    responses={200: AnimeSearchResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_search(request):
-
-    query = request.GET.get(
-        "q",
-        ""
-    ).strip()
-
-    page = safe_int(
-        request.GET.get("page")
-    )
+    query = request.GET.get("q", "").strip()
+    page = safe_int(request.GET.get("page"))
 
     filters = {
         key: value
@@ -202,46 +154,18 @@ def anime_search(request):
         if value
     }
 
-    return Response(
-        {
-            "success": True,
-            "data": search_service.search(
-                query,
-                page,
-                filters
-            )
-        }
-    )
-
-
-@extend_schema(
-    summary="Anime Recommendations",
-    description="Return SFW anime recommendations for one anime.",
-    responses={
-        200: AnimeRecommendationsResponseSerializer
-    },
-)
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def anime_recommendations(request, anime_id):
-    return Response(
-        {
-            "items": recommendation_service.get_recommendations(anime_id),
-        }
-    )
+    return Response({
+        "success": True,
+        "data": search_service.search(query, page, filters),
+    })
 
 
 @extend_schema(
     summary="Anime Detail",
     description="Return detailed information for one anime.",
-    responses={
-        200: AnimeDetailResponseSerializer
-    },
+    responses={200: AnimeDetailResponseSerializer},
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_detail(request, anime_id):
-
-    return Response(
-        anime_service.get_detail(anime_id)
-    )
+    return Response(anime_service.get_detail(anime_id))
