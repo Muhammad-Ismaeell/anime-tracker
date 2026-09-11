@@ -206,14 +206,14 @@ anime-tracker/
 ├── backend/
 │   ├── accounts/          # custom User model
 │   ├── anime/
-│   │   ├── api/           # API endpoints and OpenAPI serializers
+│   │   ├── api/           # API endpoints, routing and OpenAPI views
 │   │   ├── application/   # application services/business logic
 │   │   ├── infrastructure/ # ORM, cache and external API integration
-│   │   └── presentation/  # response normalization
+│   │   └── presentation/  # serializers and response normalization
 │   ├── users/             # profile/library/favourite/review features
 │   ├── core/              # auth, exceptions and shared backend code
-   ├── config/             # Django configuration
-   └── manage.py
+│   ├── config/            # Django configuration
+│   └── manage.py
 │
 └── docs/
     ├── architecture.md
