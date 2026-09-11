@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/Layout/Sidebar";
-import Navbar from "../components/Layout/NavBar";
+import Navbar from "../components/Layout/Navbar";
 import MobileSearch from "../components/Layout/MobileSearch";
 
 export default function AppLayout() {
