@@ -1,6 +1,6 @@
 from django.urls import path
 
-from anime.api.views import (
+from anime.api.anime_views import (
     anime_detail,
     anime_search,
     recently_added_anime,
