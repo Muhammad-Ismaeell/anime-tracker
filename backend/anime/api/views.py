@@ -85,7 +85,6 @@ def top_anime(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def trending_anime(request):
-
     page = safe_int(
         request.GET.get("page")
     )
