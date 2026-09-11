@@ -1,25 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-    Gamepad2,
-    Heart,
-    RotateCcw,
-    Star,
-    Trophy,
-    Zap,
-} from "lucide-react";
+import { Gamepad2, MousePointer2, Zap } from "lucide-react";
+
 import "./cold-start-overlay.css";
 
 const GAME_WIDTH = 1000;
+const GAME_HEIGHT = 300;
 
 const PLAYER_X = 130;
 const PLAYER_WIDTH = 42;
 const PLAYER_HEIGHT = 54;
-
 const GROUND_Y = 246;
 
 const INITIAL_SPEED = 5;
 const MAX_SPEED = 10;
-
 const GRAVITY = 0.75;
 const JUMP_FORCE = -14;
 
@@ -28,56 +21,80 @@ const OBSTACLE_HEIGHT = 42;
 
 const STAR_SIZE = 22;
 
-function randomId() {
-    return (
-        globalThis.crypto?.randomUUID?.() ??
-        `${Date.now()}-${Math.random()}`
-    );
-}
+const HOME_REFRESH_KEY = "anime-tracker:cold-start-home-refresh";
 
-function createObstacle(x = GAME_WIDTH + 100) {
-    return {
-        id: randomId(),
-        x,
-        width: OBSTACLE_WIDTH,
-        height: OBSTACLE_HEIGHT,
-    };
-}
+const randomId = () =>
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-function createStar(x = GAME_WIDTH + 250) {
-    return {
-        id: randomId(),
-        x,
-        y: 135 + Math.random() * 65,
-    };
-}
+const createObstacle = (x = GAME_WIDTH + 80) => ({
+    id: randomId(),
+    x,
+    width: OBSTACLE_WIDTH,
+    height: OBSTACLE_HEIGHT,
+});
 
-function rectanglesOverlap(a, b) {
-    return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-    );
-}
+const createStar = (x = GAME_WIDTH + 160) => ({
+    id: randomId(),
+    x,
+    y: 135 + Math.random() * 65,
+});
 
-function getInitialGame() {
-    return {
-        playerY: GROUND_Y - PLAYER_HEIGHT,
+const getInitialGame = () => ({
+    player: {
+        x: PLAYER_X,
+        y: GROUND_Y - PLAYER_HEIGHT,
         velocityY: 0,
-        isJumping: false,
-        obstacles: [createObstacle(GAME_WIDTH + 260)],
-        stars: [createStar(GAME_WIDTH + 500)],
-        score: 0,
-        speed: INITIAL_SPEED,
-        gameOver: false,
-    };
-}
+        grounded: true,
+    },
+    obstacles: [createObstacle(GAME_WIDTH + 80)],
+    stars: [createStar(GAME_WIDTH + 330)],
+    score: 0,
+    speed: INITIAL_SPEED,
+    elapsed: 0,
+    gameOver: false,
+    nextObstacleSpawn: 1150,
+    nextStarSpawn: 850,
+});
+
+const rectanglesOverlap = (a, b) =>
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y;
+
+const hasPendingHomeRefresh = () => {
+    try {
+        return (
+            sessionStorage.getItem(HOME_REFRESH_KEY) ===
+            "true"
+        );
+    } catch {
+        return false;
+    }
+};
+
+const markHomeRefreshComplete = () => {
+    try {
+        sessionStorage.removeItem(HOME_REFRESH_KEY);
+    } catch {
+        // Ignore storage errors.
+    }
+};
+
+const markHomeRefreshPending = () => {
+    try {
+        sessionStorage.setItem(HOME_REFRESH_KEY, "true");
+    } catch {
+        // Ignore storage errors.
+    }
+};
 
 export default function ColdStartOverlay() {
     const [visible, setVisible] = useState(false);
     const [game, setGame] = useState(getInitialGame);
     const [elapsed, setElapsed] = useState(0);
+    const [slowRequestCount, setSlowRequestCount] =
+        useState(0);
 
     const slowRequests = useRef(0);
     const startedAt = useRef(null);
@@ -88,55 +105,125 @@ export default function ColdStartOverlay() {
     const gameRef = useRef(game);
     const jumpRequestedRef = useRef(false);
 
-    useEffect(() => {
-        gameRef.current = game;
-    }, [game]);
-
     const resetGame = useCallback(() => {
-        const nextGame = getInitialGame();
+        const initialGame = getInitialGame();
 
-        gameRef.current = nextGame;
+        gameRef.current = initialGame;
+        setGame(initialGame);
+        setElapsed(0);
+
+        startedAt.current = Date.now();
         jumpRequestedRef.current = false;
-        setGame(nextGame);
+    }, []);
+
+    const requestJump = useCallback(() => {
+        jumpRequestedRef.current = true;
     }, []);
 
     /*
-     * Listen for the Axios cold-start events.
+     * Finish the cold-start experience.
      *
-     * Important:
-     * We only reset the game when the first slow request appears.
-     * If several API requests are slow at the same time, the game
-     * continues instead of restarting.
+     * When the final slow request finishes on Home:
+     *
+     *   1. Hide the overlay.
+     *   2. Mark the refresh as intentional.
+     *   3. Fully reload Home.
+     *
+     * sessionStorage prevents an infinite reload loop.
+     */
+    const finishColdStart = useCallback(() => {
+        slowRequests.current = 0;
+        setSlowRequestCount(0);
+        setVisible(false);
+
+        const isHome =
+            window.location.pathname === "/" ||
+            window.location.pathname === "";
+
+        if (!isHome) {
+            return;
+        }
+
+        /*
+         * This page was already reloaded because of the
+         * previous cold start. Do not reload again.
+         */
+        if (hasPendingHomeRefresh()) {
+            markHomeRefreshComplete();
+            return;
+        }
+
+        markHomeRefreshPending();
+
+        /*
+         * Allow React to process the state update before
+         * performing the full browser refresh.
+         */
+        window.requestAnimationFrame(() => {
+            window.location.reload();
+        });
+    }, []);
+
+    /*
+     * Listen for cold-start events emitted by client.js.
      */
     useEffect(() => {
         const handleColdStart = (event) => {
-            const { type, count = 0 } = event.detail ?? {};
+            const { type, count } = event.detail || {};
 
             if (type === "start") {
-                const wasAlreadyVisible = slowRequests.current > 0;
+                const previousCount =
+                    slowRequests.current;
 
-                slowRequests.current = count;
+                /*
+                 * Keep our own count rather than trusting the
+                 * event count completely. This makes the overlay
+                 * robust when multiple requests start together.
+                 */
+                const nextCount = Math.max(
+                    Number(count) || 0,
+                    previousCount + 1
+                );
 
-                startedAt.current ??= performance.now();
+                slowRequests.current = nextCount;
+                setSlowRequestCount(nextCount);
 
-                setVisible(true);
-
-                if (!wasAlreadyVisible) {
+                /*
+                 * Only reset the game when transitioning from
+                 * zero slow requests to one or more.
+                 *
+                 * Additional simultaneous requests won't
+                 * restart the runner.
+                 */
+                if (previousCount === 0) {
                     resetGame();
+                    setVisible(true);
                 }
 
                 return;
             }
 
             if (type === "end") {
-                slowRequests.current = Math.max(0, slowRequests.current - 1);
+                const previousCount =
+                    slowRequests.current;
 
-                if (slowRequests.current === 0) {
-                    setVisible(false);
+                const nextCount = Math.max(
+                    0,
+                    Number(count) || previousCount - 1
+                );
 
-                    if (window.location.pathname === "/") {
-                        window.location.reload();
-                    }
+                slowRequests.current = nextCount;
+                setSlowRequestCount(nextCount);
+
+                /*
+                 * Only finish when every slow request has
+                 * completed.
+                 */
+                if (
+                    previousCount > 0 &&
+                    nextCount === 0
+                ) {
+                    finishColdStart();
                 }
             }
         };
@@ -152,54 +239,33 @@ export default function ColdStartOverlay() {
                 handleColdStart
             );
         };
-    }, [resetGame]);
+    }, [finishColdStart, resetGame]);
 
     /*
-     * Elapsed time.
+     * Cleanup animation and timer loops when the component
+     * unmounts.
      */
     useEffect(() => {
-        if (!visible) return undefined;
-
-        timerRef.current = window.setInterval(() => {
-            if (!startedAt.current) return;
-
-            setElapsed(
-                Math.floor(
-                    (performance.now() - startedAt.current) / 1000
-                )
-            );
-        }, 250);
-
         return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(
+                    animationFrameRef.current
+                );
+            }
+
             if (timerRef.current) {
                 window.clearInterval(timerRef.current);
             }
         };
-    }, [visible]);
-
-    /*
-     * Request a jump.
-     */
-    const jump = useCallback(() => {
-        if (!visible) return;
-
-        const current = gameRef.current;
-
-        if (current.gameOver) {
-            resetGame();
-            return;
-        }
-
-        if (!current.isJumping) {
-            jumpRequestedRef.current = true;
-        }
-    }, [resetGame, visible]);
+    }, []);
 
     /*
      * Keyboard controls.
      */
     useEffect(() => {
-        if (!visible) return undefined;
+        if (!visible) {
+            return undefined;
+        }
 
         const handleKeyDown = (event) => {
             if (
@@ -208,159 +274,266 @@ export default function ColdStartOverlay() {
                 event.code === "KeyW"
             ) {
                 event.preventDefault();
-
-                if (!event.repeat) {
-                    jump();
-                }
+                requestJump();
             }
         };
 
-        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener(
+            "keydown",
+            handleKeyDown
+        );
 
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener(
+                "keydown",
+                handleKeyDown
+            );
         };
-    }, [jump, visible]);
+    }, [visible, requestJump]);
+
+    /*
+     * Elapsed time display.
+     */
+    useEffect(() => {
+        if (!visible) {
+            if (timerRef.current) {
+                window.clearInterval(
+                    timerRef.current
+                );
+
+                timerRef.current = null;
+            }
+
+            return undefined;
+        }
+
+        if (!startedAt.current) {
+            startedAt.current = Date.now();
+        }
+
+        timerRef.current = window.setInterval(() => {
+            if (startedAt.current) {
+                setElapsed(
+                    Date.now() - startedAt.current
+                );
+            }
+        }, 250);
+
+        return () => {
+            if (timerRef.current) {
+                window.clearInterval(
+                    timerRef.current
+                );
+
+                timerRef.current = null;
+            }
+        };
+    }, [visible]);
 
     /*
      * Main runner game loop.
      */
     useEffect(() => {
-        if (!visible) return undefined;
+        if (!visible) {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(
+                    animationFrameRef.current
+                );
 
-        let previousTime = performance.now();
+                animationFrameRef.current = null;
+            }
 
-        const loop = (currentTime) => {
+            return undefined;
+        }
+
+        let lastTime = performance.now();
+
+        const tick = (now) => {
             const delta = Math.min(
-                (currentTime - previousTime) / 16.67,
-                2
+                32,
+                Math.max(8, now - lastTime)
             );
 
-            previousTime = currentTime;
+            lastTime = now;
+
+            const frameScale = delta / 16.67;
 
             setGame((previous) => {
                 if (previous.gameOver) {
+                    gameRef.current = previous;
                     return previous;
                 }
 
-                let playerY = previous.playerY;
-                let velocityY = previous.velocityY;
-                let isJumping = previous.isJumping;
+                const player = {
+                    ...previous.player,
+                };
 
-                if (jumpRequestedRef.current && !isJumping) {
-                    velocityY = JUMP_FORCE;
-                    isJumping = true;
+                let obstacles =
+                    previous.obstacles.map(
+                        (obstacle) => ({
+                            ...obstacle,
+                        })
+                    );
+
+                let stars = previous.stars.map(
+                    (star) => ({
+                        ...star,
+                    })
+                );
+
+                const speed = Math.min(
+                    MAX_SPEED,
+                    previous.speed +
+                        0.0025 * frameScale
+                );
+
+                /*
+                 * Jump.
+                 */
+                if (
+                    jumpRequestedRef.current &&
+                    player.grounded
+                ) {
+                    player.velocityY = JUMP_FORCE;
+                    player.grounded = false;
                 }
 
                 jumpRequestedRef.current = false;
 
-                velocityY += GRAVITY * delta;
-                playerY += velocityY * delta;
+                /*
+                 * Gravity.
+                 */
+                player.velocityY +=
+                    GRAVITY * frameScale;
 
-                const floorY = GROUND_Y - PLAYER_HEIGHT;
+                player.y +=
+                    player.velocityY * frameScale;
 
-                if (playerY >= floorY) {
-                    playerY = floorY;
-                    velocityY = 0;
-                    isJumping = false;
+                const floorY =
+                    GROUND_Y - PLAYER_HEIGHT;
+
+                if (player.y >= floorY) {
+                    player.y = floorY;
+                    player.velocityY = 0;
+                    player.grounded = true;
                 }
 
-                const speed = Math.min(
-                    previous.speed + 0.0025 * delta,
-                    MAX_SPEED
-                );
-
-                let obstacles = previous.obstacles
+                /*
+                 * Move obstacles.
+                 */
+                obstacles = obstacles
                     .map((obstacle) => ({
                         ...obstacle,
-                        x: obstacle.x - speed * delta,
+                        x:
+                            obstacle.x -
+                            speed * frameScale,
                     }))
                     .filter(
                         (obstacle) =>
-                            obstacle.x + obstacle.width > -50
+                            obstacle.x >
+                            -obstacle.width - 50
                     );
 
-                let stars = previous.stars
+                /*
+                 * Move stars.
+                 */
+                stars = stars
                     .map((star) => ({
                         ...star,
-                        x: star.x - speed * delta,
+                        x:
+                            star.x -
+                            speed *
+                                0.9 *
+                                frameScale,
                     }))
-                    .filter((star) => star.x > -50);
+                    .filter(
+                        (star) =>
+                            star.x >
+                            -STAR_SIZE - 50
+                    );
 
                 /*
                  * Spawn obstacles.
                  */
-                const lastObstacle =
-                    obstacles[obstacles.length - 1];
+                let nextObstacleSpawn =
+                    previous.nextObstacleSpawn -
+                    speed * frameScale;
 
-                if (
-                    !lastObstacle ||
-                    lastObstacle.x < GAME_WIDTH - 330
-                ) {
-                    const spacing =
-                        300 + Math.random() * 260;
-
+                if (nextObstacleSpawn <= 0) {
                     obstacles.push(
                         createObstacle(
-                            GAME_WIDTH + spacing
+                            GAME_WIDTH + 40
                         )
                     );
+
+                    nextObstacleSpawn =
+                        900 +
+                        Math.random() * 700;
                 }
 
                 /*
                  * Spawn stars.
                  */
-                const lastStar = stars[stars.length - 1];
+                let nextStarSpawn =
+                    previous.nextStarSpawn -
+                    speed * frameScale;
 
-                if (
-                    !lastStar ||
-                    lastStar.x < GAME_WIDTH - 280
-                ) {
+                if (nextStarSpawn <= 0) {
                     stars.push(
                         createStar(
-                            GAME_WIDTH +
-                                350 +
-                                Math.random() * 250
+                            GAME_WIDTH + 80
                         )
                     );
+
+                    nextStarSpawn =
+                        700 +
+                        Math.random() * 900;
                 }
 
-                const playerRect = {
-                    x: PLAYER_X + 8,
-                    y: playerY + 5,
-                    width: PLAYER_WIDTH - 16,
-                    height: PLAYER_HEIGHT - 8,
+                /*
+                 * Player collision box.
+                 */
+                const playerBox = {
+                    x: player.x + 7,
+                    y: player.y + 5,
+                    width: PLAYER_WIDTH - 14,
+                    height: PLAYER_HEIGHT - 7,
                 };
 
                 /*
                  * Obstacle collision.
                  */
-                const hitObstacle = obstacles.some((obstacle) => {
-                    const obstacleRect = {
-                        x: obstacle.x,
-                        y:
-                            GROUND_Y -
-                            obstacle.height,
-                        width: obstacle.width,
-                        height: obstacle.height,
-                    };
-
-                    return rectanglesOverlap(
-                        playerRect,
-                        obstacleRect
+                const hitObstacle =
+                    obstacles.some(
+                        (obstacle) =>
+                            rectanglesOverlap(
+                                playerBox,
+                                {
+                                    x:
+                                        obstacle.x +
+                                        3,
+                                    y:
+                                        GROUND_Y -
+                                        obstacle.height,
+                                    width:
+                                        obstacle.width -
+                                        6,
+                                    height:
+                                        obstacle.height,
+                                }
+                            )
                     );
-                });
 
                 if (hitObstacle) {
                     const nextGame = {
                         ...previous,
-                        playerY,
-                        velocityY,
-                        isJumping,
+                        player,
                         obstacles,
                         stars,
                         speed,
                         gameOver: true,
+                        nextObstacleSpawn,
+                        nextStarSpawn,
                     };
 
                     gameRef.current = nextGame;
@@ -371,43 +544,53 @@ export default function ColdStartOverlay() {
                 /*
                  * Collect stars.
                  */
-                let scoreIncrease = 0;
+                const remainingStars = [];
+                let collectedStars = 0;
 
-                stars = stars.filter((star) => {
-                    const starRect = {
+                for (const star of stars) {
+                    const starBox = {
                         x: star.x,
                         y: star.y,
                         width: STAR_SIZE,
                         height: STAR_SIZE,
                     };
 
-                    const collected = rectanglesOverlap(
-                        playerRect,
-                        starRect
-                    );
-
-                    if (collected) {
-                        scoreIncrease += 10;
+                    if (
+                        rectanglesOverlap(
+                            playerBox,
+                            starBox
+                        )
+                    ) {
+                        collectedStars += 1;
+                    } else {
+                        remainingStars.push(
+                            star
+                        );
                     }
-
-                    return !collected;
-                });
-
-                const nextScore =
-                    previous.score + scoreIncrease;
+                }
 
                 /*
-                 * Extra score for surviving.
+                 * Survival score:
+                 * approximately +1 every second.
                  */
+                const nextElapsed =
+                    previous.elapsed + delta;
+
+                const score =
+                    Math.floor(
+                        nextElapsed / 1000
+                    ) + collectedStars;
+
                 const nextGame = {
-                    ...previous,
-                    playerY,
-                    velocityY,
-                    isJumping,
+                    player,
                     obstacles,
-                    stars,
+                    stars: remainingStars,
+                    score,
                     speed,
-                    score: nextScore,
+                    elapsed: nextElapsed,
+                    gameOver: false,
+                    nextObstacleSpawn,
+                    nextStarSpawn,
                 };
 
                 gameRef.current = nextGame;
@@ -416,307 +599,251 @@ export default function ColdStartOverlay() {
             });
 
             animationFrameRef.current =
-                requestAnimationFrame(loop);
+                requestAnimationFrame(tick);
         };
 
         animationFrameRef.current =
-            requestAnimationFrame(loop);
+            requestAnimationFrame(tick);
 
         return () => {
             if (animationFrameRef.current) {
                 cancelAnimationFrame(
                     animationFrameRef.current
                 );
+
                 animationFrameRef.current = null;
             }
         };
     }, [visible]);
 
-    /*
-     * Add passive survival score every second.
-     */
-    useEffect(() => {
-        if (!visible) return undefined;
-
-        const scoreTimer = window.setInterval(() => {
-            setGame((current) => {
-                if (current.gameOver) {
-                    return current;
-                }
-
-                const next = {
-                    ...current,
-                    score: current.score + 1,
-                };
-
-                gameRef.current = next;
-
-                return next;
-            });
-        }, 1000);
-
-        return () => {
-            window.clearInterval(scoreTimer);
-        };
-    }, [visible]);
+    const handleRestart = () => {
+        resetGame();
+    };
 
     if (!visible) {
         return null;
     }
+
+    const displaySeconds = Math.floor(
+        elapsed / 1000
+    );
 
     return (
         <div
             className="cold-start"
             role="dialog"
             aria-modal="true"
-            aria-label="Anime Tracker backend waking up"
+            aria-label="Server wake-up"
         >
             <div className="cold-start__backdrop" />
 
             <section className="cold-start__panel">
-                <div
-                    className="cold-start__energy cold-start__energy--one"
-                    aria-hidden="true"
-                />
+                <div className="cold-start__header">
+                    <div className="cold-start__title-group">
+                        <div className="cold-start__icon">
+                            <Zap size={22} />
+                        </div>
 
-                <div
-                    className="cold-start__energy cold-start__energy--two"
-                    aria-hidden="true"
-                />
+                        <div>
+                            <p className="cold-start__eyebrow">
+                                ANIME TRACKER
+                            </p>
 
-                <div
-                    className="cold-start__icon"
-                    aria-hidden="true"
-                >
-                    <Zap size={28} strokeWidth={2.5} />
+                            <h2>
+                                Server Wake-Up Run
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div className="cold-start__status">
+                        <span className="cold-start__status-dot" />
+                        Waking up
+                    </div>
                 </div>
 
-                <p className="cold-start__eyebrow">
-                    ANIME TRACKER
-                </p>
-
-                <h2>
-                    Waking up the server
-                    <span className="cold-start__dots">
-                        ...
-                    </span>
-                </h2>
-
-                <p className="cold-start__message">
-                    The backend is taking a quick nap 😴.
-                    While it wakes up, help your character
-                    survive the run.
-                </p>
-
-                <div className="cold-start__status">
-                    <span className="cold-start__pulse" />
+                <div className="cold-start__message">
+                    <strong>
+                        The server is waking up...
+                    </strong>
 
                     <span>
-                        Waiting for the API response
+                        Waiting for the API response.
+                        This screen disappears
+                        automatically when the
+                        server is ready.
                     </span>
+                </div>
 
-                    <span className="cold-start__time">
-                        {elapsed}s
-                    </span>
+                <div className="cold-start__stats">
+                    <div className="cold-start__stat">
+                        <span>TIME</span>
+
+                        <strong>
+                            {displaySeconds}s
+                        </strong>
+                    </div>
+
+                    <div className="cold-start__stat">
+                        <span>SCORE</span>
+
+                        <strong>
+                            {game.score}
+                        </strong>
+                    </div>
+
+                    <div className="cold-start__stat">
+                        <span>REQUESTS</span>
+
+                        <strong>
+                            {slowRequestCount}
+                        </strong>
+                    </div>
                 </div>
 
                 <div
                     className="cold-start__game"
-                    aria-label="Anime runner mini game"
+                    style={{
+                        "--game-width": `${GAME_WIDTH}px`,
+                        "--game-height": `${GAME_HEIGHT}px`,
+                    }}
+                    onClick={requestJump}
+                    onPointerDown={requestJump}
                 >
-                    <div className="cold-start__game-header">
-                        <span>
-                            <Gamepad2 size={16} />
-                            Server Wake-Up Run
-                        </span>
-
-                        <div className="cold-start__score">
-                            <Trophy size={14} />
-                            <strong>
-                                {game.score}
-                            </strong>
-                        </div>
+                    <div className="cold-start__skyline">
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                        <span />
                     </div>
 
-                    <p>
-                        Jump over obstacles and collect
-                        energy while the backend wakes up.
-                    </p>
+                    <div className="cold-start__moon" />
 
-                    <div
-                        className="cold-start__arena"
-                        onPointerDown={(event) => {
-                            /*
-                             * Prevent clicking UI elements from
-                             * triggering a jump accidentally.
-                             */
-                            if (
-                                event.target ===
-                                event.currentTarget
-                            ) {
-                                jump();
-                            }
-                        }}
-                    >
+                    {game.stars.map((star) => (
                         <div
-                            className="cold-start__skyline"
-                            aria-hidden="true"
+                            key={star.id}
+                            className="cold-start__star"
+                            style={{
+                                transform: `translate(${star.x}px, ${star.y}px)`,
+                            }}
                         >
-                            <span>▰</span>
-                            <span>▰▰</span>
-                            <span>▰</span>
-                            <span>▰▰▰</span>
-                            <span>▰</span>
+                            ✦
                         </div>
+                    ))}
 
-                        <div
-                            className="cold-start__moon"
-                            aria-hidden="true"
-                        >
-                            ☾
-                        </div>
-
-                        {game.stars.map((star) => (
-                            <div
-                                key={star.id}
-                                className="cold-start__star"
-                                style={{
-                                    left: `${star.x}px`,
-                                    top: `${star.y}px`,
-                                }}
-                                aria-hidden="true"
-                            >
-                                <Star
-                                    size={STAR_SIZE}
-                                    fill="currentColor"
-                                />
-                            </div>
-                        ))}
-
-                        {game.obstacles.map((obstacle) => (
+                    {game.obstacles.map(
+                        (obstacle) => (
                             <div
                                 key={obstacle.id}
                                 className="cold-start__obstacle"
                                 style={{
-                                    left: `${obstacle.x}px`,
-                                    height: `${obstacle.height}px`,
-                                    width: `${obstacle.width}px`,
+                                    transform: `translate(${obstacle.x}px, ${
+                                        GROUND_Y -
+                                        obstacle.height
+                                    }px)`,
+                                    width:
+                                        obstacle.width,
+                                    height:
+                                        obstacle.height,
                                 }}
-                                aria-hidden="true"
                             >
                                 <span />
                                 <span />
-                                <span />
                             </div>
-                        ))}
+                        )
+                    )}
 
-                        <div
-                            className={`cold-start__runner ${
-                                game.isJumping
-                                    ? "cold-start__runner--jumping"
-                                    : ""
-                            } ${
-                                game.gameOver
-                                    ? "cold-start__runner--dead"
-                                    : ""
-                            }`}
-                            style={{
-                                left: `${PLAYER_X}px`,
-                                top: `${game.playerY}px`,
-                            }}
-                            aria-hidden="true"
-                        >
-                            <div className="cold-start__runner-aura" />
-
-                            <div className="cold-start__runner-head">
-                                <span className="cold-start__eye cold-start__eye--left" />
-                                <span className="cold-start__eye cold-start__eye--right" />
-                            </div>
-
-                            <div className="cold-start__runner-body">
-                                <span className="cold-start__arm cold-start__arm--left" />
-                                <span className="cold-start__arm cold-start__arm--right" />
-                            </div>
-
-                            <div className="cold-start__runner-leg cold-start__runner-leg--left" />
-                            <div className="cold-start__runner-leg cold-start__runner-leg--right" />
+                    <div
+                        className={`cold-start__player ${
+                            game.player.grounded
+                                ? ""
+                                : "is-jumping"
+                        }`}
+                        style={{
+                            transform: `translate(${game.player.x}px, ${game.player.y}px)`,
+                        }}
+                    >
+                        <div className="cold-start__player-head">
+                            <span className="cold-start__player-eye" />
+                            <span className="cold-start__player-eye" />
                         </div>
 
-                        <div
-                            className="cold-start__ground"
-                            aria-hidden="true"
-                        />
+                        <div className="cold-start__player-body" />
 
-                        {game.gameOver && (
-                            <div className="cold-start__game-over">
-                                <div>
-                                    <Heart
-                                        size={20}
-                                        fill="currentColor"
-                                    />
+                        <div className="cold-start__player-arm cold-start__player-arm--left" />
 
-                                    <strong>
-                                        RUN OVER
-                                    </strong>
+                        <div className="cold-start__player-arm cold-start__player-arm--right" />
 
-                                    <span>
-                                        Score: {game.score}
-                                    </span>
+                        <div className="cold-start__player-leg cold-start__player-leg--left" />
 
-                                    <button
-                                        type="button"
-                                        onClick={resetGame}
-                                    >
-                                        <RotateCcw size={15} />
-                                        Run again
-                                    </button>
-                                </div>
+                        <div className="cold-start__player-leg cold-start__player-leg--right" />
+                    </div>
+
+                    <div className="cold-start__ground" />
+
+                    {game.gameOver && (
+                        <div className="cold-start__game-over">
+                            <div className="cold-start__game-over-card">
+                                <strong>
+                                    GAME OVER
+                                </strong>
+
+                                <span>
+                                    The server is still
+                                    waking up.
+                                </span>
+
+                                <button
+                                    type="button"
+                                    onClick={(
+                                        event
+                                    ) => {
+                                        event.stopPropagation();
+                                        handleRestart();
+                                    }}
+                                >
+                                    RESTART
+                                </button>
                             </div>
-                        )}
+                        </div>
+                    )}
+                </div>
+
+                <div className="cold-start__controls">
+                    <div>
+                        <Gamepad2 size={18} />
+
+                        <span>
+                            <kbd>SPACE</kbd>
+                            <kbd>↑</kbd>
+                            <kbd>W</kbd>
+                            to jump
+                        </span>
+                    </div>
+
+                    <div>
+                        <MousePointer2 size={18} />
+
+                        <span>
+                            Click or tap the runner
+                        </span>
                     </div>
 
                     <button
                         type="button"
                         className="cold-start__jump-button"
-                        onClick={jump}
-                        aria-label={
-                            game.gameOver
-                                ? "Restart game"
-                                : "Jump"
-                        }
+                        onClick={requestJump}
                     >
-                        {game.gameOver ? (
-                            <>
-                                <RotateCcw size={16} />
-                                Restart
-                            </>
-                        ) : (
-                            <>
-                                <Zap size={16} />
-                                JUMP
-                            </>
-                        )}
+                        JUMP
                     </button>
-
-                    <div className="cold-start__hint">
-                        <span>
-                            SPACE / ↑ / W
-                        </span>
-
-                        <span>or</span>
-
-                        <span>tap JUMP</span>
-                    </div>
                 </div>
 
-                <div className="cold-start__footer">
-                    <span className="cold-start__spinner" />
-
-                    <span>
-                        This screen disappears automatically
-                        when the API responds.
-                    </span>
-                </div>
+                <p className="cold-start__footer">
+                    Free hosting can take a little
+                    longer to wake up after inactivity.
+                </p>
             </section>
         </div>
     );
