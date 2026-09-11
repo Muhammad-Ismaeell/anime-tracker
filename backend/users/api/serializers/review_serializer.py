@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
+from anime.presentation.serializers import AnimeListSerializer
 from users.infrastructure.models import Review
-from anime.api.serializers import AnimeListSerializer
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-
     anime = AnimeListSerializer(read_only=True)
 
     user_id = serializers.IntegerField(
@@ -31,20 +30,15 @@ class ReviewSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
+
 class ReviewAnalyticsSerializer(serializers.Serializer):
-
     review_count = serializers.IntegerField()
-
     average_rating = serializers.FloatField()
-
     highest_rating = serializers.IntegerField()
 
+
 class TopRatedAnimeSerializer(serializers.Serializer):
-
     anime_id = serializers.IntegerField()
-
     title = serializers.CharField()
-
     image = serializers.URLField()
-
     rating = serializers.IntegerField()
