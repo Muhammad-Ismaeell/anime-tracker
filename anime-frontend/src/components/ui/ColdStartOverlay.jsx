@@ -10,13 +10,15 @@ const PLAYER_WIDTH = 42;
 const PLAYER_HEIGHT = 63;
 const GROUND_Y = 246;
 const INITIAL_SPEED = 5;
-const MAX_SPEED = 10;
+const MAX_SPEED = 14;
+const SPEED_ACCELERATION = 0.008;
 const GRAVITY = 0.75;
 const JUMP_FORCE = -14;
 const OBSTACLE_WIDTH = 34;
 const OBSTACLE_HEIGHT = 42;
 const STAR_SIZE = 22;
 const STAR_COLLISION_PADDING = 6;
+const STAR_SCORE = 10;
 const HOME_REFRESH_KEY = "anime-tracker:cold-start-home-refresh";
 
 const randomId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -234,7 +236,10 @@ export default function ColdStartOverlay() {
                 const player = { ...previous.player };
                 let obstacles = previous.obstacles.map((obstacle) => ({ ...obstacle }));
                 let stars = previous.stars.map((star) => ({ ...star }));
-                const speed = Math.min(MAX_SPEED, previous.speed + 0.0025 * frameScale);
+                const speed = Math.min(
+                    MAX_SPEED,
+                    previous.speed + SPEED_ACCELERATION * frameScale
+                );
 
                 if (jumpRequestedRef.current && player.grounded) {
                     player.velocityY = JUMP_FORCE;
@@ -329,7 +334,7 @@ export default function ColdStartOverlay() {
 
                 const nextElapsed = previous.elapsed + delta;
                 const starsCollected = previous.starsCollected + collectedStars;
-                const score = Math.floor(nextElapsed / 1000) + starsCollected;
+                const score = Math.floor(nextElapsed / 1000) + starsCollected * STAR_SCORE;
 
                 const nextGame = {
                     player,
@@ -395,7 +400,6 @@ export default function ColdStartOverlay() {
                 <div className="cold-start__stats">
                     <div className="cold-start__stat"><span>TIME</span><strong>{displaySeconds}s</strong></div>
                     <div className="cold-start__stat"><span>SCORE</span><strong>{game.score}</strong></div>
-                    <div className="cold-start__stat"><span>REQUESTS</span><strong>{slowRequestCount}</strong></div>
                 </div>
 
                 <div
