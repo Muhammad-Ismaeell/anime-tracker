@@ -7,7 +7,7 @@ const GAME_WIDTH = 1000;
 const GAME_HEIGHT = 300;
 const PLAYER_X = 130;
 const PLAYER_WIDTH = 42;
-const PLAYER_HEIGHT = 54;
+const PLAYER_HEIGHT = 63;
 const GROUND_Y = 246;
 const INITIAL_SPEED = 5;
 const MAX_SPEED = 10;
@@ -16,6 +16,7 @@ const JUMP_FORCE = -14;
 const OBSTACLE_WIDTH = 34;
 const OBSTACLE_HEIGHT = 42;
 const STAR_SIZE = 22;
+const STAR_COLLISION_PADDING = 6;
 const HOME_REFRESH_KEY = "anime-tracker:cold-start-home-refresh";
 
 const randomId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -43,6 +44,7 @@ const getInitialGame = () => ({
     obstacles: [createObstacle()],
     stars: [createStar(GAME_WIDTH + 330)],
     score: 0,
+    starsCollected: 0,
     speed: INITIAL_SPEED,
     elapsed: 0,
     gameOver: false,
@@ -277,10 +279,10 @@ export default function ColdStartOverlay() {
                 }
 
                 const playerBox = {
-                    x: player.x + 7,
-                    y: player.y + 5,
-                    width: PLAYER_WIDTH - 14,
-                    height: PLAYER_HEIGHT - 7,
+                    x: player.x + 4,
+                    y: player.y + 3,
+                    width: PLAYER_WIDTH - 8,
+                    height: PLAYER_HEIGHT - 6,
                 };
 
                 const hitObstacle = obstacles.some((obstacle) =>
@@ -312,10 +314,10 @@ export default function ColdStartOverlay() {
 
                 for (const star of stars) {
                     const starBox = {
-                        x: star.x,
-                        y: star.y,
-                        width: STAR_SIZE,
-                        height: STAR_SIZE,
+                        x: star.x - STAR_COLLISION_PADDING,
+                        y: star.y - STAR_COLLISION_PADDING,
+                        width: STAR_SIZE + STAR_COLLISION_PADDING * 2,
+                        height: STAR_SIZE + STAR_COLLISION_PADDING * 2,
                     };
 
                     if (rectanglesOverlap(playerBox, starBox)) {
@@ -326,14 +328,15 @@ export default function ColdStartOverlay() {
                 }
 
                 const nextElapsed = previous.elapsed + delta;
-                const previousStarScore = previous.score - Math.floor(previous.elapsed / 1000);
-                const score = Math.floor(nextElapsed / 1000) + previousStarScore + collectedStars;
+                const starsCollected = previous.starsCollected + collectedStars;
+                const score = Math.floor(nextElapsed / 1000) + starsCollected;
 
                 const nextGame = {
                     player,
                     obstacles,
                     stars: remainingStars,
                     score,
+                    starsCollected,
                     speed,
                     elapsed: nextElapsed,
                     gameOver: false,
