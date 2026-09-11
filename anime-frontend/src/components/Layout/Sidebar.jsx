@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import "./SideBar.css";
+import "./Sidebar.css";
 
 const navSections = [
     {
@@ -29,7 +29,7 @@ const navSections = [
     },
 ];
 
-export default function SideBar({ isOpen = false, onClose = () => {} }) {
+export default function Sidebar({ isOpen = false, onClose = () => {} }) {
     const handleNavigation = () => onClose();
 
     return (
