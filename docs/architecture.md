@@ -49,10 +49,10 @@ The backend is organized around application/domain concerns rather than putting 
 backend/
 ├── accounts/             custom Django user model
 ├── anime/
-│   ├── api/              API views, URL routing and OpenAPI serializers
+│   ├── api/              API views, URL routing and OpenAPI views
 │   ├── application/      anime business logic/services
 │   ├── infrastructure/  ORM models, cache and external API integration
-│   └── presentation/     response normalization
+│   └── presentation/     serializers and response normalization
 ├── users/                user features and persistence
 ├── core/                 auth, shared exceptions and common infrastructure
 └── config/               Django project configuration
