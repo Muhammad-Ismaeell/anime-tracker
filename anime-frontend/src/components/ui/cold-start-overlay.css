@@ -1,268 +1,244 @@
+/* =========================================================
+   Cold Start Overlay
+   Anime Tracker — responsive server wake-up runner
+   ========================================================= */
 
 .cold-start {
     position: fixed;
     inset: 0;
     z-index: 9999;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
-    box-sizing: border-box;
-}
 
-.cold-start__backdrop {
-    position: absolute;
-    inset: 0;
+    padding: 20px;
+
     background:
         radial-gradient(
             circle at 50% 20%,
-            rgba(93, 76, 160, 0.22),
+            rgba(99, 102, 241, 0.18),
             transparent 45%
         ),
-        rgba(7, 8, 18, 0.88);
-    backdrop-filter: blur(8px);
-}
+        rgba(8, 10, 20, 0.88);
 
-.cold-start__panel {
-    position: relative;
-    z-index: 1;
-
-    width: min(1100px, 100%);
-    max-height: calc(100vh - 48px);
-
-    padding: 24px;
-    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
     overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    color: #f8fafc;
+}
+
+.cold-start *,
+.cold-start *::before,
+.cold-start *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   Main panel
+   ========================================================= */
+
+.cold-start__panel {
+    width: min(100%, 1080px);
+
+    padding: 24px;
 
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 22px;
+    border-radius: 24px;
 
     background:
         linear-gradient(
-            145deg,
-            rgba(27, 24, 50, 0.98),
-            rgba(13, 14, 28, 0.98)
+            180deg,
+            rgba(25, 28, 48, 0.98),
+            rgba(13, 16, 30, 0.98)
         );
 
     box-shadow:
         0 30px 80px rgba(0, 0, 0, 0.45),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        0 0 0 1px rgba(99, 102, 241, 0.08);
 
-    color: #f5f3ff;
+    overflow: hidden;
 }
 
-/* -------------------------------------------------- */
-/* Header */
-/* -------------------------------------------------- */
+/* =========================================================
+   Header
+   ========================================================= */
 
 .cold-start__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 16px;
+
+    margin-bottom: 18px;
 }
 
 .cold-start__title-group {
-    display: flex;
-    align-items: center;
-    gap: 13px;
     min-width: 0;
 }
 
-.cold-start__icon {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: rgba(139, 92, 246, 0.16);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-
-    color: #c4b5fd;
-}
-
 .cold-start__eyebrow {
-    margin: 0 0 3px;
+    margin: 0 0 5px;
 
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
 
-    color: #a78bfa;
+    color: #a5b4fc;
 }
 
-.cold-start__title-group h2 {
+.cold-start__title {
     margin: 0;
 
-    font-size: 22px;
-    line-height: 1.2;
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.1;
     font-weight: 800;
 
     color: #ffffff;
 }
 
+.cold-start__subtitle {
+    margin: 7px 0 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: #a8b0c4;
+}
+
 .cold-start__status {
+    flex: 0 0 auto;
+
     display: flex;
     align-items: center;
     gap: 8px;
 
-    flex-shrink: 0;
-
     padding: 8px 12px;
 
+    border: 1px solid rgba(129, 140, 248, 0.22);
     border-radius: 999px;
+
+    background: rgba(99, 102, 241, 0.1);
 
     font-size: 12px;
     font-weight: 700;
+    white-space: nowrap;
 
-    color: #ddd6fe;
-    background: rgba(139, 92, 246, 0.12);
-    border: 1px solid rgba(139, 92, 246, 0.22);
+    color: #c7d2fe;
 }
 
 .cold-start__status-dot {
     width: 7px;
     height: 7px;
 
+    flex: 0 0 7px;
+
     border-radius: 50%;
 
-    background: #a78bfa;
+    background: #818cf8;
 
-    box-shadow:
-        0 0 0 4px rgba(167, 139, 250, 0.12),
-        0 0 12px rgba(167, 139, 250, 0.7);
+    box-shadow: 0 0 12px rgba(129, 140, 248, 0.9);
 
-    animation: cold-start-status-pulse 1.4s infinite;
+    animation: cold-start-pulse 1.4s ease-in-out infinite;
 }
 
-@keyframes cold-start-status-pulse {
+@keyframes cold-start-pulse {
     0%,
     100% {
-        opacity: 0.55;
+        opacity: 0.45;
         transform: scale(0.85);
     }
 
     50% {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1.15);
     }
 }
 
-/* -------------------------------------------------- */
-/* Message */
-/* -------------------------------------------------- */
-
-.cold-start__message {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    margin-bottom: 16px;
-}
-
-.cold-start__message strong {
-    font-size: 15px;
-    color: #ffffff;
-}
-
-.cold-start__message span {
-    font-size: 13px;
-    line-height: 1.5;
-    color: #a8a5ba;
-}
-
-/* -------------------------------------------------- */
-/* Stats */
-/* -------------------------------------------------- */
+/* =========================================================
+   Stats
+   ========================================================= */
 
 .cold-start__stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .cold-start__stat {
     min-width: 0;
 
-    padding: 10px 13px;
+    padding: 10px 12px;
 
+    border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 12px;
 
     background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.cold-start__stat span {
+.cold-start__stat-label {
     display: block;
 
     margin-bottom: 3px;
 
     font-size: 9px;
     font-weight: 800;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 
-    color: #817d95;
+    color: #737c94;
 }
 
-.cold-start__stat strong {
-    font-size: 16px;
-    color: #f5f3ff;
+.cold-start__stat-value {
+    display: block;
+
+    font-size: 17px;
+    line-height: 1.1;
+    font-weight: 800;
+
+    color: #f8fafc;
 }
 
-/* -------------------------------------------------- */
-/* Responsive game viewport */
-/* -------------------------------------------------- */
-
-/*
- * The actual game physics remain 1000x300.
- *
- * .cold-start__game is the responsive viewport.
- * .cold-start__game-world is the fixed 1000x300
- * coordinate system that gets visually scaled.
- */
+/* =========================================================
+   Game viewport
+   ========================================================= */
 
 .cold-start__game {
     position: relative;
 
     width: 100%;
+
+    /*
+     * The physics world is always 1000x300.
+     * The viewport scales it down using --game-scale.
+     */
     aspect-ratio: 1000 / 300;
 
     min-height: 0;
 
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+
+    background: #11152a;
+
     overflow: hidden;
-
-    border-radius: 16px;
-
-    background:
-        linear-gradient(
-            180deg,
-            #11132b 0%,
-            #191936 55%,
-            #242442 100%
-        );
-
-    border: 1px solid rgba(255, 255, 255, 0.08);
 
     touch-action: manipulation;
 
     user-select: none;
     -webkit-user-select: none;
+
+    cursor: pointer;
 }
 
-/*
- * Fixed game coordinate system.
- *
- * React sets --game-scale using ResizeObserver.
- */
 .cold-start__game-world {
     position: absolute;
 
@@ -279,89 +255,61 @@
     transform-origin: center center;
 
     overflow: hidden;
-}
-
-/* -------------------------------------------------- */
-/* Skyline */
-/* -------------------------------------------------- */
-
-.cold-start__skyline {
-    position: absolute;
-    inset: 0;
-
-    pointer-events: none;
-}
-
-.cold-start__skyline span {
-    position: absolute;
-    bottom: 54px;
-
-    width: 55px;
 
     background:
         linear-gradient(
             180deg,
-            rgba(76, 72, 118, 0.28),
-            rgba(42, 40, 75, 0.6)
+            #171b38 0%,
+            #242853 58%,
+            #15182c 100%
+        );
+}
+
+/* =========================================================
+   Background
+   ========================================================= */
+
+.cold-start__sky-glow {
+    position: absolute;
+
+    left: 50%;
+    top: 38px;
+
+    width: 440px;
+    height: 180px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(129, 140, 248, 0.2),
+            transparent 70%
         );
 
-    border-radius: 3px 3px 0 0;
+    pointer-events: none;
 }
-
-.cold-start__skyline span:nth-child(1) {
-    left: 40px;
-    height: 85px;
-}
-
-.cold-start__skyline span:nth-child(2) {
-    left: 135px;
-    height: 115px;
-}
-
-.cold-start__skyline span:nth-child(3) {
-    left: 230px;
-    height: 72px;
-}
-
-.cold-start__skyline span:nth-child(4) {
-    left: 340px;
-    height: 130px;
-}
-
-.cold-start__skyline span:nth-child(5) {
-    left: 470px;
-    height: 90px;
-}
-
-.cold-start__skyline span:nth-child(6) {
-    left: 610px;
-    height: 120px;
-}
-
-.cold-start__skyline span:nth-child(7) {
-    left: 770px;
-    height: 75px;
-}
-
-/* -------------------------------------------------- */
-/* Moon */
-/* -------------------------------------------------- */
 
 .cold-start__moon {
     position: absolute;
 
-    top: 35px;
-    right: 100px;
+    top: 28px;
+    right: 82px;
 
     width: 54px;
     height: 54px;
 
     border-radius: 50%;
 
-    background: #e9e3ff;
+    background: #f8fafc;
 
     box-shadow:
-        0 0 25px rgba(233, 227, 255, 0.22);
+        0 0 24px rgba(248, 250, 252, 0.25),
+        0 0 50px rgba(165, 180, 252, 0.14);
+
+    opacity: 0.9;
 }
 
 .cold-start__moon::after {
@@ -369,105 +317,343 @@
 
     position: absolute;
 
-    top: -5px;
-    left: 13px;
+    top: -4px;
+    left: 12px;
 
     width: 54px;
     height: 54px;
 
     border-radius: 50%;
 
-    background: #11132b;
+    background: #171b38;
 }
 
-/* -------------------------------------------------- */
-/* Stars */
-/* -------------------------------------------------- */
+/* =========================================================
+   Stars
+   ========================================================= */
 
-.cold-start__star {
+.cold-start__sky-star {
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    opacity: 0.65;
+
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+
+    animation: cold-start-star-twinkle 2.4s ease-in-out infinite;
+}
+
+.cold-start__sky-star:nth-child(1) {
+    left: 90px;
+    top: 42px;
+}
+
+.cold-start__sky-star:nth-child(2) {
+    left: 210px;
+    top: 82px;
+    animation-delay: 0.4s;
+}
+
+.cold-start__sky-star:nth-child(3) {
+    left: 360px;
+    top: 42px;
+    animation-delay: 0.8s;
+}
+
+.cold-start__sky-star:nth-child(4) {
+    left: 500px;
+    top: 78px;
+    animation-delay: 1.2s;
+}
+
+.cold-start__sky-star:nth-child(5) {
+    left: 660px;
+    top: 48px;
+    animation-delay: 0.6s;
+}
+
+.cold-start__sky-star:nth-child(6) {
+    left: 790px;
+    top: 96px;
+    animation-delay: 1.5s;
+}
+
+.cold-start__sky-star:nth-child(7) {
+    left: 910px;
+    top: 52px;
+    animation-delay: 1s;
+}
+
+@keyframes cold-start-star-twinkle {
+    0%,
+    100% {
+        opacity: 0.25;
+    }
+
+    50% {
+        opacity: 0.95;
+    }
+}
+
+/* =========================================================
+   Skyline
+   ========================================================= */
+
+.cold-start__skyline {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 54px;
+
+    height: 100px;
+
+    opacity: 0.65;
+
+    pointer-events: none;
+}
+
+.cold-start__building {
+    position: absolute;
+
+    bottom: 0;
+
+    background: #101328;
+
+    border-radius: 2px 2px 0 0;
+}
+
+.cold-start__building:nth-child(1) {
+    left: 0;
+    width: 90px;
+    height: 60px;
+}
+
+.cold-start__building:nth-child(2) {
+    left: 78px;
+    width: 75px;
+    height: 82px;
+}
+
+.cold-start__building:nth-child(3) {
+    left: 143px;
+    width: 120px;
+    height: 48px;
+}
+
+.cold-start__building:nth-child(4) {
+    left: 250px;
+    width: 70px;
+    height: 96px;
+}
+
+.cold-start__building:nth-child(5) {
+    left: 310px;
+    width: 110px;
+    height: 62px;
+}
+
+.cold-start__building:nth-child(6) {
+    left: 410px;
+    width: 88px;
+    height: 82px;
+}
+
+.cold-start__building:nth-child(7) {
+    left: 490px;
+    width: 130px;
+    height: 52px;
+}
+
+.cold-start__building:nth-child(8) {
+    left: 610px;
+    width: 80px;
+    height: 92px;
+}
+
+.cold-start__building:nth-child(9) {
+    left: 680px;
+    width: 125px;
+    height: 58px;
+}
+
+.cold-start__building:nth-child(10) {
+    left: 790px;
+    width: 80px;
+    height: 78px;
+}
+
+.cold-start__building:nth-child(11) {
+    left: 860px;
+    width: 140px;
+    height: 50px;
+}
+
+/* =========================================================
+   Ground
+   ========================================================= */
+
+.cold-start__ground {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 54px;
+
+    border-top: 3px solid #59627d;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #1c2038 0,
+            #1c2038 38px,
+            #202640 38px,
+            #202640 76px
+        );
+
+    z-index: 2;
+}
+
+.cold-start__ground-line {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 7px;
+
+    height: 2px;
+
+    background: rgba(148, 163, 184, 0.18);
+}
+
+/* =========================================================
+   Collectible stars
+   ========================================================= */
+
+.cold-start__collectible {
     position: absolute;
 
     width: 22px;
     height: 22px;
 
+    z-index: 4;
+
+    pointer-events: none;
+}
+
+.cold-start__collectible::before {
+    content: "★";
+
+    position: absolute;
+
+    inset: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
-    color: #f5d76e;
-
     font-size: 22px;
     line-height: 1;
 
-    filter:
-        drop-shadow(
-            0 0 7px rgba(245, 215, 110, 0.65)
-        );
+    color: #facc15;
 
-    pointer-events: none;
+    text-shadow:
+        0 0 5px rgba(250, 204, 21, 0.7),
+        0 0 15px rgba(250, 204, 21, 0.4);
+
+    animation: cold-start-collectible-float 0.9s ease-in-out infinite;
 }
 
-/* -------------------------------------------------- */
-/* Obstacles */
-/* -------------------------------------------------- */
+@keyframes cold-start-collectible-float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-4deg);
+    }
+
+    50% {
+        transform: translateY(-5px) rotate(4deg);
+    }
+}
+
+/* =========================================================
+   Obstacles
+   ========================================================= */
 
 .cold-start__obstacle {
     position: absolute;
 
-    box-sizing: border-box;
+    width: 34px;
+    height: 42px;
 
-    border-radius: 8px 8px 4px 4px;
+    z-index: 4;
+
+    border-radius: 7px 7px 3px 3px;
 
     background:
         linear-gradient(
-            135deg,
-            #7c3aed,
-            #4c1d95
+            180deg,
+            #818cf8 0%,
+            #4f46e5 55%,
+            #312e81 100%
         );
 
-    border: 2px solid rgba(196, 181, 253, 0.5);
+    border: 2px solid #a5b4fc;
 
     box-shadow:
-        0 5px 12px rgba(0, 0, 0, 0.28);
-}
-
-.cold-start__obstacle span {
-    position: absolute;
-
-    top: 9px;
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.35);
-}
-
-.cold-start__obstacle span:first-child {
-    left: 7px;
-}
-
-.cold-start__obstacle span:last-child {
-    right: 7px;
-}
-
-/* -------------------------------------------------- */
-/* Player */
-/* -------------------------------------------------- */
-
-.cold-start__player {
-    position: absolute;
-
-    width: 42px;
-    height: 54px;
-
-    z-index: 5;
+        0 5px 12px rgba(0, 0, 0, 0.25),
+        0 0 12px rgba(99, 102, 241, 0.12);
 
     pointer-events: none;
 }
 
-.cold-start__player-head {
+.cold-start__obstacle::before {
+    content: "";
+
+    position: absolute;
+
+    left: 7px;
+    right: 7px;
+    top: 7px;
+
+    height: 4px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* =========================================================
+   Runner
+   IMPORTANT:
+   These selectors match the current ColdStartOverlay.jsx.
+   ========================================================= */
+
+.cold-start__runner {
+    position: absolute;
+
+    width: 42px;
+    height: 63px;
+
+    z-index: 5;
+
+    pointer-events: none;
+
+    transform-origin: center bottom;
+
+    will-change: transform, left, top;
+}
+
+/* Head */
+
+.cold-start__runner-head {
     position: absolute;
 
     top: 0;
@@ -481,9 +667,13 @@
     background: #f1c7a8;
 
     border: 2px solid #5d3a35;
+
+    box-sizing: border-box;
 }
 
-.cold-start__player-eye {
+/* Eyes */
+
+.cold-start__eye {
     position: absolute;
 
     top: 10px;
@@ -496,15 +686,17 @@
     background: #201a2d;
 }
 
-.cold-start__player-eye:first-child {
+.cold-start__eye--left {
     left: 8px;
 }
 
-.cold-start__player-eye:last-child {
+.cold-start__eye--right {
     right: 8px;
 }
 
-.cold-start__player-body {
+/* Body */
+
+.cold-start__runner-body {
     position: absolute;
 
     left: 7px;
@@ -523,9 +715,13 @@
         );
 
     border: 2px solid #5d1f2a;
+
+    box-sizing: border-box;
 }
 
-.cold-start__player-arm {
+/* Arms */
+
+.cold-start__arm {
     position: absolute;
 
     top: 29px;
@@ -536,165 +732,156 @@
     border-radius: 5px;
 
     background: #f1c7a8;
+
     border: 1px solid #5d3a35;
+
+    box-sizing: border-box;
 }
 
-.cold-start__player-arm--left {
+.cold-start__arm--left {
     left: 1px;
 
     transform: rotate(20deg);
 }
 
-.cold-start__player-arm--right {
+.cold-start__arm--right {
     right: 1px;
 
     transform: rotate(-20deg);
 }
 
-.cold-start__player-leg {
+/* Legs */
+
+.cold-start__runner-leg {
     position: absolute;
 
     top: 46px;
 
     width: 9px;
-    height: 14px;
+    height: 17px;
 
     border-radius: 4px;
 
     background: #25213a;
 }
 
-.cold-start__player-leg--left {
+.cold-start__runner-leg--left {
     left: 8px;
 }
 
-.cold-start__player-leg--right {
+.cold-start__runner-leg--right {
     right: 8px;
 }
 
-.cold-start__player.is-jumping {
+/* Runner states */
+
+.cold-start__runner--jumping {
     filter:
         drop-shadow(
             0 8px 8px rgba(0, 0, 0, 0.2)
         );
 }
 
-/* -------------------------------------------------- */
-/* Ground */
-/* -------------------------------------------------- */
+.cold-start__runner--dead {
+    filter: grayscale(1);
 
-.cold-start__ground {
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    height: 54px;
-
-    background:
-        linear-gradient(
-            180deg,
-            #302d4a,
-            #211f36
-        );
-
-    border-top: 2px solid rgba(167, 139, 250, 0.35);
+    opacity: 0.7;
 }
 
-.cold-start__ground::before {
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    top: 12px;
-
-    height: 2px;
-
-    background:
-        repeating-linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0.08) 0 30px,
-            transparent 30px 60px
-        );
-}
-
-/* -------------------------------------------------- */
-/* Game over */
-/* -------------------------------------------------- */
+/* =========================================================
+   Game over
+   ========================================================= */
 
 .cold-start__game-over {
     position: absolute;
+
     inset: 0;
 
     z-index: 20;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    background: rgba(9, 8, 20, 0.58);
+    padding: 20px;
 
-    backdrop-filter: blur(2px);
-}
+    background: rgba(8, 10, 20, 0.7);
 
-.cold-start__game-over-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-
-    padding: 18px 24px;
-
-    border-radius: 14px;
-
-    background: rgba(20, 18, 39, 0.96);
-
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 
     text-align: center;
 }
 
-.cold-start__game-over-card strong {
-    font-size: 17px;
-    letter-spacing: 0.08em;
+.cold-start__game-over-title {
+    margin: 0 0 7px;
+
+    font-size: 28px;
+    font-weight: 900;
+
+    color: #ffffff;
 }
 
-.cold-start__game-over-card span {
-    font-size: 12px;
-    color: #a8a5ba;
+.cold-start__game-over-score {
+    margin: 0 0 14px;
+
+    font-size: 14px;
+
+    color: #cbd5e1;
 }
 
-.cold-start__game-over-card button {
-    margin-top: 5px;
+/* =========================================================
+   Buttons
+   ========================================================= */
 
-    padding: 8px 16px;
+.cold-start__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+
+    padding: 0 18px;
 
     border: 0;
-    border-radius: 8px;
+    border-radius: 10px;
 
-    background: #8b5cf6;
-    color: white;
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #8b5cf6
+        );
 
-    font-size: 11px;
+    color: #ffffff;
+
+    font-size: 13px;
     font-weight: 800;
-    letter-spacing: 0.08em;
 
     cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(99, 102, 241, 0.25);
+
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
 }
 
-.cold-start__game-over-card button:hover {
+.cold-start__button:hover {
     filter: brightness(1.08);
+
+    transform: translateY(-1px);
 }
 
-/* -------------------------------------------------- */
-/* Controls */
-/* -------------------------------------------------- */
+.cold-start__button:active {
+    transform: translateY(1px);
+}
+
+/* =========================================================
+   Controls
+   ========================================================= */
 
 .cold-start__controls {
     display: flex;
@@ -705,335 +892,281 @@
     margin-top: 14px;
 }
 
-.cold-start__controls > div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.cold-start__hint {
+    margin: 0;
 
-    min-width: 0;
-
-    color: #9f9bb1;
-}
-
-.cold-start__controls svg {
-    flex: 0 0 auto;
-    color: #a78bfa;
-}
-
-.cold-start__controls span {
     font-size: 12px;
+    line-height: 1.45;
+
+    color: #8992a8;
 }
 
-.cold-start__controls kbd {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-width: 25px;
-    height: 23px;
-
-    margin-right: 4px;
-
-    padding: 0 5px;
-
-    border-radius: 5px;
-
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    color: #ddd6fe;
-
-    font-size: 9px;
-    font-weight: 800;
-}
-
-.cold-start__jump-button {
+.cold-start__jump {
     flex: 0 0 auto;
 
-    min-width: 110px;
-    min-height: 42px;
+    min-width: 120px;
+    min-height: 46px;
 
     padding: 0 20px;
 
     border: 0;
-    border-radius: 10px;
+    border-radius: 12px;
 
     background:
         linear-gradient(
             135deg,
-            #8b5cf6,
-            #6d28d9
+            #6366f1,
+            #7c3aed
         );
 
     color: #ffffff;
 
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 900;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 
     cursor: pointer;
 
-    box-shadow:
-        0 7px 18px rgba(109, 40, 217, 0.25);
-
     touch-action: manipulation;
+
+    box-shadow:
+        0 8px 20px rgba(99, 102, 241, 0.25);
 
     transition:
         transform 0.12s ease,
         filter 0.12s ease;
 }
 
-.cold-start__jump-button:hover {
+.cold-start__jump:hover {
     filter: brightness(1.08);
 }
 
-.cold-start__jump-button:active {
-    transform: scale(0.95);
+.cold-start__jump:active {
+    transform: scale(0.96);
 }
 
-/* -------------------------------------------------- */
-/* Footer */
-/* -------------------------------------------------- */
+/* =========================================================
+   Footer
+   ========================================================= */
 
 .cold-start__footer {
-    margin: 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 
-    text-align: center;
+    margin-top: 14px;
 
-    font-size: 10px;
-    line-height: 1.4;
+    font-size: 11px;
 
-    color: #6f6b80;
+    color: #697287;
 }
 
-/* -------------------------------------------------- */
-/* Tablet */
-/* -------------------------------------------------- */
+.cold-start__footer strong {
+    color: #a5b4fc;
+}
+
+/* =========================================================
+   Mobile
+   ========================================================= */
 
 @media (max-width: 700px) {
     .cold-start {
-        padding: 14px;
-    }
+        align-items: flex-start;
 
-    .cold-start__panel {
-        max-height: calc(100vh - 28px);
+        padding: 12px;
 
-        padding: 18px;
-
-        border-radius: 18px;
-    }
-
-    .cold-start__title-group h2 {
-        font-size: 19px;
-    }
-
-    .cold-start__message {
-        margin-bottom: 12px;
-    }
-
-    .cold-start__stats {
-        margin-bottom: 12px;
-    }
-
-    .cold-start__controls {
-        gap: 10px;
-    }
-}
-
-/* -------------------------------------------------- */
-/* Phone */
-/* -------------------------------------------------- */
-
-@media (max-width: 520px) {
-    .cold-start {
-        align-items: center;
-        padding: 10px;
+        overflow-y: auto;
     }
 
     .cold-start__panel {
         width: 100%;
-        max-height: calc(100vh - 20px);
 
-        padding: 15px;
+        margin: auto 0;
 
-        border-radius: 16px;
+        padding: 16px;
+
+        border-radius: 18px;
     }
 
     .cold-start__header {
         align-items: flex-start;
-        margin-bottom: 12px;
+
+        margin-bottom: 14px;
     }
 
-    .cold-start__icon {
-        width: 38px;
-        height: 38px;
-        flex-basis: 38px;
+    .cold-start__title {
+        font-size: 21px;
     }
 
-    .cold-start__icon svg {
-        width: 19px;
-        height: 19px;
-    }
+    .cold-start__subtitle {
+        max-width: 280px;
 
-    .cold-start__eyebrow {
-        font-size: 8px;
-        letter-spacing: 0.15em;
-    }
-
-    .cold-start__title-group h2 {
-        font-size: 17px;
+        font-size: 12px;
     }
 
     .cold-start__status {
-        padding: 6px 8px;
+        padding: 7px 9px;
 
         font-size: 10px;
     }
 
-    .cold-start__status-dot {
-        width: 6px;
-        height: 6px;
-    }
-
-    .cold-start__message strong {
-        font-size: 13px;
-    }
-
-    .cold-start__message span {
-        font-size: 11px;
-    }
-
     .cold-start__stats {
         gap: 7px;
+
         margin-bottom: 10px;
     }
 
     .cold-start__stat {
         padding: 8px 9px;
-        border-radius: 9px;
-    }
-
-    .cold-start__stat span {
-        font-size: 7px;
-    }
-
-    .cold-start__stat strong {
-        font-size: 14px;
-    }
-
-    .cold-start__game {
-        border-radius: 12px;
-    }
-
-    .cold-start__controls {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 9px;
-
-        margin-top: 10px;
-    }
-
-    /*
-     * Hide desktop keyboard instructions on phones.
-     */
-    .cold-start__controls > div:first-child {
-        display: none;
-    }
-
-    .cold-start__controls > div:nth-child(2) {
-        min-width: 0;
-    }
-
-    .cold-start__controls > div:nth-child(2) span {
-        font-size: 10px;
-    }
-
-    .cold-start__jump-button {
-        min-width: 105px;
-        min-height: 44px;
-
-        padding: 0 16px;
-
-        font-size: 11px;
 
         border-radius: 9px;
     }
 
-    .cold-start__footer {
-        margin-top: 9px;
-        font-size: 9px;
-    }
-}
-
-/* -------------------------------------------------- */
-/* Very small phones */
-/* -------------------------------------------------- */
-
-@media (max-width: 360px) {
-    .cold-start {
-        padding: 7px;
+    .cold-start__stat-label {
+        font-size: 8px;
     }
 
-    .cold-start__panel {
-        max-height: calc(100vh - 14px);
-        padding: 12px;
-    }
-
-    .cold-start__header {
-        gap: 8px;
-    }
-
-    .cold-start__title-group {
-        gap: 8px;
-    }
-
-    .cold-start__icon {
-        width: 34px;
-        height: 34px;
-        flex-basis: 34px;
-    }
-
-    .cold-start__title-group h2 {
+    .cold-start__stat-value {
         font-size: 15px;
     }
 
-    .cold-start__status {
-        padding: 5px 7px;
+    .cold-start__game {
+        border-radius: 14px;
+    }
+
+    .cold-start__controls {
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 9px;
+    }
+
+    .cold-start__hint {
+        text-align: center;
+    }
+
+    .cold-start__jump {
+        width: 100%;
+
+        min-height: 50px;
+
+        font-size: 14px;
+    }
+
+    .cold-start__footer {
+        justify-content: center;
+
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   Small phones
+   ========================================================= */
+
+@media (max-width: 430px) {
+    .cold-start {
+        padding: 8px;
+    }
+
+    .cold-start__panel {
+        padding: 13px;
+
+        border-radius: 16px;
+    }
+
+    .cold-start__eyebrow {
         font-size: 9px;
     }
 
-    .cold-start__message {
-        margin-bottom: 9px;
+    .cold-start__title {
+        font-size: 19px;
+    }
+
+    .cold-start__subtitle {
+        margin-top: 5px;
+
+        font-size: 11px;
+    }
+
+    .cold-start__status {
+        display: none;
     }
 
     .cold-start__stats {
-        gap: 5px;
+        margin-bottom: 8px;
     }
 
     .cold-start__stat {
         padding: 7px;
     }
 
-    .cold-start__stat strong {
-        font-size: 13px;
+    .cold-start__stat-value {
+        font-size: 14px;
     }
 
-    .cold-start__jump-button {
-        min-width: 92px;
-        min-height: 42px;
+    .cold-start__footer {
+        margin-top: 10px;
+
+        font-size: 10px;
     }
 }
 
-/* -------------------------------------------------- */
-/* Reduced motion */
-/* -------------------------------------------------- */
+/* =========================================================
+   Very small screens / landscape phones
+   ========================================================= */
+
+@media (max-height: 520px) and (orientation: landscape) {
+    .cold-start {
+        align-items: flex-start;
+
+        padding: 8px;
+    }
+
+    .cold-start__panel {
+        padding: 12px;
+    }
+
+    .cold-start__header {
+        margin-bottom: 8px;
+    }
+
+    .cold-start__subtitle {
+        display: none;
+    }
+
+    .cold-start__stats {
+        margin-bottom: 7px;
+    }
+
+    .cold-start__controls {
+        margin-top: 7px;
+    }
+
+    .cold-start__jump {
+        min-height: 40px;
+    }
+
+    .cold-start__footer {
+        display: none;
+    }
+}
+
+/* =========================================================
+   Reduced motion
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-    .cold-start__status-dot {
+    .cold-start__status-dot,
+    .cold-start__sky-star,
+    .cold-start__collectible::before {
         animation: none;
     }
 
-    .cold-start__jump-button {
+    .cold-start__button,
+    .cold-start__jump {
         transition: none;
     }
 }
