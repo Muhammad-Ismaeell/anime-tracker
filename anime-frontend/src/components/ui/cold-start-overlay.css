@@ -40,10 +40,24 @@
 }
 
 /* =========================================================
+   Backdrop
+   ========================================================= */
+
+.cold-start__backdrop {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+}
+
+/* =========================================================
    Main panel
    ========================================================= */
 
 .cold-start__panel {
+    position: relative;
+    z-index: 1;
+
     width: min(100%, 1080px);
 
     padding: 24px;
@@ -75,17 +89,47 @@
     justify-content: space-between;
     gap: 16px;
 
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .cold-start__title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
     min-width: 0;
 }
 
-.cold-start__eyebrow {
-    margin: 0 0 5px;
+.cold-start__icon {
+    width: 42px;
+    height: 42px;
 
-    font-size: 11px;
+    flex: 0 0 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(129, 140, 248, 0.25);
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(99, 102, 241, 0.22),
+            rgba(139, 92, 246, 0.14)
+        );
+
+    color: #a5b4fc;
+
+    box-shadow:
+        0 8px 24px rgba(99, 102, 241, 0.12);
+}
+
+.cold-start__eyebrow {
+    margin: 0 0 4px;
+
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -93,23 +137,14 @@
     color: #a5b4fc;
 }
 
-.cold-start__title {
+.cold-start__title-group h2 {
     margin: 0;
 
-    font-size: clamp(20px, 3vw, 30px);
+    font-size: clamp(20px, 3vw, 28px);
     line-height: 1.1;
-    font-weight: 800;
+    font-weight: 850;
 
     color: #ffffff;
-}
-
-.cold-start__subtitle {
-    margin: 7px 0 0;
-
-    font-size: 13px;
-    line-height: 1.5;
-
-    color: #a8b0c4;
 }
 
 .cold-start__status {
@@ -143,9 +178,12 @@
 
     background: #818cf8;
 
-    box-shadow: 0 0 12px rgba(129, 140, 248, 0.9);
+    box-shadow:
+        0 0 12px rgba(129, 140, 248, 0.9);
 
-    animation: cold-start-pulse 1.4s ease-in-out infinite;
+    animation:
+        cold-start-pulse
+        1.4s ease-in-out infinite;
 }
 
 @keyframes cold-start-pulse {
@@ -162,49 +200,29 @@
 }
 
 /* =========================================================
-   Stats
+   Message
    ========================================================= */
 
-.cold-start__stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+.cold-start__message {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 
     margin-bottom: 14px;
 }
 
-.cold-start__stat {
-    min-width: 0;
+.cold-start__message strong {
+    font-size: 14px;
+    font-weight: 750;
 
-    padding: 10px 12px;
-
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-
-    background: rgba(255, 255, 255, 0.035);
+    color: #e2e8f0;
 }
 
-.cold-start__stat-label {
-    display: block;
+.cold-start__message span {
+    font-size: 12px;
+    line-height: 1.5;
 
-    margin-bottom: 3px;
-
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-
-    color: #737c94;
-}
-
-.cold-start__stat-value {
-    display: block;
-
-    font-size: 17px;
-    line-height: 1.1;
-    font-weight: 800;
-
-    color: #f8fafc;
+    color: #8992a8;
 }
 
 /* =========================================================
@@ -216,13 +234,7 @@
 
     width: 100%;
 
-    /*
-     * The physics world is always 1000x300.
-     * The viewport scales it down using --game-scale.
-     */
     aspect-ratio: 1000 / 300;
-
-    min-height: 0;
 
     border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 18px;
@@ -266,7 +278,112 @@
 }
 
 /* =========================================================
-   Background
+   In-game HUD
+   ========================================================= */
+
+.cold-start__hud {
+    position: absolute;
+
+    top: 12px;
+    left: 14px;
+    right: 14px;
+
+    z-index: 30;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    pointer-events: none;
+}
+
+.cold-start__hud-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 82px;
+
+    padding: 6px 10px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+
+    background: rgba(10, 13, 28, 0.72);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.18);
+}
+
+.cold-start__hud-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cold-start__hud-icon {
+    width: 25px;
+    height: 25px;
+
+    flex: 0 0 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: rgba(129, 140, 248, 0.13);
+
+    font-size: 14px;
+
+    color: #a5b4fc;
+}
+
+.cold-start__hud-item strong {
+    font-size: 14px;
+    line-height: 1;
+
+    font-weight: 900;
+
+    color: #ffffff;
+}
+
+.cold-start__hud-label {
+    font-size: 7px;
+    line-height: 1;
+
+    font-weight: 800;
+    letter-spacing: 0.12em;
+
+    color: #7f89a3;
+}
+
+.cold-start__hud-score {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+}
+
+.cold-start__hud-score .cold-start__hud-icon {
+    background: rgba(250, 204, 21, 0.12);
+
+    color: #facc15;
+}
+
+.cold-start__hud-star-icon {
+    background: rgba(250, 204, 21, 0.12);
+
+    color: #facc15;
+}
+
+/* =========================================================
+   Background glow
    ========================================================= */
 
 .cold-start__sky-glow {
@@ -292,6 +409,10 @@
     pointer-events: none;
 }
 
+/* =========================================================
+   Moon
+   ========================================================= */
+
 .cold-start__moon {
     position: absolute;
 
@@ -310,6 +431,8 @@
         0 0 50px rgba(165, 180, 252, 0.14);
 
     opacity: 0.9;
+
+    z-index: 1;
 }
 
 .cold-start__moon::after {
@@ -329,7 +452,7 @@
 }
 
 /* =========================================================
-   Stars
+   Background stars
    ========================================================= */
 
 .cold-start__sky-star {
@@ -344,47 +467,52 @@
 
     opacity: 0.65;
 
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+    box-shadow:
+        0 0 6px rgba(255, 255, 255, 0.6);
 
-    animation: cold-start-star-twinkle 2.4s ease-in-out infinite;
+    animation:
+        cold-start-star-twinkle
+        2.4s ease-in-out infinite;
+
+    z-index: 1;
 }
 
-.cold-start__sky-star:nth-child(1) {
+.cold-start__sky-star--1 {
     left: 90px;
     top: 42px;
 }
 
-.cold-start__sky-star:nth-child(2) {
+.cold-start__sky-star--2 {
     left: 210px;
     top: 82px;
     animation-delay: 0.4s;
 }
 
-.cold-start__sky-star:nth-child(3) {
+.cold-start__sky-star--3 {
     left: 360px;
     top: 42px;
     animation-delay: 0.8s;
 }
 
-.cold-start__sky-star:nth-child(4) {
+.cold-start__sky-star--4 {
     left: 500px;
     top: 78px;
     animation-delay: 1.2s;
 }
 
-.cold-start__sky-star:nth-child(5) {
+.cold-start__sky-star--5 {
     left: 660px;
     top: 48px;
     animation-delay: 0.6s;
 }
 
-.cold-start__sky-star:nth-child(6) {
+.cold-start__sky-star--6 {
     left: 790px;
     top: 96px;
     animation-delay: 1.5s;
 }
 
-.cold-start__sky-star:nth-child(7) {
+.cold-start__sky-star--7 {
     left: 910px;
     top: 52px;
     animation-delay: 1s;
@@ -403,6 +531,7 @@
 
 /* =========================================================
    Skyline
+   Matches the 7 spans in JSX
    ========================================================= */
 
 .cold-start__skyline {
@@ -417,82 +546,62 @@
     opacity: 0.65;
 
     pointer-events: none;
+
+    z-index: 1;
 }
 
-.cold-start__building {
+.cold-start__skyline span {
     position: absolute;
 
     bottom: 0;
+
+    display: block;
 
     background: #101328;
 
     border-radius: 2px 2px 0 0;
 }
 
-.cold-start__building:nth-child(1) {
+.cold-start__skyline span:nth-child(1) {
     left: 0;
-    width: 90px;
-    height: 60px;
-}
-
-.cold-start__building:nth-child(2) {
-    left: 78px;
-    width: 75px;
-    height: 82px;
-}
-
-.cold-start__building:nth-child(3) {
-    left: 143px;
-    width: 120px;
-    height: 48px;
-}
-
-.cold-start__building:nth-child(4) {
-    left: 250px;
-    width: 70px;
-    height: 96px;
-}
-
-.cold-start__building:nth-child(5) {
-    left: 310px;
     width: 110px;
     height: 62px;
 }
 
-.cold-start__building:nth-child(6) {
-    left: 410px;
-    width: 88px;
-    height: 82px;
+.cold-start__skyline span:nth-child(2) {
+    left: 100px;
+    width: 95px;
+    height: 84px;
 }
 
-.cold-start__building:nth-child(7) {
-    left: 490px;
-    width: 130px;
+.cold-start__skyline span:nth-child(3) {
+    left: 185px;
+    width: 125px;
     height: 52px;
 }
 
-.cold-start__building:nth-child(8) {
-    left: 610px;
-    width: 80px;
-    height: 92px;
+.cold-start__skyline span:nth-child(4) {
+    left: 300px;
+    width: 90px;
+    height: 96px;
 }
 
-.cold-start__building:nth-child(9) {
-    left: 680px;
-    width: 125px;
-    height: 58px;
+.cold-start__skyline span:nth-child(5) {
+    left: 380px;
+    width: 135px;
+    height: 65px;
 }
 
-.cold-start__building:nth-child(10) {
-    left: 790px;
-    width: 80px;
-    height: 78px;
+.cold-start__skyline span:nth-child(6) {
+    left: 500px;
+    width: 105px;
+    height: 82px;
 }
 
-.cold-start__building:nth-child(11) {
-    left: 860px;
-    width: 140px;
-    height: 50px;
+.cold-start__skyline span:nth-child(7) {
+    left: 590px;
+    width: 410px;
+    height: 55px;
 }
 
 /* =========================================================
@@ -519,10 +628,18 @@
             #202640 76px
         );
 
+    /*
+     * IMPORTANT:
+     * Ground is BELOW obstacles and runner.
+     */
     z-index: 2;
+
+    pointer-events: none;
 }
 
-.cold-start__ground-line {
+.cold-start__ground::after {
+    content: "";
+
     position: absolute;
 
     left: 0;
@@ -538,23 +655,13 @@
    Collectible stars
    ========================================================= */
 
-.cold-start__collectible {
+.cold-start__star {
     position: absolute;
 
     width: 22px;
     height: 22px;
 
-    z-index: 4;
-
-    pointer-events: none;
-}
-
-.cold-start__collectible::before {
-    content: "★";
-
-    position: absolute;
-
-    inset: 0;
+    z-index: 5;
 
     display: flex;
     align-items: center;
@@ -569,17 +676,23 @@
         0 0 5px rgba(250, 204, 21, 0.7),
         0 0 15px rgba(250, 204, 21, 0.4);
 
-    animation: cold-start-collectible-float 0.9s ease-in-out infinite;
+    animation:
+        cold-start-collectible-float
+        0.9s ease-in-out infinite;
+
+    pointer-events: none;
 }
 
 @keyframes cold-start-collectible-float {
     0%,
     100% {
-        transform: translateY(0) rotate(-4deg);
+        margin-top: 0;
+        transform: rotate(-4deg);
     }
 
     50% {
-        transform: translateY(-5px) rotate(4deg);
+        margin-top: -5px;
+        transform: rotate(4deg);
     }
 }
 
@@ -590,10 +703,12 @@
 .cold-start__obstacle {
     position: absolute;
 
-    width: 34px;
-    height: 42px;
-
-    z-index: 4;
+    /*
+     * IMPORTANT:
+     * Positioning is controlled with left/top from JSX.
+     * No transform is used here.
+     */
+    z-index: 6;
 
     border-radius: 7px 7px 3px 3px;
 
@@ -630,10 +745,33 @@
     background: rgba(255, 255, 255, 0.18);
 }
 
+.cold-start__obstacle span {
+    position: absolute;
+
+    bottom: 5px;
+
+    width: 5px;
+    height: 8px;
+
+    border-radius: 2px;
+
+    background: rgba(15, 23, 42, 0.35);
+}
+
+.cold-start__obstacle span:nth-child(1) {
+    left: 6px;
+}
+
+.cold-start__obstacle span:nth-child(2) {
+    left: 14px;
+}
+
+.cold-start__obstacle span:nth-child(3) {
+    right: 5px;
+}
+
 /* =========================================================
    Runner
-   IMPORTANT:
-   These selectors match the current ColdStartOverlay.jsx.
    ========================================================= */
 
 .cold-start__runner {
@@ -642,16 +780,17 @@
     width: 42px;
     height: 63px;
 
-    z-index: 5;
+    /*
+     * Runner must be above the obstacle.
+     */
+    z-index: 7;
 
     pointer-events: none;
 
     transform-origin: center bottom;
 
-    will-change: transform, left, top;
+    will-change: left, top;
 }
-
-/* Head */
 
 .cold-start__runner-head {
     position: absolute;
@@ -667,11 +806,7 @@
     background: #f1c7a8;
 
     border: 2px solid #5d3a35;
-
-    box-sizing: border-box;
 }
-
-/* Eyes */
 
 .cold-start__eye {
     position: absolute;
@@ -694,8 +829,6 @@
     right: 8px;
 }
 
-/* Body */
-
 .cold-start__runner-body {
     position: absolute;
 
@@ -715,11 +848,7 @@
         );
 
     border: 2px solid #5d1f2a;
-
-    box-sizing: border-box;
 }
-
-/* Arms */
 
 .cold-start__arm {
     position: absolute;
@@ -734,8 +863,6 @@
     background: #f1c7a8;
 
     border: 1px solid #5d3a35;
-
-    box-sizing: border-box;
 }
 
 .cold-start__arm--left {
@@ -749,8 +876,6 @@
 
     transform: rotate(-20deg);
 }
-
-/* Legs */
 
 .cold-start__runner-leg {
     position: absolute;
@@ -772,8 +897,6 @@
 .cold-start__runner-leg--right {
     right: 8px;
 }
-
-/* Runner states */
 
 .cold-start__runner--jumping {
     filter:
@@ -800,13 +923,12 @@
     z-index: 20;
 
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
 
     padding: 20px;
 
-    background: rgba(8, 10, 20, 0.7);
+    background: rgba(8, 10, 20, 0.72);
 
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
@@ -814,103 +936,48 @@
     text-align: center;
 }
 
-.cold-start__game-over-title {
-    margin: 0 0 7px;
+.cold-start__game-over-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-    font-size: 28px;
+    min-width: 210px;
+
+    padding: 20px 22px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+
+    background: rgba(18, 22, 42, 0.94);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+.cold-start__game-over-card strong {
+    margin-bottom: 6px;
+
+    font-size: 22px;
     font-weight: 900;
 
     color: #ffffff;
 }
 
-.cold-start__game-over-score {
-    margin: 0 0 14px;
+.cold-start__game-over-card span {
+    margin-bottom: 14px;
 
-    font-size: 14px;
+    font-size: 12px;
 
-    color: #cbd5e1;
+    color: #a8b0c4;
 }
 
-/* =========================================================
-   Buttons
-   ========================================================= */
-
-.cold-start__button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 42px;
+.cold-start__game-over-card button {
+    min-height: 38px;
 
     padding: 0 18px;
 
     border: 0;
-    border-radius: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #6366f1,
-            #8b5cf6
-        );
-
-    color: #ffffff;
-
-    font-size: 13px;
-    font-weight: 800;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 8px 20px rgba(99, 102, 241, 0.25);
-
-    transition:
-        transform 0.15s ease,
-        filter 0.15s ease;
-}
-
-.cold-start__button:hover {
-    filter: brightness(1.08);
-
-    transform: translateY(-1px);
-}
-
-.cold-start__button:active {
-    transform: translateY(1px);
-}
-
-/* =========================================================
-   Controls
-   ========================================================= */
-
-.cold-start__controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-
-    margin-top: 14px;
-}
-
-.cold-start__hint {
-    margin: 0;
-
-    font-size: 12px;
-    line-height: 1.45;
-
-    color: #8992a8;
-}
-
-.cold-start__jump {
-    flex: 0 0 auto;
-
-    min-width: 120px;
-    min-height: 46px;
-
-    padding: 0 20px;
-
-    border: 0;
-    border-radius: 12px;
+    border-radius: 9px;
 
     background:
         linear-gradient(
@@ -921,10 +988,111 @@
 
     color: #ffffff;
 
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 850;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+.cold-start__game-over-card button:hover {
+    filter: brightness(1.08);
+
+    transform: translateY(-1px);
+}
+
+.cold-start__game-over-card button:active {
+    transform: translateY(1px);
+}
+
+/* =========================================================
+   Controls
+   ========================================================= */
+
+.cold-start__controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 12px;
+}
+
+.cold-start__control-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 11px;
+
+    color: #8992a8;
+}
+
+.cold-start__control-hint--mouse {
+    margin-left: auto;
+}
+
+.cold-start__control-hint svg {
+    flex: 0 0 auto;
+
+    color: #818cf8;
+}
+
+.cold-start__control-hint span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cold-start__control-hint kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 27px;
+    height: 22px;
+
+    padding: 0 5px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+
+    background: rgba(255, 255, 255, 0.05);
+
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 800;
+
+    color: #cbd5e1;
+}
+
+.cold-start__jump-button {
+    flex: 0 0 auto;
+
+    min-width: 112px;
+    min-height: 42px;
+
+    margin-left: auto;
+
+    padding: 0 18px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #7c3aed
+        );
+
+    color: #ffffff;
+
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: 0.04em;
-    text-transform: uppercase;
 
     cursor: pointer;
 
@@ -938,11 +1106,11 @@
         filter 0.12s ease;
 }
 
-.cold-start__jump:hover {
+.cold-start__jump-button:hover {
     filter: brightness(1.08);
 }
 
-.cold-start__jump:active {
+.cold-start__jump-button:active {
     transform: scale(0.96);
 }
 
@@ -951,20 +1119,14 @@
    ========================================================= */
 
 .cold-start__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    margin: 12px 0 0;
 
-    margin-top: 14px;
+    font-size: 10px;
+    line-height: 1.4;
 
-    font-size: 11px;
+    text-align: center;
 
     color: #697287;
-}
-
-.cold-start__footer strong {
-    color: #a5b4fc;
 }
 
 /* =========================================================
@@ -976,8 +1138,6 @@
         align-items: flex-start;
 
         padding: 12px;
-
-        overflow-y: auto;
     }
 
     .cold-start__panel {
@@ -993,72 +1153,107 @@
     .cold-start__header {
         align-items: flex-start;
 
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
-    .cold-start__title {
-        font-size: 21px;
+    .cold-start__icon {
+        width: 36px;
+        height: 36px;
+
+        flex-basis: 36px;
     }
 
-    .cold-start__subtitle {
-        max-width: 280px;
+    .cold-start__eyebrow {
+        font-size: 9px;
+    }
 
-        font-size: 12px;
+    .cold-start__title-group h2 {
+        font-size: 20px;
     }
 
     .cold-start__status {
-        padding: 7px 9px;
+        padding: 6px 9px;
 
         font-size: 10px;
     }
 
-    .cold-start__stats {
-        gap: 7px;
-
+    .cold-start__message {
         margin-bottom: 10px;
     }
 
-    .cold-start__stat {
-        padding: 8px 9px;
-
-        border-radius: 9px;
+    .cold-start__message strong {
+        font-size: 13px;
     }
 
-    .cold-start__stat-label {
-        font-size: 8px;
-    }
-
-    .cold-start__stat-value {
-        font-size: 15px;
+    .cold-start__message span {
+        font-size: 11px;
     }
 
     .cold-start__game {
         border-radius: 14px;
     }
 
+    .cold-start__hud {
+        top: 9px;
+        left: 9px;
+        right: 9px;
+    }
+
+    .cold-start__hud-item {
+        min-width: 68px;
+
+        padding: 5px 8px;
+
+        gap: 6px;
+
+        border-radius: 8px;
+    }
+
+    .cold-start__hud-icon {
+        width: 21px;
+        height: 21px;
+
+        flex-basis: 21px;
+
+        font-size: 12px;
+    }
+
+    .cold-start__hud-label {
+        font-size: 6px;
+    }
+
+    .cold-start__hud-item strong {
+        font-size: 12px;
+    }
+
     .cold-start__controls {
-        flex-direction: column;
-        align-items: stretch;
+        flex-wrap: wrap;
 
-        gap: 9px;
+        gap: 8px;
+
+        margin-top: 9px;
     }
 
-    .cold-start__hint {
-        text-align: center;
+    .cold-start__control-hint {
+        font-size: 10px;
     }
 
-    .cold-start__jump {
+    .cold-start__control-hint--mouse {
+        margin-left: 0;
+    }
+
+    .cold-start__jump-button {
         width: 100%;
 
-        min-height: 50px;
+        min-height: 48px;
 
-        font-size: 14px;
+        margin-left: 0;
     }
 
     .cold-start__footer {
-        justify-content: center;
+        margin-top: 9px;
 
-        text-align: center;
+        font-size: 9px;
     }
 }
 
@@ -1077,45 +1272,68 @@
         border-radius: 16px;
     }
 
+    .cold-start__icon {
+        display: none;
+    }
+
     .cold-start__eyebrow {
-        font-size: 9px;
+        font-size: 8px;
     }
 
-    .cold-start__title {
-        font-size: 19px;
-    }
-
-    .cold-start__subtitle {
-        margin-top: 5px;
-
-        font-size: 11px;
+    .cold-start__title-group h2 {
+        font-size: 18px;
     }
 
     .cold-start__status {
         display: none;
     }
 
-    .cold-start__stats {
-        margin-bottom: 8px;
+    .cold-start__message span {
+        font-size: 10px;
     }
 
-    .cold-start__stat {
-        padding: 7px;
+    .cold-start__hud-item {
+        min-width: 61px;
+
+        padding: 4px 6px;
     }
 
-    .cold-start__stat-value {
-        font-size: 14px;
+    .cold-start__hud-icon {
+        width: 19px;
+        height: 19px;
+
+        flex-basis: 19px;
+    }
+
+    .cold-start__hud-item strong {
+        font-size: 11px;
+    }
+
+    .cold-start__game-over-card {
+        min-width: 185px;
+
+        padding: 16px;
+    }
+
+    .cold-start__game-over-card strong {
+        font-size: 19px;
+    }
+
+    .cold-start__game-over-card span {
+        font-size: 10px;
+    }
+
+    .cold-start__control-hint--mouse {
+        display: none;
     }
 
     .cold-start__footer {
-        margin-top: 10px;
-
-        font-size: 10px;
+        font-size: 9px;
     }
 }
 
 /* =========================================================
-   Very small screens / landscape phones
+   Very small landscape screens
    ========================================================= */
 
 @media (max-height: 520px) and (orientation: landscape) {
@@ -1130,23 +1348,19 @@
     }
 
     .cold-start__header {
-        margin-bottom: 8px;
-    }
-
-    .cold-start__subtitle {
-        display: none;
-    }
-
-    .cold-start__stats {
         margin-bottom: 7px;
+    }
+
+    .cold-start__message {
+        display: none;
     }
 
     .cold-start__controls {
         margin-top: 7px;
     }
 
-    .cold-start__jump {
-        min-height: 40px;
+    .cold-start__jump-button {
+        min-height: 38px;
     }
 
     .cold-start__footer {
@@ -1161,12 +1375,12 @@
 @media (prefers-reduced-motion: reduce) {
     .cold-start__status-dot,
     .cold-start__sky-star,
-    .cold-start__collectible::before {
+    .cold-start__star {
         animation: none;
     }
 
-    .cold-start__button,
-    .cold-start__jump {
+    .cold-start__game-over-card button,
+    .cold-start__jump-button {
         transition: none;
     }
 }

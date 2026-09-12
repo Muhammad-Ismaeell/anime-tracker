@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Gamepad2, MousePointer2, Zap } from "lucide-react";
 
@@ -27,30 +26,23 @@ const STAR_SIZE = 22;
 const STAR_COLLISION_PADDING = 6;
 const STAR_SCORE = 10;
 
-const HOME_REFRESH_KEY =
-    "anime-tracker:cold-start-home-refresh";
+const HOME_REFRESH_KEY = "anime-tracker:cold-start-home-refresh";
 
-/* -------------------------------------------------- */
-/* Helpers */
-/* -------------------------------------------------- */
+/* =========================================================
+   Helpers
+   ========================================================= */
 
 const randomId = () =>
-    `${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2)}`;
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const createObstacle = (
-    x = GAME_WIDTH + 80
-) => ({
+const createObstacle = (x = GAME_WIDTH + 80) => ({
     id: randomId(),
     x,
     width: OBSTACLE_WIDTH,
     height: OBSTACLE_HEIGHT,
 });
 
-const createStar = (
-    x = GAME_WIDTH + 160
-) => ({
+const createStar = (x = GAME_WIDTH + 160) => ({
     id: randomId(),
     x,
     y: 135 + Math.random() * 65,
@@ -66,9 +58,7 @@ const getInitialGame = () => ({
 
     obstacles: [createObstacle()],
 
-    stars: [
-        createStar(GAME_WIDTH + 330),
-    ],
+    stars: [createStar(GAME_WIDTH + 330)],
 
     score: 0,
     starsCollected: 0,
@@ -89,16 +79,14 @@ const rectanglesOverlap = (a, b) =>
     a.y < b.y + b.height &&
     a.y + a.height > b.y;
 
-/* -------------------------------------------------- */
-/* Home refresh protection */
-/* -------------------------------------------------- */
+/* =========================================================
+   Home refresh protection
+   ========================================================= */
 
 const hasPendingHomeRefresh = () => {
     try {
         return (
-            sessionStorage.getItem(
-                HOME_REFRESH_KEY
-            ) === "true"
+            sessionStorage.getItem(HOME_REFRESH_KEY) === "true"
         );
     } catch {
         return false;
@@ -107,9 +95,7 @@ const hasPendingHomeRefresh = () => {
 
 const markHomeRefreshComplete = () => {
     try {
-        sessionStorage.removeItem(
-            HOME_REFRESH_KEY
-        );
+        sessionStorage.removeItem(HOME_REFRESH_KEY);
     } catch {
         // Ignore storage errors.
     }
@@ -117,102 +103,74 @@ const markHomeRefreshComplete = () => {
 
 const markHomeRefreshPending = () => {
     try {
-        sessionStorage.setItem(
-            HOME_REFRESH_KEY,
-            "true"
-        );
+        sessionStorage.setItem(HOME_REFRESH_KEY, "true");
     } catch {
         // Ignore storage errors.
     }
 };
 
-/* -------------------------------------------------- */
-/* Component */
-/* -------------------------------------------------- */
+/* =========================================================
+   Component
+   ========================================================= */
 
 export default function ColdStartOverlay() {
     /*
-     * IMPORTANT:
-     *
-     * visible starts as false.
-     *
-     * Therefore the mini-game does not render at all
-     * during normal/fast requests.
+     * The overlay is completely absent until an API request
+     * actually crosses the cold-start threshold.
      */
-    const [visible, setVisible] =
-        useState(false);
+    const [visible, setVisible] = useState(false);
 
-    const [game, setGame] =
-        useState(getInitialGame);
+    const [game, setGame] = useState(getInitialGame);
 
-    const [elapsed, setElapsed] =
-        useState(0);
+    const [elapsed, setElapsed] = useState(0);
 
-    const [gameScale, setGameScale] =
-        useState(1);
+    const [gameScale, setGameScale] = useState(1);
 
     /*
-     * Number of requests that have actually crossed
-     * the cold-start delay.
+     * Number of requests that crossed the cold-start delay.
      */
     const slowRequests = useRef(0);
 
     /*
-     * True only after the mini-game has actually
-     * become visible.
+     * True only after the overlay has actually appeared.
      */
-    const coldStartShown =
-        useRef(false);
+    const coldStartShown = useRef(false);
 
-    const startedAt =
-        useRef(null);
+    const startedAt = useRef(null);
 
-    const animationFrameRef =
-        useRef(null);
+    const animationFrameRef = useRef(null);
 
-    const timerRef =
-        useRef(null);
+    const timerRef = useRef(null);
 
-    const gameRef =
-        useRef(game);
+    const gameRef = useRef(game);
 
-    const gameViewportRef =
-        useRef(null);
+    const gameViewportRef = useRef(null);
 
-    const jumpRequestedRef =
-        useRef(false);
+    const jumpRequestedRef = useRef(false);
 
-    /* -------------------------------------------------- */
-    /* Game reset */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Game reset
+       ===================================================== */
 
     const resetGame = useCallback(() => {
-        const initialGame =
-            getInitialGame();
+        const initialGame = getInitialGame();
 
-        gameRef.current =
-            initialGame;
+        gameRef.current = initialGame;
 
         setGame(initialGame);
 
         setElapsed(0);
 
-        startedAt.current =
-            Date.now();
+        startedAt.current = Date.now();
 
-        jumpRequestedRef.current =
-            false;
+        jumpRequestedRef.current = false;
     }, []);
 
-    /* -------------------------------------------------- */
-    /* Jump */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Jump
+       ===================================================== */
 
     const requestJump = useCallback(() => {
-        /*
-         * Only allow jump requests while the game is
-         * actually visible.
-         */
         if (!coldStartShown.current) {
             return;
         }
@@ -220,113 +178,87 @@ export default function ColdStartOverlay() {
         jumpRequestedRef.current = true;
     }, []);
 
-    /* -------------------------------------------------- */
-    /* Cold-start completion */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Cold-start completion
+       ===================================================== */
 
-    const finishColdStart =
-        useCallback(() => {
-            /*
-             * Capture this BEFORE changing the ref.
-             */
-            const wasColdStartShown =
-                coldStartShown.current;
+    const finishColdStart = useCallback(() => {
+        const wasColdStartShown = coldStartShown.current;
 
-            slowRequests.current = 0;
+        slowRequests.current = 0;
 
-            /*
-             * If the request finished before the
-             * 2.2-second threshold, absolutely nothing
-             * should happen.
-             */
-            if (!wasColdStartShown) {
-                return;
-            }
+        /*
+         * Fast requests never opened the overlay, so there is
+         * absolutely nothing to hide or reload.
+         */
+        if (!wasColdStartShown) {
+            return;
+        }
 
-            coldStartShown.current =
-                false;
+        coldStartShown.current = false;
 
-            setVisible(false);
+        setVisible(false);
 
-            /*
-             * Only reload Home.
-             *
-             * Other pages simply remove the overlay.
-             */
-            const isHome =
-                window.location.pathname === "/" ||
-                window.location.pathname === "";
+        const isHome =
+            window.location.pathname === "/" ||
+            window.location.pathname === "";
 
-            if (!isHome) {
-                return;
-            }
+        /*
+         * Other pages simply remove the overlay.
+         */
+        if (!isHome) {
+            return;
+        }
 
-            /*
-             * Prevent a reload loop.
-             */
-            if (hasPendingHomeRefresh()) {
-                markHomeRefreshComplete();
-                return;
-            }
+        /*
+         * Prevent a reload loop.
+         */
+        if (hasPendingHomeRefresh()) {
+            markHomeRefreshComplete();
+            return;
+        }
 
-            markHomeRefreshPending();
+        markHomeRefreshPending();
 
-            /*
-             * Give React one frame to remove the overlay
-             * before reloading the page.
-             */
-            window.requestAnimationFrame(() => {
-                window.location.reload();
-            });
-        }, []);
+        /*
+         * Let React remove the overlay before reloading.
+         */
+        window.requestAnimationFrame(() => {
+            window.location.reload();
+        });
+    }, []);
 
-    /* -------------------------------------------------- */
-    /* Cold-start event listener */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Cold-start event listener
+       ===================================================== */
 
     useEffect(() => {
-        const handleColdStart = (
-            event
-        ) => {
-            const {
-                type,
-                count,
-            } = event.detail || {};
+        const handleColdStart = (event) => {
+            const { type, count } = event.detail || {};
 
-            /* ------------------------------------------ */
-            /* Slow request started */
-            /* ------------------------------------------ */
+            /* ---------------------------------------------
+               Slow request started
+               --------------------------------------------- */
 
             if (type === "start") {
-                const previousCount =
-                    slowRequests.current;
+                const previousCount = slowRequests.current;
 
                 const nextCount =
                     typeof count === "number"
-                        ? Math.max(
-                              previousCount + 1,
-                              count
-                          )
+                        ? Math.max(previousCount + 1, count)
                         : previousCount + 1;
 
-                slowRequests.current =
-                    nextCount;
+                slowRequests.current = nextCount;
 
                 /*
-                 * IMPORTANT:
-                 *
-                 * The game opens ONLY here.
-                 *
-                 * This event is emitted only after
-                 * client.js has waited COLD_START_DELAY
-                 * milliseconds.
+                 * Open the game only when the first slow
+                 * request is detected.
                  */
                 if (
                     previousCount === 0 &&
                     !coldStartShown.current
                 ) {
-                    coldStartShown.current =
-                        true;
+                    coldStartShown.current = true;
 
                     resetGame();
 
@@ -336,28 +268,22 @@ export default function ColdStartOverlay() {
                 return;
             }
 
-            /* ------------------------------------------ */
-            /* Slow request finished */
-            /* ------------------------------------------ */
+            /* ---------------------------------------------
+               Slow request finished
+               --------------------------------------------- */
 
             if (type === "end") {
-                const previousCount =
-                    slowRequests.current;
+                const previousCount = slowRequests.current;
 
                 const nextCount =
                     typeof count === "number"
                         ? Math.max(0, count)
-                        : Math.max(
-                              0,
-                              previousCount - 1
-                          );
+                        : Math.max(0, previousCount - 1);
 
-                slowRequests.current =
-                    nextCount;
+                slowRequests.current = nextCount;
 
                 /*
-                 * Only finish after every slow request
-                 * has completed.
+                 * Only finish when ALL slow requests are done.
                  */
                 if (
                     previousCount > 0 &&
@@ -379,57 +305,43 @@ export default function ColdStartOverlay() {
                 handleColdStart
             );
         };
-    }, [
-        finishColdStart,
-        resetGame,
-    ]);
+    }, [finishColdStart, resetGame]);
 
-    /* -------------------------------------------------- */
-    /* Clear stale refresh flag after reload */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Clear stale refresh flag after reload
+       ===================================================== */
 
     useEffect(() => {
         /*
-         * A previous cold start may have triggered a
-         * full Home reload.
-         *
-         * Once this new document exists, the marker is
-         * no longer needed.
+         * The reload has created a fresh document.
+         * The previous refresh marker is no longer needed.
          */
         markHomeRefreshComplete();
     }, []);
 
-    /* -------------------------------------------------- */
-    /* General cleanup */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       General cleanup
+       ===================================================== */
 
     useEffect(() => {
         return () => {
-            if (
-                animationFrameRef.current
-            ) {
+            if (animationFrameRef.current) {
                 cancelAnimationFrame(
                     animationFrameRef.current
                 );
             }
 
             if (timerRef.current) {
-                window.clearInterval(
-                    timerRef.current
-                );
+                window.clearInterval(timerRef.current);
             }
         };
     }, []);
 
-    /* -------------------------------------------------- */
-    /* Responsive game scaling */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Responsive game scaling
+       ===================================================== */
 
     useEffect(() => {
-        /*
-         * Don't even observe the game container while
-         * the mini-game is hidden.
-         */
         if (
             !visible ||
             !gameViewportRef.current
@@ -437,12 +349,10 @@ export default function ColdStartOverlay() {
             return undefined;
         }
 
-        const viewport =
-            gameViewportRef.current;
+        const viewport = gameViewportRef.current;
 
         const updateGameScale = () => {
-            const width =
-                viewport.clientWidth;
+            const width = viewport.clientWidth;
 
             if (!width) {
                 return;
@@ -450,7 +360,6 @@ export default function ColdStartOverlay() {
 
             /*
              * Physics remain 1000x300.
-             *
              * Only the visual world scales.
              */
             const scale = Math.min(
@@ -463,32 +372,27 @@ export default function ColdStartOverlay() {
 
         updateGameScale();
 
-        const resizeObserver =
-            new ResizeObserver(
-                updateGameScale
-            );
-
-        resizeObserver.observe(
-            viewport
+        const resizeObserver = new ResizeObserver(
+            updateGameScale
         );
+
+        resizeObserver.observe(viewport);
 
         return () => {
             resizeObserver.disconnect();
         };
     }, [visible]);
 
-    /* -------------------------------------------------- */
-    /* Keyboard controls */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Keyboard controls
+       ===================================================== */
 
     useEffect(() => {
         if (!visible) {
             return undefined;
         }
 
-        const handleKeyDown = (
-            event
-        ) => {
+        const handleKeyDown = (event) => {
             if (
                 event.code === "Space" ||
                 event.code === "ArrowUp" ||
@@ -511,256 +415,194 @@ export default function ColdStartOverlay() {
                 handleKeyDown
             );
         };
-    }, [
-        visible,
-        requestJump,
-    ]);
+    }, [visible, requestJump]);
 
-    /* -------------------------------------------------- */
-    /* Timer */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Timer
+       ===================================================== */
 
     useEffect(() => {
-        /*
-         * No timer while the cold-start overlay is hidden.
-         */
         if (!visible) {
             if (timerRef.current) {
-                window.clearInterval(
-                    timerRef.current
-                );
+                window.clearInterval(timerRef.current);
 
-                timerRef.current =
-                    null;
+                timerRef.current = null;
             }
 
             return undefined;
         }
 
         if (!startedAt.current) {
-            startedAt.current =
-                Date.now();
+            startedAt.current = Date.now();
         }
 
-        timerRef.current =
-            window.setInterval(() => {
-                if (
-                    startedAt.current
-                ) {
-                    setElapsed(
-                        Date.now() -
-                            startedAt.current
-                    );
-                }
-            }, 250);
+        timerRef.current = window.setInterval(() => {
+            if (startedAt.current) {
+                setElapsed(
+                    Date.now() - startedAt.current
+                );
+            }
+        }, 250);
 
         return () => {
             if (timerRef.current) {
-                window.clearInterval(
-                    timerRef.current
-                );
+                window.clearInterval(timerRef.current);
 
-                timerRef.current =
-                    null;
+                timerRef.current = null;
             }
         };
     }, [visible]);
 
-    /* -------------------------------------------------- */
-    /* Game loop */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Game loop
+       ===================================================== */
 
     useEffect(() => {
-        /*
-         * The animation loop does not run at all while
-         * the server is responding normally.
-         */
         if (!visible) {
-            if (
-                animationFrameRef.current
-            ) {
+            if (animationFrameRef.current) {
                 cancelAnimationFrame(
                     animationFrameRef.current
                 );
 
-                animationFrameRef.current =
-                    null;
+                animationFrameRef.current = null;
             }
 
             return undefined;
         }
 
-        let lastTime =
-            performance.now();
+        let lastTime = performance.now();
 
         const tick = (now) => {
-            const delta =
-                Math.min(
-                    32,
-                    Math.max(
-                        8,
-                        now - lastTime
-                    )
-                );
+            const delta = Math.min(
+                32,
+                Math.max(8, now - lastTime)
+            );
 
             lastTime = now;
 
-            const frameScale =
-                delta / 16.67;
+            const frameScale = delta / 16.67;
 
             setGame((previous) => {
-                if (
-                    previous.gameOver
-                ) {
-                    gameRef.current =
-                        previous;
+                if (previous.gameOver) {
+                    gameRef.current = previous;
 
                     return previous;
                 }
-
-                /* -------------------------------------- */
-                /* Copy game state */
-                /* -------------------------------------- */
 
                 const player = {
                     ...previous.player,
                 };
 
-                let obstacles =
-                    previous.obstacles.map(
-                        (obstacle) => ({
-                            ...obstacle,
-                        })
-                    );
+                let obstacles = previous.obstacles.map(
+                    (obstacle) => ({
+                        ...obstacle,
+                    })
+                );
 
-                let stars =
-                    previous.stars.map(
-                        (star) => ({
-                            ...star,
-                        })
-                    );
+                let stars = previous.stars.map(
+                    (star) => ({
+                        ...star,
+                    })
+                );
 
-                /* -------------------------------------- */
-                /* Increase speed */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Increase speed
+                   ----------------------------------------- */
 
-                const speed =
-                    Math.min(
-                        MAX_SPEED,
-                        previous.speed +
-                            SPEED_ACCELERATION *
-                                frameScale
-                    );
+                const speed = Math.min(
+                    MAX_SPEED,
+                    previous.speed +
+                        SPEED_ACCELERATION *
+                            frameScale
+                );
 
-                /* -------------------------------------- */
-                /* Jump */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Jump
+                   ----------------------------------------- */
 
                 if (
                     jumpRequestedRef.current &&
                     player.grounded
                 ) {
-                    player.velocityY =
-                        JUMP_FORCE;
+                    player.velocityY = JUMP_FORCE;
 
-                    player.grounded =
-                        false;
+                    player.grounded = false;
                 }
 
-                jumpRequestedRef.current =
-                    false;
+                jumpRequestedRef.current = false;
 
-                /* -------------------------------------- */
-                /* Gravity */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Gravity
+                   ----------------------------------------- */
 
                 player.velocityY +=
-                    GRAVITY *
-                    frameScale;
+                    GRAVITY * frameScale;
 
                 player.y +=
-                    player.velocityY *
-                    frameScale;
+                    player.velocityY * frameScale;
 
-                /* -------------------------------------- */
-                /* Ground collision */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Ground collision
+                   ----------------------------------------- */
 
                 const floorY =
-                    GROUND_Y -
-                    PLAYER_HEIGHT;
+                    GROUND_Y - PLAYER_HEIGHT;
 
-                if (
-                    player.y >=
-                    floorY
-                ) {
-                    player.y =
-                        floorY;
+                if (player.y >= floorY) {
+                    player.y = floorY;
 
-                    player.velocityY =
-                        0;
+                    player.velocityY = 0;
 
-                    player.grounded =
-                        true;
+                    player.grounded = true;
                 }
 
-                /* -------------------------------------- */
-                /* Move obstacles */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Move obstacles
+                   ----------------------------------------- */
 
-                obstacles =
-                    obstacles
-                        .map(
-                            (obstacle) => ({
-                                ...obstacle,
+                obstacles = obstacles
+                    .map((obstacle) => ({
+                        ...obstacle,
 
-                                x:
-                                    obstacle.x -
-                                    speed *
-                                        frameScale,
-                            })
-                        )
-                        .filter(
-                            (obstacle) =>
-                                obstacle.x >
-                                -obstacle.width -
-                                    50
-                        );
+                        x:
+                            obstacle.x -
+                            speed * frameScale,
+                    }))
+                    .filter(
+                        (obstacle) =>
+                            obstacle.x >
+                            -obstacle.width - 50
+                    );
 
-                /* -------------------------------------- */
-                /* Move stars */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Move stars
+                   ----------------------------------------- */
 
-                stars =
-                    stars
-                        .map((star) => ({
-                            ...star,
+                stars = stars
+                    .map((star) => ({
+                        ...star,
 
-                            x:
-                                star.x -
-                                speed *
-                                    0.9 *
-                                    frameScale,
-                        }))
-                        .filter(
-                            (star) =>
-                                star.x >
-                                -STAR_SIZE -
-                                    50
-                        );
+                        x:
+                            star.x -
+                            speed *
+                                0.9 *
+                                frameScale,
+                    }))
+                    .filter(
+                        (star) =>
+                            star.x >
+                            -STAR_SIZE - 50
+                    );
 
-                /* -------------------------------------- */
-                /* Spawn obstacle */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Spawn obstacle
+                   ----------------------------------------- */
 
                 let nextObstacleSpawn =
                     previous.nextObstacleSpawn -
-                    speed *
-                        frameScale;
+                    speed * frameScale;
 
-                if (
-                    nextObstacleSpawn <= 0
-                ) {
+                if (nextObstacleSpawn <= 0) {
                     obstacles.push(
                         createObstacle(
                             GAME_WIDTH + 40
@@ -769,22 +611,18 @@ export default function ColdStartOverlay() {
 
                     nextObstacleSpawn =
                         900 +
-                        Math.random() *
-                            700;
+                        Math.random() * 700;
                 }
 
-                /* -------------------------------------- */
-                /* Spawn star */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Spawn star
+                   ----------------------------------------- */
 
                 let nextStarSpawn =
                     previous.nextStarSpawn -
-                    speed *
-                        frameScale;
+                    speed * frameScale;
 
-                if (
-                    nextStarSpawn <= 0
-                ) {
+                if (nextStarSpawn <= 0) {
                     stars.push(
                         createStar(
                             GAME_WIDTH + 80
@@ -793,55 +631,48 @@ export default function ColdStartOverlay() {
 
                     nextStarSpawn =
                         700 +
-                        Math.random() *
-                            900;
+                        Math.random() * 900;
                 }
 
-                /* -------------------------------------- */
-                /* Player collision box */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Player collision box
+                   ----------------------------------------- */
 
                 const playerBox = {
-                    x:
-                        player.x + 4,
-
-                    y:
-                        player.y + 3,
-
-                    width:
-                        PLAYER_WIDTH - 8,
-
-                    height:
-                        PLAYER_HEIGHT - 6,
+                    x: player.x + 4,
+                    y: player.y + 3,
+                    width: PLAYER_WIDTH - 8,
+                    height: PLAYER_HEIGHT - 6,
                 };
 
-                /* -------------------------------------- */
-                /* Obstacle collision */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Obstacle collision
 
-                const hitObstacle =
-                    obstacles.some(
-                        (obstacle) =>
-                            rectanglesOverlap(
-                                playerBox,
-                                {
-                                    x:
-                                        obstacle.x +
-                                        3,
+                   IMPORTANT:
+                   The collision Y is exactly the same
+                   position used by the visual obstacle.
+                   ----------------------------------------- */
 
-                                    y:
-                                        GROUND_Y -
-                                        obstacle.height,
+                const hitObstacle = obstacles.some(
+                    (obstacle) =>
+                        rectanglesOverlap(
+                            playerBox,
+                            {
+                                x:
+                                    obstacle.x + 3,
 
-                                    width:
-                                        obstacle.width -
-                                        6,
+                                y:
+                                    GROUND_Y -
+                                    obstacle.height,
 
-                                    height:
-                                        obstacle.height,
-                                }
-                            )
-                    );
+                                width:
+                                    obstacle.width - 6,
+
+                                height:
+                                    obstacle.height,
+                            }
+                        )
+                );
 
                 if (hitObstacle) {
                     const nextGame = {
@@ -862,25 +693,20 @@ export default function ColdStartOverlay() {
                         nextStarSpawn,
                     };
 
-                    gameRef.current =
-                        nextGame;
+                    gameRef.current = nextGame;
 
                     return nextGame;
                 }
 
-                /* -------------------------------------- */
-                /* Star collection */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Star collection
+                   ----------------------------------------- */
 
-                const remainingStars =
-                    [];
+                const remainingStars = [];
 
-                let collectedStars =
-                    0;
+                let collectedStars = 0;
 
-                for (
-                    const star of stars
-                ) {
+                for (const star of stars) {
                     const starBox = {
                         x:
                             star.x -
@@ -892,13 +718,11 @@ export default function ColdStartOverlay() {
 
                         width:
                             STAR_SIZE +
-                            STAR_COLLISION_PADDING *
-                                2,
+                            STAR_COLLISION_PADDING * 2,
 
                         height:
                             STAR_SIZE +
-                            STAR_COLLISION_PADDING *
-                                2,
+                            STAR_COLLISION_PADDING * 2,
                     };
 
                     if (
@@ -907,22 +731,18 @@ export default function ColdStartOverlay() {
                             starBox
                         )
                     ) {
-                        collectedStars +=
-                            1;
+                        collectedStars += 1;
                     } else {
-                        remainingStars.push(
-                            star
-                        );
+                        remainingStars.push(star);
                     }
                 }
 
-                /* -------------------------------------- */
-                /* Score */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   Score
+                   ----------------------------------------- */
 
                 const nextElapsed =
-                    previous.elapsed +
-                    delta;
+                    previous.elapsed + delta;
 
                 const starsCollected =
                     previous.starsCollected +
@@ -930,23 +750,20 @@ export default function ColdStartOverlay() {
 
                 const score =
                     Math.floor(
-                        nextElapsed /
-                            1000
+                        nextElapsed / 1000
                     ) +
-                    starsCollected *
-                        STAR_SCORE;
+                    starsCollected * STAR_SCORE;
 
-                /* -------------------------------------- */
-                /* New game state */
-                /* -------------------------------------- */
+                /* -----------------------------------------
+                   New game state
+                   ----------------------------------------- */
 
                 const nextGame = {
                     player,
 
                     obstacles,
 
-                    stars:
-                        remainingStars,
+                    stars: remainingStars,
 
                     score,
 
@@ -954,8 +771,7 @@ export default function ColdStartOverlay() {
 
                     speed,
 
-                    elapsed:
-                        nextElapsed,
+                    elapsed: nextElapsed,
 
                     gameOver: false,
 
@@ -964,70 +780,57 @@ export default function ColdStartOverlay() {
                     nextStarSpawn,
                 };
 
-                gameRef.current =
-                    nextGame;
+                gameRef.current = nextGame;
 
                 return nextGame;
             });
 
             animationFrameRef.current =
-                requestAnimationFrame(
-                    tick
-                );
+                requestAnimationFrame(tick);
         };
 
         animationFrameRef.current =
-            requestAnimationFrame(
-                tick
-            );
+            requestAnimationFrame(tick);
 
         return () => {
-            if (
-                animationFrameRef.current
-            ) {
+            if (animationFrameRef.current) {
                 cancelAnimationFrame(
                     animationFrameRef.current
                 );
 
-                animationFrameRef.current =
-                    null;
+                animationFrameRef.current = null;
             }
         };
     }, [visible]);
 
-    /* -------------------------------------------------- */
-    /* Restart */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Restart
+       ===================================================== */
 
-    const handleRestart =
-        useCallback(() => {
-            if (
-                !coldStartShown.current
-            ) {
-                return;
-            }
+    const handleRestart = useCallback(() => {
+        if (!coldStartShown.current) {
+            return;
+        }
 
-            resetGame();
-        }, [resetGame]);
+        resetGame();
+    }, [resetGame]);
 
-    /* -------------------------------------------------- */
-    /* CRITICAL:
-       Nothing related to the mini-game is rendered
-       unless a real slow request has been detected.
-    /* -------------------------------------------------- */
-
+    /*
+     * CRITICAL:
+     * Nothing related to the mini-game is rendered unless
+     * a real slow request has been detected.
+     */
     if (!visible) {
         return null;
     }
 
-    const displaySeconds =
-        Math.floor(
-            elapsed / 1000
-        );
+    const displaySeconds = Math.floor(
+        elapsed / 1000
+    );
 
-    /* -------------------------------------------------- */
-    /* Render */
-    /* -------------------------------------------------- */
+    /* =====================================================
+       Render
+       ===================================================== */
 
     return (
         <div
@@ -1039,14 +842,10 @@ export default function ColdStartOverlay() {
             <div className="cold-start__backdrop" />
 
             <section className="cold-start__panel">
-
-                {/* -------------------------------------- */}
                 {/* Header */}
-                {/* -------------------------------------- */}
 
                 <div className="cold-start__header">
                     <div className="cold-start__title-group">
-
                         <div className="cold-start__icon">
                             <Zap size={22} />
                         </div>
@@ -1064,14 +863,11 @@ export default function ColdStartOverlay() {
 
                     <div className="cold-start__status">
                         <span className="cold-start__status-dot" />
-
                         Waking up
                     </div>
                 </div>
 
-                {/* -------------------------------------- */}
                 {/* Message */}
-                {/* -------------------------------------- */}
 
                 <div className="cold-start__message">
                     <strong>
@@ -1086,71 +882,78 @@ export default function ColdStartOverlay() {
                     </span>
                 </div>
 
-                {/* -------------------------------------- */}
-                {/* Stats */}
-                {/* -------------------------------------- */}
-
-                <div className="cold-start__stats">
-
-                    <div className="cold-start__stat">
-                        <span>
-                            TIME
-                        </span>
-
-                        <strong>
-                            {displaySeconds}s
-                        </strong>
-                    </div>
-
-                    <div className="cold-start__stat">
-                        <span>
-                            SCORE
-                        </span>
-
-                        <strong>
-                            {game.score}
-                        </strong>
-                    </div>
-
-                    <div className="cold-start__stat">
-                        <span>
-                            STARS
-                        </span>
-
-                        <strong>
-                            {game.starsCollected}
-                        </strong>
-                    </div>
-
-                </div>
-
-                {/* -------------------------------------- */}
-                {/* Responsive game viewport */}
-                {/* -------------------------------------- */}
+                {/* Game */}
 
                 <div
-                    ref={
-                        gameViewportRef
-                    }
+                    ref={gameViewportRef}
                     className="cold-start__game"
                     style={{
-                        "--game-scale":
-                            gameScale,
+                        "--game-scale": gameScale,
                     }}
-                    onPointerDown={(
-                        event
-                    ) => {
+                    onPointerDown={(event) => {
                         event.preventDefault();
 
                         requestJump();
                     }}
                 >
+                    {/* HUD */}
 
-                    {/* ---------------------------------- */}
+                    <div className="cold-start__hud">
+                        <div className="cold-start__hud-item">
+                            <span className="cold-start__hud-icon">
+                                ◷
+                            </span>
+
+                            <div>
+                                <span className="cold-start__hud-label">
+                                    TIME
+                                </span>
+
+                                <strong>
+                                    {displaySeconds}s
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div className="cold-start__hud-item cold-start__hud-score">
+                            <span className="cold-start__hud-icon">
+                                ★
+                            </span>
+
+                            <div>
+                                <span className="cold-start__hud-label">
+                                    SCORE
+                                </span>
+
+                                <strong>
+                                    {game.score}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div className="cold-start__hud-item">
+                            <span className="cold-start__hud-icon cold-start__hud-star-icon">
+                                ✦
+                            </span>
+
+                            <div>
+                                <span className="cold-start__hud-label">
+                                    STARS
+                                </span>
+
+                                <strong>
+                                    {game.starsCollected}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Fixed 1000x300 game world */}
-                    {/* ---------------------------------- */}
 
                     <div className="cold-start__game-world">
+                        {/* Background glow */}
+
+                        <div className="cold-start__sky-glow" />
 
                         {/* Skyline */}
 
@@ -1166,55 +969,54 @@ export default function ColdStartOverlay() {
 
                         {/* Moon */}
 
-                        <div className="cold-start__moon">
-                            ◐
-                        </div>
+                        <div className="cold-start__moon" />
 
-                        {/* Stars */}
+                        {/* Background stars */}
 
-                        {game.stars.map(
-                            (star) => (
-                                <div
-                                    key={
-                                        star.id
-                                    }
-                                    className="cold-start__star"
-                                    style={{
-                                        transform:
-                                            `translate(${star.x}px, ${star.y}px)`,
-                                    }}
-                                >
-                                    ✦
-                                </div>
-                            )
-                        )}
+                        <div className="cold-start__sky-star cold-start__sky-star--1" />
+                        <div className="cold-start__sky-star cold-start__sky-star--2" />
+                        <div className="cold-start__sky-star cold-start__sky-star--3" />
+                        <div className="cold-start__sky-star cold-start__sky-star--4" />
+                        <div className="cold-start__sky-star cold-start__sky-star--5" />
+                        <div className="cold-start__sky-star cold-start__sky-star--6" />
+                        <div className="cold-start__sky-star cold-start__sky-star--7" />
+
+                        {/* Collectible stars */}
+
+                        {game.stars.map((star) => (
+                            <div
+                                key={star.id}
+                                className="cold-start__star"
+                                style={{
+                                    left: `${star.x}px`,
+                                    top: `${star.y}px`,
+                                }}
+                            >
+                                ✦
+                            </div>
+                        ))}
 
                         {/* Obstacles */}
 
-                        {game.obstacles.map(
-                            (obstacle) => (
-                                <div
-                                    key={
-                                        obstacle.id
-                                    }
-                                    className="cold-start__obstacle"
-                                    style={{
-                                        transform:
-                                            `translate(${obstacle.x}px, ${GROUND_Y - obstacle.height}px)`,
-
-                                        width:
-                                            obstacle.width,
-
-                                        height:
-                                            obstacle.height,
-                                    }}
-                                >
-                                    <span />
-                                    <span />
-                                    <span />
-                                </div>
-                            )
-                        )}
+                        {game.obstacles.map((obstacle) => (
+                            <div
+                                key={obstacle.id}
+                                className="cold-start__obstacle"
+                                style={{
+                                    left: `${obstacle.x}px`,
+                                    top: `${
+                                        GROUND_Y -
+                                        obstacle.height
+                                    }px`,
+                                    width: `${obstacle.width}px`,
+                                    height: `${obstacle.height}px`,
+                                }}
+                            >
+                                <span />
+                                <span />
+                                <span />
+                            </div>
+                        ))}
 
                         {/* Runner */}
 
@@ -1222,8 +1024,7 @@ export default function ColdStartOverlay() {
                             className={[
                                 "cold-start__runner",
 
-                                game.player
-                                    .grounded
+                                game.player.grounded
                                     ? ""
                                     : "cold-start__runner--jumping",
 
@@ -1234,13 +1035,12 @@ export default function ColdStartOverlay() {
                                 .filter(Boolean)
                                 .join(" ")}
                             style={{
-                                transform:
-                                    `translate(${game.player.x}px, ${game.player.y}px)`,
+                                left: `${game.player.x}px`,
+                                top: `${game.player.y}px`,
                             }}
                         >
                             <div className="cold-start__runner-head">
                                 <span className="cold-start__eye cold-start__eye--left" />
-
                                 <span className="cold-start__eye cold-start__eye--right" />
                             </div>
 
@@ -1271,22 +1071,18 @@ export default function ColdStartOverlay() {
                         {game.gameOver && (
                             <div className="cold-start__game-over">
                                 <div className="cold-start__game-over-card">
-
                                     <strong>
                                         GAME OVER
                                     </strong>
 
                                     <span>
                                         The server is
-                                        still waking
-                                        up.
+                                        still waking up.
                                     </span>
 
                                     <button
                                         type="button"
-                                        onPointerDown={(
-                                            event
-                                        ) => {
+                                        onPointerDown={(event) => {
                                             event.stopPropagation();
                                             event.preventDefault();
 
@@ -1295,41 +1091,27 @@ export default function ColdStartOverlay() {
                                     >
                                         RESTART
                                     </button>
-
                                 </div>
                             </div>
                         )}
-
                     </div>
                 </div>
 
-                {/* -------------------------------------- */}
                 {/* Controls */}
-                {/* -------------------------------------- */}
 
                 <div className="cold-start__controls">
-
-                    <div>
+                    <div className="cold-start__control-hint">
                         <Gamepad2 size={18} />
 
                         <span>
-                            <kbd>
-                                SPACE
-                            </kbd>
-
-                            <kbd>
-                                ↑
-                            </kbd>
-
-                            <kbd>
-                                W
-                            </kbd>
-
+                            <kbd>SPACE</kbd>
+                            <kbd>↑</kbd>
+                            <kbd>W</kbd>
                             {" "}to jump
                         </span>
                     </div>
 
-                    <div>
+                    <div className="cold-start__control-hint cold-start__control-hint--mouse">
                         <MousePointer2 size={18} />
 
                         <span>
@@ -1340,9 +1122,7 @@ export default function ColdStartOverlay() {
                     <button
                         type="button"
                         className="cold-start__jump-button"
-                        onPointerDown={(
-                            event
-                        ) => {
+                        onPointerDown={(event) => {
                             event.stopPropagation();
                             event.preventDefault();
 
@@ -1351,18 +1131,14 @@ export default function ColdStartOverlay() {
                     >
                         JUMP
                     </button>
-
                 </div>
 
-                {/* -------------------------------------- */}
                 {/* Footer */}
-                {/* -------------------------------------- */}
 
                 <p className="cold-start__footer">
                     Free hosting can take a little longer
                     to wake up after inactivity.
                 </p>
-
             </section>
         </div>
     );
