@@ -9,7 +9,6 @@ import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
-import ColdStartOverlay from "./components/ui/ColdStartOverlay";
 import {
     QueryClient,
     QueryClientProvider,
@@ -47,7 +46,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         </AuthProvider>
                     </ThemeProvider>
                 </BrowserRouter>
-                <ColdStartOverlay />
                 {import.meta.env.DEV && (
                     <ReactQueryDevtools initialIsOpen={false} />
                 )}
