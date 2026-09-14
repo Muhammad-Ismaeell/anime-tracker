@@ -87,15 +87,28 @@ http://127.0.0.1:8000/api/schema/
 
 ## Docker
 
-The backend includes a production-oriented Dockerfile that runs Gunicorn:
+The repository includes an optional root-level Dockerfile for containerized Django deployment. It installs the backend dependencies and runs Django with Gunicorn.
+
+Build it from the repository root:
+
+```bash
+docker build -t anime-tracker-backend .
+```
+
+Run it with the backend environment file:
+
+```bash
+docker run --env-file ./backend/.env -p 8000:8000 anime-tracker-backend
+```
+
+The repository also includes `backend/docker-compose.yml` for Docker-based local development. It uses the root Dockerfile, mounts the repository source, runs migrations and starts Django's development server:
 
 ```bash
 cd backend
-docker build -t anime-tracker-backend .
-docker run --env-file .env -p 8000:8000 anime-tracker-backend
+docker compose up --build
 ```
 
-The repository does not currently include a Docker Compose configuration. Local development is documented using the Python virtual environment and Django development server above.
+Docker is an optional development/deployment path; the documented default local workflow uses a Python virtual environment and the Django development server. The current production deployment uses Belmo/Nixpacks rather than Docker.
 
 ## Database migrations
 
