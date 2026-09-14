@@ -21,6 +21,7 @@ ALLOWED_HOSTS = env.list(
     default=[
         "localhost",
         "127.0.0.1",
+        "anime-tracker-3a68.onbelmo.uk",
     ],
 )
 
@@ -228,6 +229,7 @@ CSRF_TRUSTED_ORIGINS = env.list(
     default=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "https://anime-tracker-3a68.onbelmo.uk",
     ],
 )
 
