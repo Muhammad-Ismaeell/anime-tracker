@@ -178,7 +178,13 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "core.exceptions.handlers.custom_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+    ),
+
 }
+
+
 
 
 SPECTACULAR_SETTINGS = {

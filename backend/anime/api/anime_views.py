@@ -49,8 +49,7 @@ def safe_int(value, default=1):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    logger.error("TOP ANIME: RETURNING JSONRESPONSE")
-    return JsonResponse({"ok": True})
+    return Response({"ok": True})
 
 
 @extend_schema(
