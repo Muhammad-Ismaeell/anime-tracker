@@ -6,7 +6,7 @@ from drf_spectacular.utils import (
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
+import logging
 from anime.api.docs import (
     AnimeDetailResponseSerializer,
     AnimeListResponseSerializer,
@@ -17,7 +17,7 @@ from anime.application.database_anime_service import DatabaseAnimeService
 from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 
-
+logger = logging.getLogger(__name__)
 search_service = AnimeSearchService()
 anime_service = AnimeService(TenraiClient())
 
@@ -42,12 +42,25 @@ def safe_int(value, default=1):
     ],
     responses={200: AnimeListResponseSerializer},
 )
+
+
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    return Response(
-        DatabaseAnimeService.get_top(safe_int(request.GET.get("page")))
-    )
+    try:
+        logger.error("TOP ANIME: BEFORE DB QUERY")
+
+        result = DatabaseAnimeService.get_top(
+            safe_int(request.GET.get("page"))
+        )
+
+        logger.error("TOP ANIME: AFTER DB QUERY")
+        return Response(result)
+
+    except Exception:
+        logger.exception("TOP ANIME FAILED")
+        raise
 
 
 @extend_schema(
