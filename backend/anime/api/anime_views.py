@@ -6,7 +6,6 @@ from drf_spectacular.utils import (
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-import logging
 from anime.api.docs import (
     AnimeDetailResponseSerializer,
     AnimeListResponseSerializer,
@@ -18,7 +17,6 @@ from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 from django.http import JsonResponse
 
-logger = logging.getLogger(__name__)
 search_service = AnimeSearchService()
 anime_service = AnimeService(TenraiClient())
 
