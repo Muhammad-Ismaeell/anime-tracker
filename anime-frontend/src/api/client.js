@@ -21,46 +21,6 @@ const refreshClient = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-const COLD_START_DELAY = 2200;
-let slowRequestCount = 0;
-
-const emitColdStart = (type) => {
-    window.dispatchEvent(
-        new CustomEvent("anime-tracker:cold-start", {
-            detail: {
-                type,
-                count: slowRequestCount,
-            },
-        })
-    );
-};
-
-const markSlowRequest = (config) => {
-    if (config.skipColdStart) return;
-
-    config.__coldStartTimer = window.setTimeout(() => {
-        config.__coldStartTimer = null;
-        config.__coldStartSlow = true;
-        slowRequestCount += 1;
-        emitColdStart("start");
-    }, COLD_START_DELAY);
-};
-
-const finishColdStartRequest = (config) => {
-    if (!config) return;
-
-    if (config.__coldStartTimer) {
-        window.clearTimeout(config.__coldStartTimer);
-        config.__coldStartTimer = null;
-    }
-
-    if (config.__coldStartSlow) {
-        config.__coldStartSlow = false;
-        slowRequestCount = Math.max(0, slowRequestCount - 1);
-        emitColdStart("end");
-    }
-};
-
 const processQueue = (error, token = null) => {
     failedQueue.forEach(({ resolve, reject }) => {
         if (error) {
@@ -75,8 +35,6 @@ const processQueue = (error, token = null) => {
 
 api.interceptors.request.use(
     (config) => {
-        markSlowRequest(config);
-
         if (config.skipAuth) {
             return config;
         }
@@ -94,10 +52,7 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-    (response) => {
-        finishColdStartRequest(response.config);
-        return response;
-    },
+    (response) => response,
 
     async (error) => {
         const originalRequest = error.config;
@@ -105,8 +60,6 @@ api.interceptors.response.use(
         if (!originalRequest) {
             return Promise.reject(error);
         }
-
-        finishColdStartRequest(originalRequest);
 
         const isAuthRequest =
             originalRequest.url?.includes("/auth/login/") ||
