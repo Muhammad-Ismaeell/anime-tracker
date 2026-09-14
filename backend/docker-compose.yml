@@ -2,17 +2,21 @@ version: "3.9"
 
 services:
   backend:
-    build: .
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: anime-tracker-backend
 
     ports:
       - "8000:8000"
 
     volumes:
-      - .:/app
+      - ..:/app
 
     env_file:
       - .env
+
+    working_dir: /app/backend
 
     command: >
       sh -c "
