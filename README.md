@@ -8,7 +8,11 @@ A full-stack anime discovery and tracking platform built with **Django REST Fram
 
 ## Live Demo
 
-**Web app:** https://anime-tracker-zeta-green.vercel.app
+- **Web app:** https://one-anime.vercel.app/
+- **Backend API:** https://anime-tracker-3a68.onbelmo.uk/
+- **API documentation:** https://anime-tracker-3a68.onbelmo.uk/api/docs/
+
+The frontend is deployed on **Vercel**, the Django backend is deployed on **Belmo**, and the production database is **PostgreSQL on Neon**.
 
 ## What I Built
 
@@ -24,7 +28,8 @@ Key engineering areas demonstrated:
 - Relational constraints and indexes for data integrity and common query paths
 - Responsive React UI with lazy-loaded routes and TanStack Query server-state management
 - Automated backend tests plus frontend lint/build checks in GitHub Actions
-- PostgreSQL production deployment
+- PostgreSQL production deployment on Neon
+- Separate production deployments for the React frontend and Django API
 
 ## Screenshots
 
@@ -123,11 +128,14 @@ The interface is designed to adapt to different screen sizes and provide a usabl
 ## Architecture
 
 ```text
+                           Production
+
 Browser
    │
    ▼
 React + Vite
-   │ Axios / JSON
+   │
+   │ HTTPS / JSON
    ▼
 Django + Django REST Framework
    │
@@ -138,17 +146,55 @@ Django + Django REST Framework
    │
    ├── Anime API
    │       └── Application services
-   │               ├── Database / Django ORM
+   │               ├── PostgreSQL (Neon)
    │               ├── Django cache
-   │               └── Tenrai API client
+   │               └── External anime API
    │
-   └── PostgreSQL (production)
-           └── SQLite (local development)
+   └── Media storage
+           └── Cloudinary
+
+Frontend: Vercel
+Backend:  Belmo
+Database: Neon PostgreSQL
 ```
+
+For local development, SQLite can be used instead of PostgreSQL.
 
 The backend separates API/presentation concerns from application services and infrastructure integrations. External anime data is persisted locally when appropriate, while freshness windows and caching reduce unnecessary upstream requests.
 
 See [docs/architecture.md](docs/architecture.md) for detailed request flows.
+
+## Production Deployment
+
+The production application is split into independently deployed frontend, backend and database services:
+
+| Component | Service | Purpose |
+|---|---|---|
+| Frontend | Vercel | React/Vite production application |
+| Backend | Belmo | Django + Django REST Framework API |
+| Database | Neon | Managed PostgreSQL database |
+| Media | Cloudinary | Production media/avatar storage |
+
+### Production URLs
+
+```text
+Frontend:
+https://one-anime.vercel.app/
+
+Backend:
+https://anime-tracker-3a68.onbelmo.uk/
+
+API documentation:
+https://anime-tracker-3a68.onbelmo.uk/api/docs/
+```
+
+The frontend uses the production API through the `VITE_API_URL` environment variable:
+
+```text
+VITE_API_URL=https://anime-tracker-3a68.onbelmo.uk/api
+```
+
+Production secrets and credentials are configured through the deployment platforms and are not committed to the repository.
 
 ## Tech Stack
 
@@ -183,9 +229,12 @@ See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 
 ### External services
 
-- Tenrai API for anime data
+- Jikan API for anime data
 - Google authentication
 - Cloudinary media storage
+- Neon PostgreSQL
+- Belmo hosting
+- Vercel hosting
 
 ## Repository Structure
 
@@ -273,6 +322,12 @@ npm install
 
 Create `.env` from `.env.example` and configure the API/media URLs and Google client ID.
 
+For local development, the API URL should point to the local Django server:
+
+```text
+VITE_API_URL=http://127.0.0.1:8000/api
+```
+
 Start the development server:
 
 ```bash
@@ -283,15 +338,22 @@ The frontend normally runs at `http://localhost:5173/`.
 
 ## API Documentation
 
-The backend exposes OpenAPI documentation:
+### Production
+
+```text
+https://anime-tracker-3a68.onbelmo.uk/api/docs/
+```
+
+The production raw schema is available at:
+
+```text
+https://anime-tracker-3a68.onbelmo.uk/api/schema/
+```
+
+### Local development
 
 ```text
 http://127.0.0.1:8000/api/docs/
-```
-
-The raw schema is available at:
-
-```text
 http://127.0.0.1:8000/api/schema/
 ```
 
@@ -373,4 +435,4 @@ This is a portfolio-scale application. The current design deliberately avoids in
 
 ## Attribution
 
-Anime metadata is provided by the Tenrai API. This is an independent portfolio project and is not affiliated with Tenrai, MyAnimeList, anime studios or publishers represented in the data.
+Anime metadata is provided by the Jikan API. This is an independent portfolio project and is not affiliated with Jikan, MyAnimeList, anime studios or publishers represented in the data.
