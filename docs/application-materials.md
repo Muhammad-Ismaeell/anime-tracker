@@ -3,7 +3,7 @@
 ## CV — Project Entry
 
 **Anime Tracker — Full-Stack Web Application**  
-React, Vite, Django REST Framework, PostgreSQL-ready architecture, JWT, TanStack Query, Axios
+React, Vite, Django REST Framework, PostgreSQL, JWT, TanStack Query, Axios
 
 - Built a full-stack anime discovery and tracking platform with a React/Vite frontend and Django REST API.
 - Implemented search/filtering, anime discovery, detailed anime pages, personal library, watch progress, favourites, reviews, user profiles, activity and dashboard features.
@@ -12,6 +12,7 @@ React, Vite, Django REST Framework, PostgreSQL-ready architecture, JWT, TanStack
 - Implemented JWT authentication with short-lived access tokens, refresh-token rotation/blacklisting, email verification and Google authentication.
 - Added automated backend tests and GitHub Actions CI, plus OpenAPI/Swagger documentation for the REST API.
 - Improved frontend reliability and performance with TanStack Query server-state caching, lazy-loaded routes, loading/error states, responsive navigation and an error boundary.
+- Deployed the React frontend on Vercel, Django API on Belmo, and production PostgreSQL database on Neon.
 
 ## CV — Short Version
 
@@ -21,11 +22,15 @@ Built and deployed a full-stack anime tracking platform with JWT/Google authenti
 
 ## Skills Demonstrated
 
-**Backend:** Python, Django, Django REST Framework, Django ORM, REST APIs, JWT, authentication, service-layer architecture, caching, rate limiting, PostgreSQL-ready database configuration, testing
+**Backend:** Python, Django, Django REST Framework, Django ORM, REST APIs, JWT, authentication, service-layer architecture, caching, rate limiting, PostgreSQL, testing
 
 **Frontend:** React, Vite, React Router, TanStack React Query, Axios, Context API, responsive CSS, lazy loading, error/loading states
 
-**Tools:** Git, GitHub, GitHub Actions, Docker, OpenAPI/Swagger
+**Tools:** Git, GitHub, GitHub Actions, OpenAPI/Swagger
+
+**Deployment:** Vercel, Belmo/Nixpacks, Neon PostgreSQL, Cloudinary
+
+**Optional infrastructure configuration:** Docker/Docker Compose files are included in the repository, but Docker was not used as the production deployment path.
 
 ## 30-Second Project Explanation
 
@@ -52,12 +57,12 @@ The goal was to go beyond a simple CRUD project and build something with real fr
 - **Frontend:** React + Vite + TanStack React Query + Axios
 - **Backend:** Django + Django REST Framework
 - **Authentication:** JWT + refresh-token rotation/blacklisting + Google authentication
-- **Data:** Django ORM with SQLite for local development and PostgreSQL-ready production configuration
+- **Data:** Django ORM with SQLite for local development and PostgreSQL in production
 - **External API:** Tenrai
 - **Reliability:** database-first persistence, caching and shared API rate limiting
 - **Documentation:** OpenAPI/Swagger + architecture and database documentation
 - **Testing:** Pytest + GitHub Actions
-- **Deployment:** Vercel frontend with a separately deployed Django backend
+- **Deployment:** Vercel frontend, Belmo Django backend and Neon PostgreSQL
 
 Live demo: https://anime-tracker-zeta-green.vercel.app
 
