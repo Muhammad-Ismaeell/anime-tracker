@@ -1,13 +1,13 @@
 import api from "./client";
-export const UserAPI = {
 
+export const UserAPI = {
     profile: async () => {
         const res = await api.get("/users/profile/");
         return res.data.data;
     },
 
     updateProfile: async (payload) => {
-        const res = await api.put("/users/profile/update/", payload);
+        const res = await api.patch("/users/profile/update/", payload);
         return res.data.data;
     },
 
@@ -18,10 +18,9 @@ export const UserAPI = {
 
     activity: async (page = 1) => {
         const res = await api.get("/users/activity/", {
-            params: { page }
+            params: { page },
         });
 
-
         return res.data;
-    }
+    },
 };
