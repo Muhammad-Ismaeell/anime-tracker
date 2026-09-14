@@ -48,19 +48,8 @@ def safe_int(value, default=1):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    try:
-        logger.error("TOP ANIME: BEFORE DB QUERY")
-
-        result = DatabaseAnimeService.get_top(
-            safe_int(request.GET.get("page"))
-        )
-
-        logger.error("TOP ANIME: AFTER DB QUERY")
-        return Response(result)
-
-    except Exception:
-        logger.exception("TOP ANIME FAILED")
-        raise
+    logger.error("TOP ANIME: RETURNING TEST RESPONSE")
+    return Response({"ok": True})
 
 
 @extend_schema(
