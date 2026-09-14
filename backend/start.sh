@@ -2,7 +2,7 @@
 
 python manage.py migrate
 
-if [ "$RUN_DB_POPULATION" = "true" ]; then
+if [ "$RUN_DB_POPULATION" = "false" ]; then
     python manage.py populate_anime \
         --max-pages 3 \
         --catalog-pages 5 \
