@@ -63,7 +63,7 @@ Replace `{anime_id}` with the provider/MAL identifier stored by the application.
 | Method | Endpoint | Purpose | Auth |
 |---|---|---|---|
 | GET | `/api/users/profile/` | Get profile | JWT |
-| PUT/PATCH | `/api/users/profile/update/` | Update profile | JWT |
+| PATCH | `/api/users/profile/update/` | Update profile | JWT |
 | GET | `/api/users/favorites/` | List favourites | JWT |
 | POST | `/api/users/favorites/toggle/` | Add/remove favourite | JWT |
 | GET | `/api/users/favorites/ids/` | Return favourite anime IDs | JWT |
