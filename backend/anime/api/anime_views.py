@@ -16,6 +16,7 @@ from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
 from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 search_service = AnimeSearchService()
@@ -48,8 +49,8 @@ def safe_int(value, default=1):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    logger.error("TOP ANIME: RETURNING TEST RESPONSE")
-    return Response({"ok": True})
+    logger.error("TOP ANIME: RETURNING JSONRESPONSE")
+    return JsonResponse({"ok": True})
 
 
 @extend_schema(
