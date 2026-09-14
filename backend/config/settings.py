@@ -16,13 +16,16 @@ SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS",
-    default=[
-        "localhost",
-        "127.0.0.1",
-        "anime-tracker-3a68.onbelmo.uk",
-    ],
+# Always include the Belmo hostname, even when Belmo provides ALLOWED_HOSTS.
+ALLOWED_HOSTS = list(
+    dict.fromkeys(
+        env.list("ALLOWED_HOSTS", default=[])
+        + [
+            "localhost",
+            "127.0.0.1",
+            "anime-tracker-3a68.onbelmo.uk",
+        ]
+    )
 )
 
 
@@ -211,7 +214,7 @@ else:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
 
@@ -224,13 +227,15 @@ CORS_ALLOWED_ORIGINS = env.list(
     ],
 )
 
-CSRF_TRUSTED_ORIGINS = env.list(
-    "CSRF_TRUSTED_ORIGINS",
-    default=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://anime-tracker-3a68.onbelmo.uk",
-    ],
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys(
+        env.list("CSRF_TRUSTED_ORIGINS", default=[])
+        + [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "https://anime-tracker-3a68.onbelmo.uk",
+        ]
+    )
 )
 
 CORS_ALLOW_ALL_ORIGINS = False
