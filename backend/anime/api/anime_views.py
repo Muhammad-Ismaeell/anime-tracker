@@ -44,12 +44,14 @@ def safe_int(value, default=1):
     responses={200: AnimeListResponseSerializer},
 )
 
-
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    return Response({"ok": True})
+    return Response(
+        DatabaseAnimeService.get_top(
+            safe_int(request.GET.get("page"))
+        )
+    )
 
 
 @extend_schema(
