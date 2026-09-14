@@ -3,9 +3,8 @@ from datetime import timedelta
 from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
-from anime.infrastructure.db_write_lock import db_write_lock
 from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
-from anime.infrastructure.models import Anime, AnimeStaff, StaffPerson
+from anime.infrastructure.models import Anime, AnimeStaff
 
 
 class StaffService:
@@ -34,9 +33,9 @@ class StaffService:
             if rows:
                 return self._serialize(rows)
 
-        return self._fetch_and_store_staff(anime_id, anime)
+        return self._fetch_staff(anime_id, anime)
 
-    def _fetch_and_store_staff(self, anime_id, anime=None):
+    def _fetch_staff(self, anime_id, anime=None):
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/staff")
         if not data:
             return []
@@ -67,29 +66,6 @@ class StaffService:
                 "positions": positions,
                 "favorites": entry.get("favorites") or 0,
             })
-
-        with db_write_lock:
-            AnimeStaff.objects.filter(anime=anime).delete()
-            staff_rows = []
-            for item in items:
-                staff_person, _ = StaffPerson.objects.update_or_create(
-                    mal_id=item["id"],
-                    defaults={
-                        "name": item["name"],
-                        "image": item["image"],
-                        "favorites": item["favorites"],
-                    },
-                )
-                staff_rows.append(
-                    AnimeStaff(
-                        anime=anime,
-                        person=staff_person,
-                        positions=item["positions"],
-                    )
-                )
-
-            if staff_rows:
-                AnimeStaff.objects.bulk_create(staff_rows)
 
         return items
 
