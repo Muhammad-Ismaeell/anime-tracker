@@ -1,0 +1,8 @@
+﻿backend/.env
+backend/.venv-clean/
+backend/venv/
+backend/db.sqlite3
+backend/media/
+.git/
+anime-frontend/node_modules/
+anime-frontend/dist/
