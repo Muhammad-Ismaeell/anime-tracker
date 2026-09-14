@@ -8,7 +8,7 @@ A full-stack anime discovery and tracking platform built with **Django REST Fram
 
 ## Live Demo
 
-- **Web app:** https://one-anime.vercel.app/
+- **Web app:** https://anime-tracker-zeta-green.vercel.app/
 - **Backend API:** https://anime-tracker-3a68.onbelmo.uk/
 - **API documentation:** https://anime-tracker-3a68.onbelmo.uk/api/docs/
 
@@ -148,7 +148,7 @@ Django + Django REST Framework
    │       └── Application services
    │               ├── PostgreSQL (Neon)
    │               ├── Django cache
-   │               └── External anime API
+   │               └── Tenrai API
    │
    └── Media storage
            └── Cloudinary
@@ -179,7 +179,7 @@ The production application is split into independently deployed frontend, backen
 
 ```text
 Frontend:
-https://one-anime.vercel.app/
+https://anime-tracker-zeta-green.vercel.app/
 
 Backend:
 https://anime-tracker-3a68.onbelmo.uk/
@@ -229,7 +229,7 @@ Production secrets and credentials are configured through the deployment platfor
 
 ### External services
 
-- Jikan API for anime data
+- Tenrai API for anime data
 - Google authentication
 - Cloudinary media storage
 - Neon PostgreSQL
@@ -435,4 +435,4 @@ This is a portfolio-scale application. The current design deliberately avoids in
 
 ## Attribution
 
-Anime metadata is provided by the Jikan API. This is an independent portfolio project and is not affiliated with Jikan, MyAnimeList, anime studios or publishers represented in the data.
+Anime metadata is provided by the Tenrai API. This is an independent portfolio project and is not affiliated with Tenrai, MyAnimeList, anime studios or publishers represented in the data.
