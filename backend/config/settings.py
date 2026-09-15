@@ -6,14 +6,10 @@ import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
-
+env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
-
 DEBUG = env.bool("DEBUG", default=False)
 
 # Always include the Belmo hostname, even when Belmo provides ALLOWED_HOSTS.
@@ -28,9 +24,7 @@ ALLOWED_HOSTS = list(
     )
 )
 
-
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -67,10 +61,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-GOOGLE_CLIENT_ID = env(
-    "GOOGLE_CLIENT_ID",
-    default="",
-)
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")
 
 TEMPLATES = [
     {
@@ -93,9 +84,7 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
-
 if DEBUG:
     DATABASES = {
         "default": dj_database_url.config(
@@ -112,24 +101,16 @@ else:
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = (
-        "HTTP_X_FORWARDED_PROTO",
-        "https",
-    )
-
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
 
-
 # Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -145,27 +126,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # Static and media files
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
 # Default primary key field type
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -181,11 +155,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
     ),
-
 }
-
-
-
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Anime Tracker API",
@@ -203,7 +173,6 @@ SPECTACULAR_SETTINGS = {
     """,
     "VERSION": "1.0.0",
 }
-
 
 if DEBUG:
     STORAGES = {
@@ -223,7 +192,6 @@ else:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-
 
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
@@ -247,11 +215,7 @@ CSRF_TRUSTED_ORIGINS = list(
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
-FRONTEND_URL = env(
-    "FRONTEND_URL",
-    default="http://localhost:5173",
-)
-
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 if DEBUG:
@@ -263,7 +227,6 @@ else:
     EMAIL_HOST_USER = env("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = True
-
 
 CORS_ALLOW_HEADERS = [
     "authorization",
@@ -282,7 +245,6 @@ CORS_ALLOW_METHODS = [
     "DELETE",
     "OPTIONS",
 ]
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
