@@ -4,8 +4,8 @@ from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
 from anime.infrastructure.db_write_lock import db_write_lock
-from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeTheme
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 
 
 class ThemeService:
@@ -14,7 +14,6 @@ class ThemeService:
 
     def get_themes(self, anime_id):
         key = f"anime-themes:v2:{anime_id}"
-
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
