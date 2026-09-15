@@ -2,24 +2,18 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useLogin } from "../auth/useAuth";
 import { AuthContext } from "../context/AuthContext";
-import GoogleLoginButton from "../components/GoogleLoginButton";
 
-
-const GOOGLE_ONLY_AUTH =
-    import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
-
+const GOOGLE_ONLY_AUTH = import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
     const { login } = useContext(AuthContext);
-
     const loginMutation = useLogin();
     const navigate = useNavigate();
-
 
     const handleLogin = (event) => {
         event.preventDefault();
@@ -27,10 +21,7 @@ export default function Login() {
         const cleanUsername = username.trim();
 
         if (!cleanUsername || !password) {
-            toast.error(
-                "Please enter your username and password."
-            );
-
+            toast.error("Please enter your username and password.");
             return;
         }
 
@@ -41,75 +32,46 @@ export default function Login() {
             },
             {
                 onSuccess: async (response) => {
-                    const {
-                        access,
-                        refresh,
-                        user,
-                    } = response.data;
+                    const { access, refresh, user } = response.data;
 
-                    await login(
-                        access,
-                        refresh,
-                        user
-                    );
-
+                    await login(access, refresh, user);
                     toast.success("Welcome back!");
-
                     window.location.href = "/";
                 },
-
                 onError: (error) => {
-                    const status =
-                        error.response?.status;
-
-                    const message =
-                        error.response?.data?.detail;
+                    const status = error.response?.status;
+                    const message = error.response?.data?.detail;
 
                     if (status === 403) {
                         toast.error(
                             message ||
-                            "Please verify your email before logging in."
+                                "Please verify your email before logging in."
                         );
-
                         return;
                     }
 
-                    toast.error(
-                        message ||
-                        "Invalid username or password."
-                    );
+                    toast.error(message || "Invalid username or password.");
                 },
             }
         );
     };
-
 
     return (
         <main className="auth-page">
             <div className="auth-background" />
 
             <div className="auth-brand">
-                <span className="auth-brand-mark">
-                    ✦
-                </span>
-
+                <span className="auth-brand-mark">✦</span>
                 <span>Anime Tracker</span>
             </div>
 
             <section className="auth-card">
                 <div className="auth-header">
-                    <span className="auth-eyebrow">
-                        WELCOME BACK
-                    </span>
-
-                    <h1>
-                        Sign in to Anime Tracker
-                    </h1>
-
+                    <span className="auth-eyebrow">WELCOME BACK</span>
+                    <h1>Sign in to Anime Tracker</h1>
                     <p>
-                        Keep track of what you're watching,
-                        discover something new, and build your
-                        anime library.
+                        Keep track of what you're watching, discover something
+                        new, and build your anime library.
                     </p>
                 </div>
 
@@ -120,28 +82,18 @@ export default function Login() {
                 {!GOOGLE_ONLY_AUTH && (
                     <>
                         <div className="auth-divider">
-                            <span>
-                                or continue with username
-                            </span>
+                            <span>or continue with username</span>
                         </div>
 
-                        <form
-                            onSubmit={handleLogin}
-                            className="auth-form"
-                        >
+                        <form onSubmit={handleLogin} className="auth-form">
                             <div className="auth-field">
-                                <label htmlFor="username">
-                                    Username
-                                </label>
-
+                                <label htmlFor="username">Username</label>
                                 <input
                                     id="username"
                                     type="text"
                                     value={username}
                                     onChange={(event) =>
-                                        setUsername(
-                                            event.target.value
-                                        )
+                                        setUsername(event.target.value)
                                     }
                                     placeholder="Enter your username"
                                     autoComplete="username"
@@ -149,18 +101,13 @@ export default function Login() {
                             </div>
 
                             <div className="auth-field">
-                                <label htmlFor="password">
-                                    Password
-                                </label>
-
+                                <label htmlFor="password">Password</label>
                                 <input
                                     id="password"
                                     type="password"
                                     value={password}
                                     onChange={(event) =>
-                                        setPassword(
-                                            event.target.value
-                                        )
+                                        setPassword(event.target.value)
                                     }
                                     placeholder="Enter your password"
                                     autoComplete="current-password"
@@ -170,9 +117,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 className="auth-submit"
-                                disabled={
-                                    loginMutation.isPending
-                                }
+                                disabled={loginMutation.isPending}
                             >
                                 {loginMutation.isPending
                                     ? "Signing in..."
@@ -190,13 +135,10 @@ export default function Login() {
 
                 <p className="auth-footer">
                     New to Anime Tracker?{" "}
-
                     <button
                         type="button"
                         className="auth-link"
-                        onClick={() =>
-                            navigate("/register")
-                        }
+                        onClick={() => navigate("/register")}
                     >
                         Create an account
                     </button>
