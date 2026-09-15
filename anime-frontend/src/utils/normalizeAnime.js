@@ -11,7 +11,6 @@ export const getAnimeId = (anime) => {
     );
 };
 
-
 export const normalizeAnime = (anime) => {
     if (!anime) {
         return null;
@@ -36,40 +35,18 @@ export const normalizeAnime = (anime) => {
         normalImage;
 
     return {
-        // MAL ID is the canonical anime ID everywhere
         id: animeId,
-
-        // Keep mal_id available for compatibility
         mal_id: animeId,
-
         title:
             anime.title ??
             anime.title_english ??
             "Unknown Anime",
-
-        // Keep both image variants so each view can choose the appropriate size.
         image: normalImage,
         largeImage,
-
-        score:
-            anime.score ??
-            0,
-
-        type:
-            anime.type ??
-            "",
-
-        episodes:
-            anime.episodes ??
-            null,
-
-        year:
-            anime.year ??
-            anime.aired?.prop?.from?.year ??
-            null,
-
-        synopsis:
-            anime.synopsis ??
-            "",
+        score: anime.score ?? 0,
+        type: anime.type ?? "",
+        episodes: anime.episodes ?? null,
+        year: anime.year ?? anime.aired?.prop?.from?.year ?? null,
+        synopsis: anime.synopsis ?? "",
     };
 };
