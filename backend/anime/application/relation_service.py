@@ -4,8 +4,8 @@ from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
 from anime.infrastructure.db_write_lock import db_write_lock
-from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeRelation
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 
 
 class RelationService:
@@ -14,7 +14,6 @@ class RelationService:
 
     def get_relations(self, anime_id):
         key = f"anime-relations:v2:{anime_id}"
-
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
@@ -59,7 +58,7 @@ class RelationService:
                         relation_type=relation_type,
                         related_mal_id=entry_id,
                         related_title=entry.get("name") or "Unknown Anime",
-                        related_type=entry.get("type") or "anime",
+                        related_type="anime",
                         related_url=entry.get("url") or "",
                     )
                 )
@@ -75,12 +74,14 @@ class RelationService:
     def _serialize(rows):
         grouped = {}
         for row in rows:
-            grouped.setdefault(row.relation_type, []).append({
-                "id": row.related_mal_id,
-                "title": row.related_title,
-                "type": row.related_type,
-                "url": row.related_url,
-            })
+            grouped.setdefault(row.relation_type, []).append(
+                {
+                    "id": row.related_mal_id,
+                    "title": row.related_title,
+                    "type": row.related_type,
+                    "url": row.related_url,
+                }
+            )
 
         return [
             {"relation": relation, "entries": entries}
