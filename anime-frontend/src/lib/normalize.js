@@ -1,5 +1,3 @@
-// src/lib/normalize.js
-
 export function normalizeListResponse(response) {
     return {
         results: response.data.results ?? response.data ?? [],
