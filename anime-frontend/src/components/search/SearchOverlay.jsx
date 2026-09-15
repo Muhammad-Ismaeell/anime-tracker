@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAnimeSearch } from "../../hooks/useAnimeSearch";
 import { Link } from "react-router-dom";
+
+import { useAnimeSearch } from "../../hooks/useAnimeSearch";
 
 function SearchOverlay({ open, onClose }) {
     const [query, setQuery] = useState("");
@@ -14,31 +15,30 @@ function SearchOverlay({ open, onClose }) {
         return () => clearTimeout(timer);
     }, [query]);
 
-    const {
-        data,
-        isLoading
-    } = useAnimeSearch(debounced);
+    const { data, isLoading } = useAnimeSearch(debounced);
+    const results = data?.pages?.flatMap((page) => page.items || []) || [];
 
-    const results =
-        data?.pages?.flatMap(page => page.items || []) || [];
-
-    // ESC to close
     useEffect(() => {
         const handleKey = (e) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") {
+                onClose();
+            }
         };
 
         window.addEventListener("keydown", handleKey);
         return () => window.removeEventListener("keydown", handleKey);
     }, [onClose]);
 
-    if (!open) return null;
+    if (!open) {
+        return null;
+    }
 
     return (
         <div style={styles.overlay} onClick={onClose}>
-            <div style={styles.container} onClick={(e) => e.stopPropagation()}>
-
-                {/* SEARCH INPUT */}
+            <div
+                style={styles.container}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <input
                     autoFocus
                     value={query}
@@ -47,7 +47,6 @@ function SearchOverlay({ open, onClose }) {
                     style={styles.input}
                 />
 
-                {/* RESULTS */}
                 <div style={styles.results}>
                     {isLoading && (
                         <p style={{ color: "#9ca3af" }}>Searching...</p>
@@ -58,7 +57,7 @@ function SearchOverlay({ open, onClose }) {
                     )}
 
                     <div style={styles.grid}>
-                        {(results || []).slice(0, 12).map((anime) => (
+                        {results.slice(0, 12).map((anime) => (
                             <Link
                                 key={anime.id ?? anime.anime_id ?? anime.mal_id}
                                 to={`/anime/${anime.id ?? anime.mal_id}`}
@@ -70,10 +69,7 @@ function SearchOverlay({ open, onClose }) {
                                     style={styles.image}
                                     alt={anime.title}
                                 />
-
-                                <p style={styles.title}>
-                                    {anime.title}
-                                </p>
+                                <p style={styles.title}>{anime.title}</p>
                             </Link>
                         ))}
                     </div>
@@ -93,14 +89,12 @@ const styles = {
         justifyContent: "center",
         alignItems: "flex-start",
         paddingTop: "80px",
-        zIndex: 9999
+        zIndex: 9999,
     },
-
     container: {
         width: "80%",
-        maxWidth: "900px"
+        maxWidth: "900px",
     },
-
     input: {
         width: "100%",
         padding: "18px",
@@ -110,39 +104,34 @@ const styles = {
         outline: "none",
         background: "#111827",
         color: "white",
-        marginBottom: "20px"
+        marginBottom: "20px",
     },
-
     results: {
         background: "#0f172a",
         borderRadius: "16px",
         padding: "20px",
         maxHeight: "70vh",
-        overflowY: "auto"
+        overflowY: "auto",
     },
-
     grid: {
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-        gap: "15px"
+        gap: "15px",
     },
-
     card: {
         textDecoration: "none",
-        color: "white"
+        color: "white",
     },
-
     image: {
         width: "100%",
         height: "200px",
         objectFit: "cover",
-        borderRadius: "12px"
+        borderRadius: "12px",
     },
-
     title: {
         fontSize: "13px",
-        marginTop: "8px"
-    }
+        marginTop: "8px",
+    },
 };
 
 export default SearchOverlay;
