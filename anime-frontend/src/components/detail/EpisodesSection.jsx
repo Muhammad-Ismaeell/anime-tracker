@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 
-import { useAnimeEpisodes } from "../../hooks/useAnimeEpisodes";
 import { useAnimeDetail } from "../../hooks/useAnimeDetail";
+import { useAnimeEpisodes } from "../../hooks/useAnimeEpisodes";
 import { useGlobalLibrary } from "../../hooks/useGlobalLibrary";
 
 import "./EpisodesSection.css";
-
 
 function EpisodesSection({ animeId }) {
     const {
@@ -21,7 +20,6 @@ function EpisodesSection({ animeId }) {
     // expose the total episode count, so use the already-cached anime detail
     // data as the source of truth for the count.
     const { data: anime } = useAnimeDetail(animeId);
-
     const { libraryMap } = useGlobalLibrary();
 
     const watchedProgress = useMemo(() => {
@@ -29,9 +27,7 @@ function EpisodesSection({ animeId }) {
             return 0;
         }
 
-        return Number(
-            libraryMap.get(String(animeId))?.progress ?? 0
-        ) || 0;
+        return Number(libraryMap.get(String(animeId))?.progress ?? 0) || 0;
     }, [libraryMap, animeId]);
 
     const episodes = useMemo(
@@ -64,10 +60,7 @@ function EpisodesSection({ animeId }) {
             {isLoading ? (
                 <div className="episodes-list">
                     {Array.from({ length: 6 }).map((_, index) => (
-                        <div
-                            className="episode-skeleton"
-                            key={index}
-                        />
+                        <div className="episode-skeleton" key={index} />
                     ))}
                 </div>
             ) : isError ? (
@@ -89,9 +82,7 @@ function EpisodesSection({ animeId }) {
                                     className={`episode-row ${watched ? "watched" : ""}`}
                                     key={episode.id ?? `${animeId}-${number}`}
                                 >
-                                    <div className="episode-number">
-                                        {number}
-                                    </div>
+                                    <div className="episode-number">{number}</div>
 
                                     <div className="episode-main">
                                         <h3>
@@ -147,6 +138,5 @@ function EpisodesSection({ animeId }) {
         </section>
     );
 }
-
 
 export default EpisodesSection;
