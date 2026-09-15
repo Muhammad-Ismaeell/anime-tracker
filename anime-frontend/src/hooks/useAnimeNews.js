@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { AnimeAPI } from "../api/anime.api";
 
-
 export function useAnimeNews(animeId) {
     return useQuery({
         queryKey: ["anime-news", animeId],
