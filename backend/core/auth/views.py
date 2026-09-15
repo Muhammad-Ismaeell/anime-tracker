@@ -6,10 +6,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
+from django.utils.text import slugify
 from drf_spectacular.utils import extend_schema
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from django.utils.text import slugify
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -29,7 +29,6 @@ from core.auth.services.auth_service import AuthService
 from core.auth.services.email_verification_service import EmailVerificationService
 from users.api.serializers import UserSerializer
 from users.models import EmailVerification
-
 
 User = get_user_model()
 
@@ -111,10 +110,12 @@ def login(request):
             status=403,
         )
 
-    return Response({
-        **AuthService.create_tokens(user),
-        "user": UserSerializer(user).data,
-    })
+    return Response(
+        {
+            **AuthService.create_tokens(user),
+            "user": UserSerializer(user).data,
+        }
+    )
 
 
 @extend_schema(
@@ -140,10 +141,12 @@ def refresh_token(request):
     except (TokenError, User.DoesNotExist):
         return Response({"detail": "Invalid refresh token"}, status=401)
 
-    return Response({
-        "access": new_access,
-        "refresh": str(new_refresh),
-    })
+    return Response(
+        {
+            "access": new_access,
+            "refresh": str(new_refresh),
+        }
+    )
 
 
 @extend_schema(
@@ -182,7 +185,6 @@ def google_login(request):
             status=400,
         )
 
-    # Prefer an existing Google identity, then fall back to a verified email match.
     user = User.objects.filter(google_sub=google_sub).first()
     if user is None:
         user = User.objects.filter(email__iexact=email).first()
@@ -211,7 +213,6 @@ def google_login(request):
             update_fields=["google_sub", "email", "first_name", "updated_at"]
         )
 
-    # Google has already verified the identity, so mark the local email verification as complete.
     verified_token_hash = hashlib.sha256(
         f"google:{google_sub}".encode("utf-8")
     ).hexdigest()
@@ -224,10 +225,12 @@ def google_login(request):
         },
     )
 
-    return Response({
-        **AuthService.create_tokens(user),
-        "user": UserSerializer(user).data,
-    })
+    return Response(
+        {
+            **AuthService.create_tokens(user),
+            "user": UserSerializer(user).data,
+        }
+    )
 
 
 @extend_schema(
