@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.character_service import CharacterService
 
-
 character_service = CharacterService()
 
 
@@ -30,6 +29,7 @@ def safe_int(value, default=1):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def general_characters(request):
+    """Return paginated characters for general discovery."""
     return Response(
         character_service.get_general_characters(
             page=safe_int(request.GET.get("page")),
@@ -48,6 +48,5 @@ def general_characters(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_characters(request, anime_id):
-    return Response({
-        "items": character_service.get_characters(anime_id),
-    })
+    """Return characters and voice actors for an anime."""
+    return Response({"items": character_service.get_characters(anime_id)})
