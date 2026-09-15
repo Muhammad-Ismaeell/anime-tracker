@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.statistics_service import StatisticsService
 
-
 statistics_service = StatisticsService()
 
 
@@ -16,6 +15,4 @@ statistics_service = StatisticsService()
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_statistics(request, anime_id):
-    return Response(
-        statistics_service.get_statistics(anime_id)
-    )
+    return Response(statistics_service.get_statistics(anime_id))
