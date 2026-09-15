@@ -4,8 +4,8 @@ from django.utils import timezone
 
 from anime.infrastructure.cache import get_or_set
 from anime.infrastructure.db_write_lock import db_write_lock
-from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 from anime.infrastructure.models import Anime, AnimeExternalLink
+from anime.infrastructure.tenrai.tenrai_client import BASE_URL, safe_request
 
 
 class ExternalLinkService:
@@ -14,7 +14,6 @@ class ExternalLinkService:
 
     def get_links(self, anime_id):
         key = f"anime-external-links:v2:{anime_id}"
-
         return get_or_set(
             key,
             self.CACHE_TIMEOUT,
