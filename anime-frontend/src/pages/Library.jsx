@@ -1,16 +1,13 @@
 import { useMemo } from "react";
-
-import { useLibrary } from "../hooks/useLibrary";
+import { Helmet } from "react-helmet-async";
 
 import AnimeCardSkeleton from "../components/skeletons/AnimeCardSkeleton";
-import { Helmet } from "react-helmet-async";
+import EmptyState from "../components/ui/EmptyState";
 import PageContainer from "../components/ui/PageContainer";
 import LibrarySection from "../components/library/LibrarySection";
-import EmptyState from "../components/ui/EmptyState";
-
+import { useLibrary } from "../hooks/useLibrary";
 
 function Library() {
-
     const {
         data,
         isLoading,
@@ -18,36 +15,22 @@ function Library() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        refetch
+        refetch,
     } = useLibrary();
 
-
     const grouped = useMemo(() => {
-
-        const library =
-            data?.pages?.flatMap(
-                page => page.results || []
-            ) || [];
-
+        const library = data?.pages?.flatMap((page) => page.results || []) || [];
 
         return library.reduce(
             (acc, item) => {
-
-                const status =
-                    (item.status || "")
-                    .toLowerCase();
-
+                const status = (item.status || "").toLowerCase();
 
                 if (!acc[status]) {
                     acc[status] = [];
                 }
 
-
                 acc[status].push(item);
-
-
                 return acc;
-
             },
             {
                 watching: [],
@@ -56,176 +39,82 @@ function Library() {
                 dropped: [],
             }
         );
-
     }, [data]);
 
-
-    const totalLibraryItems =
-        Object.values(grouped)
-            .flat()
-            .length;
-
-
-
-    // ---------------- LOADING ----------------
+    const totalLibraryItems = Object.values(grouped).flat().length;
 
     if (isLoading) {
-
         return (
             <PageContainer>
-
                 <div className="grid">
-
-                    {Array.from({
-                        length: 12
-                    }).map((_, index) => (
-
-                        <AnimeCardSkeleton
-                            key={index}
-                        />
-
+                    {Array.from({ length: 12 }).map((_, index) => (
+                        <AnimeCardSkeleton key={index} />
                     ))}
-
                 </div>
-
             </PageContainer>
         );
-
     }
-
-
-
-    // ---------------- ERROR ----------------
 
     if (error) {
-
         return (
             <PageContainer>
-
-                <EmptyState
-                    text="Failed to load your library."
-                    icon="⚠️"
-                />
-
-
-                <button
-                    className="retry-btn"
-                    onClick={refetch}
-                >
+                <EmptyState text="Failed to load your library." icon="⚠️" />
+                <button className="retry-btn" onClick={refetch}>
                     Retry
                 </button>
-
             </PageContainer>
         );
-
     }
-
-
 
     return (
         <>
-
             <Helmet>
-
-                <title>
-                    My Library | Anime Tracker
-                </title>
-
-
+                <title>My Library | Anime Tracker</title>
                 <meta
                     name="description"
                     content="Manage your anime watching list."
                 />
-
             </Helmet>
 
-
-
             <PageContainer>
-
-
-                <h1 style={styles.title}>
-                    My Library
-                </h1>
-
-
-
-                {/* EMPTY STATE */}
+                <h1 style={styles.title}>My Library</h1>
 
                 {totalLibraryItems === 0 ? (
-
                     <EmptyState
                         text="Your library is empty. Start adding anime to track your progress."
                         icon="📚"
                     />
-
                 ) : (
-
-
-                    Object.entries(grouped)
-                        .map(([key, items]) => (
-
-                            items.length > 0 && (
-
-                                <LibrarySection
-
-                                    key={key}
-
-                                    title={
-                                        key.replaceAll(
-                                            "_",
-                                            " "
-                                        )
-                                    }
-
-                                    items={items}
-
-                                />
-
-                            )
-
-                        ))
-
+                    Object.entries(grouped).map(([key, items]) =>
+                        items.length > 0 ? (
+                            <LibrarySection
+                                key={key}
+                                title={key.replaceAll("_", " ")}
+                                items={items}
+                            />
+                        ) : null
+                    )
                 )}
 
-
-
-                {/* LOAD MORE */}
-
                 {hasNextPage && (
-
                     <button
                         className="load-more-btn"
                         disabled={isFetchingNextPage}
                         onClick={fetchNextPage}
                     >
-
-                        {isFetchingNextPage
-                            ? "Loading..."
-                            : "Load More Anime"}
-
+                        {isFetchingNextPage ? "Loading..." : "Load More Anime"}
                     </button>
-
                 )}
-
-
             </PageContainer>
-
         </>
     );
-
 }
 
-
-
 const styles = {
-
     title: {
         fontSize: "42px",
-        marginBottom: "30px"
-    }
-
+        marginBottom: "30px",
+    },
 };
-
 
 export default Library;
