@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 
-class APIResponse:
 
+class APIResponse:
     @staticmethod
     def success(
         data=None,
