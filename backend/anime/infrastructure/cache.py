@@ -1,34 +1,26 @@
-from django.core.cache import cache
 import hashlib
 import json
 
-# -------------------------
-# KEY GENERATOR (SAFE)
-# -------------------------
+from django.core.cache import cache
 
 
 def make_cache_key(query, filters, page=1, limit=20):
-
-    raw = json.dumps({
-        "q": query,
-        "filters": filters or {},
-        "page": page,
-        "limit": limit
-    }, sort_keys=True)
-
+    """Build a stable cache key for an anime search request."""
+    raw = json.dumps(
+        {
+            "q": query,
+            "filters": filters or {},
+            "page": page,
+            "limit": limit,
+        },
+        sort_keys=True,
+    )
     return "search:" + hashlib.md5(raw.encode()).hexdigest()
 
 
-# -------------------------
-# GET OR SET (MAIN HELPER)
-# -------------------------
 def get_or_set(key, timeout, callback):
-    """
-    If cache exists → return it
-    Else → call function and cache result
-    """
+    """Return cached data or compute, cache, and return it."""
     data = cache.get(key)
-
     if data is not None:
         return data
 
