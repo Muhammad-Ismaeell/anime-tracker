@@ -1,13 +1,12 @@
-# users/admin.py
-
 from django.contrib import admin
+
 from .infrastructure.models import (
-    Profile,
-    UserAnimeStatus,
-    FavoriteAnime,
-    Review,
     Activity,
-    Anime
+    Anime,
+    FavoriteAnime,
+    Profile,
+    Review,
+    UserAnimeStatus,
 )
 
 admin.site.register(Anime)
