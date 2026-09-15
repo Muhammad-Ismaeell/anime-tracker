@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.episode_service import EpisodeService
 
-
 episode_service = EpisodeService()
 
 
