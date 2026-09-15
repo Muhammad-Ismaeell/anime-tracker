@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.news_service import NewsService
 
-
 news_service = NewsService()
 
 
@@ -19,16 +18,15 @@ def safe_int(value, default=1):
 @extend_schema(
     summary="Anime News",
     description="Return recent anime news for general discovery.",
-    parameters=[OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY)],
+    parameters=[
+        OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY)
+    ],
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def general_news(request):
-    return Response(
-        news_service.get_general_news(
-            safe_int(request.GET.get("page"))
-        )
-    )
+    """Return paginated general anime news."""
+    return Response(news_service.get_general_news(safe_int(request.GET.get("page"))))
 
 
 @extend_schema(
@@ -38,4 +36,5 @@ def general_news(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_news(request, anime_id):
+    """Return news articles for an anime."""
     return Response(news_service.get_news(anime_id))
