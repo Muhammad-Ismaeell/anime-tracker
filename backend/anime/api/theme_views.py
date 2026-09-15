@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.theme_service import ThemeService
 
-
 theme_service = ThemeService()
 
 
