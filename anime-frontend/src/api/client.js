@@ -1,14 +1,12 @@
 import axios from "axios";
 
-import { tokenService } from "../auth/tokenService";
 import {
     notifyAccessTokenChanged,
     notifySessionExpired,
 } from "../auth/authEvents";
+import { tokenService } from "../auth/tokenService";
 
-const baseURL =
-    import.meta.env.VITE_API_URL ||
-    "http://127.0.0.1:8000/api";
+const baseURL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
 const api = axios.create({
     baseURL,
@@ -53,7 +51,6 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (response) => response,
-
     async (error) => {
         const originalRequest = error.config;
 
