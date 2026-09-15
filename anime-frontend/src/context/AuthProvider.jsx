@@ -1,18 +1,14 @@
-import {
-    useCallback,
-    useEffect,
-    useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { AuthAPI } from "../api/auth.api";
 import { tokenService } from "../auth/tokenService";
-import { AuthContext } from "./AuthContext";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../lib/querykeys";
 import {
     setAccessTokenListener,
     setSessionExpiredListener,
 } from "../auth/authEvents";
+import { queryKeys } from "../lib/querykeys";
+import { AuthContext } from "./AuthContext";
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
