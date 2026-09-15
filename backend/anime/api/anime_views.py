@@ -1,11 +1,8 @@
-from drf_spectacular.utils import (
-    OpenApiParameter,
-    OpenApiTypes,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
 from anime.api.docs import (
     AnimeDetailResponseSerializer,
     AnimeListResponseSerializer,
@@ -15,7 +12,6 @@ from anime.application.anime_service import AnimeService
 from anime.application.database_anime_service import DatabaseAnimeService
 from anime.application.search_service import AnimeSearchService
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
-from django.http import JsonResponse
 
 search_service = AnimeSearchService()
 anime_service = AnimeService(TenraiClient())
@@ -41,15 +37,11 @@ def safe_int(value, default=1):
     ],
     responses={200: AnimeListResponseSerializer},
 )
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def top_anime(request):
-    return Response(
-        DatabaseAnimeService.get_top(
-            safe_int(request.GET.get("page"))
-        )
-    )
+    """Return top-rated anime from the local catalog."""
+    return Response(DatabaseAnimeService.get_top(safe_int(request.GET.get("page"))))
 
 
 @extend_schema(
@@ -68,6 +60,7 @@ def top_anime(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def trending_anime(request):
+    """Return trending anime from the local catalog."""
     return Response(
         DatabaseAnimeService.get_trending(safe_int(request.GET.get("page")))
     )
@@ -89,6 +82,7 @@ def trending_anime(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def seasonal_anime(request):
+    """Return seasonal anime from the local catalog."""
     return Response(
         DatabaseAnimeService.get_seasonal(safe_int(request.GET.get("page")))
     )
@@ -110,10 +104,9 @@ def seasonal_anime(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def recently_added_anime(request):
+    """Return recently added anime from the local catalog."""
     return Response(
-        DatabaseAnimeService.get_recently_added(
-            safe_int(request.GET.get("page"))
-        )
+        DatabaseAnimeService.get_recently_added(safe_int(request.GET.get("page")))
     )
 
 
@@ -137,6 +130,7 @@ def recently_added_anime(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_search(request):
+    """Search anime using the requested query and filters."""
     query = request.GET.get("q", "").strip()
     page = safe_int(request.GET.get("page"))
 
@@ -170,4 +164,5 @@ def anime_search(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_detail(request, anime_id):
+    """Return detailed information for an anime."""
     return Response(anime_service.get_detail(anime_id))
