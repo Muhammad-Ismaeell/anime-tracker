@@ -17,7 +17,6 @@ export default function Login() {
 
     const handleLogin = (event) => {
         event.preventDefault();
-
         const cleanUsername = username.trim();
 
         if (!cleanUsername || !password) {
@@ -26,14 +25,10 @@ export default function Login() {
         }
 
         loginMutation.mutate(
-            {
-                username: cleanUsername,
-                password,
-            },
+            { username: cleanUsername, password },
             {
                 onSuccess: async (response) => {
                     const { access, refresh, user } = response.data;
-
                     await login(access, refresh, user);
                     toast.success("Welcome back!");
                     window.location.href = "/";
