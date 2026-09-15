@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.recommendation_service import RecommendationService
 
-
 recommendation_service = RecommendationService()
 
 
@@ -19,11 +18,14 @@ def safe_int(value, default=1):
 @extend_schema(
     summary="General Anime Recommendations",
     description="Return general anime recommendations for discovery.",
-    parameters=[OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY)],
+    parameters=[
+        OpenApiParameter("page", OpenApiTypes.INT, OpenApiParameter.QUERY),
+    ],
 )
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def general_recommendations(request):
+    """Return paginated general anime recommendations."""
     return Response(
         recommendation_service.get_general_recommendations(
             safe_int(request.GET.get("page"))
@@ -38,8 +40,7 @@ def general_recommendations(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_recommendations(request, anime_id):
+    """Return recommendations for an anime."""
     return Response(
-        {
-            "items": recommendation_service.get_recommendations(anime_id),
-        }
+        {"items": recommendation_service.get_recommendations(anime_id)}
     )
