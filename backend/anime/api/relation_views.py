@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.relation_service import RelationService
 
-
 relation_service = RelationService()
 
 
@@ -16,6 +15,5 @@ relation_service = RelationService()
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_relations(request, anime_id):
-    return Response({
-        "items": relation_service.get_relations(anime_id),
-    })
+    """Return related anime grouped by relation type."""
+    return Response({"items": relation_service.get_relations(anime_id)})
