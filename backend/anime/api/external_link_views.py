@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from anime.application.external_link_service import ExternalLinkService
 
-
 external_link_service = ExternalLinkService()
 
 
