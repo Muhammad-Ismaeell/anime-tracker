@@ -1,5 +1,4 @@
 class BaseAppException(Exception):
-
     def __init__(
         self,
         message,
@@ -7,7 +6,6 @@ class BaseAppException(Exception):
         errors=None,
     ):
         super().__init__(message)
-
         self.message = message
         self.status_code = status_code
         self.errors = errors or []
