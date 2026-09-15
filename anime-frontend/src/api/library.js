@@ -1,10 +1,9 @@
 import api from "./client";
 
 export const LibraryAPI = {
-
     list: async (page = 1) => {
         const res = await api.get("/users/library/", {
-            params: { page }
+            params: { page },
         });
 
         const data = res.data.data;
@@ -12,16 +11,12 @@ export const LibraryAPI = {
         return {
             results: data?.results || [],
             next: data?.next || null,
-            page: data?.page || page
+            page: data?.page || page,
         };
     },
 
     update: async (payload) => {
-        const res = await api.post(
-            "/users/library/update/",
-            payload
-        );
-
+        const res = await api.post("/users/library/update/", payload);
         return res.data.data;
-    }
+    },
 };
