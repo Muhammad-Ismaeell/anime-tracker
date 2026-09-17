@@ -19,6 +19,7 @@ import "./review-polish.css";
 import "./auth-polish.css";
 import "./not-found-polish.css";
 import "./layout.css";
+import "./theme.css";
 
 const queryClient = new QueryClient({
     defaultOptions: {
