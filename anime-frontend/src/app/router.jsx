@@ -1,7 +1,6 @@
-import { lazy, Suspense, useContext } from "react";
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
-import { ThemeContext } from "../context/ThemeContext";
 import NotFound from "../pages/NotFound";
 import AppLayout from "./AppLayout";
 import PageLoader from "../components/ui/PageLoader";
@@ -30,16 +29,8 @@ const Profile = lazy(() => import("../pages/Profile"));
 const EditProfile = lazy(() => import("../pages/EditProfile"));
 
 export default function App() {
-    const { darkMode } = useContext(ThemeContext);
-
     return (
-        <div
-            style={{
-                background: darkMode ? "#111" : "#f5f5f5",
-                color: darkMode ? "white" : "black",
-                minHeight: "100vh",
-            }}
-        >
+        <>
             <ScrollToTop />
             <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -77,6 +68,6 @@ export default function App() {
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </Suspense>
-        </div>
+        </>
     );
 }
