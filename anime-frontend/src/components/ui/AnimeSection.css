@@ -184,6 +184,15 @@
 .home-hero-secondary-action { background: transparent; color: var(--text-primary); }
 .home-hero-secondary-action:hover { background: var(--surface-hover); border-color: var(--border); transform: translateY(-1px); }
 
+/* Keep the hero text readable in light mode regardless of stylesheet order. */
+:root[data-theme="light"] .home-hero-title {
+    color: #18181b !important;
+}
+
+:root[data-theme="light"] .home-hero-description {
+    color: #52525b !important;
+}
+
 .home-discovery-controls {
     width: 100%;
     margin: 0 0 18px;
