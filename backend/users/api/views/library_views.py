@@ -24,10 +24,6 @@ class LibraryPagination(StandardPagination):
     page_size = 24
 
 
-# ============================================================
-# Library Stats
-# ============================================================
-
 @extend_schema(
     summary="Library Statistics",
     description="Return statistics about user's anime library.",
@@ -38,16 +34,11 @@ class LibraryPagination(StandardPagination):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def library_stats(request):
-
     return APIResponse.success(
         stats_service.get_stats(request.user),
         "Stats fetched",
     )
 
-
-# ============================================================
-# Library
-# ============================================================
 
 @extend_schema(
     summary="Get user library",
@@ -59,7 +50,6 @@ def library_stats(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def library(request):
-
     queryset = (
         library_service
         .get_user_library(request.user)
@@ -67,7 +57,6 @@ def library(request):
     )
 
     paginator = LibraryPagination()
-
     page = paginator.paginate_queryset(
         queryset,
         request,
@@ -83,10 +72,6 @@ def library(request):
     )
 
 
-# ============================================================
-# Update Library Status
-# ============================================================
-
 @extend_schema(
     request=LibraryUpdateRequestSerializer,
     responses={
@@ -96,7 +81,6 @@ def library(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def update_status(request):
-
     anime_id = request.data.get("anime_id")
     status = request.data.get("status")
     remove = request.data.get("remove", False)
@@ -107,7 +91,6 @@ def update_status(request):
         )
 
     if remove or status == "remove":
-
         library_service.remove_from_library(
             request.user,
             anime_id,
@@ -140,10 +123,6 @@ def update_status(request):
     )
 
 
-# ============================================================
-# Remove From Library
-# ============================================================
-
 @extend_schema(
     summary="Remove Anime From Library",
     description="Remove an anime from the authenticated user's library.",
@@ -157,7 +136,6 @@ def remove_from_library(
     request,
     anime_id,
 ):
-
     library_service.remove_from_library(
         request.user,
         anime_id,
