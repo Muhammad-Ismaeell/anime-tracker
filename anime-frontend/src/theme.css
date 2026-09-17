@@ -7,6 +7,7 @@
     --text-primary: #f9fafb;
     --text-secondary: #d1d5db;
     --text-muted: #9ca3af;
+    --heading: #f9fafb;
     --border: rgba(255, 255, 255, 0.08);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
@@ -19,6 +20,7 @@
     --text-primary: #18181b;
     --text-secondary: #52525b;
     --text-muted: #71717a;
+    --heading: #18181b;
     --border: rgba(24, 24, 27, 0.12);
     --shadow: 0 10px 30px rgba(24, 24, 27, 0.10);
     color-scheme: light;
@@ -158,6 +160,10 @@
 
 :root[data-theme="light"] .anime-ranking-item:hover {
     background: var(--surface-hover);
+}
+
+:root[data-theme="light"] .stat-card.glass h3 {
+    color: var(--text-primary);
 }
 
 :root[data-theme="light"] .error-state,
