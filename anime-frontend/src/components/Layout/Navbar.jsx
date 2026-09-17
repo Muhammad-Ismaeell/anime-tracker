@@ -288,6 +288,15 @@ function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
                     onClick={toggleTheme}
                     aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                     title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                    style={{
+                        border: "0",
+                        background: "transparent",
+                        color: "inherit",
+                        fontSize: "1.2rem",
+                        cursor: "pointer",
+                        padding: "0.4rem",
+                        borderRadius: "8px",
+                    }}
                 >
                     {darkMode ? "☀️" : "🌙"}
                 </button>
