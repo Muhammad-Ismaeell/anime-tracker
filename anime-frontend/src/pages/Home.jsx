@@ -110,8 +110,16 @@ function Home() {
                 <div className="home-hero-inner">
                     <div className="home-hero-content">
                         <span className="home-hero-eyebrow">ANIME TRACKER</span>
-                        <h1 className="home-hero-title">Discover. Track. Organize.</h1>
-                        <p className="home-hero-description">
+                        <h1
+                            className="home-hero-title"
+                            style={{ color: "#f9fafb" }}
+                        >
+                            Discover. Track. Organize.
+                        </h1>
+                        <p
+                            className="home-hero-description"
+                            style={{ color: "#d1d5db" }}
+                        >
                             Discover anime, build your personal library, and keep track of what you watch.
                         </p>
                         <div className="home-hero-actions">

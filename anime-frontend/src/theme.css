@@ -7,6 +7,11 @@
     --text-primary: #f9fafb;
     --text-secondary: #d1d5db;
     --text-muted: #9ca3af;
+    --heading: #f9fafb;
+    --text: #f9fafb;
+    --text-light: #d1d5db;
+    --background: #0f1117;
+    --card-radius: 12px;
     --border: rgba(255, 255, 255, 0.08);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
@@ -19,6 +24,11 @@
     --text-primary: #18181b;
     --text-secondary: #52525b;
     --text-muted: #71717a;
+    --heading: #18181b;
+    --text: #18181b;
+    --text-light: #52525b;
+    --background: #f5f7fb;
+    --card-radius: 12px;
     --border: rgba(24, 24, 27, 0.12);
     --shadow: 0 10px 30px rgba(24, 24, 27, 0.10);
     color-scheme: light;
@@ -112,6 +122,53 @@
     background: #ffffff;
 }
 
+:root[data-theme="light"] .anime-card,
+:root[data-theme="light"] .anime-card-poster,
+:root[data-theme="light"] .anime-card .imageWrapper,
+:root[data-theme="light"] .anime-ranking-image {
+    background: var(--surface);
+}
+
+/* Explicit light-mode text colors for cards. */
+:root[data-theme="light"] .anime-card .content,
+:root[data-theme="light"] .anime-card .anime-card-title-link,
+:root[data-theme="light"] .anime-card .title {
+    color: #18181b !important;
+}
+
+:root[data-theme="light"] .anime-card .anime-card-score,
+:root[data-theme="light"] .anime-card .status-badge,
+:root[data-theme="light"] .anime-ranking-info strong,
+:root[data-theme="light"] .anime-ranking-score {
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .anime-card .anime-card-meta,
+:root[data-theme="light"] .anime-ranking-info span,
+:root[data-theme="light"] .anime-ranking-number {
+    color: var(--text-muted);
+}
+
+:root[data-theme="light"] .anime-card .status-menu {
+    background: var(--surface);
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .anime-ranking-item:hover {
+    background: var(--surface-hover);
+}
+
+/* Explicit light-mode text colors for the home hero and discovery area. */
+:root[data-theme="light"] .home-hero-content,
+:root[data-theme="light"] .home-hero-title,
+:root[data-theme="light"] .home-hero-description {
+    color: #18181b !important;
+}
+
+:root[data-theme="light"] .home-hero-description {
+    color: #52525b !important;
+}
+
 :root[data-theme="light"] .home-quick-links,
 :root[data-theme="light"] .home-quick-link {
     background: var(--surface);
@@ -131,6 +188,77 @@
     background: var(--surface-hover);
 }
 
+:root[data-theme="light"] .home-hero-secondary-action,
+:root[data-theme="light"] .home-category-tab,
+:root[data-theme="light"] .home-quick-link strong,
+:root[data-theme="light"] .home-quick-links-heading p {
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .home-quick-link span,
+:root[data-theme="light"] .home-main-section-label,
+:root[data-theme="light"] .home-discovery-controls-label,
+:root[data-theme="light"] .home-discovery-view-all {
+    color: var(--text-muted);
+}
+
+:root[data-theme="light"] .stat-card.glass h3 {
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .dashboard-hero h1,
+:root[data-theme="light"] .dashboard-hero p,
+:root[data-theme="light"] .dashboard-hero .dashboard-eyebrow,
+:root[data-theme="light"] .dashboard .section-heading h2,
+:root[data-theme="light"] .dashboard .section-heading h3,
+:root[data-theme="light"] .dashboard-progress h3,
+:root[data-theme="light"] .dashboard-progress p,
+:root[data-theme="light"] .watching-info h3,
+:root[data-theme="light"] .dashboard-empty h3,
+:root[data-theme="light"] .dashboard-empty p,
+:root[data-theme="light"] .completed-card strong,
+:root[data-theme="light"] .activity-content strong {
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .dashboard-hero p,
+:root[data-theme="light"] .section-eyebrow,
+:root[data-theme="light"] .watching-info p,
+:root[data-theme="light"] .progress-description,
+:root[data-theme="light"] .activity-date,
+:root[data-theme="light"] .completed-card p {
+    color: var(--text-secondary);
+}
+
+:root[data-theme="light"] .dashboard-progress,
+:root[data-theme="light"] .dashboard-watching-card,
+:root[data-theme="light"] .dashboard-empty,
+:root[data-theme="light"] .activity-list,
+:root[data-theme="light"] .completed-card {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+:root[data-theme="light"] .recommendations-header h1,
+:root[data-theme="light"] .recommendation-anime span {
+    color: var(--text-primary);
+}
+
+:root[data-theme="light"] .recommendations-header p,
+:root[data-theme="light"] .recommendations-eyebrow,
+:root[data-theme="light"] .recommendation-content,
+:root[data-theme="light"] .recommendation-meta {
+    color: var(--text-secondary);
+}
+
+:root[data-theme="light"] .discovery-search input,
+:root[data-theme="light"] .discovery-sort button,
+:root[data-theme="light"] .discovery-load-more-button,
+:root[data-theme="light"] .recommendation-card {
+    color: var(--text-primary);
+    background: var(--surface);
+}
+
 :root[data-theme="light"] .footer {
     color: var(--text-muted);
     border-top-color: var(--border);
@@ -143,21 +271,6 @@
 :root[data-theme="light"] .form-control {
     background: var(--surface);
     color: var(--text-primary);
-}
-
-:root[data-theme="light"] .anime-card,
-:root[data-theme="light"] .anime-card-poster,
-:root[data-theme="light"] .anime-card .imageWrapper,
-:root[data-theme="light"] .anime-ranking-image {
-    background: var(--surface);
-}
-
-:root[data-theme="light"] .anime-card .status-menu {
-    background: var(--surface);
-}
-
-:root[data-theme="light"] .anime-ranking-item:hover {
-    background: var(--surface-hover);
 }
 
 :root[data-theme="light"] .error-state,
