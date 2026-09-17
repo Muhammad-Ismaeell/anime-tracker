@@ -7,6 +7,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
 import { useNavbarSearch } from "../../hooks/useNavbarSearch";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useProfile } from "../../hooks/useProfile";
@@ -32,6 +33,7 @@ const GENRES = [
 function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const navigate = useNavigate();
     const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
+    const { darkMode, toggleTheme } = useContext(ThemeContext);
     const { data: profile } = useProfile();
 
     const [open, setOpen] = useState(false);
@@ -280,6 +282,16 @@ function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
             </div>
 
             <div className="navbar-right">
+                <button
+                    type="button"
+                    className="navbar-theme-toggle"
+                    onClick={toggleTheme}
+                    aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                    title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                    {darkMode ? "☀️" : "🌙"}
+                </button>
+
                 {!isAuthenticated ? (
                     <>
                         <Link to="/login" className="navbar-login">Login</Link>
