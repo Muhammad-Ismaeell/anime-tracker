@@ -8,6 +8,10 @@
     --text-secondary: #d1d5db;
     --text-muted: #9ca3af;
     --heading: #f9fafb;
+    --text: #f9fafb;
+    --text-light: #d1d5db;
+    --background: #0f1117;
+    --card-radius: 12px;
     --border: rgba(255, 255, 255, 0.08);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
@@ -21,12 +25,12 @@
     --text-secondary: #52525b;
     --text-muted: #71717a;
     --heading: #18181b;
-    --border: rgba(24, 24, 27, 0.12);
-    --shadow: 0 10px 30px rgba(24, 24, 27, 0.10);
     --text: #18181b;
     --text-light: #52525b;
     --background: #f5f7fb;
     --card-radius: 12px;
+    --border: rgba(24, 24, 27, 0.12);
+    --shadow: 0 10px 30px rgba(24, 24, 27, 0.10);
     color-scheme: light;
 }
 
@@ -125,7 +129,13 @@
     background: var(--surface);
 }
 
-:root[data-theme="light"] .anime-card .title,
+/* Explicit light-mode text colors for cards. */
+:root[data-theme="light"] .anime-card .content,
+:root[data-theme="light"] .anime-card .anime-card-title-link,
+:root[data-theme="light"] .anime-card .title {
+    color: #18181b !important;
+}
+
 :root[data-theme="light"] .anime-card .anime-card-score,
 :root[data-theme="light"] .anime-card .status-badge,
 :root[data-theme="light"] .anime-ranking-info strong,
@@ -148,6 +158,17 @@
     background: var(--surface-hover);
 }
 
+/* Explicit light-mode text colors for the home hero and discovery area. */
+:root[data-theme="light"] .home-hero-content,
+:root[data-theme="light"] .home-hero-title,
+:root[data-theme="light"] .home-hero-description {
+    color: #18181b !important;
+}
+
+:root[data-theme="light"] .home-hero-description {
+    color: #52525b !important;
+}
+
 :root[data-theme="light"] .home-quick-links,
 :root[data-theme="light"] .home-quick-link {
     background: var(--surface);
@@ -167,12 +188,10 @@
     background: var(--surface-hover);
 }
 
-:root[data-theme="light"] .home-hero-title,
-:root[data-theme="light"] .home-hero-description,
-:root[data-theme="light"] .home-quick-links-heading p,
-:root[data-theme="light"] .home-quick-link strong,
+:root[data-theme="light"] .home-hero-secondary-action,
 :root[data-theme="light"] .home-category-tab,
-:root[data-theme="light"] .home-hero-secondary-action {
+:root[data-theme="light"] .home-quick-link strong,
+:root[data-theme="light"] .home-quick-links-heading p {
     color: var(--text-primary);
 }
 
