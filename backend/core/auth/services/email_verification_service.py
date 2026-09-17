@@ -1,6 +1,5 @@
 import hashlib
 import secrets
-
 from datetime import timedelta
 
 from django.conf import settings
@@ -11,7 +10,6 @@ from users.models import EmailVerification
 
 
 class EmailVerificationService:
-
     TOKEN_BYTES = 32
     EXPIRATION_HOURS = 24
 
@@ -24,7 +22,6 @@ class EmailVerificationService:
     @classmethod
     def create_verification(cls, user):
         raw_token = secrets.token_urlsafe(cls.TOKEN_BYTES)
-
         token_hash = cls._hash_token(raw_token)
 
         verification, _ = EmailVerification.objects.update_or_create(
