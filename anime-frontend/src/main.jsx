@@ -5,7 +5,6 @@ import App from "./app/router";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AuthProvider from "./context/AuthProvider";
-import ThemeProvider from "./context/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthPromptProvider } from "./context/AuthPromptProvider";
@@ -19,7 +18,6 @@ import "./review-polish.css";
 import "./auth-polish.css";
 import "./not-found-polish.css";
 import "./layout.css";
-import "./theme.css";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -37,15 +35,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <HelmetProvider>
             <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
-                    <ThemeProvider>
-                        <AuthProvider>
-                            <AuthPromptProvider>
-                                <ErrorBoundary>
-                                    <App />
-                                </ErrorBoundary>
-                            </AuthPromptProvider>
-                        </AuthProvider>
-                    </ThemeProvider>
+                    <AuthProvider>
+                        <AuthPromptProvider>
+                            <ErrorBoundary>
+                                <App />
+                            </ErrorBoundary>
+                        </AuthPromptProvider>
+                    </AuthProvider>
                 </BrowserRouter>
                 {import.meta.env.DEV && (
                     <ReactQueryDevtools initialIsOpen={false} />
