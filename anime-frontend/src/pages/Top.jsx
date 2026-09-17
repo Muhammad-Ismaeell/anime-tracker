@@ -3,9 +3,7 @@ import { useEffect, useRef } from "react";
 import "../styles/infinite-scroll.css";
 
 import { useInfiniteAnime } from "../hooks/useInfiniteAnime";
-import {
-    useToggleFavorite,
-} from "../hooks/user/useFavorites";
+import { useToggleFavorite } from "../hooks/user/useFavorites";
 import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 
 import AnimeCard from "../components/AnimeCard";
@@ -127,7 +125,11 @@ function Top() {
             )}
 
             {hasNextPage && (
-                <div ref={loadMoreRef} className="infinite-scroll-sentinel" aria-hidden="true">
+                <div
+                    ref={loadMoreRef}
+                    className="infinite-scroll-sentinel"
+                    aria-hidden="true"
+                >
                     {isFetchingNextPage && (
                         <div className="grid infinite-scroll-skeleton-grid">
                             {Array.from({ length: 4 }).map((_, index) => (
