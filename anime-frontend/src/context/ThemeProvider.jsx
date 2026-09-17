@@ -14,6 +14,7 @@ function ThemeProvider({ children }) {
 
     useEffect(() => {
         localStorage.setItem("darkMode", String(darkMode));
+        document.documentElement.dataset.theme = darkMode ? "dark" : "light";
     }, [darkMode]);
 
     const toggleTheme = () => {
