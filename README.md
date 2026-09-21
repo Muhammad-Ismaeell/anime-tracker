@@ -23,7 +23,7 @@ Key engineering areas demonstrated:
 - Layered Django backend with API, application-service and infrastructure boundaries
 - Database-first persistence for core and selected supplementary anime data
 - External anime API integration isolated behind a dedicated client
-- Optional anime trailer embedding on detail pages
+- Optional anime trailer embedding on detail pages, with persisted trailer metadata
 - Shared upstream request throttling and caching
 - JWT refresh-token rotation, blacklisting and centralized Axios token refresh
 - Relational constraints and indexes for data integrity and common query paths
@@ -58,7 +58,7 @@ Users can search for anime and browse matching results with relevant information
 
 ### Anime Details
 
-Each anime has a dedicated detail page containing its key information, synopsis, genres, ratings, and other relevant data.
+Each anime has a dedicated detail page containing its key information, synopsis, genres, ratings, and other relevant data. When a trailer is available, the detail page also displays an embedded trailer with the standard player controls.
 
 <p align="center">
   <img src="docs/screenshots/anime-detail.png" alt="Anime Tracker anime detail page" width="90%">
@@ -247,7 +247,7 @@ anime-tracker/
 │       ├── api/           # HTTP/API client functions
 │       ├── app/           # application shell and routing
 │       ├── auth/          # token/session helpers
-│       ├── components/    # reusable UI components
+│       ├── components/   # reusable UI components
 │       ├── context/       # global providers
 │       ├── hooks/         # reusable/server-state hooks
 │       ├── lib/           # shared client utilities
@@ -390,6 +390,7 @@ GitHub Actions runs Django tests plus frontend lint/build checks on pushes and p
 
 Trailer embed URLs are stored alongside the anime record when the external provider supplies one. A `trailer_checked_at` timestamp records that trailer metadata was checked, including for titles without a trailer, so the application does not repeatedly request the same metadata on every detail-page visit.
 
+The frontend removes any upstream autoplay parameter from the stored embed URL, so trailers open with the normal player and require the user to press Play.
 
 The application uses a database-first approach for data that benefits from persistence. Core anime records and selected supplementary records are stored locally and refreshed according to feature-specific freshness windows.
 
@@ -426,7 +427,7 @@ See [docs/technical-decisions.md](docs/technical-decisions.md) for the reasoning
 - API-client isolation
 - rate limiting
 - caching
-- trailer metadata persistence
+- trailer metadata persistence and embedding
 - JWT refresh handling
 - SQLite development vs PostgreSQL deployment
 - React Query and lazy-loaded routes

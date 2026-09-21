@@ -66,7 +66,6 @@ sequenceDiagram
     participant D as Django API
     participant S as Anime Service
     participant DB as Database
-    participant C as Cache
     participant T as Tenrai
 
     R->>D: GET /api/anime/{id}/
@@ -83,6 +82,8 @@ sequenceDiagram
     S-->>D: Normalized detail
     D-->>R: JSON response
 ```
+
+The anime detail flow also includes optional trailer metadata. When Tenrai supplies a trailer embed URL, the service persists it in `Anime.trailer_embed_url` and records `trailer_checked_at`. The normalizer exposes it as `trailer.embed_url`, and the React detail page renders a dedicated responsive trailer section. The frontend strips the upstream autoplay parameter so playback starts only when the user presses Play.
 
 Selected supplementary data follows the same database-first principle. Relations, themes, external links and staff are persisted and refreshed using freshness windows. Trailer embed URLs are also persisted with the anime record when available. This reduces repeated external calls and makes repeat page visits more reliable.
 
@@ -137,6 +138,7 @@ See [database.dbml](database.dbml) for the application/domain ERD.
 - React routes use an error boundary and loading fallbacks.
 - Persisted supplementary data has freshness windows instead of being fetched on every request.
 - Trailer metadata is checked and persisted so repeated detail visits do not require another trailer lookup.
+- The frontend removes upstream autoplay parameters before embedding trailer URLs.
 - Database constraints prevent duplicate user/anime statuses, favourites, reviews and supplementary records.
 
 ## Production evolution

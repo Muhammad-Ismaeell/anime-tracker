@@ -16,7 +16,9 @@ Trailer metadata is stored with the anime detail record rather than fetched dire
 
 The trailer is optional: if Tenrai does not provide an embeddable trailer URL, the frontend omits the trailer section.
 
-## External identifiers are stored as external identities
+The frontend removes any upstream `autoplay` parameter from the persisted embed URL before rendering it, so trailers use the standard player and require the user to press Play.
+
+### External identifiers are stored as external identities
 
 `AnimeRelation.related_mal_id` is intentionally an integer rather than a foreign key to the local `Anime` table. A related anime may exist in the external catalogue without having been visited or persisted locally.
 
