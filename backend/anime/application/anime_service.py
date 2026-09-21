@@ -45,9 +45,7 @@ class AnimeService:
             existing.trailer_embed_url if existing else ""
         )
 
-        anime, created = Anime.objects.update_or_create(
-            mal_id=mal_id,
-            defaults={
+        defaults = {
                 "title": data.get("title", ""),
                 "title_english": data.get("title_english") or data.get("title"),
                 "search_title": data.get("title", "").lower(),
@@ -74,9 +72,15 @@ class AnimeService:
                     or (existing.rating if existing else "Unknown")
                     or "Unknown"
                 ),
-                "trailer_embed_url": trailer_embed_url,
-                "trailer_checked_at": timezone.now(),
-            },
+            "trailer_embed_url": trailer_embed_url,
+        }
+
+        if "trailer" in data:
+            defaults["trailer_checked_at"] = timezone.now()
+
+        anime, created = Anime.objects.update_or_create(
+            mal_id=mal_id,
+            defaults=defaults,
         )
 
         genres = []
