@@ -23,6 +23,7 @@ Key engineering areas demonstrated:
 - Layered Django backend with API, application-service and infrastructure boundaries
 - Database-first persistence for core and selected supplementary anime data
 - External anime API integration isolated behind a dedicated client
+- Optional anime trailer embedding on detail pages
 - Shared upstream request throttling and caching
 - JWT refresh-token rotation, blacklisting and centralized Axios token refresh
 - Relational constraints and indexes for data integrity and common query paths
@@ -101,6 +102,7 @@ The interface is designed to adapt to different screen sizes and provide a usabl
   - episodes
   - characters
   - staff
+  - trailer embedding when available
   - statistics
   - recommendations
   - relations
@@ -160,7 +162,7 @@ Database: Neon PostgreSQL
 
 For local development, SQLite can be used instead of PostgreSQL.
 
-The backend separates API/presentation concerns from application services and infrastructure integrations. External anime data is persisted locally when appropriate, while freshness windows and caching reduce unnecessary upstream requests.
+The backend separates API/presentation concerns from application services and infrastructure integrations. External anime data is persisted locally when appropriate, while freshness windows and caching reduce unnecessary upstream requests. Optional trailer embed URLs are persisted with anime details so the frontend can render trailers without a separate client-side provider request.
 
 See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 
@@ -229,7 +231,7 @@ Production secrets and credentials are configured through the deployment platfor
 
 ### External services
 
-- Tenrai API for anime data
+- Tenrai API for anime data and optional trailer metadata
 - Google authentication
 - Cloudinary media storage
 - Neon PostgreSQL
@@ -386,6 +388,9 @@ GitHub Actions runs Django tests plus frontend lint/build checks on pushes and p
 
 ## Data & Caching Strategy
 
+Trailer embed URLs are stored alongside the anime record when the external provider supplies one. A `trailer_checked_at` timestamp records that trailer metadata was checked, including for titles without a trailer, so the application does not repeatedly request the same metadata on every detail-page visit.
+
+
 The application uses a database-first approach for data that benefits from persistence. Core anime records and selected supplementary records are stored locally and refreshed according to feature-specific freshness windows.
 
 The backend cache reduces repeated work and external API calls. TanStack Query provides browser-side server-state caching. These layers complement each other: frontend caching reduces duplicate browser requests, while backend caching reduces duplicate server/external work.
@@ -421,6 +426,7 @@ See [docs/technical-decisions.md](docs/technical-decisions.md) for the reasoning
 - API-client isolation
 - rate limiting
 - caching
+- trailer metadata persistence
 - JWT refresh handling
 - SQLite development vs PostgreSQL deployment
 - React Query and lazy-loaded routes

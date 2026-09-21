@@ -119,6 +119,8 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
+The trailer feature adds `trailer_embed_url` and `trailer_checked_at` to `Anime`; migration `anime/0010_anime_trailer_fields.py` applies the schema change.
+
 Do not edit an already-applied migration just to make it look cleaner; create a new migration for subsequent schema changes.
 
 ## Before opening a pull request
@@ -127,4 +129,5 @@ Do not edit an already-applied migration just to make it look cleaner; create a 
 2. Run frontend lint and build.
 3. Verify no `.env`, database files, uploaded media or generated static files are tracked.
 4. Check the API for regressions in authentication and major anime endpoints.
+5. Verify an anime with a trailer renders the embedded trailer and an anime without one omits the trailer section.
 5. Keep documentation aligned with actual behavior.

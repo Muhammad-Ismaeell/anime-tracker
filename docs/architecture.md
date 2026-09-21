@@ -84,7 +84,7 @@ sequenceDiagram
     D-->>R: JSON response
 ```
 
-Selected supplementary data follows the same database-first principle. Relations, themes, external links and staff are persisted and refreshed using freshness windows. This reduces repeated external calls and makes repeat page visits more reliable.
+Selected supplementary data follows the same database-first principle. Relations, themes, external links and staff are persisted and refreshed using freshness windows. Trailer embed URLs are also persisted with the anime record when available. This reduces repeated external calls and makes repeat page visits more reliable.
 
 ## Request flow: authenticated user action
 
@@ -108,7 +108,7 @@ JWT access tokens are attached by the Axios request interceptor. When an authent
 
 ## External API integration
 
-The external provider is accessed through `TenraiClient` in the infrastructure layer. The client targets the Tenrai API while retaining external identifiers such as `mal_id` where they are part of the provider's data contract.
+The external provider is accessed through `TenraiClient` in the infrastructure layer. The client targets the Tenrai API while retaining external identifiers such as `mal_id` where they are part of the provider's data contract. Tenrai follows the Jikan v4 schema and provides anime video/trailer data; Anime Tracker stores the optional trailer embed URL with the anime detail record.
 
 The client applies a shared request interval and lock around external requests. Application services decide when external data is needed, while the database/cache layer prevents unnecessary calls where persisted data is fresh enough.
 
@@ -136,6 +136,7 @@ See [database.dbml](database.dbml) for the application/domain ERD.
 - Authentication refresh requests are isolated from the main Axios interceptor.
 - React routes use an error boundary and loading fallbacks.
 - Persisted supplementary data has freshness windows instead of being fetched on every request.
+- Trailer metadata is checked and persisted so repeated detail visits do not require another trailer lookup.
 - Database constraints prevent duplicate user/anime statuses, favourites, reviews and supplementary records.
 
 ## Production evolution

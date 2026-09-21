@@ -10,6 +10,12 @@ Selected supplementary data (relations, themes, external links and staff) is als
 
 Persisted external data can become stale. The application therefore stores synchronization timestamps and refreshes data when it is outside its freshness window.
 
+## Trailer metadata persistence
+
+Trailer metadata is stored with the anime detail record rather than fetched directly by the browser. The model stores `trailer_embed_url` and `trailer_checked_at`. The detail service refreshes a stored anime when trailer metadata has not yet been checked, then serves the normalized trailer URL from the database.
+
+The trailer is optional: if Tenrai does not provide an embeddable trailer URL, the frontend omits the trailer section.
+
 ## External identifiers are stored as external identities
 
 `AnimeRelation.related_mal_id` is intentionally an integer rather than a foreign key to the local `Anime` table. A related anime may exist in the external catalogue without having been visited or persisted locally.
