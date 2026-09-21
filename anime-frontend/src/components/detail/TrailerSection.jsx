@@ -5,6 +5,9 @@ function TrailerSection({ trailer }) {
         return null;
     }
 
+    const trailerUrl = new URL(embedUrl);
+    trailerUrl.searchParams.delete("autoplay");
+
     return (
         <section className="anime-section trailer-section">
             <div className="trailer-section-header">
@@ -19,7 +22,7 @@ function TrailerSection({ trailer }) {
 
             <div className="trailer-frame">
                 <iframe
-                    src={embedUrl}
+                    src={trailerUrl.toString()}
                     title="Anime trailer"
                     loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
