@@ -2,6 +2,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from anime.application.anime_service import AnimeService
+from anime.infrastructure.models import Anime
 from anime.infrastructure.tenrai.tenrai_client import TenraiClient
 from core.exceptions.custom_exceptions import ValidationException
 from users.application.activity_service import ActivityService
@@ -21,8 +22,16 @@ class LibraryService:
             .select_related("anime")
         )
 
-    def _get_anime(self, anime_id):
-        return anime_service.get_or_create(anime_id)
+    def _get_anime(self, anime_id, fetch_if_missing=False):
+        anime = Anime.objects.filter(mal_id=anime_id).first()
+
+        if anime is not None:
+            return anime
+
+        if fetch_if_missing:
+            return anime_service.get_or_create(anime_id)
+
+        return None
 
     def _normalize_progress(self, anime, progress):
         try:
@@ -52,7 +61,10 @@ class LibraryService:
         if requested_status not in valid_statuses:
             raise ValidationException("Invalid library status")
 
-        anime = self._get_anime(anime_id)
+        anime = self._get_anime(anime_id, fetch_if_missing=True)
+        if anime is None:
+            raise ValidationException("Anime not found")
+
         obj = (
             UserAnimeStatus.objects
             .select_for_update()
@@ -146,7 +158,10 @@ class LibraryService:
 
     @transaction.atomic
     def remove_from_library(self, user, anime_id):
-        anime = anime_service.get_or_create(anime_id)
+        anime = self._get_anime(anime_id)
+        if anime is None:
+            return {"deleted": False}
+
         deleted_count, _ = (
             UserAnimeStatus.objects
             .filter(user=user, anime=anime)

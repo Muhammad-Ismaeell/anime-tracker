@@ -48,5 +48,6 @@ export const normalizeAnime = (anime) => {
         episodes: anime.episodes ?? null,
         year: anime.year ?? anime.aired?.prop?.from?.year ?? null,
         synopsis: anime.synopsis ?? "",
+        trailer: anime.trailer ?? null,
     };
 };
