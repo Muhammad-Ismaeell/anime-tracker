@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from core.exceptions.custom_exceptions import NotFoundException
 
 from anime.infrastructure.models import Anime, Genre
@@ -13,7 +15,6 @@ class AnimeService:
         if not data:
             raise ValueError("Anime data is empty.")
 
-        # Reject unsafe titles before persisting external API data.
         if is_nsfw(data):
             raise ValueError("Anime blocked by NSFW filter.")
 
@@ -23,7 +24,6 @@ class AnimeService:
 
         existing = Anime.objects.filter(mal_id=mal_id).first()
 
-        # Preserve metadata when the external API returns null values.
         episodes = data.get("episodes")
         if episodes is None and existing:
             episodes = existing.episodes
@@ -39,6 +39,11 @@ class AnimeService:
         status = data.get("status")
         if not status and existing:
             status = existing.status
+
+        trailer = data.get("trailer") or {}
+        trailer_embed_url = trailer.get("embed_url") or (
+            existing.trailer_embed_url if existing else ""
+        )
 
         anime, created = Anime.objects.update_or_create(
             mal_id=mal_id,
@@ -69,6 +74,8 @@ class AnimeService:
                     or (existing.rating if existing else "Unknown")
                     or "Unknown"
                 ),
+                "trailer_embed_url": trailer_embed_url,
+                "trailer_checked_at": timezone.now(),
             },
         )
 
@@ -93,8 +100,11 @@ class AnimeService:
     def get_or_create(self, anime_id):
         anime = Anime.objects.filter(mal_id=anime_id).first()
 
-        # Use the stored record when its episode metadata is complete.
-        if anime and anime.episodes is not None:
+        if (
+            anime
+            and anime.episodes is not None
+            and anime.trailer_checked_at is not None
+        ):
             return anime
 
         raw = self.client.get_detail(anime_id)

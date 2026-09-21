@@ -10,8 +10,6 @@ def normalize_anime_card(raw):
     return {
         "id": raw.get("mal_id"),
         "title": raw.get("title") or "Unknown",
-        # Use the standard image URL for catalogue cards instead of the
-        # large MAL CDN variant. Keep the large URL available for detail views.
         "image": images.get("image_url") or images.get("large_image_url"),
         "image_large": images.get("large_image_url") or images.get("image_url"),
         "backgroundText": raw.get("background"),
@@ -40,17 +38,17 @@ def normalize_anime_detail(anime, embed_url=None):
             "synopsis": anime.synopsis,
             "backgroundText": None,
             "trailer": {
-                "embed_url": embed_url,
+                "embed_url": anime.trailer_embed_url or embed_url,
             },
         }
 
     images = anime.get("images", {}).get("jpg", {})
 
+    trailer = anime.get("trailer") or {}
+
     return {
         "id": anime.get("mal_id"),
         "title": anime.get("title"),
-        # Prefer the normal-sized image for the default image field.
-        # Keep the large variant available when a detail view needs it.
         "image": images.get("image_url") or images.get("large_image_url"),
         "image_large": images.get("large_image_url") or images.get("image_url"),
         "score": anime.get("score"),
@@ -70,6 +68,6 @@ def normalize_anime_detail(anime, embed_url=None):
         "synopsis": anime.get("synopsis"),
         "backgroundText": anime.get("background"),
         "trailer": {
-            "embed_url": embed_url,
+            "embed_url": trailer.get("embed_url"),
         },
     }

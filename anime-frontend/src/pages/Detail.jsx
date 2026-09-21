@@ -8,6 +8,7 @@ import PageContainer from "../components/ui/PageContainer";
 import ReviewSection from "../components/review/ReviewSection";
 import AnimeDetailSkeleton from "../components/skeletons/AnimeDetailSkeleton";
 import OptimizedImage from "../components/ui/OptimizedImage";
+import TrailerSection from "../components/detail/TrailerSection";
 
 import { useAnimeDetail } from "../hooks/useAnimeDetail";
 import { useAuthPrompt } from "../context/useAuthPrompt";
@@ -18,6 +19,7 @@ import { useGlobalLibrary } from "../hooks/useGlobalLibrary";
 import { useUpdateLibrary } from "../hooks/useLibrary";
 
 import "../detail.css";
+import "../components/detail/TrailerSection.css";
 
 function Detail() {
     const { id } = useParams();
@@ -697,6 +699,8 @@ function Detail() {
                             )}
                         </div>
                     </div>
+
+                    <TrailerSection trailer={anime.trailer} />
 
                     <div className="anime-section">
                         <h2>Synopsis</h2>

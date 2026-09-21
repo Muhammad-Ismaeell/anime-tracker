@@ -109,6 +109,16 @@ class Anime(models.Model):
         default=""
     )
 
+    trailer_embed_url = models.URLField(
+        blank=True,
+        default=""
+    )
+
+    trailer_checked_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         db_index=True
@@ -124,7 +134,7 @@ class Anime(models.Model):
             "-score"
         ]
 
-        indexes=[
+        indexes = [
             models.Index(fields=["year"]),
             models.Index(fields=["season"]),
             models.Index(fields=["type"]),
