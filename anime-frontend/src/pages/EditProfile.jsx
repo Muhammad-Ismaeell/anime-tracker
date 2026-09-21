@@ -91,7 +91,7 @@ function EditProfileForm({ user, profile }) {
             formData,
             {
                 onSuccess: () => {
-                    navigate("/profile");
+                    navigate("/");
                 },
             }
         );

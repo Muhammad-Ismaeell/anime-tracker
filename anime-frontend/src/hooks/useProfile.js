@@ -21,14 +21,15 @@ export function useUpdateProfile() {
 
     return useMutation({
         mutationFn: updateProfile,
-        onSuccess: (updatedProfile) => {
+        onSuccess: async (updatedProfile) => {
             queryClient.setQueryData(
                 queryKeys.users.profile,
                 updatedProfile
             );
 
-            queryClient.invalidateQueries({
+            await queryClient.invalidateQueries({
                 queryKey: queryKeys.users.profile,
+                refetchType: "active",
             });
         },
     });

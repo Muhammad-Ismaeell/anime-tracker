@@ -49,7 +49,7 @@ function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const lastScrollY = useRef(0);
 
     const profileAvatar = profile?.profile?.avatar ?? null;
-    const username = user?.username || "Profile";
+    const username = profile?.user?.username || user?.username || "Profile";
     const avatarUrl = profileAvatar ? getMediaUrl(profileAvatar) : null;
     const avatarFallback = username.charAt(0).toUpperCase() || "U";
     const hasSearchQuery = query.trim().length >= 3;
