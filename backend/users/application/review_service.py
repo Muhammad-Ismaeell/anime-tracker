@@ -17,6 +17,8 @@ class ReviewService:
 
     @staticmethod
     def validate_rating(rating):
+        """Validate and normalize a review rating from 1 to 10."""
+
         try:
             rating = int(rating)
         except (TypeError, ValueError):
@@ -33,6 +35,8 @@ class ReviewService:
 
     @staticmethod
     def get_user_review(user, review_id):
+        """Return a user's review or raise if it does not exist."""
+
         review = (
             Review.objects
             .filter(
@@ -52,6 +56,8 @@ class ReviewService:
 
     @staticmethod
     def get_anime(anime_id):
+        """Return an anime by MAL ID or raise if it does not exist."""
+
         anime = AnimeRepository.get_by_mal_id(
             anime_id
         )
@@ -71,6 +77,8 @@ class ReviewService:
         rating,
         text="",
     ):
+        """Create or update a user's review for an anime."""
+
         anime = self.get_anime(anime_id)
 
         text = (text or "").strip()
@@ -98,6 +106,8 @@ class ReviewService:
         rating=None,
         text=None,
     ):
+        """Update the provided fields of an existing review."""
+
         review = self.get_user_review(
             user,
             review_id,
@@ -121,6 +131,8 @@ class ReviewService:
         user,
         review_id,
     ):
+        """Delete a user's review."""
+
         review = self.get_user_review(
             user,
             review_id,
@@ -129,6 +141,8 @@ class ReviewService:
         review.delete()
 
     def get_anime_reviews(self, anime_id):
+        """Return reviews and rating statistics for an anime."""
+
         anime = self.get_anime(anime_id)
 
         reviews = (
@@ -152,6 +166,8 @@ class ReviewService:
         }
 
     def get_user_reviews(self, user):
+        """Return all reviews written by a user."""
+
         return (
             Review.objects
             .filter(user=user)
@@ -160,6 +176,8 @@ class ReviewService:
         )
 
     def get_review_analytics(self, user):
+        """Return rating statistics for a user's reviews."""
+
         reviews = Review.objects.filter(
             user=user
         )
@@ -189,6 +207,8 @@ class ReviewService:
         }
 
     def get_top_rated(self, user, limit=5):
+        """Return the user's highest-rated anime reviews."""
+
         reviews = (
             Review.objects
             .filter(user=user)

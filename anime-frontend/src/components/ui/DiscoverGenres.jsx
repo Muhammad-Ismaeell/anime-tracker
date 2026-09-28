@@ -35,6 +35,7 @@ export default function DiscoverGenres() {
 
             <div className="discover-genres-row">
 
+                {/* Keep the genre in the URL so the search page can apply the selected filter. */}
                 {genres.map((genre) => (
                     <Link
                         key={genre}

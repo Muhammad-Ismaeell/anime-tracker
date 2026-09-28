@@ -133,6 +133,7 @@ def refresh_token(request):
         return Response({"detail": "No refresh token"}, status=401)
 
     try:
+        # Rotate the refresh token so the submitted token cannot be reused.
         refresh = RefreshToken(token)
         new_access = str(refresh.access_token)
         refresh.blacklist()
@@ -213,6 +214,7 @@ def google_login(request):
             update_fields=["google_sub", "email", "first_name", "updated_at"]
         )
 
+    # Mark Google-authenticated users as verified without a separate email.
     verified_token_hash = hashlib.sha256(
         f"google:{google_sub}".encode("utf-8")
     ).hexdigest()

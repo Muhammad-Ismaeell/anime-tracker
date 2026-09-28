@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def custom_exception_handler(exc, context):
+    """Format application and JWT errors consistently before falling back to DRF."""
+
     logger.exception("API EXCEPTION: %s", exc)
 
     if isinstance(exc, BaseAppException):

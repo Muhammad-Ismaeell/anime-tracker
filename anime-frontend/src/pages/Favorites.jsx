@@ -26,6 +26,7 @@ function Favorites() {
     const { statusMap } = useGlobalLibrary();
 
     useEffect(() => {
+        // Load the next page only when more favorites exist and no request is already running.
         const observer = new IntersectionObserver(
             (entries) => {
                 if (
@@ -121,6 +122,7 @@ function Favorites() {
                                     return null;
                                 }
 
+                                // Normalize the ID so React keys and favorite lookups use a consistent value.
                                 const normalizedId = String(animeId);
 
                                 return (

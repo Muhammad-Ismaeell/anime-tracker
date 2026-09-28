@@ -14,6 +14,8 @@ User = get_user_model()
 class ProfileService:
 
     def get_profile(self, user):
+        """Return the user's profile and library entries."""
+
         profile, _ = Profile.objects.get_or_create(
             user=user
         )
@@ -30,6 +32,8 @@ class ProfileService:
         data,
         files,
     ):
+        """Update the user's profile and username when provided."""
+
         profile, _ = Profile.objects.get_or_create(
             user=user
         )

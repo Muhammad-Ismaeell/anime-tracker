@@ -38,6 +38,7 @@ function EditProfileForm({ user, profile }) {
             return;
         }
 
+        // Generate a local preview so the selected avatar can be shown before upload.
         const reader = new FileReader();
 
         reader.onload = () => {
@@ -63,6 +64,7 @@ function EditProfileForm({ user, profile }) {
             return;
         }
 
+        // Use multipart form data because the profile update may include an avatar file.
         const formData = new FormData();
 
         formData.append(

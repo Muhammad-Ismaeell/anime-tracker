@@ -1,3 +1,4 @@
+// Keep auth event listeners outside React so the API layer can notify the app without a component dependency.
 let accessTokenListener = null;
 let sessionExpiredListener = null;
 

@@ -13,6 +13,7 @@ export default function OptimizedImage({
 
     const hasImage = Boolean(src) && !error;
 
+    // Show a fallback when the image is missing or failed to load.
     if (!hasImage) {
         return (
             <div

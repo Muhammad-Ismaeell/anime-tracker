@@ -36,6 +36,7 @@ function Seasonal() {
 
     const favoriteIds = useFavoriteIds();
 
+    // Prevent repeated observer events from triggering duplicate page requests.
     useEffect(() => {
         const element = loadMoreRef.current;
 

@@ -1,5 +1,8 @@
 import { Component } from "react";
 
+/**
+ * Prevent a rendering error from taking down the entire React application.
+ */
 class ErrorBoundary extends Component {
     constructor(props) {
         super(props);

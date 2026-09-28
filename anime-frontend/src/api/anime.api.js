@@ -106,6 +106,7 @@ export const AnimeAPI = {
         return res.data;
     },
     search: async ({ query, page = 1, filters = {} }) => {
+        // Merge optional filters into the search query sent to the backend.
         const res = await api.get("/anime/search/", {
             params: { q: query, page, ...filters },
             skipAuth: true,

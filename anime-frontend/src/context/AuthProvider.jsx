@@ -17,6 +17,7 @@ function AuthProvider({ children }) {
 
     const queryClient = useQueryClient();
 
+    // Invalidate user-specific queries so they refresh for the current account.
     const refreshPrivateCache = useCallback(() => {
         queryClient.invalidateQueries({
             queryKey: queryKeys.users.favorites,

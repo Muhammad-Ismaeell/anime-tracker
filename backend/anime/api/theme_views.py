@@ -15,4 +15,6 @@ theme_service = ThemeService()
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_themes(request, anime_id):
+    """Return opening and ending themes for an anime."""
+
     return Response(theme_service.get_themes(anime_id))

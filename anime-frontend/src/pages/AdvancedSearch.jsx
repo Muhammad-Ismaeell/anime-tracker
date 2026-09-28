@@ -50,6 +50,7 @@ export default function AdvancedSearch() {
 
     const debouncedQuery = useDebouncedSearch(query, 400);
 
+    // Omit empty filters so the API only receives criteria the user selected.
     const normalizedFilters = useMemo(
         () => ({
             type: filters.type || undefined,
@@ -114,6 +115,7 @@ export default function AdvancedSearch() {
         return () => clearTimeout(timeout);
     }, [query, filters, setParams]);
 
+    // Load the next page when the sentinel approaches the viewport.
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {

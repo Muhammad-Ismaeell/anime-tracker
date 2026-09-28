@@ -32,6 +32,7 @@ export function useInfiniteAnime(type) {
                 ? lastPage.page + 1
                 : undefined,
 
+        // Flatten, normalize, and deduplicate pages into one anime list for the UI.
         select: (data) => {
             const map = new Map();
 

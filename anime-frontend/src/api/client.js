@@ -20,6 +20,7 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
+    // Resolve or reject requests that were waiting for the in-progress token refresh.
     failedQueue.forEach(({ resolve, reject }) => {
         if (error) {
             reject(error);
@@ -75,6 +76,7 @@ api.interceptors.response.use(
         }
 
         if (isRefreshing) {
+            // Wait for the existing refresh instead of sending multiple refresh requests.
             return new Promise((resolve, reject) => {
                 failedQueue.push({ resolve, reject });
             }).then((newAccessToken) => {

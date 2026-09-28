@@ -5,6 +5,8 @@ from anime.presentation.serializers import AnimeSerializer
 
 PAGE_SIZE = 24
 
+# Restrict sortable fields to known model fields instead of accepting
+# arbitrary values from the request.
 ALLOWED_ORDERING = {
     "score",
     "year",
@@ -12,6 +14,7 @@ ALLOWED_ORDERING = {
     "title",
 }
 
+# Map API filter values to the status labels stored in the database.
 STATUS_MAP = {
     "airing": "Currently Airing",
     "complete": "Finished Airing",
@@ -22,6 +25,8 @@ STATUS_MAP = {
 class AnimeSearchService:
     @staticmethod
     def search(query="", page=1, filters=None):
+        """Search, filter, sort, and paginate anime results."""
+
         filters = filters or {}
         queryset = Anime.objects.all()
 

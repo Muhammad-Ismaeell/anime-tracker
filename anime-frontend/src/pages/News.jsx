@@ -50,6 +50,7 @@ function News() {
     } = newsQuery;
 
     const allNews = (data?.pages ?? []).flatMap((page) => page.items ?? []);
+    // Filter the loaded articles by date without changing the paginated API response.
     const news = period === "week"
         ? allNews.filter((article) => {
             const timestamp = article.date ? new Date(article.date).getTime() : 0;
@@ -64,6 +65,7 @@ function News() {
             return undefined;
         }
 
+        // Prevent repeated observer events from triggering duplicate page requests.
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (!entry?.isIntersecting) {

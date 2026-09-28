@@ -19,6 +19,7 @@ export function useAnimeSearch(query = "", filters = {}) {
             return data?.data ?? data;
         },
         initialPageParam: 1,
+        // Keep previous results visible while the new search is loading.
         placeholderData: (previousData) => previousData,
         enabled: true,
         getNextPageParam: (lastPage) => {

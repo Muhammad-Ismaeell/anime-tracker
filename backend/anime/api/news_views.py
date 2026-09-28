@@ -9,6 +9,8 @@ news_service = NewsService()
 
 
 def safe_int(value, default=1):
+    """Convert a value to a positive integer or return the default."""
+
     try:
         return max(1, int(value))
     except (TypeError, ValueError):
@@ -26,6 +28,7 @@ def safe_int(value, default=1):
 @permission_classes([AllowAny])
 def general_news(request):
     """Return paginated general anime news."""
+
     return Response(news_service.get_general_news(safe_int(request.GET.get("page"))))
 
 
@@ -37,4 +40,5 @@ def general_news(request):
 @permission_classes([AllowAny])
 def anime_news(request, anime_id):
     """Return news articles for an anime."""
+
     return Response(news_service.get_news(anime_id))

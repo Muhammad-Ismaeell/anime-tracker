@@ -24,6 +24,7 @@ episode_service = EpisodeService()
 @permission_classes([AllowAny])
 def anime_episodes(request, anime_id):
     """Return one page of episode information for an anime."""
+
     try:
         page = max(1, int(request.GET.get("page", 1)))
     except (TypeError, ValueError):

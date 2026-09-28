@@ -40,6 +40,7 @@ const getAnimeImage = (anime) => {
     return anime?.image ?? "";
 };
 
+// Normalize favorites and review results into the shape expected by AnimeCard.
 const normalizeAnime = (item, score = 0) => {
     const source = item?.anime ?? item;
 
@@ -95,6 +96,7 @@ function Profile() {
         refetch: refetchFavorites,
     } = useFavorites();
 
+    // Combine all loaded favorite pages into one list for the profile section.
     const favorites = useMemo(
         () =>
             favoritesData?.pages?.flatMap(

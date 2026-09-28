@@ -1,10 +1,13 @@
 from rest_framework.pagination import PageNumberPagination
 from core.responses import APIResponse
 
+
 class StandardPagination(PageNumberPagination):
     page_size = 12
 
     def get_paginated_response(self, data):
+        """Return paginated results using the project's standard API response format."""
+
         return APIResponse.success({
             "results": data,
             "count": self.page.paginator.count,

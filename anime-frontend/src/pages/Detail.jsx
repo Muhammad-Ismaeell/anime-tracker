@@ -107,6 +107,7 @@ function Detail() {
         anime.title ||
         "Unknown Anime";
 
+    // Prefer the detail response, then fall back to cached library metadata.
     const episodeCount =
         Number(anime.episodes) ||
         Number(libraryItem?.anime?.episodes) ||
@@ -116,6 +117,7 @@ function Detail() {
 
     const liked = favoriteIds.has(String(anime.id));
 
+    // Keep stored progress within the known episode range.
     const safeStoredProgress = Math.max(
         0,
         hasKnownEpisodeCount
@@ -123,6 +125,7 @@ function Detail() {
             : storedProgress
     );
 
+    // Use the draft while editing; otherwise show the sanitized stored progress.
     const displayedProgress = isProgressEditing
         ? Math.max(
             0,
@@ -220,6 +223,7 @@ function Detail() {
         }
 
         if (status === "completed") {
+            // Completing an anime marks all known episodes as watched.
             const completedProgress = hasKnownEpisodeCount
                 ? episodeCount
                 : safeStoredProgress;
@@ -306,6 +310,7 @@ function Detail() {
         setIsProgressEditing(true);
     };
 
+    // Normalize the final value again before persisting it.
     const handleSaveProgress = () => {
         let safeProgress = isProgressEditing
             ? Number(progressDraft)

@@ -23,6 +23,7 @@ export default function AnimeSection({
     const CARDS_PER_PAGE = 7;
     const RANKING_ITEMS = 8;
 
+    // Normalize favorite IDs so Set lookups work regardless of API data shape.
     const safeFavoriteIds =
         favoriteIds instanceof Set
             ? favoriteIds
@@ -32,6 +33,7 @@ export default function AnimeSection({
                     : []
             );
 
+    // Filter out entries without a usable anime ID before rendering links or cards.
     const validAnime = useMemo(() => {
         const list = Array.isArray(animeList) ? animeList : [];
 

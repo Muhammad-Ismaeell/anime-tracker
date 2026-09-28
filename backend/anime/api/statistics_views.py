@@ -15,4 +15,6 @@ statistics_service = StatisticsService()
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_statistics(request, anime_id):
+    """Return viewing statistics for an anime."""
+
     return Response(statistics_service.get_statistics(anime_id))

@@ -32,6 +32,7 @@ function CharactersSection({ animeId }) {
                 </div>
             ) : (
                 <div className="characters-grid">
+                    {/* Keep the detail page compact by showing only the first 12 characters. */}
                     {characters.slice(0, 12).map((character) => {
                         const image = character.image || "/no-image.png";
                         const voiceActor = character.voice_actors?.[0]?.name;

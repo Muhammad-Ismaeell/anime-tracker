@@ -12,6 +12,8 @@ class StaffService:
     DB_REFRESH_TIMEOUT = timedelta(days=30)
 
     def get_staff(self, anime_id):
+        """Return cached staff data or refresh it when the database data is stale."""
+
         key = f"anime-staff:v2:{anime_id}"
 
         return get_or_set(
@@ -23,6 +25,7 @@ class StaffService:
     def _get_or_fetch_staff(self, anime_id):
         anime = Anime.objects.filter(mal_id=anime_id).first()
         if anime:
+            # Reuse stored staff data for 30 days before requesting the external API again.
             cutoff = timezone.now() - self.DB_REFRESH_TIMEOUT
             rows = list(
                 AnimeStaff.objects.select_related("person").filter(
@@ -36,6 +39,8 @@ class StaffService:
         return self._fetch_staff(anime_id, anime)
 
     def _fetch_staff(self, anime_id, anime=None):
+        """Fetch and normalize staff data from the external API."""
+
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/staff")
         if not data:
             return []
@@ -71,6 +76,8 @@ class StaffService:
 
     @staticmethod
     def _serialize(rows):
+        """Serialize stored staff records for the API response."""
+
         return [
             {
                 "id": row.person.mal_id,

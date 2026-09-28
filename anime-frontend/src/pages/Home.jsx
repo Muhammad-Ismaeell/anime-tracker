@@ -61,6 +61,7 @@ function Home() {
         { id: "top", label: "Top Anime", anime: topAnime, to: "/top", mobileOnly: true },
     ];
 
+    // Fall back to the first category if the selected category is unavailable.
     const activeCategoryData =
         categories.find((category) => category.id === activeCategory) ?? categories[0];
 
@@ -191,6 +192,7 @@ function Home() {
                                             const anime = item.anime;
                                             const progress = Math.max(Number(item.progress) || 0, 0);
                                             const episodes = Number(anime.episodes) || 0;
+                                            // Convert episode progress to a capped percentage for the progress bar.
                                             const percentage = episodes > 0
                                                 ? Math.min(Math.round((progress / episodes) * 100), 100)
                                                 : 0;

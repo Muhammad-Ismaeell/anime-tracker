@@ -12,6 +12,7 @@ function MobileSearch() {
 
     const debouncedQuery = useDebounce(query, 500);
     const { data: results = [], isLoading } = useNavbarSearch(debouncedQuery);
+    // Require at least 3 characters before triggering the search dropdown.
     const hasSearchQuery = query.trim().length >= 3;
 
     useEffect(() => {

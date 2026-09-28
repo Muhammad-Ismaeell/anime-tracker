@@ -15,6 +15,7 @@ export function useNavbarSearch(query) {
 
             const data = res.data?.data ?? res.data;
 
+            // Support both paginated and unpaginated response shapes.
             const items =
                 data?.items ||
                 data?.results ||

@@ -15,12 +15,16 @@ class EmailVerificationService:
 
     @staticmethod
     def _hash_token(token: str) -> str:
+        """Hash a verification token before storing or comparing it."""
+
         return hashlib.sha256(
             token.encode("utf-8")
         ).hexdigest()
 
     @classmethod
     def create_verification(cls, user):
+        """Create or replace the user's email verification token."""
+
         raw_token = secrets.token_urlsafe(cls.TOKEN_BYTES)
         token_hash = cls._hash_token(raw_token)
 
@@ -72,6 +76,8 @@ class EmailVerificationService:
 
     @classmethod
     def verify_token(cls, raw_token: str):
+        """Validate a verification token and mark the user's email as verified."""
+
         token_hash = cls._hash_token(raw_token)
 
         verification = (

@@ -7,10 +7,13 @@ class NewsService:
     MAX_ITEMS = 10
 
     def get_news(self, anime_id):
+        """Return cached news for an anime."""
+
         key = f"anime-news:{anime_id}"
         return get_or_set(key, self.CACHE_TIMEOUT, lambda: self._fetch_news(anime_id))
 
     def get_general_news(self, page=1):
+        """Return cached general news for a page."""
         key = f"news:page:{page}"
         return get_or_set(
             key,
@@ -19,6 +22,8 @@ class NewsService:
         )
 
     def _fetch_general_news(self, page):
+        """Fetch and normalize a page of general news."""
+
         response = TenraiClient().get_general_news(page)
         items = [
             item
@@ -39,6 +44,7 @@ class NewsService:
         if not isinstance(items, list):
             return []
 
+        # Limit the response to keep the anime detail page lightweight.
         return [
             item
             for item in (self._normalize_item(news_item) for news_item in items[:self.MAX_ITEMS])
@@ -47,6 +53,8 @@ class NewsService:
 
     @staticmethod
     def _normalize_item(item):
+        """Normalize an external news item to the API response format."""
+
         if not isinstance(item, dict):
             return None
 

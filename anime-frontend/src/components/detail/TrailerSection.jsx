@@ -6,6 +6,8 @@ function TrailerSection({ trailer }) {
     }
 
     const trailerUrl = new URL(embedUrl);
+
+    // Prevent embedded trailers from starting automatically when the detail page loads.
     trailerUrl.searchParams.delete("autoplay");
 
     return (

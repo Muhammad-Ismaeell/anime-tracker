@@ -40,6 +40,7 @@ function RecentlyAdded() {
             return undefined;
         }
 
+        // Prevent repeated observer events from triggering duplicate page requests.
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (!entry?.isIntersecting) {

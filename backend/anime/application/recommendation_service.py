@@ -6,9 +6,12 @@ class RecommendationService:
     CACHE_TIMEOUT = 60 * 60
 
     def __init__(self, client=None):
+        """Initialize the service with an optional API client."""
+
         self.client = client or TenraiClient()
 
     def get_recommendations(self, anime_id):
+        """Return cached recommendations for an anime."""
         key = f"anime-recommendations:{anime_id}"
 
         return get_or_set(
@@ -18,6 +21,8 @@ class RecommendationService:
         )
 
     def get_general_recommendations(self, page=1):
+        """Return cached general recommendations for a page."""
+
         key = f"recommendations:page:{page}"
 
         return get_or_set(
@@ -27,6 +32,8 @@ class RecommendationService:
         )
 
     def _fetch_general_recommendations(self, page):
+        """Fetch and normalize a page of general recommendations."""
+
         response = self.client.get_general_recommendations(page)
         items = []
 
@@ -79,6 +86,8 @@ class RecommendationService:
         }
 
     def _fetch_recommendations(self, anime_id):
+        """Fetch and normalize recommendations for an anime."""
+
         recommendations = self.client.get_recommendations(anime_id)
         items = []
 

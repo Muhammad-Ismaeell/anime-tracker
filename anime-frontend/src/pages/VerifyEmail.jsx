@@ -23,6 +23,7 @@ export default function VerifyEmail() {
             return;
         }
 
+        // Ignore the response if the component unmounts before verification finishes.
         let cancelled = false;
 
         const verifyEmail = async () => {

@@ -1,3 +1,6 @@
+/**
+ * Normalize API responses that may be wrapped in a `data` envelope.
+ */
 export function unwrap(response) {
     return response?.data?.data ?? response?.data ?? response;
 }

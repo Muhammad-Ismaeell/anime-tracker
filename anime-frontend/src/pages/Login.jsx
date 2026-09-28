@@ -6,6 +6,7 @@ import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useLogin } from "../auth/useAuth";
 import { AuthContext } from "../context/AuthContext";
 
+// Allow deployments to disable username/password login when Google-only auth is enabled.
 const GOOGLE_ONLY_AUTH = import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
 
 export default function Login() {
@@ -31,6 +32,7 @@ export default function Login() {
                     const { access, refresh, user } = response.data;
                     await login(access, refresh, user);
                     toast.success("Welcome back!");
+                    // Reload the app so all authenticated state and private queries initialize for the new session.
                     window.location.href = "/";
                 },
                 onError: (error) => {

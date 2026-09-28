@@ -14,6 +14,7 @@ class ActivityService:
     }
 
     def create(self, user, anime, action):
+        """Create an activity after validating its action type."""
 
         if action not in self.VALID_ACTIONS:
             raise ValueError(

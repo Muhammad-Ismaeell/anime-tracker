@@ -45,6 +45,7 @@ function StaffSection({ animeId }) {
                 </p>
             ) : (
                 <div className="staff-grid">
+                    {/* Keep the staff section compact by showing only the first 12 people. */}
                     {staff.slice(0, 12).map((person) => (
                         <article className="staff-card" key={person.id}>
                             <div className="staff-image-wrap">

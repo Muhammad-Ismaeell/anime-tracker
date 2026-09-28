@@ -29,7 +29,7 @@ function AnimeCard({
     const [open, setOpen] = useState(false);
     const [showProgressInput, setShowProgressInput] = useState(false);
     const [progress, setProgress] = useState(0);
-
+    // Accept the different ID shapes used by API and normalized data sources.
     const rawAnimeId = anime?.mal_id ?? anime?.id ?? anime?.anime_id;
 
     if (rawAnimeId == null) {
@@ -118,6 +118,7 @@ function AnimeCard({
     };
 
     const handleWatchingSubmit = () => {
+        // Normalize progress before sending it so the backend never receives invalid or fractional episode counts.
         let safeProgress = Number(progress);
 
         if (!Number.isFinite(safeProgress)) {
@@ -143,6 +144,7 @@ function AnimeCard({
     };
 
     const handleProgressChange = (event) => {
+        // Keep the input responsive while preventing invalid or out-of-range episode values.
         const rawValue = event.target.value;
 
         if (rawValue === "") {

@@ -10,6 +10,7 @@ export function extractAnimePages(data) {
     const pages = data.pages ?? [];
     const map = new Map();
 
+    // Merge paginated results while keeping only one entry per anime ID.
     pages.forEach((page) => {
         (page?.items ?? []).forEach((anime) => {
             if (!anime?.id) {

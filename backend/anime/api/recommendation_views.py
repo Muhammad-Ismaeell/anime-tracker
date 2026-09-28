@@ -9,6 +9,7 @@ recommendation_service = RecommendationService()
 
 
 def safe_int(value, default=1):
+    """Convert a value to a positive integer or return the default."""
     try:
         return max(1, int(value))
     except (TypeError, ValueError):
@@ -41,6 +42,7 @@ def general_recommendations(request):
 @permission_classes([AllowAny])
 def anime_recommendations(request, anime_id):
     """Return recommendations for an anime."""
+
     return Response(
         {"items": recommendation_service.get_recommendations(anime_id)}
     )

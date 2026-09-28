@@ -44,10 +44,12 @@ function Characters() {
 
     const characters = (data?.pages ?? []).flatMap((page) => page.items ?? []);
 
+    // Prevent the observer from triggering another request while pagination is in progress.
     useEffect(() => {
         canLoadMoreRef.current = !isFetchingNextPage;
     }, [isFetchingNextPage]);
 
+    // Load another page before the sentinel reaches the viewport.
     useEffect(() => {
         const element = loadMoreRef.current;
         if (!element) return undefined;

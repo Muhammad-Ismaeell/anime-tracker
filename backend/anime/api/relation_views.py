@@ -16,4 +16,5 @@ relation_service = RelationService()
 @permission_classes([AllowAny])
 def anime_relations(request, anime_id):
     """Return related anime grouped by relation type."""
+
     return Response({"items": relation_service.get_relations(anime_id)})

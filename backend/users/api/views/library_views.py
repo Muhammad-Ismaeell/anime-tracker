@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.pagination import StandardPagination
 from core.responses import APIResponse
-
 from users.api.docs.library_docs import (
     LibraryStatsResponseSerializer,
     LibraryUpdateRequestSerializer,

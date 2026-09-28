@@ -13,6 +13,8 @@ class ThemeService:
     DB_REFRESH_TIMEOUT = timedelta(days=30)
 
     def get_themes(self, anime_id):
+        """Return cached themes or refresh them when the database data is stale."""
+
         key = f"anime-themes:v2:{anime_id}"
         return get_or_set(
             key,
@@ -23,6 +25,7 @@ class ThemeService:
     def _get_or_fetch_themes(self, anime_id):
         anime = Anime.objects.filter(mal_id=anime_id).first()
         if anime:
+            # Reuse stored themes for 30 days before requesting the external API again.
             cutoff = timezone.now() - self.DB_REFRESH_TIMEOUT
             rows = list(
                 AnimeTheme.objects.filter(
@@ -36,6 +39,8 @@ class ThemeService:
         return self._fetch_and_store_themes(anime_id, anime)
 
     def _fetch_and_store_themes(self, anime_id, anime=None):
+        """Fetch, persist, and serialize anime opening and ending themes."""
+
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/themes")
         if not data:
             return {"openings": [], "endings": []}
@@ -62,6 +67,7 @@ class ThemeService:
             )
 
         with db_write_lock:
+            # Replace the stored set so removed themes are not left in the database.
             AnimeTheme.objects.filter(anime=anime).delete()
             if rows:
                 AnimeTheme.objects.bulk_create(rows)
@@ -70,6 +76,8 @@ class ThemeService:
 
     @staticmethod
     def _serialize(rows):
+        """Group stored themes into opening and ending lists."""
+
         result = {"openings": [], "endings": []}
         for row in rows:
             result[f"{row.theme_type}s"].append(row.title)
@@ -77,6 +85,8 @@ class ThemeService:
 
     @staticmethod
     def _normalize_list(items):
+        """Return non-empty theme titles as a clean list."""
+
         if not isinstance(items, list):
             return []
         return [str(item).strip() for item in items if str(item).strip()]

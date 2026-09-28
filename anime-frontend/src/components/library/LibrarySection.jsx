@@ -37,6 +37,7 @@ function LibrarySection({ title, items }) {
 
             <div className="grid">
                 {items.map((item) => {
+                    // Normalize library entries and plain anime objects into one source shape.
                     const source = item.anime ?? item;
 
                     const animeId =

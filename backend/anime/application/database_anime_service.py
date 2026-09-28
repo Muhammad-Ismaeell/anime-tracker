@@ -9,6 +9,7 @@ class DatabaseAnimeService:
 
     @staticmethod
     def paginate(queryset, page=1, size=DEFAULT_PAGE_SIZE):
+        """Paginate a queryset and return items with pagination metadata."""
 
         start = (page - 1) * size
         end = start + size
@@ -24,6 +25,7 @@ class DatabaseAnimeService:
     @staticmethod
     def get_current_season():
         """Return the actual anime season for today's calendar date."""
+
         today = timezone.localdate()
 
         if today.month <= 3:
@@ -39,6 +41,7 @@ class DatabaseAnimeService:
 
     @classmethod
     def get_seasonal(cls, page=1):
+        """Return anime from the current season, ordered by popularity."""
 
         year, season = cls.get_current_season()
 
@@ -66,6 +69,7 @@ class DatabaseAnimeService:
 
     @classmethod
     def get_top(cls, page=1):
+        """Return the highest-scored anime."""
 
         queryset = (
             Anime.objects
@@ -86,6 +90,7 @@ class DatabaseAnimeService:
 
     @classmethod
     def get_trending(cls, page=1):
+        """Return anime ordered by popularity."""
 
         queryset = (
             Anime.objects
@@ -105,6 +110,7 @@ class DatabaseAnimeService:
 
     @classmethod
     def get_recently_added(cls, page=1):
+        """Return the most recently added anime."""
 
         queryset = (
             Anime.objects

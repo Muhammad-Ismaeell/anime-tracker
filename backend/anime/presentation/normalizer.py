@@ -2,6 +2,8 @@ from anime.infrastructure.models import Anime
 
 
 def normalize_anime_card(raw):
+    """Normalize external anime data for card responses."""
+
     if not raw:
         return None
 
@@ -21,6 +23,8 @@ def normalize_anime_card(raw):
 
 
 def normalize_anime_detail(anime, embed_url=None):
+    """Normalize anime model or API data for detail responses."""
+
     if isinstance(anime, Anime):
         return {
             "id": anime.mal_id,

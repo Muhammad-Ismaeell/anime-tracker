@@ -9,6 +9,8 @@ character_service = CharacterService()
 
 
 def safe_int(value, default=1):
+    """Convert a value to a positive integer or return the default."""
+
     try:
         return max(1, int(value))
     except (TypeError, ValueError):
@@ -26,10 +28,12 @@ def safe_int(value, default=1):
         OpenApiParameter("letter", OpenApiTypes.STR, OpenApiParameter.QUERY),
     ],
 )
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def general_characters(request):
     """Return paginated characters for general discovery."""
+
     return Response(
         character_service.get_general_characters(
             page=safe_int(request.GET.get("page")),
@@ -45,6 +49,7 @@ def general_characters(request):
     summary="Anime Characters",
     description="Return characters and voice actors for one anime.",
 )
+
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_characters(request, anime_id):

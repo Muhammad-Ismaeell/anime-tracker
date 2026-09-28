@@ -7,7 +7,7 @@ export function useGlobalLibrary() {
 
     const { data } = useLibrary();
 
-
+    // Flatten paginated library results into a single collection for shared lookups.
     const library = useMemo(() => {
 
         return (
@@ -18,7 +18,7 @@ export function useGlobalLibrary() {
 
     }, [data]);
 
-
+    // Normalize different anime ID shapes so all library lookups use the same key.
     const libraryMap = useMemo(() => {
 
         const map = new Map();

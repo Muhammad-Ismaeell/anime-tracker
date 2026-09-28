@@ -12,6 +12,8 @@ class AnimeService:
         self.client = client
 
     def save_anime(self, data):
+        """Create or update an anime and its related genres from API data."""
+
         if not data:
             raise ValueError("Anime data is empty.")
 
@@ -24,6 +26,8 @@ class AnimeService:
 
         existing = Anime.objects.filter(mal_id=mal_id).first()
 
+        # Preserve existing metadata when the external API omits fields
+        # from a later response.
         episodes = data.get("episodes")
         if episodes is None and existing:
             episodes = existing.episodes
@@ -40,41 +44,45 @@ class AnimeService:
         if not status and existing:
             status = existing.status
 
+        # Keep the previously saved trailer when the API response does not
+        # include trailer data.
         trailer = data.get("trailer") or {}
         trailer_embed_url = trailer.get("embed_url") or (
             existing.trailer_embed_url if existing else ""
         )
 
         defaults = {
-                "title": data.get("title", ""),
-                "title_english": data.get("title_english") or data.get("title"),
-                "search_title": data.get("title", "").lower(),
-                "image": (
-                    data.get("images", {})
-                    .get("jpg", {})
-                    .get("image_url")
-                ),
-                "image_large": (
-                    data.get("images", {})
-                    .get("jpg", {})
-                    .get("large_image_url")
-                ),
-                "synopsis": data.get("synopsis"),
-                "score": data.get("score"),
-                "popularity": data.get("popularity"),
-                "type": data.get("type"),
-                "episodes": episodes,
-                "year": year,
-                "season": season,
-                "status": status,
-                "rating": (
-                    data.get("rating")
-                    or (existing.rating if existing else "Unknown")
-                    or "Unknown"
-                ),
+            "title": data.get("title", ""),
+            "title_english": data.get("title_english") or data.get("title"),
+            "search_title": data.get("title", "").lower(),
+            "image": (
+                data.get("images", {})
+                .get("jpg", {})
+                .get("image_url")
+            ),
+            "image_large": (
+                data.get("images", {})
+                .get("jpg", {})
+                .get("large_image_url")
+            ),
+            "synopsis": data.get("synopsis"),
+            "score": data.get("score"),
+            "popularity": data.get("popularity"),
+            "type": data.get("type"),
+            "episodes": episodes,
+            "year": year,
+            "season": season,
+            "status": status,
+            "rating": (
+                data.get("rating")
+                or (existing.rating if existing else "Unknown")
+                or "Unknown"
+            ),
             "trailer_embed_url": trailer_embed_url,
         }
 
+        # Track when trailer metadata was explicitly checked so get_or_create()
+        # knows whether it needs to refresh the anime details.
         if "trailer" in data:
             defaults["trailer_checked_at"] = timezone.now()
 
@@ -102,8 +110,12 @@ class AnimeService:
         return anime, created
 
     def get_or_create(self, anime_id):
+        """Return cached anime data or refresh it from the external API."""
+
         anime = Anime.objects.filter(mal_id=anime_id).first()
 
+        # Avoid an external API request when the local record already has
+        # the metadata required by the detail page.
         if (
             anime
             and anime.episodes is not None
@@ -121,5 +133,7 @@ class AnimeService:
         return anime
 
     def get_detail(self, anime_id):
+        """Return normalized anime detail data for the API layer."""
+
         anime = self.get_or_create(anime_id)
         return {"item": normalize_anime_detail(anime)}

@@ -6,6 +6,8 @@ class StatisticsService:
     CACHE_TIMEOUT = 60 * 60
 
     def get_statistics(self, anime_id):
+        """Return cached statistics for an anime."""
+
         key = f"anime-statistics:{anime_id}"
 
         return get_or_set(
@@ -15,6 +17,8 @@ class StatisticsService:
         )
 
     def _fetch_statistics(self, anime_id):
+        """Fetch and normalize statistics from the external API."""
+
         data = safe_request(
             f"{BASE_URL}/anime/{anime_id}/statistics"
         )
@@ -30,6 +34,8 @@ class StatisticsService:
 
     @staticmethod
     def _normalize_statistics(data):
+        """Normalize statistic counts and calculate the total."""
+
         watching = data.get("watching") or 0
         completed = data.get("completed") or 0
         on_hold = data.get("on_hold") or 0

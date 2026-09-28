@@ -13,6 +13,8 @@ class RelationService:
     DB_REFRESH_TIMEOUT = timedelta(days=30)
 
     def get_relations(self, anime_id):
+        """Return cached relations or refresh them when the database data is stale."""
+
         key = f"anime-relations:v2:{anime_id}"
         return get_or_set(
             key,
@@ -23,6 +25,7 @@ class RelationService:
     def _get_or_fetch_relations(self, anime_id):
         anime = Anime.objects.filter(mal_id=anime_id).first()
         if anime:
+            # Reuse stored relations for 30 days before requesting the external API again.
             cutoff = timezone.now() - self.DB_REFRESH_TIMEOUT
             rows = list(
                 AnimeRelation.objects.filter(
@@ -36,6 +39,8 @@ class RelationService:
         return self._fetch_and_store_relations(anime_id, anime)
 
     def _fetch_and_store_relations(self, anime_id, anime=None):
+        """Fetch, persist, and serialize anime relations."""
+
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/relations")
         if not data:
             return []
@@ -64,6 +69,7 @@ class RelationService:
                 )
 
         with db_write_lock:
+            # Replace the stored set so removed relations are not left in the database.
             AnimeRelation.objects.filter(anime=anime).delete()
             if rows:
                 AnimeRelation.objects.bulk_create(rows)
@@ -72,6 +78,8 @@ class RelationService:
 
     @staticmethod
     def _serialize(rows):
+        """Group stored relations by relation type for the API response."""
+
         grouped = {}
         for row in rows:
             grouped.setdefault(row.relation_type, []).append(

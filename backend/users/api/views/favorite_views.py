@@ -1,4 +1,3 @@
-
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import (
     api_view,
@@ -8,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.pagination import StandardPagination
 from core.responses import APIResponse
-
 from users.api.docs.favorite_docs import (
     FavoriteListResponseSerializer,
     ToggleFavoriteRequestSerializer,

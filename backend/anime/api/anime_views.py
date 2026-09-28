@@ -18,6 +18,8 @@ anime_service = AnimeService(TenraiClient())
 
 
 def safe_int(value, default=1):
+    """Convert a value to a positive integer or return the default."""
+
     try:
         return max(1, int(value))
     except (TypeError, ValueError):
@@ -41,6 +43,7 @@ def safe_int(value, default=1):
 @permission_classes([AllowAny])
 def top_anime(request):
     """Return top-rated anime from the local catalog."""
+
     return Response(DatabaseAnimeService.get_top(safe_int(request.GET.get("page"))))
 
 
@@ -61,6 +64,7 @@ def top_anime(request):
 @permission_classes([AllowAny])
 def trending_anime(request):
     """Return trending anime from the local catalog."""
+
     return Response(
         DatabaseAnimeService.get_trending(safe_int(request.GET.get("page")))
     )
@@ -83,6 +87,7 @@ def trending_anime(request):
 @permission_classes([AllowAny])
 def seasonal_anime(request):
     """Return seasonal anime from the local catalog."""
+
     return Response(
         DatabaseAnimeService.get_seasonal(safe_int(request.GET.get("page")))
     )
@@ -105,6 +110,7 @@ def seasonal_anime(request):
 @permission_classes([AllowAny])
 def recently_added_anime(request):
     """Return recently added anime from the local catalog."""
+
     return Response(
         DatabaseAnimeService.get_recently_added(safe_int(request.GET.get("page")))
     )
@@ -131,9 +137,11 @@ def recently_added_anime(request):
 @permission_classes([AllowAny])
 def anime_search(request):
     """Search anime using the requested query and filters."""
+
     query = request.GET.get("q", "").strip()
     page = safe_int(request.GET.get("page"))
-
+    # Keep only filters provided by the client so empty query parameters
+    # do not affect the search.
     filters = {
         key: value
         for key, value in {
@@ -165,4 +173,5 @@ def anime_search(request):
 @permission_classes([AllowAny])
 def anime_detail(request, anime_id):
     """Return detailed information for an anime."""
+
     return Response(anime_service.get_detail(anime_id))

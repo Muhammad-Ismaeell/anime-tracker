@@ -13,6 +13,8 @@ class ExternalLinkService:
     DB_REFRESH_TIMEOUT = timedelta(days=30)
 
     def get_links(self, anime_id):
+        """Return cached external links or refresh them when the database data is stale."""
+
         key = f"anime-external-links:v2:{anime_id}"
         return get_or_set(
             key,
@@ -23,6 +25,7 @@ class ExternalLinkService:
     def _get_or_fetch_links(self, anime_id):
         anime = Anime.objects.filter(mal_id=anime_id).first()
         if anime:
+            # Reuse stored links for 30 days before requesting the external API again.
             cutoff = timezone.now() - self.DB_REFRESH_TIMEOUT
             rows = list(
                 AnimeExternalLink.objects.filter(
@@ -32,10 +35,12 @@ class ExternalLinkService:
             )
             if rows:
                 return self._serialize(rows)
-
+        # No usable recent links were found, so refresh them from the external API.
         return self._fetch_and_store_links(anime_id, anime)
 
     def _fetch_and_store_links(self, anime_id, anime=None):
+        """Fetch, validate, deduplicate, and persist external links."""
+
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/full")
         if not data:
             return []
@@ -49,6 +54,7 @@ class ExternalLinkService:
             return []
 
         links = []
+        # The API can expose the same URL in multiple link categories.
         seen_urls = set()
 
         for item in anime_data.get("external", []) or []:
@@ -68,6 +74,7 @@ class ExternalLinkService:
         ]
 
         with db_write_lock:
+            # Replace the stored set so removed links are not left in the database.
             AnimeExternalLink.objects.filter(anime=anime).delete()
             if rows:
                 AnimeExternalLink.objects.bulk_create(rows)
@@ -76,6 +83,8 @@ class ExternalLinkService:
 
     @staticmethod
     def _append_link(links, seen_urls, item, category):
+        """Validate and append a unique external link."""
+
         if not isinstance(item, dict):
             return
 
@@ -84,8 +93,11 @@ class ExternalLinkService:
 
         if not name or not url:
             return
+
+        # Store only absolute HTTP(S) URLs returned by the external API.
         if not url.startswith(("http://", "https://")):
             return
+
         if url in seen_urls:
             return
 

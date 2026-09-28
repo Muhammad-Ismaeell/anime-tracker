@@ -11,6 +11,8 @@ from anime.infrastructure.models import CharacterSafety
 
 
 class CharacterService:
+    # Character data changes infrequently, while safety results are cached
+    # longer because they require additional external API requests.
     CACHE_TIMEOUT = 60 * 60
     SAFETY_CACHE_TIMEOUT = 7 * 24 * 60 * 60
     SAFETY_WORKERS = 3
@@ -23,6 +25,8 @@ class CharacterService:
         return get_or_set(key, self.CACHE_TIMEOUT, lambda: self._fetch_characters(anime_id))
 
     def get_general_characters(self, page=1, query="", order_by="favorites", sort="desc", letter=""):
+        """Return filtered character results with cached safety information."""
+
         key = f"characters:page:{page}:q:{query}:order:{order_by}:sort:{sort}:letter:{letter}"
         return get_or_set(
             key,
@@ -49,6 +53,8 @@ class CharacterService:
         return {**response, "items": items}
 
     def _get_safe_flags(self, character_ids):
+        """Return cached or freshly checked safety flags for characters."""
+
         if not character_ids:
             return {}
 
@@ -64,6 +70,8 @@ class CharacterService:
         missing_ids = [character_id for character_id in character_ids if character_id not in cached]
 
         if missing_ids:
+            # Check multiple characters concurrently because each safety check
+            # requires a separate external API request.
             with ThreadPoolExecutor(max_workers=self.SAFETY_WORKERS) as executor:
                 results = executor.map(self._check_character_safety, missing_ids)
                 safety_records = [
@@ -82,6 +90,8 @@ class CharacterService:
 
     @classmethod
     def _check_character_safety(cls, character_id):
+        # Serialize request timing so concurrent workers still respect the
+        # minimum interval between external API requests.
         with cls._safety_rate_lock:
             elapsed = time.monotonic() - cls._last_safety_request
             if elapsed < cls.SAFETY_INTERVAL:
@@ -104,6 +114,8 @@ class CharacterService:
         }
 
     def _fetch_characters(self, anime_id):
+        """Fetch characters and voice actors for an anime from the external API."""
+
         data = safe_request(f"{BASE_URL}/anime/{anime_id}/characters")
         if not data:
             return []

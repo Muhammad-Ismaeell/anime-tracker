@@ -6,6 +6,8 @@ class EpisodeService:
     CACHE_TIMEOUT = 60 * 60
 
     def get_episodes(self, anime_id, page=1):
+        """Return a cached page of episodes for an anime."""
+
         page = max(1, int(page or 1))
         key = f"anime-episodes:{anime_id}:page:{page}"
 
@@ -16,6 +18,8 @@ class EpisodeService:
         )
 
     def _fetch_episodes(self, anime_id, page):
+        """Fetch and normalize one page of episode data from the external API."""
+
         data = safe_request(
             f"{BASE_URL}/anime/{anime_id}/episodes",
             params={"page": page},
@@ -30,6 +34,7 @@ class EpisodeService:
             }
 
         pagination = data.get("pagination") or {}
+        # Handle both pagination formats returned by the external API.
         pagination_items = pagination.get("items") or {}
 
         if isinstance(pagination_items, dict):

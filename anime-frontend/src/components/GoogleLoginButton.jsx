@@ -12,6 +12,7 @@ export default function GoogleLoginButton() {
         setError(null);
 
         try {
+            // Validate the credential before sending it to the backend.
             const credential = credentialResponse?.credential;
 
             if (!credential) {

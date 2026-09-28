@@ -17,4 +17,5 @@ staff_service = StaffService()
 @permission_classes([AllowAny])
 def anime_staff(request, anime_id):
     """Return staff members and positions for an anime."""
+
     return Response({"items": staff_service.get_staff(anime_id)})

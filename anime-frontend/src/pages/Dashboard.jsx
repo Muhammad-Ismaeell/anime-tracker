@@ -34,6 +34,7 @@ function formatDate(date) {
     });
 }
 
+// Convert episode progress into a bounded percentage for the progress bar.
 function getAnimeProgress(progress, episodes) {
     const current = Math.max(Number(progress) || 0, 0);
     const total = Number(episodes) || 0;
@@ -148,6 +149,7 @@ function Dashboard() {
     const stats = data ?? {};
     const progress = stats.progress ?? {};
 
+    // Guard against unexpected API shapes so rendering always receives arrays.
     const currentlyWatching = Array.isArray(
         stats.currently_watching
     )
@@ -185,6 +187,7 @@ function Dashboard() {
 
     const hasKnownProgressTotal = episodesAvailable > 0;
 
+    // Ignore incomplete activity records that don't contain an anime ID.
     const openAnime = (animeId) => {
         if (animeId == null) {
             return;

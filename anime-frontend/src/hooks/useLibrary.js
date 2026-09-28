@@ -41,6 +41,7 @@ export function useUpdateLibrary() {
 
     return useMutation({
         mutationFn: LibraryAPI.update,
+        // Update the cached library immediately and keep a snapshot for rollback on failure.
         onMutate: async (payload) => {
             await queryClient.cancelQueries({ queryKey: libraryQueryKey });
 

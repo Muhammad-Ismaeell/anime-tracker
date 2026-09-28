@@ -3,6 +3,8 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Custom user model with email and Google authentication metadata."""
+
     email = models.EmailField(unique=True)
 
     google_sub = models.CharField(

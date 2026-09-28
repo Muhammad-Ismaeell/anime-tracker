@@ -70,7 +70,7 @@ function ReviewSection({ animeId }) {
             data?.average_rating ?? 0
         );
 
-
+    // Keep review actions behind the same authentication check.
     const requireAuthentication = () => {
         if (!isAuthenticated) {
             showLoginRequired();
@@ -227,6 +227,7 @@ function ReviewSection({ animeId }) {
                         />
                     ) : (
                         reviews.map((review) => {
+                            // Only allow the review owner to see the delete action.
                             const isOwnReview =
                                 isAuthenticated &&
                                 String(user?.id) ===

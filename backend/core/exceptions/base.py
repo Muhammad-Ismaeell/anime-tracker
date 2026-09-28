@@ -1,4 +1,6 @@
 class BaseAppException(Exception):
+    """Base exception carrying an API message, status code, and errors."""
+
     def __init__(
         self,
         message,

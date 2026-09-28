@@ -22,6 +22,7 @@ function EpisodesSection({ animeId }) {
     const { data: anime } = useAnimeDetail(animeId);
     const { libraryMap } = useGlobalLibrary();
 
+    // Use the user's stored library progress to mark episodes as watched.
     const watchedProgress = useMemo(() => {
         if (!(libraryMap instanceof Map)) {
             return 0;

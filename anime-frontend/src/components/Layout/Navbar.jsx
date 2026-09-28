@@ -52,6 +52,7 @@ function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
     const username = profile?.user?.username || user?.username || "Profile";
     const avatarUrl = profileAvatar ? getMediaUrl(profileAvatar) : null;
     const avatarFallback = username.charAt(0).toUpperCase() || "U";
+    // Require at least 3 characters before showing search results.
     const hasSearchQuery = query.trim().length >= 3;
 
     useEffect(() => {
@@ -62,6 +63,7 @@ function Navbar({ onMenuToggle = () => {}, sidebarOpen = false }) {
             const atTop = currentScrollY <= 12;
             const atBottom = maxScrollY - currentScrollY <= 8;
 
+            // Collapse the navbar while scrolling down, but keep it expanded at the page edges.
             if (atTop) {
                 setCompact(false);
             } else if (!atBottom && Math.abs(scrollDelta) >= 8) {

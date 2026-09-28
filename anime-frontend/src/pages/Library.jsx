@@ -18,6 +18,7 @@ function Library() {
         refetch,
     } = useLibrary();
 
+    // Flatten paginated results and group library entries by their normalized status.
     const grouped = useMemo(() => {
         const library = data?.pages?.flatMap((page) => page.results || []) || [];
 

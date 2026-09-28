@@ -49,6 +49,7 @@ class Command(BaseCommand):
         )
 
     def save_items(self, items, service):
+        """Save a page of anime while tracking created, updated, blocked, and failed items."""
 
         new_count = 0
         update_count = 0
@@ -80,6 +81,7 @@ class Command(BaseCommand):
         return new_count, update_count, blocked_count, fail_count
 
     def fetch_page(self, name, fetcher, page, request_retries):
+        """Fetch one page with retries when the source returns no usable items."""
 
         attempts = request_retries + 1
 
@@ -91,6 +93,7 @@ class Command(BaseCommand):
                 return response
 
             if attempt < attempts:
+                # Increase the retry delay after each failed attempt.
                 wait = 2 ** (attempt - 1)
 
                 self.stdout.write(
@@ -114,6 +117,7 @@ class Command(BaseCommand):
         request_retries,
         continue_after_failure=False,
     ):
+        """Populate anime from one source while handling pagination and failures."""
 
         total_new = 0
         total_updated = 0
@@ -190,6 +194,7 @@ class Command(BaseCommand):
         return total_new, total_updated, total_blocked, total_failed
 
     def handle(self, *args, **options):
+        """Populate the database from the configured Tenrai anime sources."""
 
         client = TenraiClient()
         service = AnimeService(client)

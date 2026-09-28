@@ -15,4 +15,6 @@ external_link_service = ExternalLinkService()
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def anime_external_links(request, anime_id):
+    """Return official and streaming links for an anime."""
+
     return Response(external_link_service.get_links(anime_id))

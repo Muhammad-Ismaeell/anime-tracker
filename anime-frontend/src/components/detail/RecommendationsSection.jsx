@@ -60,6 +60,7 @@ function RecommendationsSection({ animeId }) {
                     </div>
 
                     <div className="detail-recommendations-grid">
+                        {/* Keep the recommendations section compact on the detail page. */}
                         {recommendations.slice(0, 8).map((recommendation) => {
                             const id = String(recommendation.id);
 

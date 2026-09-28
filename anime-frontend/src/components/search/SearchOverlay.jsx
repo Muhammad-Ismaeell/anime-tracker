@@ -7,6 +7,7 @@ function SearchOverlay({ open, onClose }) {
     const [query, setQuery] = useState("");
     const [debounced, setDebounced] = useState("");
 
+    // Wait for the user to pause typing before triggering an API search.
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebounced(query.trim());
@@ -57,6 +58,7 @@ function SearchOverlay({ open, onClose }) {
                     )}
 
                     <div style={styles.grid}>
+                        {/* Keep the overlay compact by showing only the first 12 results. */}
                         {results.slice(0, 12).map((anime) => (
                             <Link
                                 key={anime.id ?? anime.anime_id ?? anime.mal_id}

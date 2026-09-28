@@ -9,6 +9,7 @@ class Command(BaseCommand):
     help = "Populate current seasonal anime from Tenrai"
 
     def handle(self, *args, **options):
+        """Populate the database with the first five pages of seasonal anime."""
 
         client = TenraiClient()
         service = AnimeService(client)

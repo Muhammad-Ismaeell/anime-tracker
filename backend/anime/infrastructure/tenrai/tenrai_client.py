@@ -29,6 +29,8 @@ BLOCKED_GENRES = {
 
 
 def _wait_for_rate_limit():
+    """Wait until the next external API request is allowed."""
+
     global _next_request_at
 
     with _request_lock:
@@ -40,6 +42,8 @@ def _wait_for_rate_limit():
 
 
 def safe_request(url, params=None, retries=3):
+    """Make a rate-limited API request with retries and JSON validation."""
+
     for attempt in range(retries):
         _wait_for_rate_limit()
 
@@ -86,7 +90,7 @@ def safe_request(url, params=None, retries=3):
                 exc,
                 url,
             )
-
+        # Back off between retries to avoid repeatedly hitting a failing API.
         if attempt < retries - 1:
             time.sleep(2**attempt)
 
@@ -94,6 +98,8 @@ def safe_request(url, params=None, retries=3):
 
 
 def is_nsfw(anime):
+    """Return whether an anime matches the blocked ratings or genres."""
+
     if anime.get("rating") in BLOCKED_RATINGS:
         return True
 
@@ -102,10 +108,14 @@ def is_nsfw(anime):
 
 
 def filter_nsfw(items):
+    """Remove anime that match the blocked content rules."""
+
     return [anime for anime in items if not is_nsfw(anime)]
 
 
 def list_response(data, page):
+    """Normalize an API list response to the application's pagination format."""
+
     if not data:
         return {"items": [], "page": page, "has_next": False, "total": 0}
 
@@ -121,6 +131,8 @@ def list_response(data, page):
 
 
 class TenraiClient:
+    """Client for fetching anime data from the Tenrai API."""
+
     def _get_list(self, endpoint, page=1, params=None, strict_sfw=False):
         params = dict(params or {})
         params["page"] = page

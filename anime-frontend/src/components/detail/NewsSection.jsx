@@ -52,6 +52,7 @@ function NewsSection({ animeId }) {
                 </div>
             ) : (
                 <div className="news-list">
+                    {/* Keep the detail page focused by showing only the latest 10 articles. */}
                     {news.slice(0, 10).map((article, index) => (
                         <a
                             className="news-item"

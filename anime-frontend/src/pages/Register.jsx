@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useRegister } from "../auth/useAuth";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 
-
+// Allow deployments to disable username/password registration when Google-only auth is enabled.
 const GOOGLE_ONLY_AUTH =
     import.meta.env.VITE_GOOGLE_ONLY_AUTH === "true";
 
@@ -43,6 +43,7 @@ export default function Register() {
             return;
         }
 
+        // Keep the verification email so the success screen can direct the user to verify it.
         registerMutation.mutate(
             {
                 username: cleanUsername,

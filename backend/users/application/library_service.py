@@ -14,8 +14,10 @@ anime_service = AnimeService(client=TenraiClient())
 
 
 class LibraryService:
+
     def get_user_library(self, user):
-        # Library reads use stored records only; metadata refresh belongs to anime detail flows.
+        """Return the user's stored library entries without refreshing anime metadata."""
+
         return (
             UserAnimeStatus.objects
             .filter(user=user)
@@ -23,6 +25,8 @@ class LibraryService:
         )
 
     def _get_anime(self, anime_id, fetch_if_missing=False):
+        """Return a local anime, optionally fetching it when it is missing."""
+
         anime = Anime.objects.filter(mal_id=anime_id).first()
 
         if anime is not None:
@@ -34,6 +38,8 @@ class LibraryService:
         return None
 
     def _normalize_progress(self, anime, progress):
+        """Normalize progress to a non-negative value within the episode count."""
+
         try:
             progress = int(progress)
         except (TypeError, ValueError):
@@ -46,6 +52,8 @@ class LibraryService:
 
     @transaction.atomic
     def update_status(self, user, data):
+        """Create or update a user's library status and record status changes."""
+
         anime_id = data.get("anime_id")
         requested_status = data.get("status")
 
@@ -85,6 +93,7 @@ class LibraryService:
             and anime.episodes is not None
             and effective_progress >= anime.episodes
         ):
+            # Reaching the known episode count automatically completes the entry.
             requested_status = "completed"
             effective_progress = anime.episodes
 
@@ -158,6 +167,8 @@ class LibraryService:
 
     @transaction.atomic
     def remove_from_library(self, user, anime_id):
+        """Remove an anime from the user's library and record the activity."""
+
         anime = self._get_anime(anime_id)
         if anime is None:
             return {"deleted": False}
