@@ -10,11 +10,11 @@ from django.utils.text import slugify
 from drf_spectacular.utils import extend_schema
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-
+from core.auth.throttles import ResendVerificationThrottle
 from core.auth.docs import (
     ErrorSerializer,
     GoogleLoginRequestSerializer,
@@ -106,6 +106,7 @@ def register(request):
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([ResendVerificationThrottle])
 def resend_verification(request):
     email = (request.data.get("email") or "").strip().lower()
 
@@ -115,18 +116,18 @@ def resend_verification(request):
             status=400,
         )
 
+    generic_message = (
+        "If an unverified account exists for this email, "
+        "a new verification email has been sent."
+    )
+
     user = User.objects.filter(
         email__iexact=email
     ).first()
 
-    if not user:
+    if user is None:
         return Response(
-            {
-                "detail": (
-                    "If an unverified account exists for this email, "
-                    "a new verification email has been sent."
-                )
-            },
+            {"detail": generic_message},
             status=200,
         )
 
@@ -136,10 +137,10 @@ def resend_verification(request):
         None,
     )
 
-    if verification and verification.is_verified:
+    if verification is None or verification.is_verified:
         return Response(
-            {"detail": "This email is already verified."},
-            status=400,
+            {"detail": generic_message},
+            status=200,
         )
 
     raw_token = EmailVerificationService.create_verification(
@@ -152,12 +153,7 @@ def resend_verification(request):
     )
 
     return Response(
-        {
-            "detail": (
-                "If an unverified account exists for this email, "
-                "a new verification email has been sent."
-            )
-        },
+        {"detail": generic_message},
         status=200,
     )
 

@@ -155,6 +155,9 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
     ),
+    "DEFAULT_THROTTLE_RATES": {
+        "resend_verification": "3/hour",
+    },
 }
 
 SPECTACULAR_SETTINGS = {
