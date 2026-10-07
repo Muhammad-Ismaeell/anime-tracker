@@ -10,4 +10,9 @@ urlpatterns = [
     path("google/", views.google_login),
     path("me/", views.me),
     path("verify-email/", views.verify_email, name="verify-email"),
+    path(
+        "resend-verification/",
+        views.resend_verification,
+        name="resend-verification",
+    ),
 ]

@@ -47,6 +47,11 @@ class AuthTests(APITestCase):
             "refresh",
             response.data,
         )
+        self.assertFalse(
+            EmailVerification.objects.get(
+                user__username="testuser",
+            ).is_verified
+        )
 
         self.assertTrue(
             EmailVerification.objects.filter(
@@ -163,4 +168,68 @@ class AuthTests(APITestCase):
         self.assertEqual(
             response.status_code,
             401,
+        )
+
+    def test_nonexistent_user_cannot_login(self):
+        response = self.client.post(
+            "/api/auth/login/",
+            {
+                "username": "doesnotexist",
+                "password": "password123",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            400,
+        )
+
+        self.assertEqual(
+            response.data["detail"],
+            "Invalid credentials.",
+        )
+
+        self.assertFalse(
+            User.objects.filter(
+                username="doesnotexist"
+            ).exists()
+        )
+
+    def test_resend_verification(self):
+        user = User.objects.create_user(
+            username="resend",
+            email="resend@test.com",
+            password="password123",
+        )
+
+        EmailVerification.objects.create(
+            user=user,
+            token_hash="old-token",
+            expires_at=timezone.now() - timedelta(hours=1),
+        )
+
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {
+                "email": "resend@test.com",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        verification = EmailVerification.objects.get(
+            user=user,
+        )
+
+        self.assertNotEqual(
+            verification.token_hash,
+            "old-token",
+        )
+
+        self.assertGreater(
+            verification.expires_at,
+            timezone.now(),
         )

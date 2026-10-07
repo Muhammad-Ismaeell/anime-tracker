@@ -10,11 +10,16 @@ export function useLogin() {
 
 }
 
-
 export function useRegister() {
 
     return useMutation({
         mutationFn: AuthAPI.register
     });
 
+}
+
+export function useResendVerification() {
+    return useMutation({
+        mutationFn: AuthAPI.resendVerification,
+    });
 }

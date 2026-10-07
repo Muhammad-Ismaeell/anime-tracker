@@ -58,7 +58,10 @@ def register(request):
         return Response({"detail": exc.messages}, status=400)
 
     if User.objects.filter(username=username).exists():
-        return Response({"detail": "User already exists."}, status=400)
+        return Response(
+            {"detail": "User already exists."},
+            status=400,
+        )
 
     if User.objects.filter(email__iexact=email).exists():
         return Response(
@@ -72,17 +75,91 @@ def register(request):
             email=email,
             password=password,
         )
-        raw_token = EmailVerificationService.create_verification(user)
-        EmailVerificationService.send_verification_email(user, raw_token)
+
+        raw_token = EmailVerificationService.create_verification(
+            user
+        )
+
+        transaction.on_commit(
+            lambda: EmailVerificationService.send_verification_email(
+                user,
+                raw_token,
+            )
+        )
 
     return Response(
         {
-            "detail": "Registration successful. Please check your email to verify your account.",
+            "detail": (
+                "Registration successful. "
+                "Please check your email to verify your account."
+            ),
             "email": user.email,
         },
         status=201,
     )
 
+@extend_schema(
+    summary="Resend Verification Email",
+    description="Send a new email verification link.",
+    request=RegisterRequestSerializer,
+    responses={200: ErrorSerializer, 400: ErrorSerializer},
+)
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def resend_verification(request):
+    email = (request.data.get("email") or "").strip().lower()
+
+    if not email:
+        return Response(
+            {"detail": "Email is required."},
+            status=400,
+        )
+
+    user = User.objects.filter(
+        email__iexact=email
+    ).first()
+
+    if not user:
+        return Response(
+            {
+                "detail": (
+                    "If an unverified account exists for this email, "
+                    "a new verification email has been sent."
+                )
+            },
+            status=200,
+        )
+
+    verification = getattr(
+        user,
+        "email_verification",
+        None,
+    )
+
+    if verification and verification.is_verified:
+        return Response(
+            {"detail": "This email is already verified."},
+            status=400,
+        )
+
+    raw_token = EmailVerificationService.create_verification(
+        user
+    )
+
+    EmailVerificationService.send_verification_email(
+        user,
+        raw_token,
+    )
+
+    return Response(
+        {
+            "detail": (
+                "If an unverified account exists for this email, "
+                "a new verification email has been sent."
+            )
+        },
+        status=200,
+    )
 
 @extend_schema(
     summary="Login",
@@ -284,3 +361,4 @@ def verify_email(request):
         return Response({"detail": error_message}, status=400)
 
     return Response({"detail": "Email verified successfully. You can now log in."})
+

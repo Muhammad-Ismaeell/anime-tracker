@@ -21,6 +21,12 @@ export const AuthAPI = {
         });
     },
 
+    resendVerification(email) {
+        return api.post("/auth/resend-verification/", {
+            email,
+        });
+    },
+
     logout(refreshToken) {
         return api.post("/auth/logout/", {
             refresh: refreshToken,

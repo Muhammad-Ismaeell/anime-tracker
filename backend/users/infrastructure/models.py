@@ -118,7 +118,12 @@ class EmailVerification(models.Model):
         on_delete=models.CASCADE,
         related_name="email_verification",
     )
-    token_hash = models.CharField(max_length=128, unique=True)
+    token_hash = models.CharField(
+        max_length=128,
+        unique=True,
+        null=True,
+        blank=True,
+    )
     expires_at = models.DateTimeField()
     verified_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

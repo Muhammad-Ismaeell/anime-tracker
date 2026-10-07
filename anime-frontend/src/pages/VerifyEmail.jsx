@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-
+import { useResendVerification } from "../auth/useAuth";
 import api from "../api/client";
 
 export default function VerifyEmail() {
     const [params] = useSearchParams();
     const token = params.get("token");
-
+    const [email, setEmail] = useState("");
+    const resendMutation = useResendVerification();
     const [status, setStatus] = useState(
         token ? "loading" : "missing"
     );
@@ -180,8 +181,8 @@ export default function VerifyEmail() {
                                 {status === "expired"
                                     ? "Verification link expired"
                                     : status === "invalid"
-                                      ? "Verification link invalid"
-                                      : status === "missing"
+                                    ? "Verification link invalid"
+                                    : status === "missing"
                                         ? "Verification link incomplete"
                                         : "Verification failed"}
                             </h1>
@@ -189,6 +190,63 @@ export default function VerifyEmail() {
                             <p>
                                 {message}
                             </p>
+
+                            {status === "expired" && (
+                                <div className="auth-form">
+                                    <div className="auth-field">
+                                        <label htmlFor="verification-email">
+                                            Email
+                                        </label>
+
+                                        <input
+                                            id="verification-email"
+                                            type="email"
+                                            value={email}
+                                            onChange={(event) =>
+                                                setEmail(event.target.value)
+                                            }
+                                            placeholder="you@example.com"
+                                            autoComplete="email"
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className="auth-submit"
+                                        disabled={resendMutation.isPending}
+                                        onClick={() => {
+                                            const cleanEmail = email
+                                                .trim()
+                                                .toLowerCase();
+
+                                            if (!cleanEmail) {
+                                                return;
+                                            }
+
+                                            resendMutation.mutate(
+                                                cleanEmail,
+                                                {
+                                                    onSuccess: (response) => {
+                                                        setMessage(
+                                                            response.data?.detail ||
+                                                            "If an unverified account exists for this email, a new verification email has been sent."
+                                                        );
+                                                    },
+                                                    onError: () => {
+                                                        setMessage(
+                                                            "We couldn't send a new verification email right now."
+                                                        );
+                                                    },
+                                                }
+                                            );
+                                        }}
+                                    >
+                                        {resendMutation.isPending
+                                            ? "Sending..."
+                                            : "Resend verification email"}
+                                    </button>
+                                </div>
+                            )}
 
                             <div className="verify-email-actions">
                                 <Link

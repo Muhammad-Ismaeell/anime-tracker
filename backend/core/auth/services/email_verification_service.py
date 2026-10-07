@@ -93,16 +93,17 @@ class EmailVerificationService:
         if verification.is_verified:
             return (
                 verification.user,
-                None,
+                "Email is already verified.",
             )
 
         if verification.is_expired:
             return None, "Verification token has expired."
 
         verification.verified_at = timezone.now()
+        verification.token_hash = None
 
         verification.save(
-            update_fields=["verified_at"]
+            update_fields=["verified_at", "token_hash"]
         )
 
         return verification.user, None
