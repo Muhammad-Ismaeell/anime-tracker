@@ -2,6 +2,8 @@ import hashlib
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.core.cache import cache
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
@@ -12,6 +14,9 @@ User = get_user_model()
 
 
 class AuthTests(APITestCase):
+
+    def setUp(self):
+        cache.clear()
 
     def test_register(self):
         response = self.client.post(
@@ -232,4 +237,141 @@ class AuthTests(APITestCase):
         self.assertGreater(
             verification.expires_at,
             timezone.now(),
+        )
+
+    def test_resend_verification_unknown_email_returns_generic_response(self):
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {
+                "email": "unknown@test.com",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertEqual(
+            response.data["detail"],
+            (
+                "If an unverified account exists for this email, "
+                "a new verification email has been sent."
+            ),
+        )
+
+    def test_resend_verification_already_verified_returns_generic_response(self):
+        user = User.objects.create_user(
+            username="alreadyverified",
+            email="alreadyverified@test.com",
+            password="password123",
+        )
+
+        EmailVerification.objects.create(
+            user=user,
+            token_hash="verified-token",
+            expires_at=timezone.now() + timedelta(hours=24),
+            verified_at=timezone.now(),
+        )
+
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {
+                "email": "alreadyverified@test.com",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertEqual(
+            response.data["detail"],
+            (
+                "If an unverified account exists for this email, "
+                "a new verification email has been sent."
+            ),
+        )
+
+        self.assertEqual(
+            len(mail.outbox),
+            0,
+        )
+
+    def test_resend_verification_sends_email_for_unverified_user(self):
+        user = User.objects.create_user(
+            username="unverifiedresend",
+            email="unverifiedresend@test.com",
+            password="password123",
+        )
+
+        EmailVerification.objects.create(
+            user=user,
+            token_hash="old-token",
+            expires_at=timezone.now() - timedelta(hours=1),
+        )
+
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {
+                "email": "unverifiedresend@test.com",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        self.assertEqual(
+            len(mail.outbox),
+            1,
+        )
+
+        self.assertEqual(
+            mail.outbox[0].to,
+            ["unverifiedresend@test.com"],
+        )
+
+    def test_resend_verification_requires_email(self):
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {},
+        )
+
+        self.assertEqual(
+            response.status_code,
+            400,
+        )
+
+        self.assertEqual(
+            response.data["detail"],
+            "Email is required.",
+        )
+
+    def test_resend_verification_rate_limit(self):
+        for _ in range(3):
+            response = self.client.post(
+                "/api/auth/resend-verification/",
+                {
+                    "email": "unknown@test.com",
+                },
+            )
+
+            self.assertEqual(
+                response.status_code,
+                200,
+            )
+
+        response = self.client.post(
+            "/api/auth/resend-verification/",
+            {
+                "email": "unknown@test.com",
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            429,
         )
