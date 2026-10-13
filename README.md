@@ -44,53 +44,35 @@ Key engineering areas demonstrated:
 
 - Separate production deployments for the React frontend and Django API
 
+
 ## Screenshots
 
 ### Home & Discovery
 
 ![Anime Tracker home page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/home-top.png)
 
-![Anime Tracker home page - additional content](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/home-lower.png)
-
----
+![Anime Tracker home page lower section](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/home-lower.png)
 
 ### Search & Discovery
 
-Users can search for anime and browse matching results with relevant information and artwork.
-
 ![Anime Tracker search page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/search.png)
-
----
 
 ### Anime Details
 
-Each anime has a dedicated detail page containing its key information, synopsis, genres, ratings, and other relevant data. When a trailer is available, the detail page also displays an embedded trailer with the standard player controls.
-
-![Anime Tracker anime detail page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/anime-detail.png)
-
----
+![Anime Tracker anime details page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/anime-detail.png)
 
 ### Personal Library
 
-Users can manage their anime library and keep track of their favorites and viewing status.
-
 ![Anime Tracker personal library](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/library.png)
-
----
 
 ### Profile & Activity
 
-The profile provides an overview of the user's activity and interactions within the application.
-
-![Anime Tracker profile and activity page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/profile.png)
-
----
+![Anime Tracker profile page](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/profile.png)
 
 ### Responsive Design
 
-The interface is designed to adapt to different screen sizes and provide a usable experience on mobile devices.
+![Anime Tracker mobile layout](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/mobile.png)
 
-![Anime Tracker mobile responsive layout](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/mobile.png)
 
 ## Features
 
