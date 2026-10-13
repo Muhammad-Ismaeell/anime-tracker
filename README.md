@@ -37,11 +37,11 @@ Key engineering areas demonstrated:
 ### Home & Discovery
 
 <p align="center">
-  <img src="docs/screenshots/home-top.png" alt="Anime Tracker home page" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/home-top.png)" alt="Anime Tracker home page" width="90%">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/home-lower.png" alt="Anime Tracker home page - additional content" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/home-lower.png)" alt="Anime Tracker home page - additional content" width="90%">
 </p>
 
 ---
@@ -51,7 +51,7 @@ Key engineering areas demonstrated:
 Users can search for anime and browse matching results with relevant information and artwork.
 
 <p align="center">
-  <img src="docs/screenshots/search.png" alt="Anime Tracker search page" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/search.png)" alt="Anime Tracker search page" width="90%">
 </p>
 
 ---
@@ -61,7 +61,7 @@ Users can search for anime and browse matching results with relevant information
 Each anime has a dedicated detail page containing its key information, synopsis, genres, ratings, and other relevant data. When a trailer is available, the detail page also displays an embedded trailer with the standard player controls.
 
 <p align="center">
-  <img src="docs/screenshots/anime-detail.png" alt="Anime Tracker anime detail page" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/anime-detail.png)" alt="Anime Tracker anime detail page" width="90%">
 </p>
 
 ---
@@ -71,7 +71,7 @@ Each anime has a dedicated detail page containing its key information, synopsis,
 Users can manage their anime library and keep track of their favorites and viewing status.
 
 <p align="center">
-  <img src="docs/screenshots/library.png" alt="Anime Tracker personal library" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/library.png)" alt="Anime Tracker personal library" width="90%">
 </p>
 
 ---
@@ -81,7 +81,7 @@ Users can manage their anime library and keep track of their favorites and viewi
 The profile provides an overview of the user's activity and interactions within the application.
 
 <p align="center">
-  <img src="docs/screenshots/profile.png" alt="Anime Tracker profile and activity page" width="90%">
+  <img src="![Anime Tracker home page](docs/screenshots/profile.png)" alt="Anime Tracker profile and activity page" width="90%">
 </p>
 
 ---
@@ -91,7 +91,7 @@ The profile provides an overview of the user's activity and interactions within 
 The interface is designed to adapt to different screen sizes and provide a usable experience on mobile devices.
 
 <p align="center">
-  <img src="docs/screenshots/mobile.png" alt="Anime Tracker mobile responsive layout" width="45%">
+  <img src="![Anime Tracker home page](docs/screenshots/mobile.png)" alt="Anime Tracker mobile responsive layout" width="45%">
 </p>
 
 ## Features
