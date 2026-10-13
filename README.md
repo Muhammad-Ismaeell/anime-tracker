@@ -1,70 +1,48 @@
-**# Anime Tracker**
+# Anime Tracker
 
+[![CI](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml/badge.svg)](https://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml)
 
+A full-stack anime discovery and tracking platform built with **Django REST Framework** and **React**. It combines a searchable anime catalogue with personal library tracking, favourites, reviews, authentication, activity, statistics and detailed supplementary anime data.
 
-[![CI]\(https\://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml/badge.svg)]\(https\://github.com/Muhammad-Ismaeell/anime-tracker/actions/workflows/tests.yml)
+**Status: Complete — portfolio-ready**
 
+## Live Demo
 
+- **Web app:** https://anime-tracker-zeta-green.vercel.app/
 
-A full-stack anime discovery and tracking platform built with **\*\*Django REST Framework\*\*** and **\*\*React\*\***. It combines a searchable anime catalogue with personal library tracking, favourites, reviews, authentication, activity, statistics and detailed supplementary anime data.
+- **Backend API:** https://anime-tracker-3a68.onbelmo.uk/
 
+- **API documentation:** https://anime-tracker-3a68.onbelmo.uk/api/docs/
 
+The frontend is deployed on **Vercel**, the Django backend is deployed on **Belmo**, and the production database is **PostgreSQL on Neon**.
 
-**\*\*Status: Complete — portfolio-ready\*\***
-
-
-
-**## Live Demo**
-
-
-
-\- **\*\*Web app:\*\*** https\://anime-tracker-zeta-green.vercel.app/
-
-\- **\*\*Backend API:\*\*** https\://anime-tracker-3a68.onbelmo.uk/
-
-\- **\*\*API documentation:\*\*** https\://anime-tracker-3a68.onbelmo.uk/api/docs/
-
-
-
-The frontend is deployed on **\*\*Vercel\*\***, the Django backend is deployed on **\*\*Belmo\*\***, and the production database is **\*\*PostgreSQL on Neon\*\***.
-
-
-
-**## What I Built**
-
-
+## What I Built
 
 Anime Tracker was built as a real-world portfolio application rather than a simple CRUD demo. The project focuses on separating responsibilities, handling external API dependencies reliably, protecting authenticated requests and providing a responsive user experience.
 
-
-
 Key engineering areas demonstrated:
 
+- Layered Django backend with API, application-service and infrastructure boundaries
 
+- Database-first persistence for core and selected supplementary anime data
 
-\- Layered Django backend with API, application-service and infrastructure boundaries
+- External anime API integration isolated behind a dedicated client
 
-\- Database-first persistence for core and selected supplementary anime data
+- Optional anime trailer embedding on detail pages, with persisted trailer metadata
 
-\- External anime API integration isolated behind a dedicated client
+- Shared upstream request throttling and caching
 
-\- Optional anime trailer embedding on detail pages, with persisted trailer metadata
+- JWT refresh-token rotation, blacklisting and centralized Axios token refresh
 
-\- Shared upstream request throttling and caching
+- Relational constraints and indexes for data integrity and common query paths
 
-\- JWT refresh-token rotation, blacklisting and centralized Axios token refresh
+- Responsive React UI with lazy-loaded routes and TanStack Query server-state management
 
-\- Relational constraints and indexes for data integrity and common query paths
+- Automated backend tests plus frontend lint/build checks in GitHub Actions
 
-\- Responsive React UI with lazy-loaded routes and TanStack Query server-state management
+- PostgreSQL production deployment on Neon
 
-\- Automated backend tests plus frontend lint/build checks in GitHub Actions
-
-\- PostgreSQL production deployment on Neon
-
-\- Separate production deployments for the React frontend and Django API
-
-
+- Separate production deployments for the React frontend and Django API
 
 ## Screenshots
 
@@ -114,15 +92,13 @@ The interface is designed to adapt to different screen sizes and provide a usabl
 
 ![Anime Tracker mobile responsive layout](https://raw.githubusercontent.com/Muhammad-Ismaeell/anime-tracker/main/docs/screenshots/mobile.png)
 
-**## Features**
+## Features
 
+- Trending, seasonal, top and recently-added anime discovery
 
+- Advanced search and filtering
 
-\- Trending, seasonal, top and recently-added anime discovery
-
-\- Advanced search and filtering
-
-\- Anime detail pages with:
+- Anime detail pages with:
 
   - episodes
 
@@ -144,51 +120,45 @@ The interface is designed to adapt to different screen sizes and provide a usabl
 
   - external links
 
-\- Personal library with watching status and episode progress
+- Personal library with watching status and episode progress
 
-\- Favourites
+- Favourites
 
-\- Ratings and reviews
+- Ratings and reviews
 
-\- User dashboard and activity feed
+- User dashboard and activity feed
 
-\- User profiles and avatar uploads
+- User profiles and avatar uploads
 
-\- Local registration with email verification
+- Local registration with email verification
 
-\- JWT authentication with refresh-token rotation and blacklisting
+- JWT authentication with refresh-token rotation and blacklisting
 
-\- Google authentication
+- Google authentication
 
-\- Protected routes and authenticated API requests
+- Protected routes and authenticated API requests
 
-\- Database-first persistence for core and selected supplementary anime data
+- Database-first persistence for core and selected supplementary anime data
 
-\- Backend and frontend caching
+- Backend and frontend caching
 
-\- Shared external API rate limiting
+- Shared external API rate limiting
 
-\- Character safety filtering/caching
+- Character safety filtering/caching
 
-\- Responsive desktop/mobile UI
+- Responsive desktop/mobile UI
 
-\- Lazy-loaded React routes and centralized server-state management
+- Lazy-loaded React routes and centralized server-state management
 
-\- OpenAPI/Swagger API documentation
+- OpenAPI/Swagger API documentation
 
-\- Automated backend tests with GitHub Actions
+- Automated backend tests with GitHub Actions
 
+## Architecture
 
-
-**## Architecture**
-
-
-
-\`\`\`text
+```text
 
                            Production
-
-
 
 Browser
 
@@ -234,179 +204,133 @@ Django + Django REST Framework
 
            └── Cloudinary
 
-
-
 Frontend: Vercel
 
 Backend:  Belmo
 
 Database: Neon PostgreSQL
 
-\`\`\`
-
-
+```
 
 For local development, SQLite can be used instead of PostgreSQL.
 
-
-
 The backend separates API/presentation concerns from application services and infrastructure integrations. External anime data is persisted locally when appropriate, while freshness windows and caching reduce unnecessary upstream requests. Optional trailer embed URLs are persisted with anime details so the frontend can render trailers without a separate client-side provider request.
 
+See [docs/architecture.md](docs/architecture.md) for detailed request flows.
 
-
-See [docs/architecture.md]\(docs/architecture.md) for detailed request flows.
-
-
-
-**## Production Deployment**
-
-
+## Production Deployment
 
 The production application is split into independently deployed frontend, backend and database services:
 
+| Component | Service | Purpose |
 
+|---|---|---|
 
-\| Component | Service | Purpose |
+| Frontend | Vercel | React/Vite production application |
 
-\|---|---|---|
+| Backend | Belmo | Django + Django REST Framework API |
 
-\| Frontend | Vercel | React/Vite production application |
+| Database | Neon | Managed PostgreSQL database |
 
-\| Backend | Belmo | Django + Django REST Framework API |
+| Media | Cloudinary | Production media/avatar storage |
 
-\| Database | Neon | Managed PostgreSQL database |
+### Production URLs
 
-\| Media | Cloudinary | Production media/avatar storage |
-
-
-
-**### Production URLs**
-
-
-
-\`\`\`text
+```text
 
 Frontend:
 
-https\://anime-tracker-zeta-green.vercel.app/
-
-
+https://anime-tracker-zeta-green.vercel.app/
 
 Backend:
 
-https\://anime-tracker-3a68.onbelmo.uk/
-
-
+https://anime-tracker-3a68.onbelmo.uk/
 
 API documentation:
 
-https\://anime-tracker-3a68.onbelmo.uk/api/docs/
+https://anime-tracker-3a68.onbelmo.uk/api/docs/
 
-\`\`\`
+```
 
+The frontend uses the production API through the `VITE_API_URL` environment variable:
 
+```text
 
-The frontend uses the production API through the \`VITE_API_URL\` environment variable:
+VITE_API_URL=https://anime-tracker-3a68.onbelmo.uk/api
 
-
-
-\`\`\`text
-
-VITE_API_URL=https\://anime-tracker-3a68.onbelmo.uk/api
-
-\`\`\`
-
-
+```
 
 Production secrets and credentials are configured through the deployment platforms and are not committed to the repository.
 
+## Tech Stack
 
+### Frontend
 
-**## Tech Stack**
+- React 19
 
+- Vite 8
 
+- React Router 7
 
-**### Frontend**
+- TanStack React Query 5
 
+- Axios
 
+- Framer Motion
 
-\- React 19
+- React Hot Toast
 
-\- Vite 8
+- Lucide React
 
-\- React Router 7
+- React Helmet Async
 
-\- TanStack React Query 5
+- Google OAuth
 
-\- Axios
+- CSS
 
-\- Framer Motion
+### Backend
 
-\- React Hot Toast
+- Python 3.11
 
-\- Lucide React
+- Django 5.2
 
-\- React Helmet Async
+- Django REST Framework
 
-\- Google OAuth
+- Simple JWT
 
-\- CSS
+- drf-spectacular / OpenAPI
 
+- Django ORM
 
+- PostgreSQL for production
 
-**### Backend**
+- SQLite for local development
 
+- Cloudinary for production media storage
 
+- WhiteNoise
 
-\- Python 3.11
+- Gunicorn
 
-\- Django 5.2
+- Pytest / pytest-django
 
-\- Django REST Framework
+### External services
 
-\- Simple JWT
+- Tenrai API for anime data and optional trailer metadata
 
-\- drf-spectacular / OpenAPI
+- Google authentication
 
-\- Django ORM
+- Cloudinary media storage
 
-\- PostgreSQL for production
+- Neon PostgreSQL
 
-\- SQLite for local development
+- Belmo hosting
 
-\- Cloudinary for production media storage
+- Vercel hosting
 
-\- WhiteNoise
+## Repository Structure
 
-\- Gunicorn
-
-\- Pytest / pytest-django
-
-
-
-**### External services**
-
-
-
-\- Tenrai API for anime data and optional trailer metadata
-
-\- Google authentication
-
-\- Cloudinary media storage
-
-\- Neon PostgreSQL
-
-\- Belmo hosting
-
-\- Vercel hosting
-
-
-
-**## Repository Structure**
-
-
-
-\`\`\`text
+```text
 
 anime-tracker/
 
@@ -470,219 +394,145 @@ anime-tracker/
 
     └── technical-decisions.md
 
-\`\`\`
+```
 
+## Local Setup
 
+### Backend
 
-**## Local Setup**
+```bash
 
-
-
-**### Backend**
-
-
-
-\`\`\`bash
-
-git clone https\://github.com/Muhammad-Ismaeell/anime-tracker.git
+git clone https://github.com/Muhammad-Ismaeell/anime-tracker.git
 
 cd anime-tracker/backend
 
 python -m venv venv
 
-\`\`\`
-
-
+```
 
 Activate the virtual environment.
 
+**Windows:**
 
-
-**\*\*Windows:\*\***
-
-
-
-\`\`\`powershell
+```powershell
 
 venv\Scripts\activate
 
-\`\`\`
+```
 
+**Linux/macOS:**
 
-
-**\*\*Linux/macOS:\*\***
-
-
-
-\`\`\`bash
+```bash
 
 source venv/bin/activate
 
-\`\`\`
-
-
+```
 
 Install development dependencies:
 
-
-
-\`\`\`bash
+```bash
 
 python -m pip install -r requirements-dev.txt
 
-\`\`\`
+```
 
+Create `backend/.env` from `backend/.env.example`, then run:
 
-
-Create \`backend/.env\` from \`backend/.env.example\`, then run:
-
-
-
-\`\`\`bash
+```bash
 
 python manage.py migrate
 
 python manage.py runserver
 
-\`\`\`
+```
 
+The backend runs at `http://127.0.0.1:8000/`.
 
-
-The backend runs at \`http\://127.0.0.1:8000/\`.
-
-
-
-**### Frontend**
-
-
+### Frontend
 
 In another terminal:
 
-
-
-\`\`\`bash
+```bash
 
 cd anime-frontend
 
 npm install
 
-\`\`\`
+```
 
-
-
-Create \`.env\` from \`.env.example\` and configure the API/media URLs and Google client ID.
-
-
+Create `.env` from `.env.example` and configure the API/media URLs and Google client ID.
 
 For local development, the API URL should point to the local Django server:
 
+```text
 
+VITE_API_URL=http://127.0.0.1:8000/api
 
-\`\`\`text
-
-VITE_API_URL=http\://127.0.0.1:8000/api
-
-\`\`\`
-
-
+```
 
 Start the development server:
 
-
-
-\`\`\`bash
+```bash
 
 npm run dev
 
-\`\`\`
+```
 
+The frontend normally runs at `http://localhost:5173/`.
 
+## API Documentation
 
-The frontend normally runs at \`http\://localhost:5173/\`.
+### Production
 
+```text
 
+https://anime-tracker-3a68.onbelmo.uk/api/docs/
 
-**## API Documentation**
-
-
-
-**### Production**
-
-
-
-\`\`\`text
-
-https\://anime-tracker-3a68.onbelmo.uk/api/docs/
-
-\`\`\`
-
-
+```
 
 The production raw schema is available at:
 
+```text
 
+https://anime-tracker-3a68.onbelmo.uk/api/schema/
 
-\`\`\`text
+```
 
-https\://anime-tracker-3a68.onbelmo.uk/api/schema/
+### Local development
 
-\`\`\`
+```text
 
+http://127.0.0.1:8000/api/docs/
 
+http://127.0.0.1:8000/api/schema/
 
-**### Local development**
-
-
-
-\`\`\`text
-
-http\://127.0.0.1:8000/api/docs/
-
-http\://127.0.0.1:8000/api/schema/
-
-\`\`\`
-
-
+```
 
 Main API groups:
 
+- `/api/auth/` — authentication and email verification
 
+- `/api/anime/` — discovery, search, detail and supplementary anime data
 
-\- \`/api/auth/\` — authentication and email verification
+- `/api/users/` — profile, library, favourites, reviews, activity and dashboard
 
-\- \`/api/anime/\` — discovery, search, detail and supplementary anime data
+See [docs/api.md](docs/api.md) for a concise endpoint reference.
 
-\- \`/api/users/\` — profile, library, favourites, reviews, activity and dashboard
-
-
-
-See [docs/api.md]\(docs/api.md) for a concise endpoint reference.
-
-
-
-**## Testing & CI**
-
-
+## Testing & CI
 
 Backend tests:
 
-
-
-\`\`\`bash
+```bash
 
 cd backend
 
 pytest -q
 
-\`\`\`
-
-
+```
 
 Frontend checks:
 
-
-
-\`\`\`bash
+```bash
 
 cd anime-frontend
 
@@ -690,124 +540,82 @@ npm run lint
 
 npm run build
 
-\`\`\`
-
-
+```
 
 GitHub Actions runs Django tests plus frontend lint/build checks on pushes and pull requests.
 
+## Data & Caching Strategy
 
-
-**## Data & Caching Strategy**
-
-
-
-Trailer embed URLs are stored alongside the anime record when the external provider supplies one. A \`trailer_checked_at\` timestamp records that trailer metadata was checked, including for titles without a trailer, so the application does not repeatedly request the same metadata on every detail-page visit.
-
-
+Trailer embed URLs are stored alongside the anime record when the external provider supplies one. A `trailer_checked_at` timestamp records that trailer metadata was checked, including for titles without a trailer, so the application does not repeatedly request the same metadata on every detail-page visit.
 
 The frontend removes any upstream autoplay parameter from the stored embed URL, so trailers open with the normal player and require the user to press Play.
 
-
-
 The application uses a database-first approach for data that benefits from persistence. Core anime records and selected supplementary records are stored locally and refreshed according to feature-specific freshness windows.
-
-
 
 The backend cache reduces repeated work and external API calls. TanStack Query provides browser-side server-state caching. These layers complement each other: frontend caching reduces duplicate browser requests, while backend caching reduces duplicate server/external work.
 
-
-
 The external API client applies a shared request interval and lock to avoid uncontrolled bursts. This is particularly useful during concurrent development requests against the upstream provider.
 
+## Security & Reliability
 
+- Environment variables are used for secrets and deployment-specific configuration.
 
-**## Security & Reliability**
+- `.env`, SQLite databases, uploaded media and generated static files are excluded from version control.
 
+- Production security settings enable HTTPS redirects, secure session/CSRF cookies and HSTS when `DEBUG=False`.
 
+- CORS is explicitly configured.
 
-\- Environment variables are used for secrets and deployment-specific configuration.
+- JWT refresh tokens are rotated and blacklisted after use.
 
-\- \`.env\`, SQLite databases, uploaded media and generated static files are excluded from version control.
+- Local accounts require email verification before login.
 
-\- Production security settings enable HTTPS redirects, secure session/CSRF cookies and HSTS when \`DEBUG=False\`.
+- The frontend centralizes JWT handling and access-token refresh in Axios interceptors.
 
-\- CORS is explicitly configured.
+- Concurrent requests waiting for an expired token share a single refresh operation.
 
-\- JWT refresh tokens are rotated and blacklisted after use.
+- React uses an error boundary and loading fallbacks.
 
-\- Local accounts require email verification before login.
+- Database constraints prevent duplicate user/anime statuses, favourites, reviews and supplementary records.
 
-\- The frontend centralizes JWT handling and access-token refresh in Axios interceptors.
+## Database Diagram
 
-\- Concurrent requests waiting for an expired token share a single refresh operation.
-
-\- React uses an error boundary and loading fallbacks.
-
-\- Database constraints prevent duplicate user/anime statuses, favourites, reviews and supplementary records.
-
-
-
-**## Database Diagram**
-
-
-
-The application/domain ERD is available as [docs/database.dbml]\(docs/database.dbml) and can be opened in [dbdiagram.io]\(https\://dbdiagram.io/).
-
-
+The application/domain ERD is available as [docs/database.dbml](docs/database.dbml) and can be opened in [dbdiagram.io](https://dbdiagram.io/).
 
 The diagram intentionally excludes Django's internal permission, session, admin and migration tables so that it focuses on the application's domain model.
 
+## Technical Decisions
 
+See [docs/technical-decisions.md](docs/technical-decisions.md) for the reasoning behind:
 
-**## Technical Decisions**
+- database-first persistence
 
+- external-provider identifiers
 
+- the service layer
 
-See [docs/technical-decisions.md]\(docs/technical-decisions.md) for the reasoning behind:
+- API-client isolation
 
+- rate limiting
 
+- caching
 
-\- database-first persistence
+- trailer metadata persistence and embedding
 
-\- external-provider identifiers
+- JWT refresh handling
 
-\- the service layer
+- SQLite development vs PostgreSQL deployment
 
-\- API-client isolation
+- React Query and lazy-loaded routes
 
-\- rate limiting
+## Development Guide
 
-\- caching
+See [docs/development.md](docs/development.md) for environment setup, testing, migrations and pre-PR checks.
 
-\- trailer metadata persistence and embedding
-
-\- JWT refresh handling
-
-\- SQLite development vs PostgreSQL deployment
-
-\- React Query and lazy-loaded routes
-
-
-
-**## Development Guide**
-
-
-
-See [docs/development.md]\(docs/development.md) for environment setup, testing, migrations and pre-PR checks.
-
-
-
-**## Current Scope**
-
-
+## Current Scope
 
 This is a portfolio-scale application. The current design deliberately avoids infrastructure complexity that is not needed at this scale. If the project grows, natural next steps include Redis for distributed caching, background jobs, observability and additional integration tests.
 
-
-
-**## Attribution**
-
-
+## Attribution
 
 Anime metadata is provided by the Tenrai API. This is an independent portfolio project and is not affiliated with Tenrai, MyAnimeList, anime studios or publishers represented in the data.
