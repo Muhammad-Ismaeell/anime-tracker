@@ -44,6 +44,8 @@ Table anime_anime {
   season varchar(20) [null, index]
   status varchar(50) [index]
   rating varchar(40)
+  trailer_embed_url varchar(200) [default: ""]
+  trailer_checked_at datetime [null]
   created_at datetime [index]
   last_synced datetime
 }
