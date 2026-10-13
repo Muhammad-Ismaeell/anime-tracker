@@ -1,28 +1,44 @@
 # API Reference
 
-The backend exposes an OpenAPI schema and Swagger UI at `/api/schema/` and `/api/docs/`.
+The backend exposes an OpenAPI schema and Swagger UI for exploring and testing the API.
 
-Run locally with:
+- **OpenAPI schema:** `/api/schema/`
+- **Swagger UI:** `/api/docs/`
 
-```text
-http://127.0.0.1:8000/api/docs/
-```
+When running locally, open [Swagger UI](http://127.0.0.1:8000/api/docs/).
 
 ## Authentication
 
 Local authentication uses JWT access and refresh tokens.
 
-| Method | Endpoint | Purpose | Auth |
+| Method | Endpoint | Purpose | Authentication |
 |---|---|---|---|
-| POST | `/api/auth/register/` | Create account and send verification email | Public |
-| POST | `/api/auth/login/` | Log in a verified local account | Public |
-| POST | `/api/auth/refresh/` | Rotate refresh token and issue a new access token | Public with refresh token |
-| POST | `/api/auth/logout/` | Blacklist a refresh token | Public with token |
-| POST | `/api/auth/google/` | Authenticate with a Google ID token | Public |
-| GET | `/api/auth/me/` | Return current authenticated user | JWT |
-| GET | `/api/auth/verify-email/?token=...` | Verify email address | Public |
+| POST | `/api/auth/register/` | Create an account and send a verification email | Public |
+| POST | `/api/auth/resend-verification/` | Request an email verification link (throttled) | Public |
+| POST | `/api/auth/login/` | Log in to a verified local account | Public |
+| POST | `/api/auth/refresh/` | Rotate the refresh token and issue new access and refresh tokens | Public; refresh token in cookie or request body |
+| POST | `/api/auth/logout/` | Log out; blacklist the supplied refresh token if present | Public; optional refresh token in request body |
+| POST | `/api/auth/google/` | Authenticate with Google | Public |
+| GET | `/api/auth/me/` | Return the current authenticated user | JWT |
+| GET | `/api/auth/verify-email/?token=...` | Verify an email address | Public |
 
-Access tokens are sent by the frontend as:
+### Email verification
+
+Local registration creates an account and sends an email verification link. Users must verify their email addresses before logging in with their usernames and passwords. Verification links expire after 24 hours.
+
+Users can request another verification link through `POST /api/auth/resend-verification/`. This endpoint accepts an email address and returns a generic response to avoid revealing whether an account exists or is already verified. Requests are rate-limited to help prevent abuse.
+
+The email verification endpoint requires a `token` query parameter. A valid token completes verification; missing, invalid, or expired tokens result in an error response.
+
+### Google authentication
+
+Google authentication uses a Google ID token. The backend verifies the token and requires the Google account's email address to be verified. Users can authenticate with an existing linked account or have an account created automatically.
+
+Google-authenticated accounts do not need to complete Anime Tracker's separate email verification process.
+
+### Authorization
+
+For protected endpoints, the frontend sends the access token in the HTTP `Authorization` header:
 
 ```text
 Authorization: Bearer <access-token>
@@ -30,77 +46,107 @@ Authorization: Bearer <access-token>
 
 ## Anime discovery
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/anime/top/` | Top anime catalogue |
-| GET | `/api/anime/search/` | Search/filter anime catalogue |
-| GET | `/api/anime/seasonal/` | Seasonal anime |
-| GET | `/api/anime/trending/` | Trending anime |
-| GET | `/api/anime/recently-added/` | Recently added anime |
-| GET | `/api/anime/recommendations/` | General recommendations |
-| GET | `/api/anime/characters/` | General character discovery |
-| GET | `/api/anime/news/` | General news endpoint |
-
-## Anime detail
-
-Replace `{anime_id}` with the provider/MAL identifier stored by the application.
+These endpoints provide anime discovery, catalogue browsing, and search functionality.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/anime/{anime_id}/` | Core anime detail, including optional trailer metadata |
-| GET | `/api/anime/{anime_id}/recommendations/` | Recommendations for a title |
-| GET | `/api/anime/{anime_id}/episodes/` | Episode data |
-| GET | `/api/anime/{anime_id}/characters/` | Characters |
-| GET | `/api/anime/{anime_id}/staff/` | Staff |
-| GET | `/api/anime/{anime_id}/statistics/` | Anime statistics |
-| GET | `/api/anime/{anime_id}/relations/` | Related titles |
-| GET | `/api/anime/{anime_id}/themes/` | Opening/ending themes |
-| GET | `/api/anime/{anime_id}/news/` | Anime news |
-| GET | `/api/anime/{anime_id}/external-links/` | External links |
+| GET | `/api/anime/top/` | Retrieve top anime |
+| GET | `/api/anime/search/` | Search and filter anime |
+| GET | `/api/anime/seasonal/` | Retrieve seasonal anime |
+| GET | `/api/anime/trending/` | Retrieve trending anime |
+| GET | `/api/anime/recently-added/` | Retrieve recently added anime |
+| GET | `/api/anime/recommendations/` | Retrieve general recommendations |
+| GET | `/api/anime/characters/` | Discover characters |
+| GET | `/api/anime/news/` | Retrieve general anime news |
+
+### Anime search parameters
+
+The `GET /api/anime/search/` endpoint supports the following optional query parameters:
+
+| Parameter | Purpose |
+|---|---|
+| `q` | Search query |
+| `page` | Page number |
+| `type` | Filter by anime type |
+| `season` | Filter by season |
+| `year` | Filter by year |
+| `status` | Filter by status |
+| `rating` | Filter by content rating |
+| `genres` | Filter by genres |
+| `order_by` | Choose the ordering field |
+| `sort` | Choose the sort direction |
+| `min_score` | Filter by minimum score |
+
+Example:
+
+`/api/anime/search/?q=naruto&page=1&min_score=7`
+
+## Anime details
+
+Replace `{anime_id}` with the anime identifier used by the application.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/anime/{anime_id}/` | Retrieve anime details, including optional trailer metadata |
+| GET | `/api/anime/{anime_id}/recommendations/` | Retrieve recommendations for a title |
+| GET | `/api/anime/{anime_id}/episodes/` | Retrieve episode information |
+| GET | `/api/anime/{anime_id}/characters/` | Retrieve characters and voice actors |
+| GET | `/api/anime/{anime_id}/staff/` | Retrieve staff information |
+| GET | `/api/anime/{anime_id}/statistics/` | Retrieve anime statistics |
+| GET | `/api/anime/{anime_id}/relations/` | Retrieve related titles |
+| GET | `/api/anime/{anime_id}/themes/` | Retrieve opening and ending themes |
+| GET | `/api/anime/{anime_id}/news/` | Retrieve news for a title |
+| GET | `/api/anime/{anime_id}/external-links/` | Retrieve external links |
 
 ## User features
 
-| Method | Endpoint | Purpose | Auth |
+These endpoints support user profiles, favourites, personal libraries, activity, dashboards, and reviews.
+
+| Method | Endpoint | Purpose | Authentication |
 |---|---|---|---|
-| GET | `/api/users/profile/` | Get profile | JWT |
-| PATCH | `/api/users/profile/update/` | Update profile | JWT |
+| GET | `/api/users/profile/` | Retrieve the user's profile | JWT |
+| PATCH | `/api/users/profile/update/` | Update the user's profile | JWT |
 | GET | `/api/users/favorites/` | List favourites | JWT |
-| POST | `/api/users/favorites/toggle/` | Add/remove favourite | JWT |
-| GET | `/api/users/favorites/ids/` | Return favourite anime IDs | JWT |
+| POST | `/api/users/favorites/toggle/` | Add or remove a favourite | JWT |
+| GET | `/api/users/favorites/ids/` | Retrieve favourite anime IDs | JWT |
 | GET | `/api/users/library/` | List library entries | JWT |
-| POST/PATCH | `/api/users/library/update/` | Update anime status/progress | JWT |
-| DELETE | `/api/users/library/{anime_id}/` | Remove from library | JWT |
-| GET | `/api/users/activity/` | Activity feed | JWT |
-| GET | `/api/users/library/stats/` | Library statistics | JWT |
-| GET | `/api/users/dashboard/` | Dashboard data | JWT |
-| POST | `/api/users/reviews/` | Create review | JWT |
-| GET | `/api/users/reviews/{anime_id}/` | Reviews for anime | Public/auth as configured |
-| PATCH | `/api/users/reviews/{review_id}/update/` | Update own review | JWT |
-| DELETE | `/api/users/reviews/{review_id}/delete/` | Delete own review | JWT |
-| GET | `/api/users/reviews/my-reviews/` | Current user's reviews | JWT |
-| GET | `/api/users/reviews/analytics/` | Review analytics | JWT |
-| GET | `/api/users/reviews/top-rated/` | Top-rated anime | JWT |
+| POST | `/api/users/library/update/` | Create or update anime status and progress | JWT |
+| DELETE | `/api/users/library/{anime_id}/` | Remove an anime from the library | JWT |
+| GET | `/api/users/activity/` | Retrieve the activity feed | JWT |
+| GET | `/api/users/library/stats/` | Retrieve library statistics | JWT |
+| GET | `/api/users/dashboard/` | Retrieve dashboard data | JWT |
+| POST | `/api/users/reviews/` | Create a review or update an existing review | JWT |
+| GET | `/api/users/reviews/{anime_id}/` | Retrieve reviews for an anime | Public |
+| PUT | `/api/users/reviews/{review_id}/update/` | Update the user's own review | JWT |
+| DELETE | `/api/users/reviews/{review_id}/delete/` | Delete the user's own review | JWT |
+| GET | `/api/users/reviews/my-reviews/` | Retrieve the current user's reviews | JWT |
+| GET | `/api/users/reviews/analytics/` | Retrieve review analytics | JWT |
+| GET | `/api/users/reviews/top-rated/` | Retrieve top-rated anime | JWT |
 
 ## Response conventions
 
-The API primarily returns JSON. Discovery endpoints use paginated response data, while detail endpoints group the normalized object under an `item` key. Error responses use the application's centralized exception handler.
+The API primarily returns JSON. Response structures and available parameters vary by endpoint. Consult the OpenAPI schema and Swagger UI for the expected request and response formats.
 
-The exact schema is generated by drf-spectacular, so Swagger/OpenAPI should be treated as the authoritative contract when developing against the API.
+Error responses use the application's centralized exception handler.
+
+The schema is generated by drf-spectacular and serves as the reference for clients integrating with the API.
 
 ## Trailer data
 
-The anime detail response includes an optional `trailer` object. When the upstream provider supplies an embeddable trailer URL, the backend returns it as `trailer.embed_url`; otherwise the value is empty and the frontend omits the trailer section.
+The anime detail response can include an optional `trailer` object. When the upstream provider supplies an embeddable trailer URL, the backend returns it as `trailer.embed_url`. If no suitable URL is available, the value is empty and the frontend omits the trailer section.
 
-The frontend embeds the returned trailer URL in a dedicated responsive player on the anime detail page. Any upstream `autoplay` query parameter is removed before embedding, so the trailer does not start automatically and the user controls playback with the player's Play button.
+The frontend displays the trailer in a responsive player on the anime detail page. Any upstream `autoplay` query parameter is removed before embedding, allowing the user to start playback manually.
 
-Example:
+Example response fragment:
 
 ```json
 {
   "item": {
     "trailer": {
-      "embed_url": "https://www.youtube.com/embed/..."
+      "embed_url": "https://www.youtube.com/embed/VIDEO_ID"
     }
   }
 }
 ```
+
+`VIDEO_ID` is a placeholder. The actual value depends on the trailer supplied by the upstream provider.
